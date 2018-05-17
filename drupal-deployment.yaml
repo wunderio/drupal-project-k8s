@@ -43,9 +43,7 @@ spec:
           value: drupal
         - name: DB_HOST_DRUPAL
           value: drupal-mysql
-        - name: WORDPRESS_DB_HOST
-          value: drupal-mysql
-        - name: WORDPRESS_DB_PASSWORD
+        - name: DB_PASS_DRUPAL
           valueFrom:
             secretKeyRef:
               name: mysql-pass
@@ -55,10 +53,15 @@ spec:
           name: drupal
         volumeMounts:
         - name: drupal-files-volume
-          mountPath: /var/www/html
+          mountPath: /var/www/html/web/sites/default/files
+        - name: drupal-web-volume
+          mountPath: /var/www/html/web
       volumes:
       - name: drupal-files-volume
         persistentVolumeClaim:
           claimName: drupal-files-volume-claim
+      - name: drupal-web-volume
+        persistentVolumeClaim:
+          claimName: drupal-web-volume-claim
 
 

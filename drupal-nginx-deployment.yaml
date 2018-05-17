@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drupal-frontend
+  labels:
+    app: drupal
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: drupal
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: drupal-frontend
+  labels:
+    app: drupal
+spec:
+  selector:
+    matchLabels:
+      app: drupal
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: drupal
+        tier: frontend
+    spec:
+      containers:
+      - image: wodby/drupal-nginx:8-1.13-3.0.2
+        name: nginx
+        env:
+        - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE
+          value: "off"
+        - name: NGINX_ERROR_LOG_LEVEL
+          value: debug
+        - name: GINX_BACKEND_HOST
+          value: drupal
+        - name: NGINX_SERVER_ROOT
+          value: /var/www/html/web
+        ports:
+        - containerPort: 80
+          name: drupal
+        volumeMounts:
+        - name: drupal-files-volume
+          mountPath: /var/www/html/web
+          readOnly: true
+      volumes:
+      - name: drupal-files-volume
+        persistentVolumeClaim:
+          claimName: drupal-files-volume-claim
+
+

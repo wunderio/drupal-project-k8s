@@ -12,19 +12,6 @@ spec:
     tier: mysql
   clusterIP: None
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: drupal-db-pv-claim
-  labels:
-    app: drupal
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
----
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -57,9 +44,9 @@ spec:
         - containerPort: 3306
           name: mysql
         volumeMounts:
-        - name: drupal-db-persistent-storage
+        - name: drupal-mysql-volume
           mountPath: /var/lib/mysql
       volumes:
-      - name: drupal-db-persistent-storage
+      - name: drupal-mysql-volume
         persistentVolumeClaim:
-          claimName: drupal-db-pv-claim
+          claimName: drupal-mysql-volume-claim

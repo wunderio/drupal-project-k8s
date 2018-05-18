@@ -32,18 +32,18 @@ spec:
         tier: drupal
     spec:
       containers:
-      - image: sergejss/reponame:1
+      - image: sergejss/drupal:2
         name: drupal
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"
-        - name: DB_USER_DRUPAL
+        - name: DB_USER
           value: drupal
-        - name: DB_NAME_DRUPAL
+        - name: DB_NAME
           value: drupal
-        - name: DB_HOST_DRUPAL
+        - name: DB_HOST
           value: drupal-mysql
-        - name: DB_PASS_DRUPAL
+        - name: DB_PASS
           valueFrom:
             secretKeyRef:
               name: mysql-pass
@@ -51,17 +51,17 @@ spec:
         ports:
         - containerPort: 80
           name: drupal
-        volumeMounts:
-        - name: drupal-files-volume
-          mountPath: /var/www/html/web/sites/default/files
-        - name: drupal-web-volume
-          mountPath: /var/www/html/web
-      volumes:
-      - name: drupal-files-volume
-        persistentVolumeClaim:
-          claimName: drupal-files-volume-claim
-      - name: drupal-web-volume
-        persistentVolumeClaim:
-          claimName: drupal-web-volume-claim
+#        volumeMounts:
+#        - name: drupal-files-volume
+#          mountPath: /var/www/html/web/sites/default/files
+#        - name: drupal-web-volume
+#          mountPath: /var/www/html/web
+#      volumes:
+#      - name: drupal-files-volume
+#        persistentVolumeClaim:
+#          claimName: drupal-files-volume-claim
+#      - name: drupal-web-volume
+#        persistentVolumeClaim:
+#          claimName: drupal-web-volume-claim
 
 

@@ -34,13 +34,13 @@ spec:
       containers:
       - image: sergejss/drupal:2
         name: drupal
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - "cp"
-                - "/gitvolume/web/sites/default/settings.php"
-                - "/var/www/html/web/sites/default/settings.php"
+#        lifecycle:
+#          postStart:
+#            exec:
+#              command:
+#                - "cp"
+#                - "/gitvolume/web/sites/default/settings.php"
+#                - "/var/www/html/web/sites/default/settings.php"
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"

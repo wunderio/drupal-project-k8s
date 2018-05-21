@@ -46,19 +46,19 @@ spec:
         ports:
         - containerPort: 80
           name: drupal
-#        volumeMounts:
-#        - name: drupal-files-volume
-#          mountPath: /var/www/html/web/sites/default/files
-#          readOnly: true
-#        - name: drupal-web-volume
-#          mountPath: /var/www/html/web
-#          readOnly: true
-#      volumes:
-#      - name: drupal-files-volume
-#        persistentVolumeClaim:
-#          claimName: drupal-files-volume-claim
-#      - name: drupal-web-volume
-#        persistentVolumeClaim:
-#          claimName: drupal-web-volume-claim
+        volumeMounts:
+        - name: drupal-files-volume
+          mountPath: /var/www/html/web/sites/default/files
+          readOnly: true
+        - name: drupal-web-volume
+          mountPath: /var/www/html/web
+          readOnly: true
+      volumes:
+      - name: drupal-files-volume
+        persistentVolumeClaim:
+          claimName: drupal-files-volume-claim
+      - name: drupal-web-volume
+        persistentVolumeClaim:
+          claimName: drupal-web-volume-claim
 
 

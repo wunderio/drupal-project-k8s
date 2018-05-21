@@ -34,16 +34,23 @@ spec:
       containers:
       - image: sergejss/drupal:2
         name: drupal
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - "cp"
+                - "/gitvolume/web/sites/default/settings.php"
+                - "/var/www/html/web/sites/default/settings.php"
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"
-        - name: DB_USER
+        - name: DB_USER_DRUPAL
           value: drupal
-        - name: DB_NAME
+        - name: DB_NAME_DRUPAL
           value: drupal
-        - name: DB_HOST
+        - name: DB_HOST_DRUPAL
           value: drupal-mysql
-        - name: DB_PASS
+        - name: DB_PASS_DRUPAL
           valueFrom:
             secretKeyRef:
               name: mysql-pass
@@ -51,17 +58,23 @@ spec:
         ports:
         - containerPort: 80
           name: drupal
-#        volumeMounts:
-#        - name: drupal-files-volume
-#          mountPath: /var/www/html/web/sites/default/files
-#        - name: drupal-web-volume
-#          mountPath: /var/www/html/web
-#      volumes:
-#      - name: drupal-files-volume
-#        persistentVolumeClaim:
-#          claimName: drupal-files-volume-claim
-#      - name: drupal-web-volume
-#        persistentVolumeClaim:
-#          claimName: drupal-web-volume-claim
+        volumeMounts:
+        - name: drupal-files-volume
+          mountPath: /var/www/html/web/sites/default/files
+        - name: drupal-web-volume
+          mountPath: /var/www/html/web
+        - name: gitvolume
+          mountPath: /gitvolume
+      volumes:
+      - name: drupal-files-volume
+        persistentVolumeClaim:
+          claimName: drupal-files-volume-claim
+      - name: drupal-web-volume
+        persistentVolumeClaim:
+          claimName: drupal-web-volume-claim
+      - name: gitvolume
+        gitRepo:
+          repository: "git@github.com:wunderio/drupal-project-k8s.git"
+          revision: "0b86ae871a9f37d252315090d9dde16461947a6e"
 
 

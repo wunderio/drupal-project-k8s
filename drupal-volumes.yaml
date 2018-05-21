@@ -6,14 +6,24 @@ metadata:
     type: local
     app: drupal
 spec:
-  storageClassName: manual
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 1Gi
+#  local:
   hostPath:
     path: /data/drupal-mysql-volume/
   persistentVolumeReclaimPolicy: Recycle
+### node affinity for future use
+#  nodeAffinity:
+#    required:
+#      nodeSelectorTerms:
+#      - matchExpressions:
+#        - key: kubernetes.io/hostname
+#          operator: In
+#          values:
+#          - my-node
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -23,14 +33,24 @@ metadata:
     type: local
     app: drupal
 spec:
-  storageClassName: manual
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 1Gi
+#  local:
   hostPath:
     path: /data/drupal-files-volume/
   persistentVolumeReclaimPolicy: Recycle
+### node affinity for future use
+#  nodeAffinity:
+#    required:
+#      nodeSelectorTerms:
+#      - matchExpressions:
+#        - key: kubernetes.io/hostname
+#          operator: In
+#          values:
+#          - my-node
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -40,21 +60,31 @@ metadata:
     type: local
     app: drupal
 spec:
-  storageClassName: manual
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 1Gi
+#  local:
   hostPath:
     path: /data/drupal-web-volume/
   persistentVolumeReclaimPolicy: Recycle
+### node affinity for future use
+#  nodeAffinity:
+#    required:
+#      nodeSelectorTerms:
+#      - matchExpressions:
+#        - key: kubernetes.io/hostname
+#          operator: In
+#          values:
+#          - my-node
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: drupal-mysql-volume-claim
 spec:
-  storageClassName: manual
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   resources:
@@ -66,7 +96,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: drupal-files-volume-claim
 spec:
-  storageClassName: manual
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   resources:
@@ -78,7 +108,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: drupal-web-volume-claim
 spec:
-  storageClassName: manual
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   resources:

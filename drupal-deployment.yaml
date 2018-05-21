@@ -63,8 +63,8 @@ spec:
           mountPath: /var/www/html/web/sites/default/files
         - name: drupal-web-volume
           mountPath: /var/www/html/web
-        - name: gitvolume
-          mountPath: /gitvolume
+#        - name: gitvolume
+#          mountPath: /gitvolume
       volumes:
       - name: drupal-files-volume
         persistentVolumeClaim:
@@ -72,9 +72,9 @@ spec:
       - name: drupal-web-volume
         persistentVolumeClaim:
           claimName: drupal-web-volume-claim
-      - name: gitvolume
-        gitRepo:
-          repository: "git@github.com:wunderio/drupal-project-k8s.git"
-          revision: "0b86ae871a9f37d252315090d9dde16461947a6e"
+#      - name: gitvolume
+#        gitRepo:
+#          repository: "git@github.com:wunderio/drupal-project-k8s.git"
+#          revision: "0b86ae871a9f37d252315090d9dde16461947a6e"
 
 

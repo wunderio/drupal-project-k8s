@@ -13,6 +13,7 @@ spec:
     storage: 1Gi
   hostPath:
     path: /data/drupal-mysql-volume/
+  persistentVolumeReclaimPolicy: Recycle
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -29,6 +30,7 @@ spec:
     storage: 1Gi
   hostPath:
     path: /data/drupal-files-volume/
+  persistentVolumeReclaimPolicy: Recycle
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -45,6 +47,7 @@ spec:
     storage: 1Gi
   hostPath:
     path: /data/drupal-web-volume/
+  persistentVolumeReclaimPolicy: Recycle
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

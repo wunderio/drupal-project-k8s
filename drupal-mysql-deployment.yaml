@@ -35,6 +35,12 @@ spec:
       - image: mariadb:10.2
         name: mysql
         env:
+        - name: MYSQL_USER
+          value: drupal
+        - name: MYSQL_PASSWORD
+          value: drupal
+        - name: MYSQL_DATABASE
+          value: drupal
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:

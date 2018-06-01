@@ -38,7 +38,10 @@ spec:
         - name: MYSQL_USER
           value: drupal
         - name: MYSQL_PASSWORD
-          value: drupal
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
         - name: MYSQL_DATABASE
           value: drupal
         - name: MYSQL_ROOT_PASSWORD

@@ -32,7 +32,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: sergejss/nginx:10
+      - image: eu.gcr.io/silta-204108/drupal-project-k8s-nginx:e9b3129b7caf0ce5ac37b9442cdd1404699b234c
         name: nginx
         env:
         - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE
@@ -50,6 +50,8 @@ spec:
         - name: drupal-files-volume
           mountPath: /var/www/html/web/sites/default/files
           readOnly: true
+      imagePullSecrets:
+      - name: gcr
       volumes:
       - name: drupal-files-volume
         persistentVolumeClaim:

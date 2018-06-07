@@ -32,7 +32,7 @@ spec:
         tier: drupal
     spec:
       containers:
-      - image: sergejss/drupal:10
+      - image: eu.gcr.io/silta-204108/drupal-project-k8s-drupal:e9b3129b7caf0ce5ac37b9442cdd1404699b234c
         name: drupal
         env:
         - name: PHP_FPM_CLEAR_ENV
@@ -54,6 +54,8 @@ spec:
         volumeMounts:
         - name: drupal-files-volume
           mountPath: /var/www/html/web/sites/default/files
+      imagePullSecrets:
+      - name: gcr
       volumes:
       - name: drupal-files-volume
         persistentVolumeClaim:

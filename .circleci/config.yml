@@ -4,82 +4,92 @@ jobs:
     docker:
       - image: wunderio/circleci-builder
 
-    steps:
-      - checkout
-
-      - run: phpcs --standard=phpcs.xml -s
-
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "composer.lock" }}
-
-      - run: composer install -n --prefer-dist --ignore-platform-reqs --no-dev
-
-      - save_cache:
-          paths:
-            - ./vendor
-            - ./web/core
-            - ./web/modules/contrib
-            - ./web/themes/contrib
-            - ./web/profiles/contrib
-            - ./web/libraries
-          key: v1-dependencies-{{ checksum "composer.lock" }}
-
-      - restore_cache:
-          keys:
-            - v1-yarn-{{ checksum "yarn.lock" }}
-            - v1-yarn-
-
-      - run: yarn install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-yarn-{{ checksum "yarn.lock" }}
-
-      # Set environment variables for Kontena CLI.
+#    steps:
+#      - checkout
+#
+#      - run: phpcs --standard=phpcs.xml -s
+#
+#      - restore_cache:
+#          keys:
+#            - v1-dependencies-{{ checksum "composer.lock" }}
+#
+#      - run: composer install -n --prefer-dist --ignore-platform-reqs --no-dev
+#
+#      - save_cache:
+#          paths:
+#            - ./vendor
+#            - ./web/core
+#            - ./web/modules/contrib
+#            - ./web/themes/contrib
+#            - ./web/profiles/contrib
+#            - ./web/libraries
+#          key: v1-dependencies-{{ checksum "composer.lock" }}
+#
+#      - restore_cache:
+#          keys:
+#            - v1-yarn-{{ checksum "yarn.lock" }}
+#            - v1-yarn-
+#
+#      - run: yarn install
+#
+#      - save_cache:
+#          paths:
+#            - node_modules
+#          key: v1-yarn-{{ checksum "yarn.lock" }}
+#
+#      # Set environment variables for Kontena CLI.
       - run: generate-kontena-config >> $BASH_ENV
 
       - setup_remote_docker
 
-      # Build the Docker image and push it to the repository.
       - run: |
-          docker login -u $KONTENA_DOCKER_USER -p $KONTENA_DOCKER_PASSWORD images.kontena.io
-          kontena stack build --name $STACK_NAME
-
-      # Create the volume for files if needed.
-      - run: kontena volume create --driver local --scope stack "${STACK_NAME}_files" || kontena volume show "${STACK_NAME}_files"
-
-      # Create or update the stack for the current branch.
-      - run: kontena stack install --name $STACK_NAME || kontena stack upgrade $STACK_NAME
+          echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
+      - run: |
+          gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+      - run: |
+          gcloud config set project silta-204108
+      - run: |
+          gcloud config set compute/zone europe-west2-a
+      - run: |
+          gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+      - run: | 
+          kubectl config get-contexts
+      - run: | 
+          kubectl create -f drupal-volumes-nfs.yaml
+      - run: | 
+          kubectl create -f drupal-mysql-deployment.yaml
+      - run: | 
+          kubectl create -f drupal-deployment.yaml
+      - run: | 
+          kubectl create -f drupal-nginx-deployment.yaml
 
       # Run drush commands within the deployed environment.
-      - run: |
-          bootstrapped=$(kontena service exec $STACK_NAME/drupal -- drush status --field=bootstrap)
+#      - run: |
+#          bootstrapped=$(kontena service exec $STACK_NAME/drupal -- drush status --field=bootstrap)
 
-          if [[ $bootstrapped = *'Success'* ]]
-          then
-            kontena service exec $STACK_NAME/drupal -- drush updatedb -n
-            test -d config/sync && kontena service exec $STACK_NAME/drupal -- drush config-import -n
-            kontena service exec $STACK_NAME/drupal -- drush entity-updates -n
-          else
+#          if [[ $bootstrapped = *'Success'* ]]
+#          then
+#            kontena service exec $STACK_NAME/drupal -- drush updatedb -n
+#            test -d config/sync && kontena service exec $STACK_NAME/drupal -- drush config-import -n
+#            kontena service exec $STACK_NAME/drupal -- drush entity-updates -n
+#          else
             # Install drupal if needed, alternatively you could import a database dump.
-            kontena service exec $STACK_NAME/drupal -- drush site-install -n config_installer
-          fi
+#            kontena service exec $STACK_NAME/drupal -- drush site-install -n config_installer
+#          fi
 
-      - run: |
-          echo "Deployment stack $STACK_NAME successfully, your site is available here: http://$VIRTUALHOST"
+#      - run: |
+#          echo "Deployment stack $STACK_NAME successfully, your site is available here: http://$VIRTUALHOST"
 
-  drupal-cron:
-    docker:
-      - image: wunderio/circleci-builder
+#  drupal-cron:
+#    docker:
+#      - image: wunderio/circleci-builder
 
-    steps:
+#    steps:
       # Set environment variables for Kontena CLI.
-      - run: generate-kontena-config >> $BASH_ENV
+#      - run: generate-kontena-config >> $BASH_ENV
 
-      - run: |
-          kontena service exec $STACK_NAME/drupal -- drush cron
+#      - run: |
+#          kontena service exec $STACK_NAME/drupal -- drush cron
 
 workflows:
   version: 2
@@ -87,14 +97,14 @@ workflows:
     jobs:
       - build_and_deploy:
           context: dev_wdr_io
-  cron:
-    triggers:
-      - schedule:
-          cron: "0 * * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - drupal-cron:
-          context: dev_wdr_io
+#  cron:
+#    triggers:
+#      - schedule:
+#          cron: "0 * * * *"
+#          filters:
+#            branches:
+#              only:
+#                - master
+#    jobs:
+#      - drupal-cron:
+#          context: dev_wdr_io

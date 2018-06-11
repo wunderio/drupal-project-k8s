@@ -4,8 +4,8 @@ jobs:
     docker:
       - image: wunderio/circleci-builder
 
-#    steps:
-#      - checkout
+    steps:
+      - checkout
 #
 #      - run: phpcs --standard=phpcs.xml -s
 #
@@ -42,26 +42,16 @@ jobs:
 
       - setup_remote_docker
 
-      - run: |
-          echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
-      - run: |
-          gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-      - run: |
-          gcloud config set project silta-204108
-      - run: |
-          gcloud config set compute/zone europe-west2-a
-      - run: |
-          gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
-      - run: | 
-          kubectl config get-contexts
-      - run: | 
-          kubectl create -f drupal-volumes-nfs.yaml
-      - run: | 
-          kubectl create -f drupal-mysql-deployment.yaml
-      - run: | 
-          kubectl create -f drupal-deployment.yaml
-      - run: | 
-          kubectl create -f drupal-nginx-deployment.yaml
+      - run: echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
+      - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+      - run: gcloud config set project silta-204108
+      - run: gcloud config set compute/zone europe-west2-a
+      - run: gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+      - run: kubectl config get-contexts
+      - run: kubectl create -f drupal-volumes-nfs.yaml
+      - run: kubectl create -f drupal-mysql-deployment.yaml
+      - run: kubectl create -f drupal-deployment.yaml
+      - run: kubectl create -f drupal-nginx-deployment.yaml
 
       # Run drush commands within the deployed environment.
 #      - run: |

@@ -2,7 +2,7 @@ version: 2
 jobs:
   build_and_deploy:
     docker:
-      - image: wunderio/circleci-builder
+      - image: wunderio/circleci-builder:k8s
 
     steps:
       - checkout
@@ -48,10 +48,8 @@ jobs:
       - run: gcloud config set compute/zone europe-west2-a
       - run: gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
       - run: kubectl config get-contexts
-      - run: kubectl create -f drupal-volumes-nfs.yaml
-      - run: kubectl create -f drupal-mysql-deployment.yaml
-      - run: kubectl create -f drupal-deployment.yaml
-      - run: kubectl create -f drupal-nginx-deployment.yaml
+      - run: ihelm init 
+      - run: helm install chart
 
       # Run drush commands within the deployed environment.
 #      - run: |

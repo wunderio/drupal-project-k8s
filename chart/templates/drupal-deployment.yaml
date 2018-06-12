@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drupal-drupal
+  labels:
+    app: drupal
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: drupal
+    tier: drupal
+  clusterIP: None
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: drupal-drupal
+  labels:
+    app: drupal
+spec:
+  selector:
+    matchLabels:
+      app: drupal
+      tier: drupal
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: drupal
+        tier: drupal
+    spec:
+      containers:
+      - image: eu.gcr.io/silta-204108/drupal-project-k8s-drupal:e9b3129b7caf0ce5ac37b9442cdd1404699b234c
+        name: drupal
+        env:
+        - name: PHP_FPM_CLEAR_ENV
+          value: "no"
+        - name: DB_USER
+          value: drupal
+        - name: DB_NAME
+          value: drupal
+        - name: DB_HOST
+          value: drupal-mysql
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 80
+          name: drupal
+        volumeMounts:
+        - name: drupal-files-volume
+          mountPath: /var/www/html/web/sites/default/files
+      imagePullSecrets:
+      - name: gcr
+      volumes:
+      - name: drupal-files-volume
+        persistentVolumeClaim:
+          claimName: drupal-files-volume-claim
+
+

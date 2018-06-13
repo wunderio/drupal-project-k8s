@@ -48,8 +48,8 @@ jobs:
       - run: gcloud config set compute/zone europe-west2-a
       - run: gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
       - run: kubectl config get-contexts
-      - run: helm init 
-      - run: helm install chart
+#      - run: helm init 
+#      - run: helm install chart
 
       # Run drush commands within the deployed environment.
 #      - run: |

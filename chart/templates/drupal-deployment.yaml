@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: drupal-drupal
+  name: {{ .Release.Name }}-drupal-drupal
   labels:
     app: drupal
 spec:
@@ -15,7 +15,7 @@ spec:
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: drupal-drupal
+  name: {{ .Release.Name }}-drupal-drupal
   labels:
     app: drupal
 spec:
@@ -32,7 +32,7 @@ spec:
         tier: drupal
     spec:
       containers:
-      - image: eu.gcr.io/silta-204108/drupal-project-k8s-drupal:e9b3129b7caf0ce5ac37b9442cdd1404699b234c
+      - image: {{ .Values.drupal.image.repository }}:{{ .Values.drupal.image.tag }}
         name: drupal
         env:
         - name: PHP_FPM_CLEAR_ENV
@@ -42,7 +42,7 @@ spec:
         - name: DB_NAME
           value: drupal
         - name: DB_HOST
-          value: drupal-mysql
+          value: {{ .Release.Name }}-drupal-mysql
         - name: DB_PASS
           valueFrom:
             secretKeyRef:
@@ -59,6 +59,6 @@ spec:
       volumes:
       - name: drupal-files-volume
         persistentVolumeClaim:
-          claimName: drupal-files-volume-claim
+          claimName: {{ template "drupal.full_name" . }}-files-volume-claim
 
 

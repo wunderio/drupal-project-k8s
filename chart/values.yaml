@@ -1,0 +1,10 @@
+nginx:
+  image:
+    repository: eu.gcr.io/silta-204108/drupal-project-k8s-nginx 
+    tag: 'e9b3129b7caf0ce5ac37b9442cdd1404699b234c'
+
+drupal:
+  image:
+    repository: eu.gcr.io/silta-204108/drupal-project-k8s-drupal 
+    tag: 'e9b3129b7caf0ce5ac37b9442cdd1404699b234c'
+

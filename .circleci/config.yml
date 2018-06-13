@@ -2,7 +2,7 @@ version: 2
 jobs:
   build_and_deploy:
     docker:
-      - image: sergejss/circleci-builder
+      - image: wunderio/circleci-builder:k8s
 
     steps:
       - checkout

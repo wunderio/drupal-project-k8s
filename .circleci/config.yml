@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  phpcs:
     parallelism: 1
     docker:
       - image: wunderio/circleci-builder:k8s
@@ -9,6 +9,14 @@ jobs:
       - checkout
 
       - run: phpcs --standard=phpcs.xml -s
+      
+  build:
+    parallelism: 1
+    docker:
+      - image: wunderio/circleci-builder:k8s
+
+    steps:
+      - checkout
 
       - restore_cache:
           keys:
@@ -59,14 +67,21 @@ jobs:
 
   deploy:
     parallelism: 1
+    docker:
+      - image: wunderio/circleci-builder:k8s
+
     steps:
-      - run: echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
-      - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-      - run: gcloud config set project silta-204108
-      - run: gcloud config set compute/zone europe-west2-a
-      - run: gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
-      - run: kubectl config get-contexts
-      - run: helm init 
+      - checkout
+
+    steps: 
+      - run: |
+          echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
+          gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+          gcloud config set project silta-204108
+          gcloud config set compute/zone europe-west2-a
+          gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+          kubectl config get-contexts
+          helm init 
       - run: helm install chart
 
       # Run drush commands within the deployed environment.
@@ -101,6 +116,8 @@ workflows:
   version: 2
   commit:
     jobs:
+      - phpcs:
+          context: dev_wdr_io
       - build:
           context: dev_wdr_io
       - deploy:

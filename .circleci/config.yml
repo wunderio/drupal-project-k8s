@@ -62,15 +62,14 @@ jobs:
     docker:
       - image: wunderio/circleci-builder:k8s
     steps:
-      - run: |
-          echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
-          gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-          gcloud config set project silta-204108
-          gcloud config set compute/zone europe-west2-a
-          gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
-          kubectl config get-contexts
-          helm init 
-          helm install chart
+      - run: echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
+      - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+      - run: gcloud config set project silta-204108
+      - run: gcloud config set compute/zone europe-west2-a
+      - run: gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+      - run: kubectl config get-contexts
+      - run: helm init 
+      - run: helm install chart
 
       # Run drush commands within the deployed environment.
 #      - run: |

@@ -58,4 +58,4 @@ spec:
       volumes:
       - name: drupal-mysql-volume
         persistentVolumeClaim:
-          claimName: {{ template "drupal.full_name" . }}-mysql-volume-claim
+          claimName: {{ .Release.Name }}-mysql-claim

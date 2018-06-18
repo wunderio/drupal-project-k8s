@@ -59,6 +59,6 @@ spec:
       volumes:
       - name: drupal-files-volume
         persistentVolumeClaim:
-          claimName: {{ template "drupal.full_name" . }}-files-volume-claim
+          claimName: {{ .Release.Name }}-files-claim
 
 

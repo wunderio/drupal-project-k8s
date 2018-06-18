@@ -73,7 +73,6 @@ jobs:
     steps:
       - checkout
 
-    steps: 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
           gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json

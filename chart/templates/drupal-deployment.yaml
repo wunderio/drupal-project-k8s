@@ -4,12 +4,14 @@ metadata:
   name: {{ .Release.Name }}-drupal-drupal
   labels:
     app: drupal
+    release: {{ .Release.Name }}
 spec:
   ports:
     - port: 80
   selector:
     app: drupal
     tier: drupal
+    release: {{ .Release.Name }}
   clusterIP: None
 ---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
@@ -18,11 +20,13 @@ metadata:
   name: {{ .Release.Name }}-drupal-drupal
   labels:
     app: drupal
+    release: {{ .Release.Name }}
 spec:
   selector:
     matchLabels:
       app: drupal
       tier: drupal
+      release: {{ .Release.Name }}
   strategy:
     type: Recreate
   template:
@@ -30,6 +34,7 @@ spec:
       labels:
         app: drupal
         tier: drupal
+        release: {{ .Release.Name }}
     spec:
       containers:
       - image: {{ .Values.drupal.image.repository }}:{{ .Values.drupal.image.tag }}

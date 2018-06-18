@@ -4,12 +4,14 @@ metadata:
   name: {{ .Release.Name }}-drupal-frontend
   labels:
     app: drupal
+    release: {{ .Release.Name }}
 spec:
   ports:
     - port: 80
   selector:
     app: drupal
     tier: frontend
+    release: {{ .Release.Name }}
   type: LoadBalancer
 ---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
@@ -23,6 +25,7 @@ spec:
     matchLabels:
       app: drupal
       tier: frontend
+      release: {{ .Release.Name }}
   strategy:
     type: Recreate
   template:
@@ -30,6 +33,7 @@ spec:
       labels:
         app: drupal
         tier: frontend
+        release: {{ .Release.Name }}
     spec:
       containers:
       - image: {{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}

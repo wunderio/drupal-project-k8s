@@ -4,12 +4,14 @@ metadata:
   name: {{ .Release.Name }}-drupal-mysql
   labels:
     app: drupal
+    release: {{ .Release.Name }}
 spec:
   ports:
     - port: 3306
   selector:
     app: drupal
     tier: mysql
+    release: {{ .Release.Name }}
   clusterIP: None
 ---
 apiVersion: apps/v1beta2
@@ -18,11 +20,13 @@ metadata:
   name: {{ .Release.Name }}-drupal-mysql
   labels:
     app: drupal
+    release: {{ .Release.Name }}
 spec:
   selector:
     matchLabels:
       app: drupal
       tier: mysql
+      release: {{ .Release.Name }}
   strategy:
     type: Recreate
   template:
@@ -30,6 +34,7 @@ spec:
       labels:
         app: drupal
         tier: mysql
+        release: {{ .Release.Name }}
     spec:
       containers:
       - image: mariadb:10.2

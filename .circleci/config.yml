@@ -81,7 +81,7 @@ jobs:
           gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
           kubectl config get-contexts
           helm init 
-      - run: helm install chart
+      - run: helm install chart --name {{$CIRCLE_BRANCH}}-{{$CIRCLE_PR_REPONAME}}
 
       # Run drush commands within the deployed environment.
 #      - run: |

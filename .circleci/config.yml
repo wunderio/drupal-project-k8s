@@ -83,7 +83,7 @@ jobs:
 
       - run: |
           helm dependency build
-          helm install chart --wait --name `echo $CIRCLE_BRANCH | sed  -e 's/_/-/g'`-`echo $CIRCLE_PROJECT_REPONAME | sed  -e 's/_/-/g'`
+          helm install ./chart --wait --name `echo $CIRCLE_BRANCH | sed  -e 's/_/-/g'`-`echo $CIRCLE_PROJECT_REPONAME | sed  -e 's/_/-/g'`
 
       # Run drush commands within the deployed environment.
 #      - run: |

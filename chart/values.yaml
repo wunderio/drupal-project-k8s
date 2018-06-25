@@ -12,3 +12,7 @@ drupal:
 mariadb:
   replication:
     enabled: false
+
+  db:
+    name: drupal
+    user: drupal

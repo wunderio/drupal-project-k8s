@@ -49,19 +49,17 @@ jobs:
 
       - setup_remote_docker
 
-      # Build the Nginx image and push it to the repository.
       - run: |
           #echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $DOCKER_REPO_HOST
           echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
+
+          # Build the Nginx image and push it to the repository.
           docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-nginx:$DOCKER_IMAGE_VERSION web
           docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-nginx:$DOCKER_IMAGE_VERSION
-      # Build the Drupal image and push it to the repository.
-      - run: |
-          #echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $DOCKER_REPO_HOST
-          echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
+
+          # Build the Drupal image and push it to the repository.
           docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-drupal:$DOCKER_IMAGE_VERSION .
           docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-drupal:$DOCKER_IMAGE_VERSION
-
 
   deploy:
     docker:

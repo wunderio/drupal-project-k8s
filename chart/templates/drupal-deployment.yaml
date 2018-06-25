@@ -51,8 +51,8 @@ spec:
         - name: DB_PASS
           valueFrom:
             secretKeyRef:
-              name: mysql-pass
-              key: password
+              name: {{ .Release.Name }}-mariadb
+              key: mariadb-password
         ports:
         - containerPort: 80
           name: drupal

@@ -45,7 +45,8 @@ jobs:
           key: v1-yarn-{{ checksum "yarn.lock" }}
 
       # Set environment variables for Kontena CLI.
-      - run: generate-kontena-config >> $BASH_ENV
+      - run: |
+         generate-kontena-config >> $BASH_ENV
 
       - setup_remote_docker
 
@@ -68,6 +69,9 @@ jobs:
     steps:
       - checkout
 
+      # Set environment variables for Helm.
+      - run: echo 'export RELEASE_NAME="${CIRCLE_PROJECT_REPONAME//[^[:alnum:]]/-}-${CIRCLE_BRANCH//[^[:alnum:]]/-}"' >> $BASH_ENV
+
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
           gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
@@ -81,8 +85,7 @@ jobs:
 
       - run: |
           helm dependency build ./chart
-          CHART_NAME="${CIRCLE_PROJECT_REPONAME//[^[:alnum:]]/-}-${CIRCLE_BRANCH//[^[:alnum:]]/-}"
-          helm install ./chart --wait --name $CHART_NAME || helm upgrade --wait $CHART_NAME ./chart
+          helm install ./chart --wait --name $RELEASE_NAME || helm upgrade --wait $RELEASE_NAME ./chart
 
       # Run drush commands within the deployed environment.
 #      - run: |

@@ -88,21 +88,22 @@ jobs:
           helm install ./chart --wait --name $RELEASE_NAME || helm upgrade --wait $RELEASE_NAME ./chart
 
       # Run drush commands within the deployed environment.
-#      - run: |
-#          bootstrapped=$(kontena service exec $STACK_NAME/drupal -- drush status --field=bootstrap)
+      - run: |
 
-#          if [[ $bootstrapped = *'Success'* ]]
-#          then
-#            kontena service exec $STACK_NAME/drupal -- drush updatedb -n
-#            test -d config/sync && kontena service exec $STACK_NAME/drupal -- drush config-import -n
-#            kontena service exec $STACK_NAME/drupal -- drush entity-updates -n
-#          else
+          bootstrapped=$(kubectl exec $RELEASE_NAME-drupal -- drush status --field=bootstrap)
+
+          if [[ $bootstrapped = *'Success'* ]]
+          then
+            kubectl exec $RELEASE_NAME-drupal -- drush updatedb -n
+            test -d config/sync && kubectl exec $RELEASE_NAME-drupal -- drush config-import -n
+            kubectl exec $RELEASE_NAME-drupal -- drush entity-updates -n
+          else
             # Install drupal if needed, alternatively you could import a database dump.
-#            kontena service exec $STACK_NAME/drupal -- drush site-install -n config_installer
-#          fi
+            kubectl exec $RELEASE_NAME-drupal -- drush site-install -n config_installer
+          fi
 
-#      - run: |
-#          echo "Deployment stack $STACK_NAME successfully, your site is available here: http://$VIRTUALHOST"
+      - run: |
+          echo "Deployment stack $STACK_NAME successfully, your site is available here: http://$VIRTUALHOST"
 
   drupal-cron:
     docker:

@@ -47,7 +47,7 @@ spec:
         - name: DB_NAME
           value: drupal
         - name: DB_HOST
-          value: {{ .Release.Name }}-drupal-mysql
+          value: {{ .Release.Name }}-mariadb
         - name: DB_PASS
           valueFrom:
             secretKeyRef:

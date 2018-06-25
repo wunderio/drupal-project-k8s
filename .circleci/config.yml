@@ -1,7 +1,6 @@
 version: 2
 jobs:
   phpcs:
-    parallelism: 1
     docker:
       - image: wunderio/circleci-builder:k8s
 
@@ -11,7 +10,6 @@ jobs:
       - run: phpcs --standard=phpcs.xml -s
       
   build:
-    parallelism: 1
     docker:
       - image: wunderio/circleci-builder:k8s
 
@@ -66,7 +64,6 @@ jobs:
 
 
   deploy:
-    parallelism: 1
     docker:
       - image: wunderio/circleci-builder:k8s
 

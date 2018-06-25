@@ -82,7 +82,7 @@ jobs:
       - run: |
           helm dependency build ./chart
           CHART_NAME="${CIRCLE_PROJECT_REPONAME//[^[:alnum:]]/-}-${CIRCLE_BRANCH//[^[:alnum:]]/-}"
-          helm install ./chart --wait --name $CHART_NAME
+          helm install ./chart --wait --name $CHART_NAME || helm upgrade --wait $CHART_NAME ./chart
 
       # Run drush commands within the deployed environment.
 #      - run: |

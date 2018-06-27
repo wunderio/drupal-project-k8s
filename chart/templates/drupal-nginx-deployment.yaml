@@ -44,7 +44,7 @@ spec:
         - name: NGINX_ERROR_LOG_LEVEL
           value: debug
         - name: NGINX_BACKEND_HOST
-          value: {{ .Release.Name }}-drupal-drupal
+          value: {{ .Release.Name }}-drupal
         - name: NGINX_SERVER_ROOT
           value: /var/www/html/web
         ports:

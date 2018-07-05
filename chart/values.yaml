@@ -16,3 +16,6 @@ mariadb:
   db:
     name: drupal
     user: drupal
+
+ingress:
+  hostname: "silta.wdr.io"

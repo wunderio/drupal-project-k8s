@@ -6,8 +6,7 @@ metadata:
     app: drupal
     release: {{ .Release.Name }}
 spec:
-  # Skip nfs storage for now
-  # storageClassName: nfs
+  storageClassName: standard
   accessModes:
     - ReadWriteMany
   resources:

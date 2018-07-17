@@ -120,8 +120,7 @@ workflows:
   version: 2
   commit:
     jobs:
-      - phpcs:
-          context: dev_wdr_io
+      - phpcs
       - build:
           context: dev_wdr_io
       - deploy:

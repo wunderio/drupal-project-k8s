@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-files-claim
+  name: {{ .Release.Name }}-public-files
   labels:
     app: drupal
     release: {{ .Release.Name }}

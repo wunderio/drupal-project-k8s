@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
           - name: drupal-cron
-            image: "{{ .Values.drupal.image}}"
+            image: "{{ .Values.drupal.image }}"
             args:
             - drush cron
             env:
@@ -21,10 +21,10 @@ spec:
             - name: DB_NAME
               value: drupal
             - name: DB_HOST
-              value: {{ .Release.Name }}-mariadb
+              value: "{{ .Release.Name }}-mariadb"
             - name: DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-mariadb
+                  name: "{{ .Release.Name }}-mariadb"
                   key: mariadb-password
           restartPolicy: OnFailure

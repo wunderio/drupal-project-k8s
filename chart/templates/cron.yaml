@@ -13,8 +13,9 @@ spec:
           containers:
           - name: drupal-cron
             image: "{{ .Values.drupal.image }}"
-            args:
-            - drush cron
+            command:
+            - drush
+            - cron
             env:
             - name: PHP_FPM_CLEAR_ENV
               value: "no"

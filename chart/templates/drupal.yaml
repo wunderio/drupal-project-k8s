@@ -37,7 +37,7 @@ spec:
         release: {{ .Release.Name }}
     spec:
       containers:
-      - image: {{ .Values.drupal.image }}
+      - image: {{ .Values.drupal.image | quote }}
         name: drupal
         env:
         - name: PHP_FPM_CLEAR_ENV

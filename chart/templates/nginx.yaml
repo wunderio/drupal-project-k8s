@@ -36,7 +36,7 @@ spec:
         release: {{ .Release.Name }}
     spec:
       containers:
-      - image: {{ .Values.nginx.image }}
+      - image: {{ .Values.nginx.image | quote }}
         name: nginx
         env:
         - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE

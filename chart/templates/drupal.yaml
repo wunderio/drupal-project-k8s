@@ -43,9 +43,9 @@ spec:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"
         - name: DB_USER
-          value: "{{ .Values.db.user }}"
+          value: "{{ .Values.mariadb.db.user }}"
         - name: DB_NAME
-          value: "{{ .Values.db.name }}"
+          value: "{{ .Values.mariadb.db.name }}"
         - name: DB_HOST
           value: {{ .Release.Name }}-mariadb
         - name: DB_PASS

@@ -4,6 +4,7 @@ metadata:
   name: drupal-cron
 spec:
   schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:

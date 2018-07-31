@@ -70,7 +70,9 @@ jobs:
       - checkout
 
       # Set environment variables for Helm.
-      - run: echo 'export RELEASE_NAME="${CIRCLE_PROJECT_REPONAME//[^[:alnum:]]/-}-${CIRCLE_BRANCH//[^[:alnum:]]/-}"' >> $BASH_ENV
+      - run: |
+          generate-kontena-config >> $BASH_ENV
+          echo 'export RELEASE_NAME="${CIRCLE_PROJECT_REPONAME//[^[:alnum:]]/-}-${CIRCLE_BRANCH//[^[:alnum:]]/-}"' >> $BASH_ENV
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json

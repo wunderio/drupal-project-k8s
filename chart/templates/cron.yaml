@@ -1,9 +1,10 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: drupal-cron
+  name: "{{ .Release.Name }}-drupal-cron"
 spec:
   schedule: "0 * * * *"
+  backOffLimit: 3
   jobTemplate:
     spec:
       template:

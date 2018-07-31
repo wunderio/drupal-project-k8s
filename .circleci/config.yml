@@ -8,7 +8,7 @@ jobs:
       - checkout
 
       - run: phpcs --standard=phpcs.xml -s
-      
+
   build:
     docker:
       - image: wunderio/circleci-builder:k8s
@@ -109,17 +109,6 @@ jobs:
       - run: |
           echo "Deployment stack $STACK_NAME successfully, your site is available here: http://$VIRTUALHOST"
 
-  drupal-cron:
-    docker:
-      - image: wunderio/circleci-builder
-
-    steps:
-      # Set environment variables for Kontena CLI.
-      - run: generate-kontena-config >> $BASH_ENV
-
-      - run: |
-          kontena service exec $STACK_NAME/drupal -- drush cron
-
 workflows:
   version: 2
   commit:
@@ -129,17 +118,6 @@ workflows:
           context: dev_wdr_io
       - deploy:
           context: dev_wdr_io
-          requires: 
+          requires:
             - build
 
-  cron:
-    triggers:
-      - schedule:
-          cron: "0 * * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - drupal-cron:
-          context: dev_wdr_io

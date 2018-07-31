@@ -1,8 +1,8 @@
 
 nginx:
-  image: null
+  image: 'ignore, overridden at build time'
 drupal:
-  image: null
+  image: 'ignore, overridden at build time'
 
 mariadb:
   persistence:

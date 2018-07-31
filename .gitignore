@@ -25,3 +25,6 @@
 
 # Ignore node modules
 node_modules
+
+# Ignore helm chart dependencies.
+chart/charts

@@ -85,7 +85,12 @@ jobs:
 
       - run: |
           helm dependency build ./chart
-          helm install ./chart --wait --name $RELEASE_NAME || helm upgrade --wait $RELEASE_NAME ./chart
+          helm install ./chart --wait --name $RELEASE_NAME
+
+          if [ $? = 1 ]
+          then
+            helm upgrade --wait $RELEASE_NAME ./chart
+          fi
 
       # Run drush commands within the deployed environment.
       - run: |

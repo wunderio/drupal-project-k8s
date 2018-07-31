@@ -1,4 +1,9 @@
 
+nginx:
+  image: null
+drupal:
+  image: null
+
 mariadb:
   persistence:
     storageClass: standard

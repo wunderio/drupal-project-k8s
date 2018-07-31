@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: drupal-cron
+  name: {{ .Release.Name }}-cron
 spec:
   schedule: "0 * * * *"
   concurrencyPolicy: Forbid

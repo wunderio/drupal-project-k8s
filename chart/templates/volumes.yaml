@@ -6,7 +6,7 @@ metadata:
     app: drupal
     release: {{ .Release.Name }}
 spec:
-  storageClassName: standard
+  storageClassName: nfs
   accessModes:
     - ReadWriteOnce
   resources:

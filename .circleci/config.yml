@@ -91,7 +91,9 @@ jobs:
 
           if [ $? = 1 ]
           then
-            helm upgrade --wait $RELEASE_NAME ./chart
+            helm upgrade --wait $RELEASE_NAME ./chart \
+             --set drupal.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-drupal:$DOCKER_IMAGE_VERSION \
+             --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-nginx:$DOCKER_IMAGE_VERSION
           fi
 
       # Run drush commands within the deployed environment.

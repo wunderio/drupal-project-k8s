@@ -1,0 +1,30 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: drupal-cron
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: drupal-cron
+            image: "{{ .Values.drupal.image}}"
+            args:
+            - drush cron
+            env:
+            - name: PHP_FPM_CLEAR_ENV
+              value: "no"
+            - name: DB_USER
+              value: drupal
+            - name: DB_NAME
+              value: drupal
+            - name: DB_HOST
+              value: {{ .Release.Name }}-mariadb
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mariadb
+                  key: mariadb-password
+          restartPolicy: OnFailure

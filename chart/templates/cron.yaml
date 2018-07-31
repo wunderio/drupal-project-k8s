@@ -1,9 +1,10 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: "{{ .Release.Name }}-drupal-cron"
+  name: {{ .Release.Name }}-cron
 spec:
   schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
   backOffLimit: 3
   jobTemplate:
     spec:
@@ -18,9 +19,9 @@ spec:
             - name: PHP_FPM_CLEAR_ENV
               value: "no"
             - name: DB_USER
-              value: drupal
+              value: "{{ .Values.mariadb.db.user }}"
             - name: DB_NAME
-              value: drupal
+              value: "{{ .Values.mariadb.db.name }}"
             - name: DB_HOST
               value: "{{ .Release.Name }}-mariadb"
             - name: DB_PASS

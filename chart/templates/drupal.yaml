@@ -37,15 +37,15 @@ spec:
         release: {{ .Release.Name }}
     spec:
       containers:
-      - image: {{ .Values.drupal.image }}
+      - image: {{ .Values.drupal.image | quote }}
         name: drupal
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"
         - name: DB_USER
-          value: drupal
+          value: "{{ .Values.mariadb.db.user }}"
         - name: DB_NAME
-          value: drupal
+          value: "{{ .Values.mariadb.db.name }}"
         - name: DB_HOST
           value: {{ .Release.Name }}-mariadb
         - name: DB_PASS

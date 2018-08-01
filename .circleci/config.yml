@@ -90,6 +90,7 @@ jobs:
           helm upgrade --install --wait $RELEASE_NAME ./chart \
             --set drupal.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-drupal:$DOCKER_IMAGE_VERSION \
             --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$DOCKER_IMAGE_PREFIX-nginx:$DOCKER_IMAGE_VERSION \
+            --namespace=$CIRCLE_PROJECT_REPONAME
 
       # Run drush commands within the deployed environment.
       - run: |

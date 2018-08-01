@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-drupal
+  name: {{ .Release.Name | lower }}-drupal
   labels:
     app: drupal
     release: {{ .Release.Name }}
@@ -17,7 +17,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-drupal
+  name: {{ .Release.Name | lower }}-drupal
   labels:
     app: drupal
     release: {{ .Release.Name }}
@@ -51,7 +51,7 @@ spec:
         - name: DB_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name | lower }}-mariadb
+              name: {{ .Release.Name }-mariadb
               key: mariadb-password
       {{- range $key, $val := .Values.drupal.env }}
         - name: {{ $key }}

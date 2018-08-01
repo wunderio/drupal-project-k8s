@@ -1,8 +1,9 @@
 
+# These variables are build-specific and should be passed via the --set parameter.
 nginx:
-  image: 'ignore, overridden at build time'
+  image: 'you need to pass in a value for nginx.image to your helm chart'
 drupal:
-  image: 'ignore, overridden at build time'
+  image: 'you need to pass in a value for drupal.image to your helm chart'
 
 mariadb:
   persistence:

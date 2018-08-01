@@ -53,10 +53,10 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-mariadb
               key: mariadb-password
-        {{- range $key, $val := .Values.drupal.env }}
-        - name: {{ $val }}
-          value: {{ $key | quote }}
-        {{- end }} 
+      {{- range $key, $val := .Values.drupal.env }}
+        - name: {{ $key }}
+          value: {{ $val | quote }}
+      {{- end }} 
         ports:
         - containerPort: 80
           name: drupal

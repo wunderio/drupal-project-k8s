@@ -3,6 +3,9 @@ nginx:
   image: 'ignore, overridden at build time'
 drupal:
   image: 'ignore, overridden at build time'
+  env:
+    ENV_VAR_1: 'env-var-one-value'
+    ENV_VAR_2: 'env-var-two-value'
 
 mariadb:
   persistence:

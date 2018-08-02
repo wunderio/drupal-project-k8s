@@ -4,6 +4,11 @@ nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 drupal:
   image: 'you need to pass in a value for drupal.image to your helm chart'
+  env:
+  #sample env vars - these will be added to drupal environment variables
+    ENV_VAR_1: 'env-var-one-value'
+    ENV_VAR_2: 'env-var-two-value'
+    ENV_VAR_3: 100
 
 mariadb:
   persistence:

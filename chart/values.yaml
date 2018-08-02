@@ -2,10 +2,11 @@
 nginx:
   image: 'ignore, overridden at build time'
 drupal:
-  image: 'ignore, overridden at build time'
+  image: 'you need to pass in a value for drupal.image to your helm chart'
   env:
     ENV_VAR_1: 'env-var-one-value'
     ENV_VAR_2: 'env-var-two-value'
+    ENV_VAR_3: 100
 
 mariadb:
   persistence:

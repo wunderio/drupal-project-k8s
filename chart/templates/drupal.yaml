@@ -65,5 +65,11 @@ spec:
       - name: drupal-files-volume
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-public-files
-
-
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-drupal-secrets
+type: Opaque
+data:
+  DRUPAL_USER_PW_HASH_SALT: dGhpcy1pcy10ZXN0LXNhbHQtdmFsdWUK # needs to to base64

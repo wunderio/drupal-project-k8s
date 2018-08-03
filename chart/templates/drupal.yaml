@@ -53,6 +53,11 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-mariadb
               key: mariadb-password
+        - name: DRUPAL_USER_PW_HASH_SALT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-drupal-secrets
+              key: DRUPAL_USER_PW_HASH_SALT
         ports:
         - containerPort: 80
           name: drupal
@@ -72,4 +77,4 @@ metadata:
   name: {{ .Release.Name }}-drupal-secrets
 type: Opaque
 data:
-  DRUPAL_USER_PW_HASH_SALT: dGhpcy1pcy10ZXN0LXNhbHQtdmFsdWUK # needs to to base64
+  DRUPAL_USER_PW_HASH_SALT: $(echo -n "this-is-secret" | base64) # needs to to base64

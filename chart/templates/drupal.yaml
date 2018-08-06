@@ -77,4 +77,4 @@ metadata:
   name: {{ .Release.Name }}-drupal-secrets
 type: Opaque
 data:
-  DRUPAL_USER_PW_HASH_SALT: {{ env DRUPAL_USER_PW_HASH_SALT | b64enc }} # needs to to base64
+  DRUPAL_USER_PW_HASH_SALT: {{ .Environment.DRUPAL_USER_PW_HASH_SALT | b64enc }} # needs to to base64

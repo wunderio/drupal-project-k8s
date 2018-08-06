@@ -1,13 +1,4 @@
 version: 2
-dependencies:
-  pre:
-    # read secrets created with "openssl aes-256-cbc -e -in .secrets -out secrets.enc -k $KEY"
-    # $KEY should be defined in circle ci project environment
-    - openssl aes-256-cbc -d -in secrets.enc -k {{ .Environment.ENC_KEY_DEV }} >> ~/.circlerc
-test:
-  override:
-    - "echo DRUPAL_USER_PW_HASH_SALT: $DRUPAL_USER_PW_HASH_SALT"
-
 jobs:
   phpcs:
     docker:
@@ -78,6 +69,10 @@ jobs:
       - run: |
           LOWERCASE_BRANCH=${CIRCLE_BRANCH,,}
           echo "export RELEASE_NAME='${LOWERCASE_BRANCH//[^[:alnum:]]/-}'" >> $BASH_ENV
+
+      # read secrets created with "openssl aes-256-cbc -e -in .secrets -out secrets.enc -k $ENC_KEY"
+      - run: |
+          openssl aes-256-cbc -d -in secrets.enc -k $ENC_KEY >> $BASH_ENV
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json

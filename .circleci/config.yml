@@ -3,7 +3,7 @@ dependencies:
   pre:
     # read secrets created with "openssl aes-256-cbc -e -in .secrets -out secrets.enc -k $KEY"
     # $KEY should be defined in circle ci project environment
-    - openssl aes-256-cbc -d -in secrets.enc -k {{ .Environment.KEY }} >> ~/.circlerc
+    - openssl aes-256-cbc -d -in secrets.enc -k {{ .Environment.ENC_KEY_DEV }} >> ~/.circlerc
 test:
   override:
     - "echo DRUPAL_USER_PW_HASH_SALT: $DRUPAL_USER_PW_HASH_SALT"

@@ -89,21 +89,6 @@ jobs:
             --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$CIRCLE_PROJECT_REPONAME-nginx:$CIRCLE_SHA1 \
             --namespace=$CIRCLE_PROJECT_REPONAME
 
-      # Run drush commands within the deployed environment.
-      - run: |
-
-          bootstrapped=$(kubectl exec $RELEASE_NAME-drupal -- drush status --field=bootstrap)
-
-          if [[ $bootstrapped = *'Success'* ]]
-          then
-            kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush updatedb -n
-            test -d config/sync && kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush config-import -n
-            kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush entity-updates -n
-          else
-            # Install drupal if needed, alternatively you could import a database dump.
-            kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush site-install -n config_installer
-          fi
-
       # TODO: output the right domain.
       - run: |
           echo "Deployed $RELEASE_NAME successfully, your site is available here: http://$DOMAIN"

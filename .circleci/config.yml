@@ -96,12 +96,12 @@ jobs:
 
           if [[ $bootstrapped = *'Success'* ]]
           then
-            kubectl exec $RELEASE_NAME-drupal -- drush updatedb -n
-            test -d config/sync && kubectl exec $RELEASE_NAME-drupal -- drush config-import -n
-            kubectl exec $RELEASE_NAME-drupal -- drush entity-updates -n
+            kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush updatedb -n
+            test -d config/sync && kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush config-import -n
+            kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush entity-updates -n
           else
             # Install drupal if needed, alternatively you could import a database dump.
-            kubectl exec $RELEASE_NAME-drupal -- drush site-install -n config_installer
+            kubectl exec --namespace=$CIRCLE_PROJECT_REPONAME $RELEASE_NAME-drupal -- drush site-install -n config_installer
           fi
 
       # TODO: output the right domain.

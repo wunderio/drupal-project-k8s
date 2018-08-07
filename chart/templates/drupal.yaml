@@ -58,8 +58,6 @@ spec:
       - image: {{ .Values.drupal.image | quote }}
         name: drupal
         env:
-        - name: PHP_FPM_CLEAR_ENV
-          value: "no"
         - name: DB_USER
           value: "{{ .Values.mariadb.db.user }}"
         - name: DB_NAME
@@ -71,6 +69,10 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-mariadb
               key: mariadb-password
+      {{- range $key, $val := .Values.drupal.env }}
+        - name: {{ $key }}
+          value: {{ $val | quote }}
+      {{- end }} 
         ports:
         - containerPort: 9000
           name: drupal

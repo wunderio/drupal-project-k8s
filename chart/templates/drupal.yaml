@@ -6,12 +6,12 @@ metadata:
     app: drupal
     release: {{ .Release.Name }}
 spec:
+  type: NodePort
   ports:
     - port: 80
   selector:
     app: drupal
     release: {{ .Release.Name }}
-  clusterIP: None
 ---
 apiVersion: apps/v1
 kind: Deployment

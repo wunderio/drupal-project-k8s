@@ -15,7 +15,7 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ .Release.Name }}-nginx
+              serviceName: {{ .Release.Name }}-drupal
               servicePort: 80
 {{- if .Values.ingress.tls }}
   tls:

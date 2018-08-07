@@ -10,7 +10,6 @@ spec:
     - port: 80
   selector:
     app: drupal
-    tier: drupal
     release: {{ .Release.Name }}
   clusterIP: None
 ---
@@ -25,7 +24,6 @@ spec:
   selector:
     matchLabels:
       app: drupal
-      tier: drupal
       release: {{ .Release.Name }}
   strategy:
     type: Recreate
@@ -33,10 +31,30 @@ spec:
     metadata:
       labels:
         app: drupal
-        tier: drupal
         release: {{ .Release.Name }}
     spec:
       containers:
+      - image: {{ .Values.nginx.image | quote }}
+        name: nginx
+        resources:
+          requests:
+            cpu: "50m"
+        env:
+        - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE
+          value: "off"
+        - name: NGINX_ERROR_LOG_LEVEL
+          value: debug
+        - name: NGINX_BACKEND_HOST
+          value: localhost
+        - name: NGINX_SERVER_ROOT
+          value: /var/www/html/web
+        ports:
+        - containerPort: 80
+          name: drupal
+        volumeMounts:
+        - name: drupal-files-volume
+          mountPath: /var/www/html/web/sites/default/files
+
       - image: {{ .Values.drupal.image | quote }}
         name: drupal
         env:
@@ -54,7 +72,7 @@ spec:
               name: {{ .Release.Name }}-mariadb
               key: mariadb-password
         ports:
-        - containerPort: 80
+        - containerPort: 9000
           name: drupal
         volumeMounts:
         - name: drupal-files-volume

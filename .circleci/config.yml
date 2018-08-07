@@ -84,10 +84,13 @@ jobs:
       - run: |
           helm dependency build ./chart
 
-          helm upgrade --install --wait $RELEASE_NAME ./chart \
+          helm upgrade --install $RELEASE_NAME ./chart \
             --set drupal.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$CIRCLE_PROJECT_REPONAME-drupal:$CIRCLE_SHA1 \
             --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$CIRCLE_PROJECT_REPONAME-nginx:$CIRCLE_SHA1 \
             --namespace=$CIRCLE_PROJECT_REPONAME
+
+      # Wait for the kubernetes deployment to be complete.
+      - run: kubectl rollout status deployment/$RELEASE_NAME-drupal --namespace=$CIRCLE_PROJECT_REPONAME --watch
 
       # TODO: output the right domain.
       - run: |

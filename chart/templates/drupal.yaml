@@ -69,6 +69,11 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-mariadb
               key: mariadb-password
+        - name: HASH_SALT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets-drupal
+              key: hashsalt
       {{- range $key, $val := .Values.drupal.env }}
         - name: {{ $key }}
           value: {{ $val | quote }}

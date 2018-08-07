@@ -81,14 +81,15 @@ jobs:
           echo $CIRCLE_BRANCH
           echo $CIRCLE_PROJECT_REPONAME
       
-      # Read and decrypt secrets and create volumes
-      - run: |
-          # read secrets (created with "openssl aes-256-cbc -e -in secrets -out secrets.enc -k $ENC_KEY")
-          ARGS=$(openssl aes-256-cbc -d -base64 -in secrets.enc -k $ENC_KEY | while \ 
-          read line ; do echo -n "--from-literal=$line "; done)
-          # generate secrets volumes for use in pods
-          kubectl create secret generic $RELEASE_NAME-drupal-secrets \ 
-          --namespace=$CIRCLE_PROJECT_REPONAME $ARGS
+      # # Read and decrypt secrets and create volumes
+      # # TODO: agree on concept for secrets management and consider using for sensitive secrets
+      # - run: |
+      #     # read secrets (created with "openssl aes-256-cbc -e -in secrets -out secrets.enc -k $ENC_KEY")
+      #     ARGS=$(openssl aes-256-cbc -d -base64 -in secrets.enc -k $ENC_KEY | while \ 
+      #     read line ; do echo -n "--from-literal=$line "; done)
+      #     # generate secrets volumes for use in pods
+      #     kubectl create secret generic $RELEASE_NAME-drupal-secrets \ 
+      #     --namespace=$CIRCLE_PROJECT_REPONAME $ARGS
 
 
       - run: |

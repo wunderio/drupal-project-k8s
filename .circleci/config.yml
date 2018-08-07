@@ -84,8 +84,8 @@ jobs:
       # Read and decrypt secrets and create volumes
       - run: |
           # read secrets (created with "openssl aes-256-cbc -e -in secrets -out secrets.enc -k $ENC_KEY")
-          ARGS=$(openssl aes-256-cbc -d -base64 -in secrets.enc -k $ENC_KEY | \ 
-          while read line ; do echo -n "--from-literal=$line "; done)
+          ARGS=$(openssl aes-256-cbc -d -base64 -in secrets.enc -k $ENC_KEY | while \ 
+          read line ; do echo -n "--from-literal=$line "; done)
           # generate secrets volumes for use in pods
           kubectl create secret generic $RELEASE_NAME-drupal-secrets \ 
           --namespace=$CIRCLE_PROJECT_REPONAME $ARGS

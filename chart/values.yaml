@@ -14,10 +14,12 @@ mariadb:
       storageClass: standard
   replication:
     enabled: false
-
+  rootUser: drupal
+    password: "$(DB_ROOT_PASS)"
   db:
     name: drupal
     user: drupal
+    password: "$(DB_USER_PASS)"
 
 ingress:
   hostname: "silta.wdr.io"

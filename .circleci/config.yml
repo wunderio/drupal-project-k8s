@@ -115,8 +115,14 @@ workflows:
     jobs:
       - phpcs
       - build:
-          context: dev_wdr_io
+          context: 
+            - dev_wdr_io
+            - global_all
+            - global_nonprod
       - deploy:
-          context: dev_wdr_io
+          context: 
+            - dev_wdr_io
+            - global_all
+            - global_nonprod
           requires:
             - build

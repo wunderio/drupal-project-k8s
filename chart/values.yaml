@@ -23,3 +23,6 @@ mariadb:
 
 ingress:
   hostname: "silta.wdr.io"
+
+secrets:
+    hashsalt: "template-hash-salt"

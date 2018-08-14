@@ -91,7 +91,6 @@ jobs:
       #     kubectl create secret generic $RELEASE_NAME-drupal-secrets \ 
       #     --namespace=$CIRCLE_PROJECT_REPONAME $ARGS
 
-
       - run: |
           helm dependency build ./chart
 
@@ -115,14 +114,8 @@ workflows:
     jobs:
       - phpcs
       - build:
-          context: 
-            - dev_wdr_io
-            - global_all
-            - global_nonprod
+          context: global_nonprod
       - deploy:
-          context: 
-            - dev_wdr_io
-            - global_all
-            - global_nonprod
+          context: global_nonprod
           requires:
             - build

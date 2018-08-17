@@ -8,7 +8,12 @@ metadata:
     {{- range $key, $value := .Values.ingress.annotations }}
       {{ $key }}: {{ $value | quote }}
     {{- end }}
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "gce"
 spec:
+  backend:
+    serviceName: {{ .Release.Name }}-drupal
+    servicePort: 80
   rules:
     - host: {{ .Values.ingress.hostname }}
       http:

@@ -1,5 +1,6 @@
-# Dockerfile for building nginx.
-FROM wodby/drupal-nginx:8-1.13-3.0.4
+# Dockerfile for runing nginx
+FROM wunderio/drupal-nginx
 
-COPY . /var/www/html/web
+COPY --chown=www-data:www-data . /var/www/html/web
 
+WORKDIR /var/www/html/web/

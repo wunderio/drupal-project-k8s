@@ -1,5 +1,5 @@
 # Dockerfile for the Drupal container.
-FROM wodby/drupal-php:7.1-3.4.0
+FROM wodby/php:7.1-4.5.3
 
 COPY --chown=www-data:www-data . /var/www/html
 USER www-data

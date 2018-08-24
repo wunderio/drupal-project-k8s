@@ -1,4 +1,3 @@
-# Dockerfile for the Drupal container.
 FROM php:7.1.21-fpm-alpine3.8
 
 COPY --chown=www-data:www-data . /var/www/html
@@ -13,7 +12,9 @@ RUN set -ex; \
         vim \
         su-exec;\
     docker-php-ext-install \
-        mysqli \
+        sockets \
+	    mysqli \
+	    pdo \ 
         pdo_mysql; \
     # Install drush.
     su-exec wodby composer global require drush/drush:^8.0; \

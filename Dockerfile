@@ -1,5 +1,5 @@
 # Dockerfile for the Drupal container.
-FROM wodby/base-php:7.1
+FROM php:7.1.21-fpm-alpine3.8
 
 COPY --chown=www-data:www-data . /var/www/html
 USER root
@@ -7,6 +7,11 @@ USER root
 RUN set -ex; \
     # Install composer
     wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; \
+    # Add apps
+    apk add --update --no-cache -t .php-rundeps \
+	mariadb-client \
+        vim \
+        su-exec;\
     # Install drush.
     su-exec wodby composer global require drush/drush:^8.0; \
     mkdir -p -m +w /var/www/html/web/sites/default/files; \

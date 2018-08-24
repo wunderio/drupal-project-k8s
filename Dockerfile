@@ -7,7 +7,7 @@ USER root
 RUN set -ex; \
     # Install composer
     wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; \
-    # Install drush
+    # Install drush.
     su-exec wodby composer global require drush/drush:^8.0; \
     mkdir -p -m +w /var/www/html/web/sites/default/files; \
     chown -R www-data:www-data /var/www/html/web/sites/default/files

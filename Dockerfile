@@ -9,9 +9,12 @@ RUN set -ex; \
     wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; \
     # Add apps
     apk add --update --no-cache -t .php-rundeps \
-	    mariadb-client=10.1.32-r0 \
+	    mariadb-client \
         vim \
         su-exec;\
+    docker-php-ext-install \
+        mysqli \
+        pdo_mysql; \
     # Install drush.
     su-exec wodby composer global require drush/drush:^8.0; \
     mkdir -p -m +w /var/www/html/web/sites/default/files; \

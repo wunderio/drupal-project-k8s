@@ -16,7 +16,7 @@ RUN set -ex; \
 	    mysqli \
 	    pdo \ 
         pdo_mysql; \
-    # Install drush.
+    # Install drush
     su-exec wodby composer global require drush/drush:^8.0; \
     mkdir -p -m +w /var/www/html/web/sites/default/files; \
     chown -R www-data:www-data /var/www/html/web/sites/default/files

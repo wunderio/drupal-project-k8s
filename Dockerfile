@@ -9,7 +9,7 @@ RUN set -ex; \
     wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; \
     # Add apps
     apk add --update --no-cache -t .php-rundeps \
-	mariadb-client \
+	    mariadb-client=10.1.32-r0 \
         vim \
         su-exec;\
     # Install drush.

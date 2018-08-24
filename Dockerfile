@@ -1,4 +1,5 @@
 # Dockerfile for the Drupal container.
+# based on https://github.com/docker-library/drupal/blob/master/Dockerfile-alpine.template
 FROM php:7.1.21-fpm-alpine3.8
 
 COPY --chown=www-data:www-data . /var/www/html

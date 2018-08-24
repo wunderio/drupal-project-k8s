@@ -17,6 +17,8 @@ RUN set -ex; \
 	    pdo \ 
         pdo_mysql; \
     # Install drush
-    su-exec wodby composer global require drush/drush:^8.0; \
+    su-exec www-data composer global require drush/drush:^8.0; \
+    ln -s /home/www-data/.composer/vendor/bin/drush /usr/local/bin/drush; \
+    # Create directory for shared files
     mkdir -p -m +w /var/www/html/web/sites/default/files; \
     chown -R www-data:www-data /var/www/html/web/sites/default/files

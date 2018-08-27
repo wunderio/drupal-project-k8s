@@ -1,5 +1,11 @@
 # Forked and adapted from https://hub.docker.com/r/petronetto/php7-alpine/
 FROM alpine:3.7
+USER root
+
+RUN addgroup -g 1000 -S www-data && \
+	adduser -u 1000 -D -S -s /sbin/nologin -G www-data www-data
+
+COPY --chown=www-data:www-data . /var/www/html
 
 LABEL maintainer="wunder.io"
 LABEL org.label-schema.name="PHP7 Alpine" \
@@ -41,7 +47,7 @@ ENV PHP_MEMORY_LIMIT=256M \
     PHP_MAX_UPLOAD_FILESIZE=10M \
     PHP_MAX_FILE_UPLOADS=20 \
     PHP_MAX_INPUT_TIME=60 \
-    PHP_DATE_TIMEZONE=America/Sao_Paulo \
+    PHP_DATE_TIMEZONE=Europe/Helsinki \
     PHP_VARIABLES_ORDER=EGPCS \
     PHP_REQUEST_ORDER=GP \
     PHP_SESSION_SERIALIZE_HANDLER=php_binary \
@@ -166,23 +172,20 @@ COPY ./conf/php-fpm.conf /etc/php7/php-fpm.conf
 COPY ./conf/xdebug.ini /etc/php7/conf.d/xdebug.ini
 COPY ./conf/newrelic.ini /etc/php7/conf.d/newrelic.ini
 
-RUN addgroup -g 1000 -S www-admin && \
-	adduser -u 1000 -D -S -s /sbin/nologin -G www-admin www-admin
-
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 RUN set -ex; \
+    apk add --update --no-cache -t .php-rundeps mariadb-client; \
     # Install drush
     apk add --update --no-cache -t .php-rundeps su-exec; \
-    su-exec www-admin composer global require drush/drush:^${DRUSH_VERSION}; \
-    apk del su-exec; \
-    ln -s /home/www-admin/.composer/vendor/bin/drush /usr/local/bin/drush; \
+    su-exec www-data composer global require drush/drush:^${DRUSH_VERSION}; \
+    ln -s /home/www-data/.composer/vendor/bin/drush /usr/local/bin/drush; \
     # Create directory for shared files
     mkdir -p -m +w /var/www/html/web/sites/default/files; \
-    chown -R www-admin:www-admin /var/www/html/web/sites/default/files
+    chown -R www-data:www-data /var/www/html/web/sites/default/files
 
 WORKDIR /var/www/html/web/
 
-USER www-admin
+USER www-data
 
 CMD ["/usr/sbin/php-fpm7"]

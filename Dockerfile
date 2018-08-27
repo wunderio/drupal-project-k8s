@@ -158,11 +158,11 @@ RUN apk add --update --no-cache --virtual .build-deps git file re2c autoconf mak
     # \
     apk del .build-deps
 
-COPY ./config/php.ini /etc/php7/php.ini
-COPY ./config/www.conf /etc/php7/php-fpm.d/www.conf
-COPY ./config/php-fpm.conf /etc/php7/php-fpm.conf
-COPY ./config/xdebug.ini /etc/php7/conf.d/xdebug.ini
-COPY ./config/newrelic.ini /etc/php7/conf.d/newrelic.ini
+COPY ./conf/php.ini /etc/php7/php.ini
+COPY ./conf/www.conf /etc/php7/php-fpm.d/www.conf
+COPY ./conf/php-fpm.conf /etc/php7/php-fpm.conf
+COPY ./conf/xdebug.ini /etc/php7/conf.d/xdebug.ini
+COPY ./conf/newrelic.ini /etc/php7/conf.d/newrelic.ini
 
 RUN addgroup -g 1000 -S www-data && \
 	adduser -u 1000 -D -S -h /app -s /sbin/nologin -G www-data www-data

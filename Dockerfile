@@ -5,6 +5,8 @@ LABEL maintainer="wunder.io"
 LABEL org.label-schema.name="PHP7 Alpine" \
       org.label-schema.description="PHP7 with basic plugins"
 
+ENV DRUSH_VERSION=8.0
+
 ENV PHP_VERSION=7.1.17-r0 \
     IGBINARY_VERSION=2.0.4 \
     PHP_MEMCACHED_VERSION=3.0.3 \
@@ -164,26 +166,23 @@ COPY ./conf/php-fpm.conf /etc/php7/php-fpm.conf
 COPY ./conf/xdebug.ini /etc/php7/conf.d/xdebug.ini
 COPY ./conf/newrelic.ini /etc/php7/conf.d/newrelic.ini
 
-RUN addgroup -g 1000 -S www-data && \
-	adduser -u 1000 -D -S -h /app -s /sbin/nologin -G www-data www-data
+RUN addgroup -g 1000 -S www-admin && \
+	adduser -u 1000 -D -S -s /sbin/nologin -G www-admin www-admin
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 RUN set -ex; \
-    # Add apps
-    apk add --update --no-cache -t .php-rundeps \
-        mariadb-client \
-        vim \
-        su-exec;\
     # Install drush
-    su-exec www-data composer global require drush/drush:^8.0; \
-    ln -s /home/www-data/.composer/vendor/bin/drush /usr/local/bin/drush; \
+    apk add --update --no-cache -t .php-rundeps su-exec; \
+    su-exec www-admin composer global require drush/drush:^${DRUSH_VERSION}; \
+    apk del su-exec; \
+    ln -s /home/www-admin/.composer/vendor/bin/drush /usr/local/bin/drush; \
     # Create directory for shared files
     mkdir -p -m +w /var/www/html/web/sites/default/files; \
-    chown -R www-data:www-data /var/www/html/web/sites/default/files
+    chown -R www-admin:www-admin /var/www/html/web/sites/default/files
 
-WORKDIR /app
+WORKDIR /var/www/html/web/
 
-USER www-data
+USER www-admin
 
 CMD ["/usr/sbin/php-fpm7"]

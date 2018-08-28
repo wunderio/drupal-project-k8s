@@ -1,4 +1,35 @@
-# Forked and adapted from https://hub.docker.com/r/petronetto/php7-alpine/
+# BSD 3-Clause License
+#
+# Copyright (c) 2017, Juliano Petronetto
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# * Neither the name of the copyright holder nor the names of its
+#   contributors may be used to endorse or promote products derived from
+#   this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Based on https://github.com/petronetto/php7-alpine/blob/master/php-fpm/Dockerfile
+
 FROM alpine:3.7
 USER root
 
@@ -9,7 +40,7 @@ COPY --chown=www-data:www-data . /var/www/html
 
 LABEL maintainer="wunder.io"
 LABEL org.label-schema.name="PHP7 Alpine" \
-      org.label-schema.description="PHP7 with basic plugins"
+      org.label-schema.description="PHP7 with common plugins, composer and drush"
 
 ENV DRUSH_VERSION=8.0
 
@@ -121,10 +152,9 @@ RUN apk add --update --no-cache \
     php7-xdebug \
     php7=${PHP_VERSION}
 
-RUN rm -rf /etc/php7/php.ini && \
-    mkdir /app
+RUN rm -rf /etc/php7/php.ini
 
-RUN apk add --update --no-cache libmemcached rabbitmq-c
+RUN apk add --update --no-cache libmemcached
 
 RUN mkdir /opt && \
     cd /opt && \
@@ -132,7 +162,7 @@ RUN mkdir /opt && \
     gzip -dc newrelic-php5-${NEWRELIC_VERSION}-linux-musl.tar.gz | tar xf - && \
     ./newrelic-php5-${NEWRELIC_VERSION}-linux-musl/newrelic-install install
 
-RUN apk add --update --no-cache --virtual .build-deps git file re2c autoconf make g++ php7-dev=${PHP_VERSION} libmemcached-dev cyrus-sasl-dev zlib-dev musl rabbitmq-c-dev pcre-dev && \
+RUN apk add --update --no-cache --virtual .build-deps git file re2c autoconf make g++ php7-dev=${PHP_VERSION} libmemcached-dev cyrus-sasl-dev zlib-dev musl pcre-dev && \
     git clone --depth=1 -b ${IGBINARY_VERSION} https://github.com/igbinary/igbinary.git /tmp/php-igbinary && \
     cd /tmp/php-igbinary && \
     phpize && ./configure CFLAGS="-O2 -g" --enable-igbinary && make && make install && \
@@ -151,12 +181,12 @@ RUN apk add --update --no-cache --virtual .build-deps git file re2c autoconf mak
     # cd .. && rm -rf /tmp/php-redis/ && \
     # echo 'extension=redis.so' >> /etc/php7/conf.d/redis.ini && \
     # \
-    git clone --depth=1 -b v${PHP_AMQP_VERSION} https://github.com/pdezwart/php-amqp.git /tmp/php-amqp && \
-    cd /tmp/php-amqp && \
-    phpize && ./configure && make && make install && \
-    cd .. && rm -rf /tmp/php-amqp/ && \
-    echo 'extension=amqp.so' >> /etc/php7/conf.d/amqp.ini && \
-    \
+    # git clone --depth=1 -b v${PHP_AMQP_VERSION} https://github.com/pdezwart/php-amqp.git /tmp/php-amqp && \
+    # cd /tmp/php-amqp && \
+    # phpize && ./configure && make && make install && \
+    # cd .. && rm -rf /tmp/php-amqp/ && \
+    # echo 'extension=amqp.so' >> /etc/php7/conf.d/amqp.ini && \
+    # \
     # git clone --depth=1 -b ${MONGO_PHP_DRIVER_VERSION} https://github.com/mongodb/mongo-php-driver.git /tmp/php-mongodb && \
     # cd /tmp/php-mongodb && \
     # git submodule update --init && \

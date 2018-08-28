@@ -42,7 +42,8 @@ LABEL maintainer="wunder.io"
 LABEL org.label-schema.name="PHP7 Alpine" \
       org.label-schema.description="PHP7 with common plugins, composer and drush"
 
-ENV DRUSH_VERSION=8.0
+ENV DRUSH_VERSION=8.0 \
+    PHP_IMGMAGICK_VERSION=3.4.3
 
 ENV PHP_VERSION=7.1.17-r0 \
     IGBINARY_VERSION=2.0.4 \
@@ -112,44 +113,51 @@ RUN apk upgrade --update --no-cache && \
     bash
 
 RUN apk add --update --no-cache \
-    php7-session=${PHP_VERSION} \
-    php7-mcrypt=${PHP_VERSION} \
-    php7-soap=${PHP_VERSION} \
-    php7-openssl=${PHP_VERSION} \
-    php7-gmp=${PHP_VERSION} \
-    php7-pdo_odbc=${PHP_VERSION} \
-    php7-json=${PHP_VERSION} \
-    php7-dom=${PHP_VERSION} \
-    php7-pdo=${PHP_VERSION} \
-    php7-zip=${PHP_VERSION} \
-    php7-mysqli=${PHP_VERSION} \
-    php7-sqlite3=${PHP_VERSION} \
-    php7-pdo_pgsql=${PHP_VERSION} \
     php7-bcmath=${PHP_VERSION} \
-    php7-gd=${PHP_VERSION} \
-    php7-odbc=${PHP_VERSION} \
-    php7-pdo_mysql=${PHP_VERSION} \
-    php7-pdo_sqlite=${PHP_VERSION} \
-    php7-gettext=${PHP_VERSION} \
-    php7-xmlreader=${PHP_VERSION} \
-    php7-xmlwriter=${PHP_VERSION} \
-    php7-xmlrpc=${PHP_VERSION} \
-    php7-xml=${PHP_VERSION} \
-    php7-simplexml=${PHP_VERSION} \
     php7-bz2=${PHP_VERSION} \
-    php7-iconv=${PHP_VERSION} \
-    php7-pdo_dblib=${PHP_VERSION} \
-    php7-curl=${PHP_VERSION} \
+    php7-calendar=${PHP_VERSION} \
     php7-ctype=${PHP_VERSION} \
-    php7-pcntl=${PHP_VERSION} \
-    php7-posix=${PHP_VERSION} \
-    php7-phar=${PHP_VERSION} \
-    php7-opcache=${PHP_VERSION} \
-    php7-mbstring=${PHP_VERSION} \
+    php7-curl=${PHP_VERSION} \
+    php7-dom=${PHP_VERSION} \
+    php7-exif=${PHP_VERSION} \
     php7-fileinfo=${PHP_VERSION} \
-    php7-tokenizer=${PHP_VERSION} \
     php7-fpm=${PHP_VERSION} \
+    php7-ftp=${PHP_VERSION} \
+    php7-gd=${PHP_VERSION} \
+    php7-gettext=${PHP_VERSION} \
+    php7-gmp=${PHP_VERSION} \
+    php7-iconv=${PHP_VERSION} \
+    php7-json=${PHP_VERSION} \
+    php7-mbstring=${PHP_VERSION} \
+    php7-mcrypt=${PHP_VERSION} \
+    php7-mysqli=${PHP_VERSION} \
+    php7-odbc=${PHP_VERSION} \
+    php7-opcache=${PHP_VERSION} \
+    php7-openssl=${PHP_VERSION} \
+    php7-pcntl=${PHP_VERSION} \
+    php7-pdo_dblib=${PHP_VERSION} \
+    php7-pdo_mysql=${PHP_VERSION} \
+    php7-pdo_odbc=${PHP_VERSION} \
+    php7-pdo_pgsql=${PHP_VERSION} \
+    php7-pdo_sqlite=${PHP_VERSION} \
+    php7-pdo=${PHP_VERSION} \
+    php7-phar=${PHP_VERSION} \
+    php7-posix=${PHP_VERSION} \
+    php7-session=${PHP_VERSION} \
+    php7-simplexml=${PHP_VERSION} \
+    php7-sockets=${PHP_VERSION} \
+    php7-soap=${PHP_VERSION} \
+    php7-sqlite3=${PHP_VERSION} \
+    php7-tidy=${PHP_VERSION} \
+    php7-tokenizer=${PHP_VERSION} \
     php7-xdebug \
+    php7-xml=${PHP_VERSION} \
+    php7-xmlreader=${PHP_VERSION} \
+    php7-xmlrpc=${PHP_VERSION} \
+    php7-xmlwriter=${PHP_VERSION} \
+    php7-xsl=${PHP_VERSION} \
+    php7-zip=${PHP_VERSION} \
+    php7-wddx=${PHP_VERSION} \
     php7=${PHP_VERSION}
 
 RUN rm -rf /etc/php7/php.ini
@@ -162,7 +170,21 @@ RUN mkdir /opt && \
     gzip -dc newrelic-php5-${NEWRELIC_VERSION}-linux-musl.tar.gz | tar xf - && \
     ./newrelic-php5-${NEWRELIC_VERSION}-linux-musl/newrelic-install install
 
-RUN apk add --update --no-cache --virtual .build-deps git file re2c autoconf make g++ php7-dev=${PHP_VERSION} libmemcached-dev cyrus-sasl-dev zlib-dev musl pcre-dev && \
+RUN apk add --update --no-cache --virtual .run-deps imagemagick-dev
+RUN apk add --update --no-cache --virtual .build-deps \ 
+        autoconf \
+        cyrus-sasl-dev \
+        file \
+        git \
+        re2c \
+        make \
+        g++ \
+        php7-dev=${PHP_VERSION} \
+        libmemcached-dev \
+        libtool \
+        musl \
+        pcre-dev \
+        zlib-dev && \
     git clone --depth=1 -b ${IGBINARY_VERSION} https://github.com/igbinary/igbinary.git /tmp/php-igbinary && \
     cd /tmp/php-igbinary && \
     phpize && ./configure CFLAGS="-O2 -g" --enable-igbinary && make && make install && \
@@ -175,6 +197,13 @@ RUN apk add --update --no-cache --virtual .build-deps git file re2c autoconf mak
     cd .. && rm -rf /tmp/php-memcached/ && \
     echo 'extension=memcached.so' >> /etc/php7/conf.d/memcached.ini && \
     \
+    cd /tmp && \
+    curl -LOk https://pecl.php.net/get/imagick-${PHP_IMGMAGICK_VERSION}.tgz  && \
+    gzip -dc imagick-${PHP_IMGMAGICK_VERSION}.tgz | tar xf - && \
+    cd imagick-${PHP_IMGMAGICK_VERSION} && \
+    phpize &&  ./configure && make && make install && \
+    cd .. && rm -rf /tmp/${PHP_IMGMAGICK_VERSION}/ && \
+    echo 'extension=imagick.so' >> /etc/php7/conf.d/imagick.ini && \
     # git clone --depth=1 -b ${PHPREDIS_VERSION} https://github.com/phpredis/phpredis.git /tmp/php-redis && \
     # cd /tmp/php-redis && \
     # phpize &&  ./configure --enable-redis-igbinary && make && make install && \

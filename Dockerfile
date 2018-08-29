@@ -61,3 +61,9 @@ COPY ./conf/www.conf /etc/php7/php-fpm.d/www.conf
 COPY ./conf/php-fpm.conf /etc/php7/php-fpm.conf
 COPY ./conf/xdebug.ini /etc/php7/conf.d/xdebug.ini
 COPY ./conf/newrelic.ini /etc/php7/conf.d/newrelic.ini
+
+WORKDIR /var/www/html/web/
+
+USER www-data
+
+CMD ["/usr/sbin/php-fpm7"]

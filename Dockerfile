@@ -1,62 +1,12 @@
-# BSD 3-Clause License
-#
-# Copyright (c) 2017, Juliano Petronetto
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# * Redistributions of source code must retain the above copyright notice, this
-#   list of conditions and the following disclaimer.
-#
-# * Redistributions in binary form must reproduce the above copyright notice,
-#   this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-#
-# * Neither the name of the copyright holder nor the names of its
-#   contributors may be used to endorse or promote products derived from
-#   this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+FROM wunderio/php-fpm-alpine:v0.0.1
 
-# Based on https://github.com/petronetto/php7-alpine/blob/master/php-fpm/Dockerfile
-
-FROM alpine:3.7
 USER root
 
-RUN addgroup -g 1000 -S www-data && \
-	adduser -u 1000 -D -S -s /sbin/nologin -G www-data www-data
-
-COPY --chown=www-data:www-data . /var/www/html
-
-LABEL maintainer="wunder.io"
-LABEL org.label-schema.name="PHP7 Alpine" \
-      org.label-schema.description="PHP7 with common plugins, composer and drush"
-
-ENV DRUSH_VERSION=8.0 \
-    PHP_IMGMAGICK_VERSION=3.4.3
-
-ENV PHP_VERSION=7.1.17-r0 \
-    IGBINARY_VERSION=2.0.4 \
-    PHP_MEMCACHED_VERSION=3.0.3 \
-    PHPREDIS_VERSION=3.1.4 \
-    PHP_AMQP_VERSION=1.9.0 \
-    MONGO_PHP_DRIVER_VERSION=1.1.10 \
-    XDEBUG_ENABLE=0 \
+ENV XDEBUG_ENABLE=0 \
     XDEBUG_REMOTE_PORT=9000 \
     XDEBUG_HOST=localhost
 
-ENV NEWRELIC_VERSION=8.1.0.209 \
-    NEWRELIC_ENABLED=0 \
+ENV NEWRELIC_ENABLED=0 \
     NEWRELIC_APP_NAME="PHP Application" \
     NEWRELIC_LICENSE="" \
     NEWRELIC_LOG_FILE="/dev/stdout" \
@@ -75,7 +25,7 @@ ENV PHP_MEMORY_LIMIT=256M \
     PHP_TRACK_ERRORS=0 \
     PHP_LOG_ERRORS=1 \
     PHP_LOG_ERRORS_MAX_LEN=10240 \
-    PHP_POST_MAX_SIZE=20M \
+    PHP_POST_MAX_SIZE=40M \
     PHP_MAX_UPLOAD_FILESIZE=10M \
     PHP_MAX_FILE_UPLOADS=20 \
     PHP_MAX_INPUT_TIME=60 \
@@ -106,145 +56,8 @@ ENV PHP_MEMORY_LIMIT=256M \
     PHP_PM_PROCESS_IDLE_TIMEOUT=60s \
     PHP_PM_MAX_REQUESTS=500
 
-RUN apk upgrade --update --no-cache && \
-    apk add --update --no-cache \
-    ca-certificates \
-    curl \
-    bash
-
-RUN apk add --update --no-cache \
-    php7-bcmath=${PHP_VERSION} \
-    php7-bz2=${PHP_VERSION} \
-    php7-calendar=${PHP_VERSION} \
-    php7-ctype=${PHP_VERSION} \
-    php7-curl=${PHP_VERSION} \
-    php7-dom=${PHP_VERSION} \
-    php7-exif=${PHP_VERSION} \
-    php7-fileinfo=${PHP_VERSION} \
-    php7-fpm=${PHP_VERSION} \
-    php7-ftp=${PHP_VERSION} \
-    php7-gd=${PHP_VERSION} \
-    php7-gettext=${PHP_VERSION} \
-    php7-gmp=${PHP_VERSION} \
-    php7-iconv=${PHP_VERSION} \
-    php7-json=${PHP_VERSION} \
-    php7-mbstring=${PHP_VERSION} \
-    php7-mcrypt=${PHP_VERSION} \
-    php7-mysqli=${PHP_VERSION} \
-    php7-odbc=${PHP_VERSION} \
-    php7-opcache=${PHP_VERSION} \
-    php7-openssl=${PHP_VERSION} \
-    php7-pcntl=${PHP_VERSION} \
-    php7-pdo_dblib=${PHP_VERSION} \
-    php7-pdo_mysql=${PHP_VERSION} \
-    php7-pdo_odbc=${PHP_VERSION} \
-    php7-pdo_pgsql=${PHP_VERSION} \
-    php7-pdo_sqlite=${PHP_VERSION} \
-    php7-pdo=${PHP_VERSION} \
-    php7-phar=${PHP_VERSION} \
-    php7-posix=${PHP_VERSION} \
-    php7-session=${PHP_VERSION} \
-    php7-simplexml=${PHP_VERSION} \
-    php7-sockets=${PHP_VERSION} \
-    php7-soap=${PHP_VERSION} \
-    php7-sqlite3=${PHP_VERSION} \
-    php7-tidy=${PHP_VERSION} \
-    php7-tokenizer=${PHP_VERSION} \
-    php7-xdebug \
-    php7-xml=${PHP_VERSION} \
-    php7-xmlreader=${PHP_VERSION} \
-    php7-xmlrpc=${PHP_VERSION} \
-    php7-xmlwriter=${PHP_VERSION} \
-    php7-xsl=${PHP_VERSION} \
-    php7-zip=${PHP_VERSION} \
-    php7-wddx=${PHP_VERSION} \
-    php7=${PHP_VERSION}
-
-RUN rm -rf /etc/php7/php.ini
-
-RUN apk add --update --no-cache libmemcached
-
-RUN mkdir /opt && \
-    cd /opt && \
-    curl -LOk http://download.newrelic.com/php_agent/release/newrelic-php5-${NEWRELIC_VERSION}-linux-musl.tar.gz && \
-    gzip -dc newrelic-php5-${NEWRELIC_VERSION}-linux-musl.tar.gz | tar xf - && \
-    ./newrelic-php5-${NEWRELIC_VERSION}-linux-musl/newrelic-install install
-
-RUN apk add --update --no-cache --virtual .run-deps imagemagick-dev
-RUN apk add --update --no-cache --virtual .build-deps \ 
-        autoconf \
-        cyrus-sasl-dev \
-        file \
-        git \
-        re2c \
-        make \
-        g++ \
-        php7-dev=${PHP_VERSION} \
-        libmemcached-dev \
-        libtool \
-        musl \
-        pcre-dev \
-        zlib-dev && \
-    git clone --depth=1 -b ${IGBINARY_VERSION} https://github.com/igbinary/igbinary.git /tmp/php-igbinary && \
-    cd /tmp/php-igbinary && \
-    phpize && ./configure CFLAGS="-O2 -g" --enable-igbinary && make && make install && \
-    cd .. && rm -rf /tmp/php-igbinary/ && \
-    echo 'extension=igbinary.so' >> /etc/php7/conf.d/igbinary.ini && \
-    \
-    git clone --depth=1 -b v${PHP_MEMCACHED_VERSION} https://github.com/php-memcached-dev/php-memcached.git /tmp/php-memcached && \
-    cd /tmp/php-memcached && \
-    phpize && ./configure --disable-memcached-sasl && make && make install && \
-    cd .. && rm -rf /tmp/php-memcached/ && \
-    echo 'extension=memcached.so' >> /etc/php7/conf.d/memcached.ini && \
-    \
-    cd /tmp && \
-    curl -LOk https://pecl.php.net/get/imagick-${PHP_IMGMAGICK_VERSION}.tgz  && \
-    gzip -dc imagick-${PHP_IMGMAGICK_VERSION}.tgz | tar xf - && \
-    cd imagick-${PHP_IMGMAGICK_VERSION} && \
-    phpize &&  ./configure && make && make install && \
-    cd .. && rm -rf /tmp/${PHP_IMGMAGICK_VERSION}/ && \
-    echo 'extension=imagick.so' >> /etc/php7/conf.d/imagick.ini && \
-    # git clone --depth=1 -b ${PHPREDIS_VERSION} https://github.com/phpredis/phpredis.git /tmp/php-redis && \
-    # cd /tmp/php-redis && \
-    # phpize &&  ./configure --enable-redis-igbinary && make && make install && \
-    # cd .. && rm -rf /tmp/php-redis/ && \
-    # echo 'extension=redis.so' >> /etc/php7/conf.d/redis.ini && \
-    # \
-    # git clone --depth=1 -b v${PHP_AMQP_VERSION} https://github.com/pdezwart/php-amqp.git /tmp/php-amqp && \
-    # cd /tmp/php-amqp && \
-    # phpize && ./configure && make && make install && \
-    # cd .. && rm -rf /tmp/php-amqp/ && \
-    # echo 'extension=amqp.so' >> /etc/php7/conf.d/amqp.ini && \
-    # \
-    # git clone --depth=1 -b ${MONGO_PHP_DRIVER_VERSION} https://github.com/mongodb/mongo-php-driver.git /tmp/php-mongodb && \
-    # cd /tmp/php-mongodb && \
-    # git submodule update --init && \
-    # phpize && ./configure --prefix=/usr && make && make install && \
-    # cd .. && rm -rf /tmp/php-mongodb/ && \
-    # echo 'extension=mongodb.so' >> /etc/php7/conf.d/mongodb.ini && \
-    # \
-    apk del .build-deps
-
 COPY ./conf/php.ini /etc/php7/php.ini
 COPY ./conf/www.conf /etc/php7/php-fpm.d/www.conf
 COPY ./conf/php-fpm.conf /etc/php7/php-fpm.conf
 COPY ./conf/xdebug.ini /etc/php7/conf.d/xdebug.ini
 COPY ./conf/newrelic.ini /etc/php7/conf.d/newrelic.ini
-
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
-
-RUN set -ex; \
-    apk add --update --no-cache -t .php-rundeps mariadb-client; \
-    # Install drush
-    apk add --update --no-cache -t .php-rundeps su-exec; \
-    su-exec www-data composer global require drush/drush:^${DRUSH_VERSION}; \
-    ln -s /home/www-data/.composer/vendor/bin/drush /usr/local/bin/drush; \
-    # Create directory for shared files
-    mkdir -p -m +w /var/www/html/web/sites/default/files; \
-    chown -R www-data:www-data /var/www/html/web/sites/default/files
-
-WORKDIR /var/www/html/web/
-
-USER www-data
-
-CMD ["/usr/sbin/php-fpm7"]

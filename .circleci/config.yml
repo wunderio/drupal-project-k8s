@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  phpcs:
+  validate:
     docker:
       - image: wunderio/circleci-builder:k8s
 
@@ -112,7 +112,7 @@ workflows:
   version: 2
   commit:
     jobs:
-      - phpcs
+      - validate
       - build:
           context: global_nonprod
       - deploy:

@@ -6,9 +6,6 @@ metadata:
     app: postinstall
     release: {{ .Release.Name }}
   annotations:
-    # This is what defines this resource as a hook. Without this line, the
-    # job is considered part of the release.
-    "helm.sh/hook": post-install
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
@@ -21,10 +18,9 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - cd web;
-          conf_count=$(ls ../config/sync/ | wc -l);
-          if [ $conf_count -gt 1 ]; then drush sql-cli < "/var/backups/db/$PRODUCTION_RELEASE_NAME-latest.sql"; drush site-install -n config_installer;
-          else drush site-install minimal -y;
-          fi;
+          bootstrapped=$(drush status --field=bootstrap);
+          if [[ $bootstrapped = *'Success'* ]]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
+          else drush site-install -n config_installer; conf_count=$(ls ../config/sync/ | wc -l); if [ $conf_count -lt 2 ]; then drush site-install minimal -y; fi; fi;
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"

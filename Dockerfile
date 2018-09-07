@@ -1,7 +1,6 @@
-# Dockerfile for the Drupal container.
-FROM wodby/drupal-php:7.1-3.4.0
+FROM wunderio/php-fpm-alpine:v0.0.1
 
-COPY --chown=www-data:www-data . /var/www/html
+COPY --chown=www-data:www-data . /var/www/html 
+WORKDIR /var/www/html/web/
+
 USER www-data
-RUN mkdir -p -m +w /var/www/html/web/sites/default/files
-

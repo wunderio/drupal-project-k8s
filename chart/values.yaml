@@ -4,6 +4,9 @@ nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 drupal:
   image: 'you need to pass in a value for drupal.image to your helm chart'
+  # will be generated random hashsalt if not provided here
+  # need to be base64 encoded
+  hashsalt: "dGVtcGxhdGUtaGFzaC1zYWx0" 
   env:
   #these are added to drupal environment
     PHP_FPM_CLEAR_ENV: "no"
@@ -24,5 +27,3 @@ mariadb:
 ingress:
   hostname: "silta.wdr.io"
 
-secrets:
-    hashsalt: "template-hash-salt"

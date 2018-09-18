@@ -20,6 +20,7 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "composer.lock" }}
 
+      - run: rm -rf vendor/wunderio
       - run: composer install -n --prefer-dist --ignore-platform-reqs --no-dev
 
       - save_cache:

@@ -39,6 +39,15 @@ spec:
         resources:
           requests:
             cpu: "50m"
+        livenessProbe:
+          httpGet:
+            path: /robots.txt
+            port: 80
+            httpHeaders:
+            - name: X-Probe-Header
+              value: Probe
+          initialDelaySeconds: 500
+          periodSeconds: 5
         env:
         - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE
           value: "off"
@@ -57,6 +66,14 @@ spec:
 
       - image: {{ .Values.drupal.image | quote }}
         name: drupal
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status --field 'Drupal bootstrap'
+          initialDelaySeconds: 500
+          periodSeconds: 10
         env:
         - name: DB_USER
           value: "{{ .Values.mariadb.db.user }}"

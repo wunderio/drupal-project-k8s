@@ -22,7 +22,7 @@ spec:
             backend:
               serviceName: {{ .Release.Name }}-drupal
               servicePort: 80
-    - host: {{ .Release.Name }}.{{ .Release.Namespace }}.silta.wdr.io
+    - host: {{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.silta.wdr.io
       http:
         paths:
           - path: /

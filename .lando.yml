@@ -30,10 +30,6 @@ services:
       services:
         environment:
           HASH_SALT: notsosecurehash
-          DB_PASS: drupal8
-          DB_USER: drupal8
-          DB_HOST: database
-          DB_NAME: drupal8
 
 proxy:
   mailhog:

@@ -5,6 +5,15 @@ metadata:
   labels:
     app: drupal
     release: {{ .Release.Name }}
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  {{ .Release.Name }}-drupal
+      host: {{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.silta.wdr.io
+      prefix: /
+      service: {{ .Release.Name }}-drupal:80
 spec:
   type: NodePort
   ports:

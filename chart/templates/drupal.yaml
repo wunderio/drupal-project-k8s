@@ -90,3 +90,17 @@ spec:
       - name: drupal-files-volume
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-public-files
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-secrets-drupal
+  labels:
+    release: "{{ .Release.Name }}"
+type: Opaque
+data:
+  {{- if .Values.drupal.hashsalt }}
+  hashsalt: "{{ .Values.drupal.hashsalt | b64enc }}"
+  {{ else }}
+  hashsalt: {{ "{{ randAlphaNum 10 }}" | b64enc }}
+  {{- end }}

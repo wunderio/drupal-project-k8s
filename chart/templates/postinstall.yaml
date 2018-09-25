@@ -23,7 +23,7 @@ spec:
         - cd web;
           bootstrapped=$(drush status --field=bootstrap);
           if [[ $bootstrapped = *'Success'* ]]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
-          else drush site-install -n config_installer; if [ $? -ne 0 ]; then drush site-install minimal -y; fi; fi;
+          else drush site-install -n config_installer; fi;
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"

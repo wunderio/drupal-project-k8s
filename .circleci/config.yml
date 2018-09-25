@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  validate:
+  phpcs:
     docker:
-      - image: wunderio/silta-circleci:v0.1
+      - image: wunderio/circleci-builder:k8s
 
     steps:
       - checkout
@@ -11,7 +11,7 @@ jobs:
 
   build:
     docker:
-      - image: wunderio/silta-circleci:v0.1
+      - image: wunderio/circleci-builder:k8s
 
     steps:
       - checkout
@@ -60,7 +60,7 @@ jobs:
 
   deploy:
     docker:
-      - image: wunderio/silta-circleci:v0.1
+      - image: wunderio/circleci-builder:k8s
 
     steps:
       - checkout
@@ -68,7 +68,7 @@ jobs:
       # Set the release name for later reuse.
       - run: |
           LOWERCASE_BRANCH=${CIRCLE_BRANCH,,}
-          echo "export RELEASE_NAME='$CIRCLE_PROJECT_REPONAME--${LOWERCASE_BRANCH//[^[:alnum:]]/-}'" >> $BASH_ENV
+          echo "export RELEASE_NAME='${LOWERCASE_BRANCH//[^[:alnum:]]/-}'" >> $BASH_ENV
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
@@ -76,6 +76,20 @@ jobs:
           gcloud config set project silta-204108
           gcloud config set compute/zone europe-west2-a
           gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+          kubectl config get-contexts
+          helm init
+          echo $CIRCLE_BRANCH
+          echo $CIRCLE_PROJECT_REPONAME
+      
+      # # Read and decrypt secrets and create volumes
+      # # TODO: agree on concept for secrets management and consider using for sensitive secrets
+      # - run: |
+      #     # read secrets (created with "openssl aes-256-cbc -e -in secrets -out secrets.enc -k $ENC_KEY")
+      #     ARGS=$(openssl aes-256-cbc -d -base64 -in secrets.enc -k $ENC_KEY | while \ 
+      #     read line ; do echo -n "--from-literal=$line "; done)
+      #     # generate secrets volumes for use in pods
+      #     kubectl create secret generic $RELEASE_NAME-drupal-secrets \ 
+      #     --namespace=$CIRCLE_PROJECT_REPONAME $ARGS
 
       - run: |
           helm dependency build ./chart
@@ -98,7 +112,7 @@ workflows:
   version: 2
   commit:
     jobs:
-      - validate
+      - phpcs
       - build:
           context: global_nonprod
       - deploy:

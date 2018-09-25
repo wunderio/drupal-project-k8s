@@ -6,7 +6,7 @@ drupal:
   image: 'you need to pass in a value for drupal.image to your helm chart'
   # will be generated random hashsalt if not provided here
   # need to be base64 encoded
-  hashsalt: "dGVtcGxhdGUtaGFzaC1zYWx0" 
+  hashsalt: "template-hash-salt" 
   env:
   #these are added to drupal environment
     PHP_FPM_CLEAR_ENV: "no"

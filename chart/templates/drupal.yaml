@@ -100,7 +100,7 @@ metadata:
 type: Opaque
 data:
   {{- if .Values.drupal.hashsalt }}
-  hashsalt: "{{ .Values.drupal.hashsalt }}"
+  hashsalt: "{{ .Values.drupal.hashsalt | b64enc }}"
   {{ else }}
   hashsalt: {{ "{{ randAlphaNum 10 }}" | b64enc }}
   {{- end }}

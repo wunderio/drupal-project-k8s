@@ -18,8 +18,7 @@ spec:
       containers:
       - name: postinstall
         image: {{ .Values.drupal.image | quote }}
-        command: ["/bin/sh","-c"]
-        args: ["drush updatedb -n; drush config-import -n; drush entity-updates -n"]
+        command: ["drush updatedb -n; drush config-import -n; drush entity-updates -n"]
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"
@@ -34,16 +33,3 @@ spec:
             secretKeyRef:
               name: "{{ .Release.Name }}-mariadb"
               key: mariadb-password
-      {{- range $key, $val := .Values.drupal.env }}
-        - name: {{ $key }}
-          value: {{ $val | quote }}
-      {{- end }}
-        volumeMounts:
-          - name: drupal-files-volume
-            mountPath: /var/www/html/web/sites/default/files
-      imagePullSecrets:
-      - name: gcr
-      volumes:
-      - name: drupal-files-volume
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-public-files

@@ -91,10 +91,8 @@ jobs:
             --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/$CIRCLE_PROJECT_REPONAME-nginx:$CIRCLE_SHA1 \
             --set mariadb.rootUser.password=$DB_ROOT_PASS \
             --set mariadb.db.password=$DB_USER_PASS \
-            --namespace=$CIRCLE_PROJECT_REPONAME
-
-      # Wait for the kubernetes deployment to be complete.
-      - run: kubectl rollout status deployment/$RELEASE_NAME-drupal --namespace=$CIRCLE_PROJECT_REPONAME --watch
+            --namespace=$CIRCLE_PROJECT_REPONAME \
+            --wait
 
 workflows:
   version: 2

@@ -96,10 +96,6 @@ jobs:
       # Wait for the kubernetes deployment to be complete.
       - run: kubectl rollout status deployment/$RELEASE_NAME-drupal --namespace=$CIRCLE_PROJECT_REPONAME --watch
 
-      # TODO: output the right domain.
-      - run: |
-          echo "Deployed $RELEASE_NAME successfully, your site is available here: http://$DOMAIN"
-
 workflows:
   version: 2
   commit:

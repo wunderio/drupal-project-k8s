@@ -43,10 +43,7 @@ spec:
           httpGet:
             path: /robots.txt
             port: 80
-            httpHeaders:
-            - name: X-Probe-Header
-              value: Probe
-          initialDelaySeconds: 500
+          initialDelaySeconds: 15
           periodSeconds: 5
         env:
         - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE

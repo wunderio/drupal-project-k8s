@@ -11,7 +11,7 @@ metadata:
       apiVersion: ambassador/v0
       kind:  Mapping
       name:  {{ .Release.Name }}-drupal
-      host: {{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.silta.wdr.io
+      host: {{ template "drupal.domain" . }}
       prefix: /
       service: {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
 spec:

@@ -61,7 +61,7 @@ spec:
         - containerPort: 80
           name: drupal
         volumeMounts:
-        - name: drupal-files-volume
+        - name: drupal-public-files
           mountPath: /var/www/html/web/sites/default/files
 
       - image: {{ .Values.drupal.image | quote }}
@@ -91,14 +91,19 @@ spec:
         - containerPort: 9000
           name: drupal
         volumeMounts:
-        - name: drupal-files-volume
+        - name: drupal-public-files
           mountPath: /var/www/html/web/sites/default/files
+        - name: drupal-private-files
+          mountPath: /var/www/html/private
       imagePullSecrets:
       - name: gcr
       volumes:
-      - name: drupal-files-volume
+      - name: drupal-public-files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-public-files
+      - name: drupal-private-files
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-private-files
 ---
 apiVersion: v1
 kind: Secret

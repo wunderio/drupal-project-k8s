@@ -24,6 +24,5 @@ mariadb:
     user: drupal
     password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
 
-ingress:
-  hostname: "silta.wdr.io"
+clusterDomain: "silta.wdr.io"
 

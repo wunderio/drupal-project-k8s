@@ -5,6 +5,15 @@ metadata:
   labels:
     app: drupal
     release: {{ .Release.Name }}
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  {{ .Release.Name }}-drupal
+      host: {{ template "drupal.domain" . }}
+      prefix: /
+      service: {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
 spec:
   type: NodePort
   ports:

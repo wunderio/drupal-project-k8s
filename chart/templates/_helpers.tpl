@@ -7,5 +7,5 @@ release: {{ .Release.Name }}
 {{- printf "%s-%s" .Release.Name .Chart.Name | trunc 63 -}}
 {{- end -}}
 {{- define "drupal.domain" -}}
-{{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.silta.wdr.io
+{{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}

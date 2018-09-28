@@ -11,6 +11,10 @@ drupal:
   #these are added to drupal environment
     PHP_FPM_CLEAR_ENV: "no"
 
+  # Create a volume for private files.
+  privateFiles:
+    enabled: false
+
 mariadb:
   master:
     persistence:

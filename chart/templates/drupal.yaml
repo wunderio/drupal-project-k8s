@@ -83,8 +83,12 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-secrets-drupal
               key: hashsalt
+
+        {{- if .Values.drupal.privateFiles.enabled }}
         - name: PRIVATE_FILES_PATH
           value: '/var/www/html/private'
+        {{- end }}
+
       {{- range $key, $val := .Values.drupal.env }}
         - name: {{ $key }}
           value: {{ $val | quote }}
@@ -95,17 +99,21 @@ spec:
         volumeMounts:
         - name: drupal-public-files
           mountPath: /var/www/html/web/sites/default/files
+        {{- if .Values.drupal.privateFiles.enabled }}
         - name: drupal-private-files
           mountPath: /var/www/html/private
+        {{- end }}
       imagePullSecrets:
       - name: gcr
       volumes:
       - name: drupal-public-files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-public-files
+      {{- if .Values.drupal.privateFiles.enabled }}
       - name: drupal-private-files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-private-files
+      {{- end }}
 ---
 apiVersion: v1
 kind: Secret

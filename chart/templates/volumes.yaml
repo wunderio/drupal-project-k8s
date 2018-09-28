@@ -13,6 +13,7 @@ spec:
     requests:
       storage: 1Gi
 ---
+{{- if .Values.drupal.privateFiles.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -27,3 +28,4 @@ spec:
   resources:
     requests:
       storage: 1Gi
+{{- end }}

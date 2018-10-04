@@ -78,7 +78,7 @@ spec:
             - /bin/sh
             - -c
             - drush status --field 'Drupal bootstrap' | grep Successfull
-          initialDelaySeconds: 120
+          initialDelaySeconds: 240
           periodSeconds: 20
         readinessProbe:
           exec:
@@ -86,7 +86,7 @@ spec:
             - /bin/sh
             - -c
             - drush status --field 'Drupal bootstrap' | grep Successfull
-          initialDelaySeconds: 120
+          initialDelaySeconds: 240
           periodSeconds: 10
         env:
         {{ include "drupal_env" . | indent 4 }}

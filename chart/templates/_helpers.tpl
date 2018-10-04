@@ -9,3 +9,25 @@ release: {{ .Release.Name }}
 {{- define "drupal.domain" -}}
 {{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}
+{{- define "drupal_env" }}
+    - name: DB_USER
+      value: "{{ .Values.mariadb.db.user }}"
+    - name: DB_NAME
+      value: "{{ .Values.mariadb.db.name }}"
+    - name: DB_HOST
+      value: {{ .Release.Name }}-mariadb
+    - name: DB_PASS
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Release.Name }}-mariadb
+          key: mariadb-password
+    - name: HASH_SALT
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Release.Name }}-secrets-drupal
+          key: hashsalt
+    {{- range $key, $val := .Values.drupal.env }}
+    - name: {{ $key }}
+      value: {{ $val | quote }}
+    {{- end }}
+{{- end }}

@@ -48,6 +48,12 @@ spec:
         resources:
           requests:
             cpu: "50m"
+        livenessProbe:
+          httpGet:
+            path: /robots.txt
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
         env:
         - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE
           value: "off"
@@ -66,6 +72,22 @@ spec:
 
       - image: {{ .Values.drupal.image | quote }}
         name: drupal
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status --field 'Drupal bootstrap' | grep Successfull
+          initialDelaySeconds: 50
+          periodSeconds: 20
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status --field 'Drupal bootstrap' | grep Successfull
+          initialDelaySeconds: 30
+          periodSeconds: 10
         env:
         {{ include "drupal_env" . | indent 4 }}
         ports:

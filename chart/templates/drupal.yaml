@@ -77,14 +77,16 @@ spec:
             command:
             - /bin/sh
             - -c
-            - drush status --field 'Drupal bootstrap'
-          initialDelaySeconds: 250
-          periodSeconds: 10
+            - drush status --field 'Drupal bootstrap' | grep Successfull
+          initialDelaySeconds: 120
+          periodSeconds: 20
         readinessProbe:
-          httpGet:
-            path: /_ping.php
-            port: 80
-          initialDelaySeconds: 300
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status --field 'Drupal bootstrap' | grep Successfull
+          initialDelaySeconds: 120
           periodSeconds: 10
         env:
         - name: DB_USER

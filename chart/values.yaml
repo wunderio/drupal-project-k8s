@@ -11,6 +11,10 @@ drupal:
   #these are added to drupal environment
     PHP_FPM_CLEAR_ENV: "no"
 
+  # Create a volume for private files.
+  privateFiles:
+    enabled: false
+
 mariadb:
   master:
     persistence:
@@ -25,4 +29,4 @@ mariadb:
     password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
 
 clusterDomain: "silta.wdr.io"
-
+branchname: "default"

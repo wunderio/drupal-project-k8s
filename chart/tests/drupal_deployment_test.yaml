@@ -1,0 +1,15 @@
+suite: drupal deployment
+templates:
+  - drupal-deployment.yaml
+tests:
+  - it: uses the right docker images
+    set:
+      drupal.image: 'drupal-12345'
+      nginx.image: 'nginx-12345'
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 'drupal-12345'
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: 'nginx-12345'

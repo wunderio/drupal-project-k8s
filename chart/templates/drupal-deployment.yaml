@@ -20,10 +20,10 @@ spec:
     spec:
       containers:
       # php-fpm container.
-      - image: {{ .Values.drupal.image | quote }}
-        name: drupal
+      - name: drupal
+        image: {{ .Values.drupal.image | quote }}
         env:
-        {{ include "drupal_env" . | indent 4 }}
+        {{ include "drupal.env" . | indent 4 }}
         ports:
         - containerPort: 9000
           name: drupal
@@ -36,8 +36,8 @@ spec:
         {{- end }}
 
       # Nginx container
-      - image: {{ .Values.nginx.image | quote }}
-        name: nginx
+      - name: nginx
+        image: {{ .Values.nginx.image | quote }}
         resources:
           requests:
             cpu: "50m"

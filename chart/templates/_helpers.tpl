@@ -8,7 +8,7 @@ release: {{ .Release.Name }}
 {{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}
 
-{{- define "drupal_env" }}
+{{- define "drupal.env" }}
     - name: DB_USER
       value: "{{ .Values.mariadb.db.user }}"
     - name: DB_NAME

@@ -17,5 +17,5 @@ spec:
             - drush
             - cron
             env:
-            {{ include "drupal_env" . | indent 8 }}
+            {{ include "drupal.env" . | indent 8 }}
           restartPolicy: OnFailure

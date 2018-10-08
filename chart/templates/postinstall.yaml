@@ -25,7 +25,7 @@ spec:
           if [[ $bootstrapped = *'Success'* ]]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
           else drush site-install -n config_installer; conf_count=$(ls ../config/sync/ | wc -l); if [ $conf_count -lt 2 ]; then drush site-install minimal -y; fi; fi;
         env:
-        {{ include "drupal_env" . | indent 4 }}
+        {{ include "drupal.env" . | indent 4 }}
         volumeMounts:
           - name: drupal-files-volume
             mountPath: /var/www/html/web/sites/default/files

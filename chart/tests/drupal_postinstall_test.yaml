@@ -2,6 +2,11 @@ suite: drupal post-install hook
 templates:
   - postinstall.yaml
 tests:
+  - it: is a helm hook
+    asserts:
+      - isKind:
+          of: Job
+
   - it: uses the right docker image
     set:
       drupal.image: 'drupal-12345'

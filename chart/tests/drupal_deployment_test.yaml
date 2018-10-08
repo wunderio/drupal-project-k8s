@@ -2,6 +2,11 @@ suite: drupal deployment
 templates:
   - drupal-deployment.yaml
 tests:
+  - it: is a deployment
+    asserts:
+      - isKind:
+          of: Deployment
+
   - it: uses the right docker images
     set:
       drupal.image: 'drupal-12345'

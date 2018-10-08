@@ -1,0 +1,43 @@
+suite: drupal private files
+templates:
+  - drupal-deployment.yaml
+  - drupal-volumes.yaml
+tests:
+  - it: private files should be disabled by default
+    asserts:
+      # No private files volume is mounted.
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+      # Only one volume is defined.
+      - hasDocuments:
+          count: 1
+        template: drupal-volumes.yaml
+
+  - it: private files should work when enabled
+    set:
+      drupal.privateFiles.enabled: true
+    asserts:
+      # A private files volume is mounted
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+
+      # The environment variable is set
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRIVATE_FILES_PATH
+            value: '/var/www/html/private'
+
+      # There are two volumes defined.
+      - hasDocuments:
+          count: 2
+        template: drupal-volumes.yaml
+

@@ -30,4 +30,8 @@ release: {{ .Release.Name }}
     - name: {{ $key }}
       value: {{ $val | quote }}
     {{- end }}
+    {{- if .Values.drupal.privateFiles.enabled }}
+    - name: PRIVATE_FILES_PATH
+      value: '/var/www/html/private'
+    {{- end }}
 {{- end }}

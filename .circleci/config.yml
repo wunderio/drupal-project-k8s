@@ -9,6 +9,8 @@ jobs:
 
       - run: phpcs --standard=phpcs.xml -s
 
+      - run: helm unittest ./chart
+
   build:
     docker:
       - image: wunderio/silta-circleci:v0.1

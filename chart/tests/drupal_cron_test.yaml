@@ -34,3 +34,30 @@ tests:
             name: "drupal-public-files"
             persistentVolumeClaim:
               claimName: RELEASE-NAME-public-files
+
+  - it: runs multiple jobs
+    set:
+      drupal.cron:
+        - command: foo
+          schedule: "0 * * * *"
+        - command: bar
+          schedule: "30 * * * *"
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: 'foo'
+        documentIndex: 0
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: 'bar'
+        documentIndex: 1
+      - equal:
+          path: spec.schedule
+          value: "0 * * * *"
+        documentIndex: 0
+      - equal:
+          path: spec.schedule
+          value: "30 * * * *"
+        documentIndex: 1

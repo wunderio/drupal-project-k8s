@@ -45,7 +45,7 @@ spec:
         - name: drupal-public-files
           mountPath: /var/www/html/web/sites/default/files
 
-      imagePullSecrets:
-      - name: gcr
       volumes:
         {{ include "drupal.volumes" . | indent 8}}
+
+      {{ include "drupal.imagePullSecrets" . | indent 6 }}

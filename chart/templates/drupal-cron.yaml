@@ -19,3 +19,5 @@ spec:
           restartPolicy: OnFailure
           volumes:
             {{ include "drupal.volumes" . | indent 12 }}
+
+          {{ include "drupal.imagePullSecrets" . | indent 10 }}

@@ -25,5 +25,11 @@ mariadb:
     user: drupal
     password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
 
+# Cluster configuration.
 clusterDomain: "silta.wdr.io"
+
+# Configure image pull secrets for the containers. This is not needed on GKE.
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
 branchname: "default"

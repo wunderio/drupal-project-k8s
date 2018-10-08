@@ -13,3 +13,14 @@ tests:
       - equal:
           path: spec.template.spec.containers[1].image
           value: 'nginx-12345'
+
+  - it: sets environment variables correctly
+    set:
+      drupal.env:
+        foo: bar
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: foo
+            value: bar

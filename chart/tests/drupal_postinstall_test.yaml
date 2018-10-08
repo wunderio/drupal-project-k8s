@@ -1,23 +1,19 @@
-suite: drupal deployment
+suite: drupal post-install hook
 templates:
-  - drupal-deployment.yaml
+  - postinstall.yaml
 tests:
-  - it: is a deployment
+  - it: is a helm hook
     asserts:
       - isKind:
-          of: Deployment
+          of: Job
 
-  - it: uses the right docker images
+  - it: uses the right docker image
     set:
       drupal.image: 'drupal-12345'
-      nginx.image: 'nginx-12345'
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
           value: 'drupal-12345'
-      - equal:
-          path: spec.template.spec.containers[1].image
-          value: 'nginx-12345'
 
   - it: sets environment variables correctly
     set:
@@ -29,3 +25,12 @@ tests:
           content:
             name: foo
             value: bar
+
+  - it: has public files mounted
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files

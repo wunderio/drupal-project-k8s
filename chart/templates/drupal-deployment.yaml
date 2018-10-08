@@ -21,19 +21,7 @@ spec:
       containers:
       # php-fpm container.
       - name: drupal
-        image: {{ .Values.drupal.image | quote }}
-        env:
-        {{ include "drupal.env" . | indent 4 }}
-        ports:
-        - containerPort: 9000
-          name: drupal
-        volumeMounts:
-        - name: drupal-public-files
-          mountPath: /var/www/html/web/sites/default/files
-        {{- if .Values.drupal.privateFiles.enabled }}
-        - name: drupal-private-files
-          mountPath: /var/www/html/private
-        {{- end }}
+        {{ include "drupal.php-container" . | indent 8}}
 
       # Nginx container
       - name: nginx
@@ -60,11 +48,4 @@ spec:
       imagePullSecrets:
       - name: gcr
       volumes:
-      - name: drupal-public-files
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-public-files
-      {{- if .Values.drupal.privateFiles.enabled }}
-      - name: drupal-private-files
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-private-files
-      {{- end }}
+        {{ include "drupal.volumes" . | indent 8}}

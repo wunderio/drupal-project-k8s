@@ -2,6 +2,8 @@ suite: drupal private files
 templates:
   - drupal-deployment.yaml
   - drupal-volumes.yaml
+  - postinstall.yaml
+  - drupal-cron.yaml
 tests:
   - it: private files should be disabled by default
     asserts:
@@ -37,7 +39,25 @@ tests:
             value: '/var/www/html/private'
 
       # There are two volumes defined.
-      - hasDocuments:
+      - template: drupal-volumes.yaml
+        hasDocuments:
           count: 2
-        template: drupal-volumes.yaml
+
+      # Private files are available for cron jobs.
+      - template: drupal-cron.yaml
+        contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+
+      # Private files are available for in the post-install hooks.
+      - template: postinstall.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
 

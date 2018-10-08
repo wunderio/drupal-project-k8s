@@ -17,21 +17,14 @@ spec:
       restartPolicy: Never
       containers:
       - name: postinstall
-        image: {{ .Values.drupal.image | quote }}
+        {{ include "drupal.php-container" . | indent 8 }}
         command: ["/bin/sh", "-c"]
         args:
         - cd web;
           bootstrapped=$(drush status --field=bootstrap);
           if [[ $bootstrapped = *'Success'* ]]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
           else drush site-install -n config_installer; conf_count=$(ls ../config/sync/ | wc -l); if [ $conf_count -lt 2 ]; then drush site-install minimal -y; fi; fi;
-        env:
-        {{ include "drupal.env" . | indent 4 }}
-        volumeMounts:
-          - name: drupal-files-volume
-            mountPath: /var/www/html/web/sites/default/files
       imagePullSecrets:
       - name: gcr
       volumes:
-      - name: drupal-files-volume
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-public-files
+        {{ include "drupal.volumes" . | indent 8 }}

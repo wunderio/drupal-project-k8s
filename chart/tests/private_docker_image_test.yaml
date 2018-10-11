@@ -1,0 +1,34 @@
+suite: private docker image
+templates:
+  - drupal-deployment.yaml
+  - drupal-cron.yaml
+  - postinstall.yaml
+tests:
+  - it: has no image pull secret by default
+    asserts:
+      - isNull:
+          path: spec.template.spec.imagePullSecrets
+
+  - it: sets the image pull secret
+    set:
+      imagePullSecrets:
+        - name: gcr
+
+    asserts:
+     - contains:
+         path: spec.template.spec.imagePullSecrets
+         content:
+           name: gcr
+
+     - template: drupal-cron.yaml
+       contains:
+         path: spec.jobTemplate.spec.template.spec.imagePullSecrets
+         content:
+           name: gcr
+
+     - template: postinstall.yaml
+       contains:
+         path: spec.template.spec.imagePullSecrets
+         content:
+           name: gcr
+

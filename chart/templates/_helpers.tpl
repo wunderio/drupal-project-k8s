@@ -34,6 +34,13 @@ volumeMounts:
 {{- end }}
 {{- end }}
 
+{{- define "drupal.imagePullSecrets" }}
+{{- if .Values.imagePullSecrets }}
+imagePullSecrets:
+{{ .Values.imagePullSecrets | toYaml }}
+{{- end }}
+{{- end }}
+
 {{- define "drupal.env" }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"

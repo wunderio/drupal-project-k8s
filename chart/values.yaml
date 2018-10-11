@@ -20,6 +20,21 @@ drupal:
   privateFiles:
     enabled: false
 
+  postinstall:
+    command: |
+      cd web;
+      conf_count=$(ls ../config/sync/ | wc -l);
+      if [ $conf_count -gt 1 ]; then drush site-install -n config_installer;
+      else drush site-install minimal -y;
+      fi;
+
+  postupgrade:
+    command: |
+      cd web;
+      conf_count=$(ls ../config/sync/ | wc -l);
+      if [ $conf_count -gt 1 ]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
+      fi;
+
 mariadb:
   replication:
     enabled: false
@@ -30,5 +45,11 @@ mariadb:
     user: drupal
     password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
 
+# Cluster configuration.
 clusterDomain: "silta.wdr.io"
+
+# Configure image pull secrets for the containers. This is not needed on GKE.
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
 branchname: "default"

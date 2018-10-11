@@ -15,6 +15,21 @@ drupal:
   privateFiles:
     enabled: false
 
+  postinstall:
+    command: |
+      cd web;
+      conf_count=$(ls ../config/sync/ | wc -l);
+      if [ $conf_count -gt 1 ]; then drush site-install -n config_installer;
+      else drush site-install minimal -y;
+      fi;
+
+  postupgrade:
+    command: |
+      cd web;
+      conf_count=$(ls ../config/sync/ | wc -l);
+      if [ $conf_count -gt 1 ]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
+      fi;
+
 mariadb:
   replication:
     enabled: false

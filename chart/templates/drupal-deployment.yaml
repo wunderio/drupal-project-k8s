@@ -28,16 +28,12 @@ spec:
             - /bin/sh
             - -c
             - drush status
-          initialDelaySeconds: 10
-          periodSeconds: 15
         readinessProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - drush status
-          initialDelaySeconds: 10
-          periodSeconds: 15
       # Nginx container
       - name: nginx
         image: {{ .Values.nginx.image | quote }}

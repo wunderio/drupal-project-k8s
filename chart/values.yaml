@@ -4,6 +4,11 @@ nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 drupal:
   image: 'you need to pass in a value for drupal.image to your helm chart'
+
+  cron:
+    - schedule: '0 * * * *'
+      command: 'drush cron'
+
   # will be generated random hashsalt if not provided here
   # need to be base64 encoded
   hashsalt: "template-hash-salt" 

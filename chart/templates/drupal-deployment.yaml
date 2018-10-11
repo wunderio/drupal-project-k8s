@@ -27,8 +27,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - netstat -t | grep :9000
-          initialDelaySeconds: 5
+            - drush status
+          initialDelaySeconds: 10
           periodSeconds: 15
         readinessProbe:
           exec:

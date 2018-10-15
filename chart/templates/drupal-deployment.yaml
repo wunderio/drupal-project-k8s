@@ -22,7 +22,18 @@ spec:
       # php-fpm container.
       - name: drupal
         {{ include "drupal.php-container" . | indent 8}}
-
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status
       # Nginx container
       - name: nginx
         image: {{ .Values.nginx.image | quote }}

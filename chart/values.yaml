@@ -14,8 +14,9 @@ drupal:
   # need to be base64 encoded
   hashsalt: "template-hash-salt" 
   env:
-  #these are added to drupal environment
-    PHP_FPM_CLEAR_ENV: "no"
+  php:
+    upload_max_filesize: 60M
+    post_max_size: 60M
 
   # Create a volume for private files.
   privateFiles:

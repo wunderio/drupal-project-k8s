@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    app: drupal
+    app: {{ include "drupal.app" . }}
     release: {{ .Release.Name }}
 spec:
   selector:
     matchLabels:
-      app: drupal
+      app: {{ include "drupal.app" . }}
       release: {{ .Release.Name }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: drupal
+        app: {{ include "drupal.app" . }}
         release: {{ .Release.Name }}
     spec:
       containers:

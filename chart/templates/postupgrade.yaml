@@ -21,7 +21,6 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
         - {{ .Values.drupal.postupgrade.command | quote }}
-      imagePullSecrets:
-      - name: gcr
+      {{ include "drupal.imagePullSecrets" . | indent 6 }}
       volumes:
         {{ include "drupal.volumes" . | indent 8 }}

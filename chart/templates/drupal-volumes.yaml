@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-public-files
   labels:
-    app: {{ include "drupal.app" . }}
+    app: {{ .Values.drupal.app | quote }}
     release: {{ .Release.Name }}
 spec:
   storageClassName: nfs
@@ -19,7 +19,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-private-files
   labels:
-    app: {{ include "drupal.app" . }}
+    app: {{ .Values.drupal.app | quote }}
     release: {{ .Release.Name }}
 spec:
   storageClassName: nfs

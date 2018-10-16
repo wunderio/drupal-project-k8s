@@ -19,6 +19,8 @@ drupal:
   # Create a volume for private files.
   privateFiles:
     enabled: false
+    
+  app: drupal  
 
   postinstall:
     command: |

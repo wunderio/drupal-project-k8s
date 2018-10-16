@@ -27,9 +27,15 @@ drupal:
       cpu: 5m
       memory: 128M
 
+  publicFiles:
+    storage: 1Gi
+    storageClassName: nfs
+
   # Create a volume for private files.
   privateFiles:
     enabled: false
+    storage: 1G
+    storageClassName: nfs
 
   postinstall:
     command: |

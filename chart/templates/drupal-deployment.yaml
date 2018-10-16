@@ -6,6 +6,7 @@ metadata:
     app: drupal
     release: {{ .Release.Name }}
 spec:
+  replicas: {{ .Values.drupal.replicas }}
   selector:
     matchLabels:
       app: drupal

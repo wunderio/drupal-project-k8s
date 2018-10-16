@@ -21,6 +21,7 @@ drupal:
   #these are added to drupal environment
     PHP_FPM_CLEAR_ENV: "no"
 
+  replicas: 1
   resources:
     requests:
       cpu: 5m

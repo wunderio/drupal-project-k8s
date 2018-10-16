@@ -30,6 +30,13 @@ tests:
             name: foo
             value: bar
 
+  - it: sets the replica count correctly
+    set:
+      drupal.replicas: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
 
   - it: takes resource requests and limits
     set:

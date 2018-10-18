@@ -3,20 +3,20 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    app: drupal
+    app: {{ .Values.drupal.app | quote }}
     release: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.drupal.replicas }}
   selector:
     matchLabels:
-      app: drupal
+      app: {{ .Values.drupal.app | quote }}
       release: {{ .Release.Name }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: drupal
+        app: {{ .Values.drupal.app | quote }}
         release: {{ .Release.Name }}
     spec:
       containers:

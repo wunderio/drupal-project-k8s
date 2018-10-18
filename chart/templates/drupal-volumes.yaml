@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-public-files
   labels:
-    app: drupal
+    app: {{ .Values.drupal.app | quote }}
     release: {{ .Release.Name }}
 spec:
   storageClassName: {{ .Values.drupal.publicFiles.storageClassName }}
@@ -19,7 +19,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-private-files
   labels:
-    app: drupal
+    app: {{ .Values.drupal.app | quote }}
     release: {{ .Release.Name }}
 spec:
   storageClassName: {{ .Values.drupal.privateFiles.storageClassName }}

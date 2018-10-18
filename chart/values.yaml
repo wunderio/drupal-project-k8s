@@ -2,6 +2,12 @@
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
+  loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg 
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
+
 drupal:
   image: 'you need to pass in a value for drupal.image to your helm chart'
 
@@ -13,14 +19,28 @@ drupal:
   # need to be base64 encoded
   hashsalt: "template-hash-salt" 
   env:
-  #these are added to drupal environment
-    PHP_FPM_CLEAR_ENV: "no"
+  php:
+    loglevel: warn # Possible Values: alert, error, warning, notice, debug
+    upload_max_filesize: 60M
+    post_max_size: 60M
+
+  replicas: 1
+  resources:
+    requests:
+      cpu: 5m
+      memory: 128M
+
+  publicFiles:
+    storage: 1Gi
+    storageClassName: nfs
 
   # Create a volume for private files.
   privateFiles:
     enabled: false
+    storage: 1G
+    storageClassName: nfs
     
-  app: drupal  
+  app: drupal
 
   postinstall:
     command: |

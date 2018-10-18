@@ -19,6 +19,8 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - {{ $job.command | quote }}
+            resources:
+{{ $.Values.drupal.resources | toYaml | indent 14 }}
           restartPolicy: OnFailure
           volumes:
             {{ include "drupal.volumes" $ | indent 12 }}

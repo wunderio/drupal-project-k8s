@@ -21,6 +21,18 @@ volumeMounts:
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
+  - name: php-conf
+    mountPath: /etc/php7/php.ini
+    readOnly: true
+    subPath: php.ini
+  - name: php-conf
+    mountPath: /etc/php7/php-fpm.conf
+    readOnly: true
+    subPath: php-fpm.conf
+  - name: php-conf
+    mountPath: /etc/php7/php-fpm.d/www.conf
+    readOnly: true
+    subPath: php-fpm.d/www.conf
 {{- end }}
 
 {{- define "drupal.volumes" }}
@@ -32,6 +44,16 @@ volumeMounts:
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-private-files
 {{- end }}
+- name: php-conf
+  configMap:
+    name: {{ .Release.Name }}-php-conf
+    items:
+      - key: php.ini
+        path: php.ini
+      - key: php-fpm.conf
+        path: php-fpm.conf
+      - key: www.conf
+        path: php-fpm.d/www.conf
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

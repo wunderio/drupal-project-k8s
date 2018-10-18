@@ -2,6 +2,11 @@
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
+
 drupal:
   image: 'you need to pass in a value for drupal.image to your helm chart'
 
@@ -16,9 +21,21 @@ drupal:
   #these are added to drupal environment
     PHP_FPM_CLEAR_ENV: "no"
 
+  replicas: 1
+  resources:
+    requests:
+      cpu: 5m
+      memory: 128M
+
+  publicFiles:
+    storage: 1Gi
+    storageClassName: nfs
+
   # Create a volume for private files.
   privateFiles:
     enabled: false
+    storage: 1G
+    storageClassName: nfs
 
   postinstall:
     command: |

@@ -22,7 +22,10 @@ tests:
 
   - it: private files should work when enabled
     set:
-      drupal.privateFiles.enabled: true
+      drupal.privateFiles:
+        enabled: true
+        storage: 123Gi
+        storageClassName: foo
     asserts:
       # A private files volume is mounted
       - contains:
@@ -68,4 +71,15 @@ tests:
             name: "drupal-private-files"
             persistentVolumeClaim:
               claimName: RELEASE-NAME-private-files
+
+      - template: drupal-volumes.yaml
+        documentIndex: 1
+        equal:
+          path: spec.storageClassName
+          value: foo
+      - template: drupal-volumes.yaml
+        documentIndex: 1
+        equal:
+          path: spec.resources.requests.storage
+          value: 123Gi
 

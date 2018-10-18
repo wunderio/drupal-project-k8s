@@ -6,12 +6,12 @@ metadata:
     app: drupal
     release: {{ .Release.Name }}
 spec:
-  storageClassName: nfs
+  storageClassName: {{ .Values.drupal.publicFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 1Gi
+      storage: {{ .Values.drupal.publicFiles.storage }}
 ---
 {{- if .Values.drupal.privateFiles.enabled }}
 apiVersion: v1
@@ -22,10 +22,10 @@ metadata:
     app: drupal
     release: {{ .Release.Name }}
 spec:
-  storageClassName: nfs
+  storageClassName: {{ .Values.drupal.privateFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 1Gi
+      storage: {{ .Values.drupal.privateFiles.storage }}
 {{- end }}

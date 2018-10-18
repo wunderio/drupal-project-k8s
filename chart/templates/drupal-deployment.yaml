@@ -6,6 +6,7 @@ metadata:
     app: drupal
     release: {{ .Release.Name }}
 spec:
+  replicas: {{ .Values.drupal.replicas }}
   selector:
     matchLabels:
       app: drupal
@@ -34,12 +35,16 @@ spec:
             - /bin/sh
             - -c
             - drush status
+        resources:
+{{ .Values.drupal.resources | toYaml | indent 10 }}
+
       # Nginx container
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
         resources:
           requests:
             cpu: "50m"
+        env:
         ports:
         - containerPort: 80
           name: drupal
@@ -54,6 +59,8 @@ spec:
           mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
           subPath: conf.d/drupal.conf
+        resources:
+{{ .Values.nginx.resources | toYaml | indent 10 }}
 
       volumes:
         {{ include "drupal.volumes" . | indent 8}}

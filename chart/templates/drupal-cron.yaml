@@ -3,6 +3,8 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ $.Release.Name }}-cron-{{ $index }}
+  labels:
+    release: "{{ $.Release.Name }}"
 spec:
   schedule: {{ $job.schedule | quote }}
   concurrencyPolicy: Forbid

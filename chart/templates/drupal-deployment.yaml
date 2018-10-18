@@ -41,25 +41,35 @@ spec:
       # Nginx container
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
+        resources:
+          requests:
+            cpu: "50m"
         env:
-        - name: NGINX_STATIC_CONTENT_OPEN_FILE_CACHE
-          value: "off"
-        - name: NGINX_ERROR_LOG_LEVEL
-          value: debug
-        - name: NGINX_BACKEND_HOST
-          value: localhost
-        - name: NGINX_SERVER_ROOT
-          value: /var/www/html/web
         ports:
         - containerPort: 80
           name: drupal
         volumeMounts:
         - name: drupal-public-files
           mountPath: /var/www/html/web/sites/default/files
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: nginx.conf
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: conf.d/drupal.conf
         resources:
 {{ .Values.nginx.resources | toYaml | indent 10 }}
 
       volumes:
         {{ include "drupal.volumes" . | indent 8}}
-
+        - name: nginx-conf
+          configMap:
+            name: {{ .Release.Name }}-nginx-conf
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+              - key: drupal.conf
+                path: conf.d/drupal.conf
       {{ include "drupal.imagePullSecrets" . | indent 6 }}

@@ -3,6 +3,7 @@ templates:
   - drupal-deployment.yaml
   - drupal-volumes.yaml
   - postinstall.yaml
+  - postupgrade.yaml
   - drupal-cron.yaml
 tests:
   - it: private files should be disabled by default
@@ -57,6 +58,13 @@ tests:
 
       # Private files are available for in the post-install hooks.
       - template: postinstall.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+      - template: postupgrade.yaml
         contains:
           path: spec.template.spec.volumes
           content:

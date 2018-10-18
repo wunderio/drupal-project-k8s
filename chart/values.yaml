@@ -39,6 +39,8 @@ drupal:
     enabled: false
     storage: 1G
     storageClassName: nfs
+    
+  app: drupal
 
   postinstall:
     command: |

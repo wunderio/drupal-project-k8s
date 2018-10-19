@@ -27,7 +27,7 @@ drupal:
   replicas: 1
   resources:
     requests:
-      cpu: 50m
+      cpu: 100m
       memory: 128M
 
   publicFiles:

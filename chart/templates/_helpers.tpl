@@ -64,6 +64,7 @@ imagePullSecrets:
 {{- end }}
 
 {{- define "drupal.env" }}
+{{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
 - name: DB_NAME
@@ -75,6 +76,7 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
+{{- end }}
 - name: HASH_SALT
   valueFrom:
     secretKeyRef:

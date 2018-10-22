@@ -58,6 +58,7 @@ drupal:
       fi;
 
 mariadb:
+  enabled: true
   replication:
     enabled: false
   rootUser:

@@ -24,11 +24,8 @@ spec:
       - name: drupal
         {{ include "drupal.php-container" . | indent 8}}
         livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - drush status
+          tcpSocket:
+            port: 9000
         readinessProbe:
           exec:
             command:

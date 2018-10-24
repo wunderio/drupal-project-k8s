@@ -62,11 +62,13 @@ mariadb:
   replication:
     enabled: false
   rootUser:
-    password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
+    # A random password will be generated if you do not supply one. 
+    password:
   db:
     name: drupal
     user: drupal
-    password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
+    # A random password will be generated if you do not supply one. 
+    password:
 
 # Cluster configuration.
 clusterDomain: "silta.wdr.io"

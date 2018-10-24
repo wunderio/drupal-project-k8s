@@ -55,6 +55,11 @@ $settings['file_scan_ignore_directories'] = [
 ];
 
 /**
+ * Generated twig files should not be on shared storage.
+ */
+$settings['php_storage']['twig']['directory'] = '/tmp';
+
+/**
  * If a volume has been set for private files, tell Drupal about it.
  */
 if (getenv('PRIVATE_FILES_PATH')) {

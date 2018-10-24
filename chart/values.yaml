@@ -13,7 +13,24 @@ drupal:
 
   cron:
     - schedule: '0 * * * *'
-      command: 'drush cron'
+      command: 'bootstrapped=$(drush status --field=bootstrap);
+        if [[ $bootstrapped = "Successful" ]];
+        then
+          drush cron;
+        fi;'
+    - schedule: '0 3 * * *'
+      command: 'bootstrapped=$(drush status --field=bootstrap);
+        if [[ $bootstrapped = "Successful" ]] && [[ "$BRANCHNAME" = "$PRODUCTION_BRANCHNAME" ]];
+        then
+          DUMP_PATH=/var/backups/db/${BRANCHNAME//[^[:alnum:]]/-}-latest.sql;
+          rm $DUMP_PATH;
+          if [ -f ../gdpr.json ]; then
+            export PATH=../vendor/bin:$PATH;
+            drush sql-dump --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file $DUMP_PATH;
+          else
+            drush sql-dump --result-file $DUMP_PATH;
+          fi
+        fi;'
 
   # will be generated random hashsalt if not provided here
   # need to be base64 encoded
@@ -76,3 +93,4 @@ clusterDomain: "silta.wdr.io"
 imagePullSecrets: []
 
 branchname: "default"
+production_branchname: "master"

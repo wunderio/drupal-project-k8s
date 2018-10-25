@@ -17,8 +17,8 @@ drupal:
 
   # will be generated random hashsalt if not provided here
   # need to be base64 encoded
-  hashsalt: "template-hash-salt" 
-  env:
+  hashsalt: "template-hash-salt"
+  env: {}
   php_ini:
     loglevel: warn # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M

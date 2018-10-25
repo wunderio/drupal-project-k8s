@@ -3,29 +3,29 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-public-files
   labels:
-    app: {{ .Values.drupal.app | quote }}
+    app: {{ .Values.php.app | quote }}
     release: {{ .Release.Name }}
 spec:
-  storageClassName: {{ .Values.drupal.publicFiles.storageClassName }}
+  storageClassName: {{ .Values.php.publicFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.drupal.publicFiles.storage }}
+      storage: {{ .Values.php.publicFiles.storage }}
 ---
-{{- if .Values.drupal.privateFiles.enabled }}
+{{- if .Values.php.privateFiles.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-private-files
   labels:
-    app: {{ .Values.drupal.app | quote }}
+    app: {{ .Values.php.app | quote }}
     release: {{ .Release.Name }}
 spec:
-  storageClassName: {{ .Values.drupal.privateFiles.storageClassName }}
+  storageClassName: {{ .Values.php.privateFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.drupal.privateFiles.storage }}
+      storage: {{ .Values.php.privateFiles.storage }}
 {{- end }}

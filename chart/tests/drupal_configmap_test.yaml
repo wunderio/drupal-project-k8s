@@ -10,7 +10,7 @@ tests:
 
   - it: injects the php.ini values
     set:
-      drupal.php_ini:
+      php.php_ini:
         loglevel: 'debug'
         upload_max_filesize: '123M'
         post_max_size: '321M'

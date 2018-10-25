@@ -9,7 +9,7 @@ release: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "drupal.php-container" }}
-image: {{ .Values.drupal.image | quote }}
+image: {{ .Values.php.image | quote }}
 env: {{ include "drupal.env" . }}
 ports:
   - containerPort: 9000
@@ -17,7 +17,7 @@ ports:
 volumeMounts:
   - name: drupal-public-files
     mountPath: /var/www/html/web/sites/default/files
-  {{- if .Values.drupal.privateFiles.enabled }}
+  {{- if .Values.php.privateFiles.enabled }}
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
@@ -39,7 +39,7 @@ volumeMounts:
 - name: drupal-public-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-public-files
-{{- if .Values.drupal.privateFiles.enabled }}
+{{- if .Values.php.privateFiles.enabled }}
 - name: drupal-private-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-private-files
@@ -82,11 +82,11 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-drupal
       key: hashsalt
-{{- range $key, $val := .Values.drupal.env }}
+{{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
-{{- if .Values.drupal.privateFiles.enabled }}
+{{- if .Values.php.privateFiles.enabled }}
 - name: PRIVATE_FILES_PATH
   value: '/var/www/html/private'
 {{- end }}

@@ -12,7 +12,7 @@ tests:
 
   - it: uses the right docker images
     set:
-      drupal.image: 'drupal-12345'
+      php.image: 'drupal-12345'
       nginx.image: 'nginx-12345'
     asserts:
       - equal:
@@ -24,7 +24,7 @@ tests:
 
   - it: sets environment variables correctly
     set:
-      drupal.env:
+      php.env:
         foo: bar
     asserts:
       - contains:
@@ -43,7 +43,7 @@ tests:
 
   - it: takes resource requests and limits
     set:
-      drupal.resources:
+      php.resources:
         requests:
           cpu: 123m
           memory: 1G

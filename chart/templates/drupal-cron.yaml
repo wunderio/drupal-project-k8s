@@ -1,4 +1,4 @@
-{{- range $index, $job := .Values.drupal.cron }}
+{{- range $index, $job := .Values.php.cron }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -20,7 +20,7 @@ spec:
             args:
               - {{ $job.command | quote }}
             resources:
-{{ $.Values.drupal.resources | toYaml | indent 14 }}
+{{ $.Values.php.resources | toYaml | indent 14 }}
           restartPolicy: OnFailure
           volumes:
             {{ include "drupal.volumes" $ | indent 12 }}

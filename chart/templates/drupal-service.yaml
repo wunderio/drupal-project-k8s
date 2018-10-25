@@ -7,7 +7,6 @@ metadata:
     release: {{ .Release.Name }}
   annotations:
     getambassador.io/config: |
-      ---
       apiVersion: ambassador/v0
       kind:  Mapping
       name:  {{ .Release.Name }}-drupal

@@ -150,14 +150,14 @@ data:
     igbinary.compact_strings=1                                           
   
 
-  php-fpm.conf: |
+  php-fpm_conf: |
     [global]
     error_log = /proc/self/fd/2
     log_level = {{ .Values.php.php_ini.loglevel }} ; Possible Values: alert, error, warning, notice, debug
     daemonize = no
     include=/etc/php7/php-fpm.d/*.conf                                               
 
-  www.conf: |
+  www_conf: |
     [www]
     listen = [::]:9000
     pm = ondemand

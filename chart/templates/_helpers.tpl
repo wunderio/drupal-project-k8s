@@ -28,11 +28,11 @@ volumeMounts:
   - name: php-conf
     mountPath: /etc/php7/php-fpm.conf
     readOnly: true
-    subPath: php-fpm.conf
+    subPath: php-fpm_conf
   - name: php-conf
     mountPath: /etc/php7/php-fpm.d/www.conf
     readOnly: true
-    subPath: php-fpm.d/www.conf
+    subPath: www_conf
 {{- end }}
 
 {{- define "drupal.volumes" }}
@@ -50,10 +50,10 @@ volumeMounts:
     items:
       - key: php_ini
         path: php_ini
-      - key: php-fpm.conf
-        path: php-fpm.conf
-      - key: www.conf
-        path: php-fpm.d/www.conf
+      - key: php-fpm_conf
+        path: php-fpm_conf
+      - key: www_conf
+        path: www_conf
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

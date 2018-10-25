@@ -9,6 +9,9 @@ tests:
       - equal:
           path: spec.replicas
           value: 1
+      - equal:
+          path: metadata.labels.app
+          value: drupal
 
   - it: uses the right docker images
     set:

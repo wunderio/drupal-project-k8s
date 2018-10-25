@@ -7,6 +7,9 @@ tests:
     asserts:
       - isKind:
           of: ConfigMap
+      - equal:
+          path: metadata.labels.app
+          value: drupal
 
   - it: injects the php.ini values
     set:

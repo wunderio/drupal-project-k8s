@@ -3,8 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-public-files
   labels:
-    app: {{ .Values.php.app | quote }}
-    release: {{ .Release.Name }}
+    {{ include "drupal.release_labels" . | indent 4 }}
 spec:
   storageClassName: {{ .Values.publicFiles.storageClassName }}
   accessModes:
@@ -19,7 +18,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-private-files
   labels:
-    app: {{ .Values.php.app | quote }}
+    app: {{ .Values.app | quote }}
     release: {{ .Release.Name }}
 spec:
   storageClassName: {{ .Values.privateFiles.storageClassName }}

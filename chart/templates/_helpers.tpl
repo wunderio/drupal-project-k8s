@@ -1,5 +1,5 @@
 {{- define "drupal.release_labels" }}
-app: {{ printf "%s-%s" .Release.Name .Chart.Name | trunc 63 }}
+app: {{ .Values.app | quote }}
 version: {{ .Chart.Version }}
 release: {{ .Release.Name }}
 {{- end }}

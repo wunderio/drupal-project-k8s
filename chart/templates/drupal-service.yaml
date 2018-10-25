@@ -3,8 +3,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    app: {{ .Values.php.app | quote }}
-    release: {{ .Release.Name }}
+    {{ include "drupal.release_labels" . | indent 4 }}
   annotations:
     getambassador.io/config: |
       apiVersion: ambassador/v0
@@ -20,5 +19,5 @@ spec:
   ports:
     - port: 80
   selector:
-    app: {{ .Values.php.app | quote }}
+    app: {{ .Values.app | quote }}
     release: {{ .Release.Name }}

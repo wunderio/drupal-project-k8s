@@ -11,6 +11,9 @@ environmentName: null
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
+# The app label added to our Kubernetes resources.
+app: drupal
+
 # How many instances of the Drupal pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.
 # Multiple pods make sense for high availability.
@@ -45,8 +48,6 @@ php:
     requests:
       cpu: 100m
       memory: 128M
-    
-  app: drupal
 
   postinstall:
     command: |

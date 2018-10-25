@@ -6,6 +6,9 @@ tests:
     asserts:
       - isKind:
           of: CronJob
+      - equal:
+          path: metadata.labels.app
+          value: drupal
 
   - it: uses the right docker image
     set:

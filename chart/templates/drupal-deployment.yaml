@@ -6,7 +6,7 @@ metadata:
     app: {{ .Values.drupal.app | quote }}
     release: {{ .Release.Name }}
 spec:
-  replicas: {{ .Values.drupal.replicas }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: {{ .Values.drupal.app | quote }}

@@ -5,7 +5,7 @@ clusterDomain: "silta.wdr.io"
 # An optional human-readable label for the environment, defaults to the release name.
 # We typically pass the branch name when we build dedicated environments per branch.
 # This name is mainly used to create nice hostnames for each environment.
-environmentName: ''
+environmentName: null
 
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/

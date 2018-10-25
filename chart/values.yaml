@@ -94,14 +94,12 @@ privateFiles:
   storage: 1G
   storageClassName: nfs
 
+# Override the default values of the MariaDB subchart.
+# These settings are optimised for development environments.
 mariadb:
   enabled: true
   replication:
     enabled: false
-  rootUser:
-    password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
   db:
     name: drupal
     user: drupal
-    password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
-

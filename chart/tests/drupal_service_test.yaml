@@ -1,0 +1,19 @@
+suite: drupal service
+templates:
+  - drupal-service.yaml
+tests:
+  - it: is a service
+    asserts:
+      - isKind:
+          of: Service
+
+  - it: uses the right docker images
+    set:
+      branchname: 'bar'
+      clusterDomain: 'silta.example.com'
+    release:
+      namespace: 'foo'
+    asserts:
+      - equal:
+          path: "metadata.annotations.domain"
+          value: "bar.foo.silta.example.com"

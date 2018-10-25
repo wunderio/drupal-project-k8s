@@ -88,7 +88,7 @@ jobs:
           helm dependency build ./chart
 
           helm upgrade --install $RELEASE_NAME ./chart \
-            --set branchname=$CIRCLE_BRANCH \
+            --set branchName=$CIRCLE_BRANCH \
             --set drupal.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-drupal:$CIRCLE_SHA1 \
             --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 \
             --set mariadb.rootUser.password=$DB_ROOT_PASS \

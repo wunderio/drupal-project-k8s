@@ -75,4 +75,4 @@ clusterDomain: "silta.wdr.io"
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
-branchname: "default"
+branchName: "default"

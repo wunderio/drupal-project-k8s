@@ -5,7 +5,7 @@ release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "drupal.domain" -}}
-{{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ regexReplaceAll "[^[:alnum:]]" .Values.branchName "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}
 
 {{- define "drupal.php-container" }}

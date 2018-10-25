@@ -9,7 +9,7 @@ tests:
 
   - it: uses the right docker images
     set:
-      branchname: 'bar'
+      branchName: 'bar'
       clusterDomain: 'silta.example.com'
     release:
       namespace: 'foo'

@@ -24,7 +24,7 @@ volumeMounts:
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true
-    subPath: php.ini
+    subPath: php_ini
   - name: php-conf
     mountPath: /etc/php7/php-fpm.conf
     readOnly: true
@@ -48,8 +48,8 @@ volumeMounts:
   configMap:
     name: {{ .Release.Name }}-php-conf
     items:
-      - key: php.ini
-        path: php.ini
+      - key: php_ini
+        path: php_ini
       - key: php-fpm.conf
         path: php-fpm.conf
       - key: www.conf

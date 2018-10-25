@@ -17,7 +17,7 @@ ports:
 volumeMounts:
   - name: drupal-public-files
     mountPath: /var/www/html/web/sites/default/files
-  {{- if .Values.php.privateFiles.enabled }}
+  {{- if .Values.privateFiles.enabled }}
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
@@ -39,7 +39,7 @@ volumeMounts:
 - name: drupal-public-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-public-files
-{{- if .Values.php.privateFiles.enabled }}
+{{- if .Values.privateFiles.enabled }}
 - name: drupal-private-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-private-files
@@ -86,7 +86,7 @@ imagePullSecrets:
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
-{{- if .Values.php.privateFiles.enabled }}
+{{- if .Values.privateFiles.enabled }}
 - name: PRIVATE_FILES_PATH
   value: '/var/www/html/private'
 {{- end }}

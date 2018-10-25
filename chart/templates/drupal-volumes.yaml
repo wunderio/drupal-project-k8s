@@ -6,14 +6,14 @@ metadata:
     app: {{ .Values.php.app | quote }}
     release: {{ .Release.Name }}
 spec:
-  storageClassName: {{ .Values.php.publicFiles.storageClassName }}
+  storageClassName: {{ .Values.publicFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.php.publicFiles.storage }}
+      storage: {{ .Values.publicFiles.storage }}
 ---
-{{- if .Values.php.privateFiles.enabled }}
+{{- if .Values.privateFiles.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -22,10 +22,10 @@ metadata:
     app: {{ .Values.php.app | quote }}
     release: {{ .Release.Name }}
 spec:
-  storageClassName: {{ .Values.php.privateFiles.storageClassName }}
+  storageClassName: {{ .Values.privateFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.php.privateFiles.storage }}
+      storage: {{ .Values.privateFiles.storage }}
 {{- end }}

@@ -1,10 +1,11 @@
 
-# Cluster configuration.
+# Main domain of the cluster.
+# If using ambassador, subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
 
 # An optional human-readable label for the environment, defaults to the release name.
 # We typically pass the branch name when we build dedicated environments per branch.
-# This name is mainly used to create nice hostnames for each environment.
+# This name is mainly used to create nice subdomains for each environment.
 environmentName: null
 
 # Configure image pull secrets for the containers. This is not needed on GKE.

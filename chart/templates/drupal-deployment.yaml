@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       # php-fpm container.
-      - name: drupal
+      - name: php
         {{ include "drupal.php-container" . | indent 8}}
         livenessProbe:
           tcpSocket:

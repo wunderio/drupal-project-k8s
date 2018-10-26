@@ -70,6 +70,21 @@ mariadb:
 
 elasticsearch:
   enabled: true
+  data:
+    exposeHttp: true
+    persistence:
+      enabled: false
+      size: 256Mi
+    replicas: 0
+    heapSize: 128m
+  master:
+    persistence:
+      enabled: false
+    replicas: 0
+    heapSize: 128m
+  client:
+    replicas: 0
+    heapSize: 128m
 
 # Cluster configuration.
 clusterDomain: "silta.wdr.io"

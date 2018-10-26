@@ -68,6 +68,9 @@ mariadb:
     user: drupal
     password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
 
+elasticsearch:
+  enabled: true
+
 # Cluster configuration.
 clusterDomain: "silta.wdr.io"
 

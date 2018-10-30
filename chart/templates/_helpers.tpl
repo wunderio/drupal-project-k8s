@@ -1,15 +1,15 @@
 {{- define "drupal.release_labels" }}
-app: {{ printf "%s-%s" .Release.Name .Chart.Name | trunc 63 }}
+app: {{ .Values.app | quote }}
 version: {{ .Chart.Version }}
 release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "drupal.domain" -}}
-{{ regexReplaceAll "[^[:alnum:]]" .Values.branchname "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}
 
 {{- define "drupal.php-container" }}
-image: {{ .Values.drupal.image | quote }}
+image: {{ .Values.php.image | quote }}
 env: {{ include "drupal.env" . }}
 ports:
   - containerPort: 9000
@@ -17,7 +17,7 @@ ports:
 volumeMounts:
   - name: drupal-public-files
     mountPath: /var/www/html/web/sites/default/files
-  {{- if .Values.drupal.privateFiles.enabled }}
+  {{- if .Values.privateFiles.enabled }}
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
@@ -26,22 +26,22 @@ volumeMounts:
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true
-    subPath: php.ini
+    subPath: php_ini
   - name: php-conf
     mountPath: /etc/php7/php-fpm.conf
     readOnly: true
-    subPath: php-fpm.conf
+    subPath: php-fpm_conf
   - name: php-conf
     mountPath: /etc/php7/php-fpm.d/www.conf
     readOnly: true
-    subPath: php-fpm.d/www.conf
+    subPath: www_conf
 {{- end }}
 
 {{- define "drupal.volumes" }}
 - name: drupal-public-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-public-files
-{{- if .Values.drupal.privateFiles.enabled }}
+{{- if .Values.privateFiles.enabled }}
 - name: drupal-private-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-private-files
@@ -53,12 +53,12 @@ volumeMounts:
   configMap:
     name: {{ .Release.Name }}-php-conf
     items:
-      - key: php.ini
-        path: php.ini
-      - key: php-fpm.conf
-        path: php-fpm.conf
-      - key: www.conf
-        path: php-fpm.d/www.conf
+      - key: php_ini
+        path: php_ini
+      - key: php-fpm_conf
+        path: php-fpm_conf
+      - key: www_conf
+        path: www_conf
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
@@ -69,10 +69,10 @@ imagePullSecrets:
 {{- end }}
 
 {{- define "drupal.env" }}
-- name: BRANCHNAME
-  value: {{ .Values.branchname }}
-- name: PRODUCTION_BRANCHNAME
-  value: {{ .Values.production_branchname | default "production" }}
+- name: IS_REFERENCE_ENVIRONMENT
+  value: {{ .Values.referenceEnvironment == .Values.environmentName }}
+- name: REFERENCE_ENVIRONMENT
+  value: {{ .Values.referenceEnvironment }}
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
@@ -91,11 +91,11 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-drupal
       key: hashsalt
-{{- range $key, $val := .Values.drupal.env }}
+{{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
-{{- if .Values.drupal.privateFiles.enabled }}
+{{- if .Values.privateFiles.enabled }}
 - name: PRIVATE_FILES_PATH
   value: '/var/www/html/private'
 {{- end }}

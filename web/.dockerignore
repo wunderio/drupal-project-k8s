@@ -3,8 +3,6 @@
 **/CHANGELOG*
 **/README*
 **/LICENSE*
-.circleci/*
-phpcs.xml
 **/*.sql
 **/*.gz
 **/*.zip

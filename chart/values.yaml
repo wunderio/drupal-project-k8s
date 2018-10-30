@@ -53,20 +53,6 @@ php:
         then
           drush cron;
         fi;
-    - schedule: '0 3 * * *'
-      command: |
-        bootstrapped=$(drush status --field=bootstrap);
-        if [[ $bootstrapped = "Successful" ]] && [[ $IS_REFERENCE_ENVIRONMENT ]];
-        then
-          DUMP_PATH=/var/backups/db/${REFERENCE_ENVIRONMENT//[^[:alnum:]]/-}-latest.sql;
-          rm $DUMP_PATH;
-          if [ -f ../gdpr.json ]; then
-            export PATH=../vendor/bin:$PATH;
-            drush sql-dump --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file $DUMP_PATH;
-          else
-            drush sql-dump --result-file $DUMP_PATH;
-          fi
-        fi;
 
   # Post-installation hook.
   # This is run every time a new environment is created.
@@ -116,6 +102,23 @@ privateFiles:
 referenceData:
   # The name of the environment from which reference data will be copied.
   referenceEnvironment: 'master'
+
+  schedule: '0 3 * * *'
+  command: |
+    bootstrapped=$(drush status --field=bootstrap);
+    if [[ $bootstrapped = "Successful" ]] && [[ $IS_REFERENCE_ENVIRONMENT ]];
+    then
+      DUMP_PATH=/var/backups/db/${REFERENCE_ENVIRONMENT//[^[:alnum:]]/-}-latest.sql;
+      rm $DUMP_PATH;
+      if [ -f ../gdpr.json ]; then
+        export PATH=../vendor/bin:$PATH;
+        drush sql-dump --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file $DUMP_PATH;
+      else
+        drush sql-dump --result-file $DUMP_PATH;
+      fi
+    fi;
+
+
   storage: 1G
   storageClassName: nfs
 

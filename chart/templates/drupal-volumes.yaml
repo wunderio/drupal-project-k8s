@@ -33,7 +33,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.referenceEnvironment }}-reference-data
+  name: {{ include "drupal.environmentName" . }}-reference-data
   labels:
     app: {{ .Values.app | quote }}
     release: {{ .Release.Name }}

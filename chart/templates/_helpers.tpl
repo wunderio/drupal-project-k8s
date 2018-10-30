@@ -5,7 +5,11 @@ release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "drupal.domain" -}}
-{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{- end -}}
+
+{{- define "drupal.environmentName" -}}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}
 {{- end -}}
 
 {{- define "drupal.php-container" }}
@@ -21,8 +25,8 @@ volumeMounts:
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
-  - name: drupal-dbdump-volume
-    mountPath: /var/backups/db
+  - name: reference-data-volume
+    mountPath: /var/reference-data
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true
@@ -46,9 +50,9 @@ volumeMounts:
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-private-files
 {{- end }}
-- name: drupal-dbdump-volume
+- name: reference-data-volume
   persistentVolumeClaim:
-    claimName: {{ .Release.Namespace }}-dbdump
+    claimName: {{ .Values.referenceData.referenceEnvironment }}-reference-data
 - name: php-conf
   configMap:
     name: {{ .Release.Name }}-php-conf

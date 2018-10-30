@@ -26,9 +26,9 @@ tests:
 
   - it: takes reference data information
     set:
-      environmentName: 'foo'
+      environmentName: 'feature/FOO'
       referenceData:
-        referenceEnvironment: 'foo'
+        referenceEnvironment: 'feature/FOO'
         storage: 123Gi
         storageClassName: foo
         schedule: '0 1 2 3 *'
@@ -40,7 +40,7 @@ tests:
         path: spec.template.spec.containers[0].env
         content:
           name: REFERENCE_ENVIRONMENT
-          value: foo
+          value: feature-foo
     - contains:
         path: spec.template.spec.containers[0].env
         content:

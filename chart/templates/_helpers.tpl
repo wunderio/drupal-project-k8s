@@ -12,6 +12,10 @@ release: {{ .Release.Name }}
 {{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}
 {{- end -}}
 
+{{- define "drupal.referenceEnvironment" -}}
+{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower }}
+{{- end -}}
+
 {{- define "drupal.php-container" }}
 image: {{ .Values.php.image | quote }}
 env: {{ include "drupal.env" . }}
@@ -52,7 +56,7 @@ volumeMounts:
 {{- end }}
 - name: reference-data-volume
   persistentVolumeClaim:
-    claimName: {{ .Values.referenceData.referenceEnvironment }}-reference-data
+    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
 - name: php-conf
   configMap:
     name: {{ .Release.Name }}-php-conf
@@ -76,7 +80,7 @@ imagePullSecrets:
 - name: IS_REFERENCE_ENVIRONMENT
   value: {{ eq .Values.referenceData.referenceEnvironment .Values.environmentName | int | quote }}
 - name: REFERENCE_ENVIRONMENT
-  value: {{ .Values.referenceData.referenceEnvironment | quote }}
+  value: {{ include "drupal.referenceEnvironment" . | quote }}
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"

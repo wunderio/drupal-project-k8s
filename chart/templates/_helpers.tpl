@@ -72,7 +72,7 @@ imagePullSecrets:
 - name: IS_REFERENCE_ENVIRONMENT
   value: {{ eq .Values.referenceEnvironment .Values.environmentName }}
 - name: REFERENCE_ENVIRONMENT
-  value: {{ .Values.referenceEnvironment }}
+  value: {{ .Values.referenceEnvironment | quote }}
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"

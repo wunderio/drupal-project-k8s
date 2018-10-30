@@ -50,14 +50,16 @@ php:
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
     - schedule: '0 * * * *'
-      command: 'bootstrapped=$(drush status --field=bootstrap);
+      command: |
+        bootstrapped=$(drush status --field=bootstrap);
         if [[ $bootstrapped = "Successful" ]];
         then
           drush cron;
-        fi;'
+        fi;
     - schedule: '0 3 * * *'
-      command: 'bootstrapped=$(drush status --field=bootstrap);
-        if [[ $bootstrapped = "Successful" ]] && [[ IS_REFERENCE_ENVIRONMENT ]];
+      command: |
+        bootstrapped=$(drush status --field=bootstrap);
+        if [[ $bootstrapped = "Successful" ]] && [[ $IS_REFERENCE_ENVIRONMENT ]];
         then
           DUMP_PATH=/var/backups/db/${REFERENCE_ENVIRONMENT//[^[:alnum:]]/-}-latest.sql;
           rm $DUMP_PATH;
@@ -67,7 +69,7 @@ php:
           else
             drush sql-dump --result-file $DUMP_PATH;
           fi
-        fi;'
+        fi;
 
   # Post-installation hook.
   # This is run every time a new environment is created.

@@ -47,9 +47,22 @@ $ helm upgrade --install drupal
     
 ```
 
-All default values are are optimised for low resource usage on non-production environments. Production environments 
-should have a dedicated files with values adapted to the project, among others: 
+All default values are are optimised for low resource usage on non-production environments.
+Production use cases will be supported (they have not been tested yet), but they should
+have a dedicated values file adapted to the needs of the project, among others:
 - High availability deployment using replicas.
 - More dedicated CPU and memory.
-- Database delegated to an external hosted service.
-- Dedicated ingress resource with a dedicated domain.
+- Database and persistent storage delegated to an external hosted service.
+- Dedicated ingress resource with a dedicated domain (to be implemented).
+
+## Dependencies
+Although this chart is built to work in a variety of different contexts, the default
+values assume that certain things will be in place in the cluster. Our setup of the
+the cluster itself can be seen here: https://github.com/wunderio/silta-cluster
+
+The relevant dependencies we currently have are:
+- An NFS server that provides an `nfs` storageClass. You can replace that with any
+storageClass that supports the `ReadWriteMany` access mode.
+- [Ambassador](https://getambassador.io) is running on the cluster with a wildcard DNS
+entry pointing to its load balancer. This makes it possible to have a dedicated
+domain added to each service with a simple annotation.

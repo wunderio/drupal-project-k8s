@@ -28,3 +28,20 @@ spec:
     requests:
       storage: {{ .Values.privateFiles.storage }}
 {{- end }}
+---
+{{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.referenceEnvironment }}-reference-data
+  labels:
+    app: {{ .Values.app | quote }}
+    release: {{ .Release.Name }}
+spec:
+  storageClassName: {{ .Values.referenceData.storageClassName }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.referenceData.storage }}
+{{- end }}

@@ -8,9 +8,6 @@ clusterDomain: "silta.wdr.io"
 # This name is mainly used to create nice subdomains for each environment.
 environmentName: ""
 
-# The name of the reference environment from which data will be copied for new environments.
-referenceEnvironment: "master"
-
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -112,6 +109,13 @@ publicFiles:
 # Configure an optional volume used for Drupal private files.
 privateFiles:
   enabled: false
+  storage: 1G
+  storageClassName: nfs
+
+# Configure reference data that will be used when creating new environments.
+referenceData:
+  # The name of the environment from which reference data will be copied.
+  referenceEnvironment: 'master'
   storage: 1G
   storageClassName: nfs
 

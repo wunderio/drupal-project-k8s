@@ -70,9 +70,9 @@ imagePullSecrets:
 
 {{- define "drupal.env" }}
 - name: IS_REFERENCE_ENVIRONMENT
-  value: {{ eq .Values.referenceEnvironment .Values.environmentName | int | quote }}
+  value: {{ eq .Values.referenceData.referenceEnvironment .Values.environmentName | int | quote }}
 - name: REFERENCE_ENVIRONMENT
-  value: {{ .Values.referenceEnvironment | quote }}
+  value: {{ .Values.referenceData.referenceEnvironment | quote }}
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"

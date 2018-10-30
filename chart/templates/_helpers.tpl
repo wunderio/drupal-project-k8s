@@ -70,7 +70,7 @@ imagePullSecrets:
 
 {{- define "drupal.env" }}
 - name: IS_REFERENCE_ENVIRONMENT
-  value: {{ .Values.referenceEnvironment == .Values.environmentName }}
+  value: {{ eq .Values.referenceEnvironment .Values.environmentName }}
 - name: REFERENCE_ENVIRONMENT
   value: {{ .Values.referenceEnvironment }}
 {{- if .Values.mariadb.enabled }}

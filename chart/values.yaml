@@ -6,7 +6,7 @@ clusterDomain: "silta.wdr.io"
 # An optional human-readable label for the environment, defaults to the release name.
 # We typically pass the branch name when we build dedicated environments per branch.
 # This name is mainly used to create nice subdomains for each environment.
-environmentName: null
+environmentName: ""
 
 # The name of the reference environment from which data will be copied for new environments.
 referenceEnvironment: "master"

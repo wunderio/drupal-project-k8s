@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ .Release.Name }}-reference-data-cron
+  name: {{ .Release.Name }}-refdata
   labels:
     {{ include "drupal.release_labels" . | indent 4 }}
 spec:

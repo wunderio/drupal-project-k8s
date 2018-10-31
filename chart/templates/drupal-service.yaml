@@ -3,11 +3,9 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    app: {{ .Values.drupal.app | quote }}
-    release: {{ .Release.Name }}
+    {{ include "drupal.release_labels" . | indent 4 }}
   annotations:
     getambassador.io/config: |
-      ---
       apiVersion: ambassador/v0
       kind:  Mapping
       name:  {{ .Release.Name }}-drupal
@@ -21,11 +19,12 @@ metadata:
       name:  ambassador
       config:
         use_remote_address: true
+    domain: {{ template "drupal.domain" . }}
 spec:
   type: NodePort
   externalTrafficPolicy: Local
   ports:
     - port: 80
   selector:
-    app: {{ .Values.drupal.app | quote }}
+    app: {{ .Values.app | quote }}
     release: {{ .Release.Name }}

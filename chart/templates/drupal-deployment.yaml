@@ -3,25 +3,22 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    app: {{ .Values.drupal.app | quote }}
-    release: {{ .Release.Name }}
+    {{ include "drupal.release_labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.drupal.replicas }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.drupal.app | quote }}
-      release: {{ .Release.Name }}
+      {{ include "drupal.release_labels" . | indent 6 }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: {{ .Values.drupal.app | quote }}
-        release: {{ .Release.Name }}
+        {{ include "drupal.release_labels" . | indent 8 }}
     spec:
       containers:
       # php-fpm container.
-      - name: drupal
+      - name: php
         {{ include "drupal.php-container" . | indent 8}}
         livenessProbe:
           tcpSocket:
@@ -33,7 +30,7 @@ spec:
             - -c
             - drush status
         resources:
-{{ .Values.drupal.resources | toYaml | indent 10 }}
+{{ .Values.php.resources | toYaml | indent 10 }}
 
       # Nginx container
       - name: nginx

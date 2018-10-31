@@ -92,7 +92,7 @@ imagePullSecrets:
 {{- end }}
 {{- end }}
 
-{{- define "nginx.basicauth" }}
+{{- define "drupal.basicauth" }}
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;
   allow 127.0.0.1;

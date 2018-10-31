@@ -5,7 +5,7 @@ metadata:
   labels:
     {{ include "drupal.release_labels" . | indent 4 }}
 data:
-  nginx.conf: |
+  nginx_conf: |
     user                            nginx;                                                 
     worker_processes                auto;
 
@@ -72,7 +72,7 @@ data:
         include conf.d/*.conf;                                                                                                                             
     }     
 
-  drupal.conf: |
+  drupal_conf: |
     upstream php {                                                  
         server localhost:9000;                   
     }                            

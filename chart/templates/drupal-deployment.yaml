@@ -48,11 +48,11 @@ spec:
         - name: nginx-conf
           mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
-          subPath: nginx.conf
+          subPath: nginx_conf
         - name: nginx-conf
           mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
-          subPath: conf.d/drupal.conf
+          subPath: drupal_conf
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           mountPath: /etc/nginx/.htaccess
@@ -68,10 +68,10 @@ spec:
           configMap:
             name: {{ .Release.Name }}-nginx-conf
             items:
-              - key: nginx.conf
-                path: nginx.conf
-              - key: drupal.conf
-                path: conf.d/drupal.conf
+              - key: nginx_conf
+                path: nginx_conf
+              - key: drupal_conf
+                path: drupal_conf
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:

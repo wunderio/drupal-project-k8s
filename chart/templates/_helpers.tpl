@@ -15,6 +15,24 @@ ports:
   - containerPort: 9000
     name: drupal
 volumeMounts:
+  {{ include "drupal.volumeMounts" . | indent 8 }}
+{{- end }}
+
+{{- define "drupal.shell-container" }}
+image: {{ .Values.shell.image | quote }}
+env:
+  {{ include "drupal.env" . | indent 2 }}
+  - name: GIT_AUTH_TOKEN
+    value: "{{ .Values.shell.gitAuthToken }}"
+  - name: REPOSITORY_URL
+    value: "{{ .Values.repositoryUrl }}"
+ports:
+  - containerPort: 22
+volumeMounts:
+  {{ include "drupal.volumeMounts" . | indent 8 }}
+{{- end }}
+
+{{- define "drupal.volumeMounts" }}
   - name: drupal-public-files
     mountPath: /var/www/html/web/sites/default/files
   {{- if .Values.privateFiles.enabled }}

@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.branchNameUrl }}-shell
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "drupal.release_labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        {{ include "drupal.release_labels" . | indent 8 }}
+    spec:
+      containers:
+      - name: shell
+        {{ include "drupal.shell-container" . | indent 8 }}
+        livenessProbe:
+          tcpSocket:
+            port: 22
+        resources:
+{{ .Values.php.resources | toYaml | indent 10 }}
+      volumes:
+        {{ include "drupal.volumes" . | indent 8}}
+        - name: nginx-conf
+          configMap:
+            name: {{ .Release.Name }}-nginx-conf
+            items:
+            - key: nginx.conf
+              path: nginx.conf
+            - key: drupal.conf
+              path: conf.d/drupal.conf
+          {{ include "drupal.imagePullSecrets" . | indent 6 }}

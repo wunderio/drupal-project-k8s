@@ -13,7 +13,6 @@ metadata:
       prefix: /
       service: {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
       timeout_ms: 30000
-      ---
       apiVersion: ambassador/v0
       kind: Module
       name:  ambassador

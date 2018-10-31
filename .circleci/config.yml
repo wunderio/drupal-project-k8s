@@ -1,4 +1,9 @@
-version: 2
+version: 2.1
+commands:
+  set_release_name:
+    steps:
+      - run: /home/circleci/utils/set_release_name.sh
+
 jobs:
   validate:
     docker:
@@ -67,9 +72,7 @@ jobs:
     steps:
       - checkout
 
-      - run: |
-          # Set the release name for later reuse.
-          /home/circleci/utils/set_release_name.sh
+      - set_release_name
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json

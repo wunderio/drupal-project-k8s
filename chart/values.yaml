@@ -36,18 +36,17 @@ nginx:
   basicauth:
     enabled: true
 
+    # Define username and password
+    credentials:
+      username: silta
+      password: demo
+
     # Trust X-Forwarded-For from these hosts for getting external IP 
     realipfrom: 10.0.0.0/8
 
     # Add IP addresses that should be excluded from basicauth
     noauthips:
       - 10.0.0.0/8 # GKE internal IPs
-
-    # Define htaccess username and password
-    htaccess:
-      username: silta
-      password: demo
-
 
   loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg
 

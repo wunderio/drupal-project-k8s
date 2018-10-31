@@ -96,7 +96,7 @@ imagePullSecrets:
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;
   allow 127.0.0.1;
-  {{- range .Values.nginx.noauthips }}
+  {{- range .Values.nginx.basicauth.noauthips }}
   allow {{ . }};
   {{- end }}
   deny all;

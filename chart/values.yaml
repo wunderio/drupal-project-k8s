@@ -35,18 +35,18 @@ nginx:
   basicauth:
     enabled: true
 
-  # Trust X-Forwarded-For from these hosts for getting external IP 
-  realipfrom: 10.0.0.0/8
+    # Trust X-Forwarded-For from these hosts for getting external IP 
+    realipfrom: 10.0.0.0/8
 
-  # Add IP addresses that should be excluded from basicauth
-  noauthips:
-    - 10.0.0.0/8 # GKE internal IPs
+    # Add IP addresses that should be excluded from basicauth
+    noauthips:
+      - 10.0.0.0/8 # GKE internal IPs
 
-  # use htpasswd utility to generate username:hashed-password
-  # e.g. below is example of htpasswd -nb silta demo
-  # Do not leave this default for protecting anything important!
-  htaccess: |
-    silta:$apr1$hshowiks$cxTgUb/iGEZtorvyif2tt0
+    # use htpasswd utility to generate username:hashed-password
+    # e.g. below is example of htpasswd -nb silta demo
+    # Do not leave this default for protecting anything important!
+    htaccess: |
+      silta:$apr1$hshowiks$cxTgUb/iGEZtorvyif2tt0
 
 
   loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg

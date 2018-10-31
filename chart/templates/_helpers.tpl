@@ -77,10 +77,6 @@ imagePullSecrets:
 {{- end }}
 
 {{- define "drupal.env" }}
-- name: IS_REFERENCE_ENVIRONMENT
-  value: {{ eq .Values.referenceData.referenceEnvironment .Values.environmentName | int | quote }}
-- name: REFERENCE_ENVIRONMENT
-  value: {{ include "drupal.referenceEnvironment" . | quote }}
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"

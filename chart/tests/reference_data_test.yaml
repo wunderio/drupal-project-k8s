@@ -6,16 +6,6 @@ templates:
 tests:
   - it: has no reference data volume by default
     asserts:
-    - contains:
-        path: spec.template.spec.containers[0].env
-        content:
-          name: REFERENCE_ENVIRONMENT
-          value: master
-    - contains:
-        path: spec.template.spec.containers[0].env
-        content:
-          name: IS_REFERENCE_ENVIRONMENT
-          value: "0"
     # Only one volume is defined.
     - hasDocuments:
         count: 1
@@ -36,16 +26,6 @@ tests:
       php.env:
         foo: bar
     asserts:
-    - contains:
-        path: spec.template.spec.containers[0].env
-        content:
-          name: REFERENCE_ENVIRONMENT
-          value: feature-foo
-    - contains:
-        path: spec.template.spec.containers[0].env
-        content:
-          name: IS_REFERENCE_ENVIRONMENT
-          value: "1"
     - hasDocuments:
         count: 2
       template: drupal-volumes.yaml

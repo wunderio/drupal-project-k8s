@@ -1,1 +1,4 @@
 Deployed {{ .Release.Name }} successfully, your site is available here: http://{{- template "drupal.domain" . }}
+{{- if .Values.nginx.basicauth.enabled }}
+Basicauth username: {{ .Values.nginx.basicauth.htaccess.username }} Basicauth password: {{ .Values.nginx.basicauth.htaccess.password }}
+{{- end }}

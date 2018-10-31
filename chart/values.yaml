@@ -32,6 +32,7 @@ nginx:
       memory: 10M
   
   # Set of values to enable and use http basic authentication
+  # It is implemented only for very basic protection (like web crawlers)
   basicauth:
     enabled: true
 
@@ -42,11 +43,10 @@ nginx:
     noauthips:
       - 10.0.0.0/8 # GKE internal IPs
 
-    # use htpasswd utility to generate username:hashed-password
-    # e.g. below is example of htpasswd -nb silta demo
-    # Do not leave this default for protecting anything important!
-    htaccess: |
-      silta:$apr1$hshowiks$cxTgUb/iGEZtorvyif2tt0
+    # Define htaccess username and password
+    htaccess:
+      username: silta
+      password: demo
 
 
   loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg

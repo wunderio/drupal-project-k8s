@@ -16,6 +16,7 @@ metadata:
     domain: {{ template "drupal.domain" . }}
 spec:
   type: NodePort
+  externalTrafficPolicy: Local
   ports:
     - port: 80
   selector:

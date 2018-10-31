@@ -30,6 +30,23 @@ nginx:
     requests:
       cpu: 10m
       memory: 10M
+  
+  # Set of values to enable and use http basic authentication
+  # It is implemented only for very basic protection (like web crawlers)
+  basicauth:
+    enabled: true
+
+    # Define username and password
+    credentials:
+      username: silta
+      password: demo
+
+    # Trust X-Forwarded-For from these hosts for getting external IP 
+    realipfrom: 10.0.0.0/8
+
+    # Add IP addresses that should be excluded from basicauth
+    noauthips:
+      - 10.0.0.0/8 # GKE internal IPs
 
 # Configuration for everything that runs in php containers.
 php:

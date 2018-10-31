@@ -360,7 +360,10 @@ data:
             fastcgi_pass php;
             access_log off;
         }
-
+        # Following directive is commented out since it produces notes in logs
+        # on every http request where parameter q= is not present
+        # to be removed completely after more tests and verification that it 
+        # brings no negative impact on funct. for majority of drupal deployments
         # # Handle autocomplete to-cleanURLs policy
         # if ( $args ~* "^q=(?<query_value>.*)" ) {
         #     rewrite ^/index.php$ $host/?q=$query_value? permanent;

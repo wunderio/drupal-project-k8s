@@ -35,7 +35,6 @@ nginx:
     enabled: true
   noauthips:
     - 10.0.0.0/24 # GKE internal IPs
-    - 94.237.27.124
   htaccess: |
     susr:$apr1$0lHDNy4R$KCsw/NvLiapRJu1MgNN25.
 

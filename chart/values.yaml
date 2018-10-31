@@ -30,11 +30,17 @@ nginx:
     requests:
       cpu: 10m
       memory: 10M
-  realipfrom: 10.0.0.0/8
+  
+  # Set of values to enable and use http basic authentication
   basicauth:
     enabled: true
+
+  # Trust X-Forwarded-For from these hosts for getting external IP 
+  realipfrom: 10.0.0.0/8
+
+  # Add IP addresses that should be excluded from basicauth
   noauthips:
-    - 10.0.0.0/24 # GKE internal IPs
+    - 10.0.0.0/8 # GKE internal IPs
 
   # use htpasswd utility to generate username:hashed-password
   # e.g. below is example of htpasswd -nb silta demo

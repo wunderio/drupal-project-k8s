@@ -2,7 +2,7 @@ version: 2
 jobs:
   validate:
     docker:
-      - image: wunderio/silta-circleci:v0.1
+      - image: wunderio/silta-circleci-test
 
     steps:
       - checkout
@@ -13,7 +13,7 @@ jobs:
 
   build:
     docker:
-      - image: wunderio/silta-circleci:v0.1
+      - image: wunderio/silta-circleci-test
 
     steps:
       - checkout
@@ -62,17 +62,23 @@ jobs:
 
   deploy:
     docker:
-      - image: wunderio/silta-circleci:v0.1
+      - image: wunderio/silta-circleci-test
 
     steps:
       - checkout
 
       - run: |
           # Set the release name for later reuse.
-          /home/circleci/set_release_name.sh
+          /home/circleci/utils/set_release_name.sh
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
+          # /home/circleci/utils/gcloud_init.sh \
+          #   $SERVICE_KEY_PATH \
+          #   $PROJECT_NAME \
+          #   $COMPUTE_ZONE \
+          #   $CLUSTER_NAME
+
           gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
           gcloud config set project silta-204108
           gcloud config set compute/zone europe-west2-a

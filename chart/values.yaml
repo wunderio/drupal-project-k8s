@@ -8,6 +8,12 @@ clusterDomain: "silta.wdr.io"
 # This name is mainly used to create nice subdomains for each environment.
 environmentName: ""
 
+# Project's git repository URL
+repositoryUrl: 'you need to pass in a value for repositoryUrl to your helm chart'
+
+# Repository branch name converted to DNS-friendly string
+branchNameUrl: 'you need to pass in a value for branchNameUrl to your helm chart'
+
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -117,6 +123,12 @@ php:
     upload_max_filesize: 60M
     post_max_size: 60M
 
+
+# Configuration for everything that runs in shell container.
+shell:
+  # The docker image to be used. This is typically passed by your CI system using the --set parameter.
+  image: 'you need to pass in a value for shell.image to your helm chart'
+  gitAuthToken: 'you need to pass in a value for shell.GitAuthToken to your helm chart'
 
 # Configure the volume used for Drupal public files.
 publicFiles:

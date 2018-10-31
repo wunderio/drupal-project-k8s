@@ -35,8 +35,12 @@ nginx:
     enabled: true
   noauthips:
     - 10.0.0.0/24 # GKE internal IPs
+
+  # use htpasswd utility to generate username:hashed-password
+  # e.g. below is example of htpasswd -nb silta demo
+  # Do not leave this default for protecting anything important!
   htaccess: |
-    susr:$apr1$0lHDNy4R$KCsw/NvLiapRJu1MgNN25.
+    silta:$apr1$hshowiks$cxTgUb/iGEZtorvyif2tt0
 
 
   loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg

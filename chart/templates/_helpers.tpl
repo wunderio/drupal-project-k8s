@@ -54,9 +54,6 @@ volumeMounts:
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-private-files
 {{- end }}
-- name: reference-data-volume
-  persistentVolumeClaim:
-    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
 - name: php-conf
   configMap:
     name: {{ .Release.Name }}-php-conf
@@ -67,6 +64,11 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+{{- end }}
+{{- define "drupal.reference-data-volume" }}
+- name: reference-data-volume
+  persistentVolumeClaim:
+    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

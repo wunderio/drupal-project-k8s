@@ -5,7 +5,15 @@ release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "drupal.domain" -}}
-{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{- end -}}
+
+{{- define "drupal.environmentName" -}}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}
+{{- end -}}
+
+{{- define "drupal.referenceEnvironment" -}}
+{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower }}
 {{- end -}}
 
 {{- define "drupal.php-container" }}
@@ -21,6 +29,8 @@ volumeMounts:
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
+  - name: reference-data-volume
+    mountPath: /var/reference-data
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true
@@ -54,6 +64,11 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+{{- end }}
+{{- define "drupal.reference-data-volume" }}
+- name: reference-data-volume
+  persistentVolumeClaim:
+    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

@@ -6,7 +6,7 @@ clusterDomain: "silta.wdr.io"
 # An optional human-readable label for the environment, defaults to the release name.
 # We typically pass the branch name when we build dedicated environments per branch.
 # This name is mainly used to create nice subdomains for each environment.
-environmentName: null
+environmentName: ""
 
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -48,8 +48,6 @@ nginx:
     noauthips:
       - 10.0.0.0/8 # GKE internal IPs
 
-  loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg
-
 # Configuration for everything that runs in php containers.
 php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
@@ -66,7 +64,12 @@ php:
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
     - schedule: '0 * * * *'
-      command: 'drush cron'
+      command: |
+        bootstrapped=$(drush status --field=bootstrap);
+        if [[ $bootstrapped = "Successful" ]];
+        then
+          drush cron;
+        fi;
 
   # Post-installation hook.
   # This is run every time a new environment is created.
@@ -109,6 +112,32 @@ publicFiles:
 # Configure an optional volume used for Drupal private files.
 privateFiles:
   enabled: false
+  storage: 1G
+  storageClassName: nfs
+
+# Configure reference data that will be used when creating new environments.
+referenceData:
+  # The name of the environment from which reference data will be copied.
+  referenceEnvironment: 'master'
+
+  schedule: '0 3 * * *'
+  command: |
+    bootstrapped=$(drush status --field=bootstrap);
+    if [[ $bootstrapped = "Successful" ]];
+    then
+      DUMP_PATH=/var/reference-data/db-latest.sql;
+
+      # NFS doesn't support replacing a file, so we delete it instead.
+      rm -f $DUMP_PATH;
+      if [ -f ../gdpr.json ]; then
+        export PATH=../vendor/bin:$PATH;
+        drush sql-dump --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file $DUMP_PATH;
+      else
+        drush sql-dump --result-file $DUMP_PATH;
+      fi
+    fi;
+
+
   storage: 1G
   storageClassName: nfs
 

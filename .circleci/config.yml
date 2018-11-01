@@ -84,7 +84,7 @@ jobs:
 
           # Updates a kubeconfig file with appropriate credentials and endpoint information 
           # to point kubectl at a specific cluster in Google Kubernetes Engine
-          gcloud container clusters get-credentials $GCLOUD_COMPUTE_ZONE  --zone $GCLOUD_COMPUTE_ZONE --project $GCLOUD_PROJECT_NAME
+          gcloud container clusters get-credentials $GCLOUD_CLUSTER_NAME  --zone $GCLOUD_COMPUTE_ZONE --project $GCLOUD_PROJECT_NAME
 
       - run: |
           helm dependency build ./chart

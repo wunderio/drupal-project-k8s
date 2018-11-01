@@ -57,7 +57,7 @@ jobs:
 
       - run: |
           # Login to docker repository
-          echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
+          echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin $DOCKER_REPO_URL
 
           # Build the Nginx image and push it to the repository.
           docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 web

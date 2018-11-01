@@ -24,7 +24,7 @@ Have a look at the file for details, but in short this is how it works:
 
 ## GDPR sanitization
 
-SQL data dump for developers is parsed with [GDPR Tools](https://github.com/machbarmacher/gdpr-dump) project.
+SQL data dump for developers is parsed with [GDPR Dump](https://github.com/machbarmacher/gdpr-dump) project.
 You can create a `/gdpr.json` file with [Faker](https://packagist.org/packages/fzaninotto/faker) formatters that will allow replacing data as it's dumped from database using `mysqldump` / `drush sql-dump` command.  
 
 ```
@@ -37,19 +37,6 @@ You can create a `/gdpr.json` file with [Faker](https://packagist.org/packages/f
   }
 } 
 ```
-Available formatters:
-```
-**name** - generates a name
-**phoneNumber** - generates a phone number
-**username** - generates a random user name
-**password** - generates a random password
-**email** - generates a random email address
-**date** - generates a date
-**longText** - generates a sentence
-**number** - generates a number
-**randomText** - generates a sentence
-**text** - generates a paragraph
-**uri** - generates a URI
-**clear** - generates an empty string
-```
+Available formatters listed in [GDPR Dump project documentation](https://github.com/machbarmacher/gdpr-dump#using-gdpr-replacements). 
+
 You can also add extra elements and attributes, like `_cookies`, `_description` or `_purpose` to enrich the Personal Data information. Just make sure it's marked or prefixed so that it does not mess up GDPR dump when it looks for table data replacements.

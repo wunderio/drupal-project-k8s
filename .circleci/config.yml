@@ -78,16 +78,14 @@ jobs:
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
-          # /home/circleci/utils/gcloud_init.sh \
-          #   $SERVICE_KEY_PATH \
-          #   $PROJECT_NAME \
-          #   $COMPUTE_ZONE \
-          #   $CLUSTER_NAME
 
           gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-          gcloud config set project silta-204108
-          gcloud config set compute/zone europe-west2-a
-          gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+          gcloud config set project $GCLOUD_PROJECT_NAME
+          gcloud config set compute/zone $GCLOUD_COMPUTE_ZONE
+
+          # updates a kubeconfig file with appropriate credentials and endpoint information 
+          # to point kubectl at a specific cluster in Google Kubernetes Engine
+          gcloud container clusters get-credentials $GCLOUD_COMPUTE_ZONE  --zone $GCLOUD_COMPUTE_ZONE --project $GCLOUD_PROJECT_NAME
 
       - run: |
           helm dependency build ./chart

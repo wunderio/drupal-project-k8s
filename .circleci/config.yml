@@ -51,6 +51,8 @@ jobs:
             - node_modules
           key: v1-yarn-{{ checksum "yarn.lock" }}
 
+      # To build Docker images for deployment, we must use a special setup_remote_docker 
+      # key which creates a separate environment for each build.
       - setup_remote_docker
 
       - run: |

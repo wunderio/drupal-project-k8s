@@ -30,7 +30,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - drush status
+            - drush check-bootstrap
         resources:
 {{ .Values.php.resources | toYaml | indent 10 }}
 

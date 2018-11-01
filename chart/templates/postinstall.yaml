@@ -23,4 +23,3 @@ spec:
       {{ include "drupal.imagePullSecrets" . | indent 6 }}
       volumes:
         {{ include "drupal.volumes" . | indent 8 }}
-        {{ include "drupal.reference-data-volume" . | indent 8 }}

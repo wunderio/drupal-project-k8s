@@ -30,7 +30,7 @@ volumeMounts:
     mountPath: /var/www/html/private
   {{- end }}
   - name: reference-data-volume
-    mountPath: /var/reference-data
+    mountPath: /var/www/html/reference-data
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true

@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ .Values.branchNameUrl }}-shell
+  name: {{ .Release.Name }}-shell
   labels:
     {{ include "drupal.release_labels" . | indent 4 }}
 spec:

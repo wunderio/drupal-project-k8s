@@ -58,7 +58,14 @@ spec:
           mountPath: /etc/nginx/.htaccess
           readOnly: true
           subPath: .htaccess
-        {{- end }}  
+        {{- end }}
+        livenessProbe:
+          tcpSocket:
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
         resources:
 {{ .Values.nginx.resources | toYaml | indent 10 }}
 

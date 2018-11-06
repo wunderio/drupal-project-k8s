@@ -8,10 +8,7 @@ clusterDomain: "silta.wdr.io"
 # This name is mainly used to create nice subdomains for each environment.
 environmentName: ""
 
-# Project's git repository URL
-repositoryUrl: 'you need to pass in a value for repositoryUrl to your helm chart'
-
-# Repository branch name converted to DNS-friendly string
+# Repository branch name converted to DNS-friendly string. We are using this for the resource names.
 branchNameUrl: 'you need to pass in a value for branchNameUrl to your helm chart'
 
 # Configure image pull secrets for the containers. This is not needed on GKE.
@@ -59,7 +56,7 @@ php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for drupal.image to your helm chart'
 
-  # The Kubernetes resources for the php containers.
+  # The Kubernetesc resources for the php containers.
   # These values are optimised for development environments.
   resources:
     requests:
@@ -128,7 +125,14 @@ php:
 shell:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for shell.image to your helm chart'
-  gitAuthToken: 'you need to pass in a value for shell.GitAuthToken to your helm chart'
+  # Values for the SSH gitAuth.
+  gitAuth:
+    # Project's git repository URL
+    repositoryUrl: 'you need to pass in a value for repositoryUrl to your helm chart'
+    #host: 'you need to pass in a value for shell.gitAuth.host to your helm chart'
+    #organisation: 'you need to pass in a value for shell.gitAuth.organisation to your helm chart'
+    #project: 'you need to pass in a value for shell.gitAuth.project to your helm chart'
+    apiToken: 'you need to pass in a value for shell.gitAuth.apiToken to your helm chart'
 
 # Configure the volume used for Drupal public files.
 publicFiles:

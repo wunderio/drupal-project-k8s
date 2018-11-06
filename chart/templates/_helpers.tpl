@@ -22,10 +22,10 @@ volumeMounts:
 image: {{ .Values.shell.image | quote }}
 env:
   {{ include "drupal.env" . | indent 2 }}
-  - name: GIT_AUTH_TOKEN
-    value: "{{ .Values.shell.gitAuthToken }}"
-  - name: REPOSITORY_URL
-    value: "{{ .Values.repositoryUrl }}"
+  - name: GITAUTH_API_TOKEN
+    value: "{{ .Values.shell.gitAuth.apiToken }}"
+  - name: GITAUTH_REPOSITORY_URL
+    value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
 ports:
   - containerPort: 22
 volumeMounts:

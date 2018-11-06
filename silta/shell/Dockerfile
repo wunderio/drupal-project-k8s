@@ -7,13 +7,11 @@ RUN mkdir -p -m +w /var/www/html/web/sites/default/files
 
 # Switch back to root
 USER root
-RUN apk add --no-cache openssh python py-requests py-yaml
+RUN apk add --no-cache openssh bash python py-requests py-yaml
 EXPOSE 22
 
-COPY silta/shell/authorized_keys.py /etc/ssh/
-COPY silta/shell/authorized_keys.yaml /etc/ssh/
+COPY silta/shell/gitauth_keys.py /etc/ssh/
+COPY silta/shell/gitauth_keys.yaml /etc/ssh/
 
 COPY silta/shell/entrypoint.sh /
 CMD ["/entrypoint.sh"]
-
-#RUN yum -y install openssh openssh-clients openssh-server python-requests python-yaml

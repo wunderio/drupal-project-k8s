@@ -147,3 +147,6 @@ mariadb:
   db:
     name: drupal
     user: drupal
+  master:
+    persistence:
+      size: 1G

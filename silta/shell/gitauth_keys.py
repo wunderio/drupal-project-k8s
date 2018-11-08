@@ -70,30 +70,14 @@ def remove_stale_cache(path, hours):
         # List files in directory
         for f in os.listdir(path):
             creation_time = os.path.getctime(path + f)
-            # If the file creation time exceeds defined, remove it
+            # If the creation time exceeds defined, remove the file
             if (time.time() - creation_time) >= 3600 * hours:
                 os.unlink(path + f)
-
-#def gitauth_org(repo_url):
-#    parse = re.compile(r'(?P<host>(git@|https://)([\w\.@]+)(/|:))(?P<owner>[\w,\-,\_]+)/(?P<repo>[\w,\-,\_]+)(.git){0,1}((/){0,1})')
-#    match = parse.match(repo_url)
-#    if match and 'owner' in match.groupdict():
-#        return match.group('owner')
-#    else:
-#        return None
-#
-#def gitauth_project(repo_url):
-#    parse = re.compile(r'(?P<host>(git@|https://)([\w\.@]+)(/|:))(?P<owner>[\w,\-,\_]+)/(?P<repo>[\w,\-,\_]+)(.git){0,1}((/){0,1})')
-#    match = parse.match(repo_url)
-#    if match and 'repo' in match.groupdict():
-#        return match.group('repo')
-#    else:
-#        return None
 
 def conf_read():
     global gitauth_api_token, gitauth_host, gitauth_organisation, gitauth_project
 
-    # Read config
+    # Read config file
     with open(os.path.join(sys.path[0], 'gitauth_keys.yaml'), 'r') as f:
     	config = yaml.load(f)
 
@@ -122,14 +106,14 @@ if gitauth_organisation:
     if not gitauth_project:
         # No repo provided, allow all organisation members
 
-        collaborator = gitauth_api_request('repos/' + gitauth_organisation + '/members')
+        collaborators = gitauth_api_request('orgs/' + gitauth_organisation + '/members')
         # Get the keys for each member
         for collaborator in collaborators:
             if 'type' in collaborator and collaborator['type'] == 'User':
                 keys += git_api_keys(collaborator['login'])
 
         # Outside collaborators
-        collaborator = gitauth_api_request('repos/' + gitauth_organisation + '/outside_collaborators')
+        collaborators = gitauth_api_request('orgs/' + gitauth_organisation + '/outside_collaborators')
         # Get the keys for each member
         for collaborator in collaborators:
             if 'type' in collaborator and collaborator['type'] == 'User':

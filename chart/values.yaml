@@ -76,6 +76,10 @@ php:
       if [ -f reference-data/db.sql.gz ]; then
         echo "Importing reference database dump"
         cat reference-data/db.sql.gz | gunzip | drush sql-cli
+
+        echo "Importing public files"
+        tar xf reference-data/public_files.tar.gz
+
         drush cr
         drush updatedb -n
         if [ -f config/sync/core.extension.yml ]; then
@@ -134,13 +138,18 @@ referenceData:
   command: |
     if [[ "$(drush status --field=bootstrap)" == "Successful" ]];
     then
-      # NFS doesn't support replacing a file, so we delete it instead.
-      rm -f reference-data/db.sql.gz
+      # NFS doesn't support replacing files, so we delete them instead.
+      rm -f reference-data/*
+
+      # Export database dump.
       if [ -f gdpr.json ]; then
         drush sql-dump --gzip --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file ../reference-data/db.sql
       else
         drush sql-dump --gzip --result-file ../reference-data/db.sql
       fi
+
+      # Export public files.
+      tar cz --exclude=css --exclude=js -f reference-data/public_files.tar.gz web/sites/default/files/
     else
       echo "Drupal is not installed, skipping reference database dump."
     fi

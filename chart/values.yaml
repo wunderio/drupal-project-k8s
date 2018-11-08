@@ -122,21 +122,18 @@ referenceData:
 
   schedule: '0 3 * * *'
   command: |
-    bootstrapped=$(drush status --field=bootstrap);
-    if [[ $bootstrapped = "Successful" ]];
+    if [[ "$(drush status --field=bootstrap)" == "Successful" ]];
     then
-      DUMP_PATH=/var/reference-data/db-latest.sql;
-
       # NFS doesn't support replacing a file, so we delete it instead.
-      rm -f $DUMP_PATH;
-      if [ -f ../gdpr.json ]; then
-        export PATH=../vendor/bin:$PATH;
-        drush sql-dump --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file $DUMP_PATH;
+      rm -f reference-data/db.sql.gz
+      if [ -f gdpr.json ]; then
+        drush sql-dump --gzip --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file ../reference-data/db.sql
       else
-        drush sql-dump --result-file $DUMP_PATH;
+        drush sql-dump --gzip --result-file ../reference-data/db.sql
       fi
-    fi;
-
+    else
+      echo "Drupal is not installed, skipping reference database dump."
+    fi
 
   storage: 1G
   storageClassName: nfs

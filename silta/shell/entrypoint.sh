@@ -38,18 +38,18 @@ fi
 env > /etc/environment
 addgroup www-admin
 # We add -D to make it non-interactive, but then the user is locked out.
-adduser www-admin -D -G www-admin -s /bin/bash
+adduser www-admin -D -G www-admin -s /bin/bash -h /var/www/html
 # So set an empty password after the user is created.
 echo "www-admin:" | chpasswd
 
 # Pass environment variables down to container, so SSH can pick it up and drush commands work too.
 mkdir ~www-admin/.ssh/
-env > ~www-admin/.ssh/environment
+env | grep -v HOME > ~www-admin/.ssh/environment
 
 # Put backup key
 # mkdir -p /root/.ssh
 # touch /root/.ssh/authorized_keys
-# echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCSv9nS5EEw6SkT5QOfAdC30lVKT9h+ogA5MhVHqbjU6kLXEPLQkgIJ5EozS4syhDCCl5t758Y3qi4RllOXILwQuwnEZzOz7R6VGuJwY+x/ftb1HrQUHya8EWQGSLczyJL7daxciwx/SEFsuzlXhU4+1b6hUJK8HyC34cp9M6YrIVbMlP2nxjwMAKaUoq8qYrHKDS7VrcRzMgteLnoJU0M3CNdrrXPkGmHn98zluzcGl5goLeCaXqhSWdQ0vHCN25dautb/ce8zMGhJ0tjtHvgdIbZrXNkGnzLbyRDO2Tif3yfdF5tV8PMQE0kjvtxRFgsS7ZofxmGrHkI+TwcxJhiF janis.bebritis@test" > /root/.ssh/authorized_keys
+# echo "pubkey" > /root/.ssh/authorized_keys
 # chmod 600 /root/.ssh/authorized_keys
 
 # run SSH server

@@ -12,3 +12,11 @@
 #  user: www-admin
 #  root: /path/to/drupal
 #  uri: http://stage.example.com
+
+#master:
+#  host: master-shell.drupal-project-k8s
+#  user: www-admin
+#  root: '/var/www/html'
+#  uri: 'http://master.drupal-project-k8s.silta.wdr.io'
+#  ssh:
+#    options: '-J root@JUMPHOST'

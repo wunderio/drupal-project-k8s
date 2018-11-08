@@ -10,8 +10,8 @@ USER root
 RUN apk add --no-cache openssh bash python py-requests py-yaml
 EXPOSE 22
 
+# Copy scripts
 COPY silta/shell/gitauth_keys.py /etc/ssh/
-COPY silta/shell/gitauth_keys.yaml /etc/ssh/
-
 COPY silta/shell/entrypoint.sh /
+
 CMD ["/entrypoint.sh"]

@@ -1,1 +1,2 @@
 Deployed {{ .Release.Name }} successfully, your site is available here: http://{{- template "drupal.domain" . }}
+SSH connection: `ssh {{ .Values.branchNameUrl }}-shell.{{ .Release.Namespace }}.{{ .Values.clusterDomain }} -J ssh.{{ .Values.clusterDomain }}`

@@ -76,7 +76,7 @@ php:
       if [ -f reference-data/db.sql.gz ]; then
         echo "Importing reference database dump"
         cat reference-data/db.sql.gz | gunzip | drush sql-cli
-
+        drush cr
         drush updatedb -n
         if [ -f config/sync/core.extension.yml ]; then
           drush config-import -n

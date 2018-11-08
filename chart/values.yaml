@@ -75,11 +75,18 @@ php:
   # This is run every time a new environment is created.
   postinstall:
     command: |
-      cd web;
-      conf_count=$(ls ../config/sync/ | wc -l);
-      if [ $conf_count -gt 1 ]; then drush site-install -n config_installer;
-      else drush site-install minimal -y;
-      fi;
+      if [ -f reference-data/db.sql.gz ]; then
+        echo "Importing reference database dump"
+        cat reference-data/db.sql.gz | gunzip | drush sql-query
+
+      elif [ -f config/sync/core.extension.yml ]; then
+        echo "Installing Drupal from existing configuration"
+        drush site-install -n config_installer
+
+      else
+        echo "No configuration found, installing a plain drupal site"
+        drush site-install -n standard
+      fi
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.

@@ -77,7 +77,7 @@ php:
     command: |
       if [ -f reference-data/db.sql.gz ]; then
         echo "Importing reference database dump"
-        cat reference-data/db.sql.gz | gunzip | drush sql-query
+        cat reference-data/db.sql.gz | gunzip | drush sql-cli
 
       elif [ -f config/sync/core.extension.yml ]; then
         echo "Installing Drupal from existing configuration"

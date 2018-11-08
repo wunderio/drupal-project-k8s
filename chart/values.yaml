@@ -56,7 +56,7 @@ php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for drupal.image to your helm chart'
 
-  # The Kubernetesc resources for the php containers.
+  # The Kubernetes resources for the php containers.
   # These values are optimised for development environments.
   resources:
     requests:
@@ -129,9 +129,6 @@ shell:
   gitAuth:
     # Project's git repository URL
     repositoryUrl: 'you need to pass in a value for repositoryUrl to your helm chart'
-    #host: 'you need to pass in a value for shell.gitAuth.host to your helm chart'
-    #organisation: 'you need to pass in a value for shell.gitAuth.organisation to your helm chart'
-    #project: 'you need to pass in a value for shell.gitAuth.project to your helm chart'
     apiToken: 'you need to pass in a value for shell.gitAuth.apiToken to your helm chart'
 
 # Configure the volume used for Drupal public files.

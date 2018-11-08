@@ -6,3 +6,5 @@ Your site is available here:
 Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
 Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
 {{- end }}
+
+SSH connection: `ssh {{ .Values.branchNameUrl }}-shell.{{ .Release.Namespace }}.{{ .Values.clusterDomain }} -J ssh.{{ .Values.clusterDomain }}`

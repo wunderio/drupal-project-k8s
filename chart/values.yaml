@@ -65,11 +65,9 @@ php:
   cron:
     - schedule: '0 * * * *'
       command: |
-        bootstrapped=$(drush status --field=bootstrap);
-        if [[ $bootstrapped = "Successful" ]];
-        then
-          drush cron;
-        fi;
+        if [[ "$(drush status --field=bootstrap)" == "Successful" ]]; then
+          drush cron
+        fi
 
   # Post-installation hook.
   # This is run every time a new environment is created.
@@ -97,10 +95,10 @@ php:
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
-      cd web;
-      conf_count=$(ls ../config/sync/ | wc -l);
-      if [ $conf_count -gt 1 ]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
-      fi;
+      drush updatedb -n
+      if [ -f config/sync/core.extension.yml ]; then
+        drush config-import -n
+      fi
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}

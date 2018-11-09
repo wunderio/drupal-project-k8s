@@ -1,3 +1,9 @@
 Deployed {{ .Release.Name }} successfully, your site is available here: http://{{- template "drupal.domain" . }}
+
 SSH connection: ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -J www-admin@ssh.{{ .Values.clusterDomain }}
 SSH connection (alternative): ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -o ProxyCommand="ssh -W %h:%p www-admin@ssh.{{ .Values.clusterDomain }}"
+
+{{- if .Values.nginx.basicauth.enabled }}
+Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
+Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
+{{- end }}

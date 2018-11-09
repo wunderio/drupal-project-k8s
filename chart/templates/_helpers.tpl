@@ -5,7 +5,15 @@ release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "drupal.domain" -}}
-{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{- end -}}
+
+{{- define "drupal.environmentName" -}}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}
+{{- end -}}
+
+{{- define "drupal.referenceEnvironment" -}}
+{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower }}
 {{- end -}}
 
 {{- define "drupal.environment.hostname" -}}
@@ -43,6 +51,8 @@ volumeMounts:
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
+  - name: reference-data-volume
+    mountPath: /var/www/html/reference-data
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true
@@ -76,6 +86,9 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+- name: reference-data-volume
+  persistentVolumeClaim:
+    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
@@ -112,4 +125,18 @@ imagePullSecrets:
 - name: PRIVATE_FILES_PATH
   value: '/var/www/html/private'
 {{- end }}
+{{- end }}
+
+{{- define "drupal.basicauth" }}
+  {{- if .Values.nginx.basicauth.enabled }}
+  satisfy any;
+  allow 127.0.0.1;
+  {{- range .Values.nginx.basicauth.noauthips }}
+  allow {{ . }};
+  {{- end }}
+  deny all;
+
+  auth_basic "Restricted";
+  auth_basic_user_file /etc/nginx/.htaccess;
+  {{- end }}
 {{- end }}

@@ -22,7 +22,10 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "composer.lock" }}
 
-      - run: composer install -n --prefer-dist --ignore-platform-reqs --no-dev
+      - run: |
+          composer install -n --prefer-dist --ignore-platform-reqs --no-dev
+          composer config repositories.gdpr-dump-mods git https://github.com/Jancis/gdpr-dump
+          composer require machbarmacher/gdpr-dump:dev-mods -n --ignore-platform-reqs
 
       - save_cache:
           paths:
@@ -106,7 +109,6 @@ jobs:
             --set shell.gitAuth.apiToken="${GITAUTH_API_TOKEN}" \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \
             --values silta.yml \
-            --timeout=600 \
             --wait
 
 workflows:

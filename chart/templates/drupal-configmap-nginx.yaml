@@ -5,9 +5,10 @@ metadata:
   labels:
     {{ include "drupal.release_labels" . | indent 4 }}
 data:
-  nginx.conf: |
+  nginx_conf: |
     user                            nginx;                                                 
-    worker_processes                auto;                                                  
+    worker_processes                auto;
+
     error_log                       /proc/self/fd/2 {{ .Values.nginx.loglevel }};                                 
                                                                                           
     events {                                                                               
@@ -15,16 +16,20 @@ data:
         multi_accept                on;                                                    
     }                                                                                      
                                                                                           
-    http {                                                                                 
+    http {
+
+        set_real_ip_from                {{ .Values.nginx.basicauth.realipfrom }};
+        real_ip_header                  X-Forwarded-For;
+
         include                     /etc/nginx/mime.types;                                 
         default_type                application/octet-stream;                              
                                                                                           
-        log_format                  real_ip '$http_x_real_ip - $remote_user [$time_local] '
-                                            '"$request" $status $body_bytes_sent '
-                                            '"$http_referer" "$http_user_agent"';
+        log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
+                                    '$status $body_bytes_sent "$http_referer" '
+                                    '"$http_user_agent" "$http_x_forwarded_for"';
                                                             
                                                                                                               
-        access_log                  /proc/self/fd/1 combined;
+        access_log                  /proc/self/fd/1 main;
                                               
         send_timeout                60s;       
         sendfile                    on;        
@@ -53,12 +58,11 @@ data:
         gzip_proxied                any;       
         gzip_disable                msie6;                                                                                                                 
                                                                                                                                                           
-        ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.                                                                                                                                                   
-        add_header                  X-XSS-Protection '1; mode=block';                                                                                      
+        ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
         add_header                  X-Frame-Options SAMEORIGIN;                                                                                            
         add_header                  X-Content-Type-Options nosniff;
         add_header                  Strict-Transport-Security max-age=31536000;
-        add_header                  X-XSS-Protection '1; mode=block';                                                                                                                                              
+        add_header                  X-XSS-Protection '1; mode=block';
                                                                     
         map $uri $no_slash_uri {                                                                                                                           
             ~^/(?<no_slash>.*)$ $no_slash;                                                                                                                 
@@ -67,7 +71,7 @@ data:
         include conf.d/*.conf;                                                                                                                             
     }     
 
-  drupal.conf: |
+  drupal_conf: |
     upstream php {                                                  
         server localhost:9000;                   
     }                            
@@ -86,9 +90,10 @@ data:
         index index.php;
                                                                               
         include fastcgi.conf;
-                                          
+
+        {{ include "drupal.basicauth" . | indent 6}}
                                               
-        location / {                                                        
+        location / {                                                          
                                                     
             location ~* /system/files/ {
                 include fastcgi.conf;                                                                                                                      
@@ -354,11 +359,14 @@ data:
             fastcgi_pass php;
             access_log off;
         }
-
-        # Handle autocomplete to-cleanURLs policy
-        if ( $args ~* "^q=(?<query_value>.*)" ) {
-            rewrite ^/index.php$ $host/?q=$query_value? permanent;
-        }
+        # Following directive is commented out since it produces notes in logs
+        # on every http request where parameter q= is not present
+        # to be removed completely after more tests and verification that it 
+        # brings no negative impact on funct. for majority of drupal deployments
+        # # Handle autocomplete to-cleanURLs policy
+        # if ( $args ~* "^q=(?<query_value>.*)" ) {
+        #     rewrite ^/index.php$ $host/?q=$query_value? permanent;
+        # }
 
         ## Disallow access to patches directory.
         location ^~ /patches { return 404; }
@@ -390,4 +398,5 @@ data:
             return 404;
         }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
                                                                                                                                                                                                                                                                                                                                                                     
-    } 
+    }
+

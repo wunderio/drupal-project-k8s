@@ -100,6 +100,9 @@ jobs:
             --values silta.yml \
             --wait
 
+          echo "Log output from the deployment container"
+          kubectl logs job/${RELEASE_NAME}-postinstall -n drupal-project-k8s
+
 workflows:
   version: 2
   commit:

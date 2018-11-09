@@ -63,9 +63,11 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+{{- if .Values.referenceData.enabled }}        
 - name: reference-data-volume
   persistentVolumeClaim:
     claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+{{- end }}
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

@@ -4,15 +4,25 @@ templates:
   - drupal-volumes.yaml
   - reference-data-cron.yaml
 tests:
-  - it: has no reference data volume by default
+  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted
+    set:
+      referenceData:
+        referenceEnvironment: 'FOO'
     asserts:
-    # Only one volume is defined.
+    # Only public files PVC is defined.
     - hasDocuments:
         count: 1
       template: drupal-volumes.yaml
     - hasDocuments:
         count: 0
       template: reference-data-cron.yaml
+    # Reference data volume is mounted in php container
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference-data  
 
   - it: takes reference data information
     set:
@@ -69,5 +79,23 @@ tests:
         path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
         value: "echo Hello World"
 
-
-
+  - it: can be disabled
+    set:
+      environmentName: 'FOO'
+      referenceData:
+        enabled: false
+        referenceEnvironment: 'FOO'
+    asserts:
+    - hasDocuments:
+        count: 1
+      template: drupal-volumes.yaml
+    - hasDocuments:
+        count: 0
+      template: reference-data-cron.yaml
+    - notContains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference-data  
+  

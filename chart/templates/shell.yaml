@@ -24,12 +24,4 @@ spec:
 {{ .Values.php.resources | toYaml | indent 10 }}
       volumes:
         {{ include "drupal.volumes" . | indent 8}}
-        - name: nginx-conf
-          configMap:
-            name: {{ .Release.Name }}-nginx-conf
-            items:
-            - key: nginx.conf
-              path: nginx.conf
-            - key: drupal.conf
-              path: conf.d/drupal.conf
-          {{ include "drupal.imagePullSecrets" . | indent 6 }}
+      {{ include "drupal.imagePullSecrets" . | indent 6 }}

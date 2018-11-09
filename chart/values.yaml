@@ -8,9 +8,6 @@ clusterDomain: "silta.wdr.io"
 # This name is mainly used to create nice subdomains for each environment.
 environmentName: null
 
-# Repository branch name converted to DNS-friendly string. We are using this for the resource names.
-branchNameUrl: 'you need to pass in a value for branchNameUrl to your helm chart'
-
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []

@@ -80,22 +80,17 @@ jobs:
       - checkout
 
       # Set the release name for later reuse.
-      # Release name length is 37 chars long, which leaves max 16 chars for kubernetes resource name.
-      # Release name is prefixed with w because  it _HAS_ to start with alphabetic character. w 4 wunder.
       - run: |
           BRANCHNAME_LOWER=${CIRCLE_BRANCH,,}
           BRANCHNAME=${BRANCHNAME_LOWER//[^[:alnum:]]/-}
           BRANCHNAME_HASH=$(echo $BRANCHNAME | shasum -a 256 | cut -c 1-4 )
           BRANCHNAME_TRUNCATED=$(echo $BRANCHNAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
-          BRANCHNAME_URL=$BRANCHNAME
           REPONAME=${CIRCLE_PROJECT_REPONAME,,}
           REPONAME_HASH=$(echo $REPONAME | shasum -a 256 | cut -c 1-4 )
           REPONAME_TRUNCATED=$(echo $REPONAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
           # Truncate long names
           if [ ${#BRANCHNAME} -ge 25 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;
-          if [ ${#BRANCHNAME} -ge 50 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;
           if [ ${#REPONAME} -ge 25 ]; then REPONAME=$REPONAME_TRUNCATED-$REPONAME_HASH; fi;
-          echo "export BRANCHNAME_URL='$BRANCHNAME_URL'" >> $BASH_ENV
           echo "export RELEASE_NAME='$REPONAME-$BRANCHNAME'" >> $BASH_ENV
 
       - run: |
@@ -115,7 +110,6 @@ jobs:
             --set shell.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 \
             --set mariadb.rootUser.password=$DB_ROOT_PASS \
             --set mariadb.db.password=$DB_USER_PASS \
-            --set branchNameUrl=$BRANCHNAME_URL \
             --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \
             --set shell.gitAuth.apiToken="${GITAUTH_API_TOKEN}" \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \

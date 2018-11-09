@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.branchNameUrl }}-shell
+  name: {{ template "drupal.environment.hostname" . }}-shell
   labels:
     {{ include "drupal.release_labels" . | indent 4 }}
 spec:

@@ -8,11 +8,15 @@ release: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "drupal.environmentName" -}}
-{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "drupal.referenceEnvironment" -}}
-{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower }}
+{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower | trunc 50 | trimSuffix "-" }}}
+{{- end -}}
+
+{{- define "drupal.environment.hostname" -}}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "drupal.php-container" }}

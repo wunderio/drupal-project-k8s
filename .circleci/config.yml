@@ -101,7 +101,12 @@ jobs:
             --wait
 
           echo "Log output from the deployment container"
-          kubectl logs job/${RELEASE_NAME}-postinstall -n drupal-project-k8s
+          REVISION=`helm ls | grep $RELEASE_NAME | cut -f 2`
+          if [[ $REVISION == 1 ]]; then
+            kubectl logs job/${RELEASE_NAME}-postinstall -n ${CIRCLE_PROJECT_REPONAME,,} -f
+          else
+            kubectl logs job/${RELEASE_NAME}-postupgrade -n ${CIRCLE_PROJECT_REPONAME,,} -f
+          fi
 
 workflows:
   version: 2

@@ -136,20 +136,21 @@ referenceData:
 
   schedule: '0 3 * * *'
   command: |
-    if [[ "$(drush status --field=bootstrap)" == "Successful" ]];
-    then
-      # NFS doesn't support replacing files, so we delete them instead.
-      rm -f reference-data/*
+    if [[ "$(drush status --field=bootstrap)" == "Successful" ]]; then
 
-      # Export database dump.
-      if [ -f gdpr.json ]; then
-        drush sql-dump --gzip --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file ../reference-data/db.sql
+      if [ -d vendor/machbarmacher/gdpr-dump ] && [ -f gdpr.json ]; then
+
+        # NFS doesn't support replacing files, so we delete them instead.
+        rm -f reference-data/*
+
+        # Export database dump.
+        drush sql-dump --gzip --result-file ../reference-data/db2.sql
+
+        # Export public files.
+        tar cz --exclude=css --exclude=js -f reference-data/public_files.tar.gz web/sites/default/files/
       else
-        drush sql-dump --gzip --result-file ../reference-data/db.sql
+        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed and gdpr.json is present in the project root."
       fi
-
-      # Export public files.
-      tar cz --exclude=css --exclude=js -f reference-data/public_files.tar.gz web/sites/default/files/
     else
       echo "Drupal is not installed, skipping reference database dump."
     fi

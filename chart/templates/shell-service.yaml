@@ -12,3 +12,4 @@ spec:
   selector:
     app: {{ .Values.app | quote }}
     release: {{ .Release.Name }}
+    name: {{ .Release.Name }}-shell

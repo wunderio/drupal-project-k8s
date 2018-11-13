@@ -53,4 +53,4 @@ env | grep -v HOME > ~www-admin/.ssh/environment
 # chmod 600 /root/.ssh/authorized_keys
 
 # run SSH server
-/usr/sbin/sshd -D
+/usr/sbin/sshd -D -E /proc/self/fd/2

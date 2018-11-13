@@ -28,8 +28,10 @@ volumeMounts:
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
+  {{- if .Values.referenceData.enabled }}  
   - name: reference-data-volume
     mountPath: /var/www/html/reference-data
+  {{- end }}    
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true

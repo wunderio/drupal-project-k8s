@@ -21,4 +21,3 @@ spec:
     - port: 80
   selector:
     {{ include "drupal.release_labels" . | indent 4 }}
-    name: {{ .Release.Name }}-drupal

@@ -3,13 +3,11 @@ kind: Service
 metadata:
   name: {{ template "drupal.environment.hostname" . }}-shell
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{ include "shell.release_labels" . | indent 4 }}
 spec:
   type: NodePort
   ports:
     - name: ssh
       port: 22
   selector:
-    app: {{ .Values.app | quote }}
-    release: {{ .Release.Name }}
-    name: {{ .Release.Name }}-shell
+    {{ include "shell.release_labels" . | indent 4 }}

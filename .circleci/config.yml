@@ -108,8 +108,10 @@ jobs:
             --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \
             --set shell.gitAuth.apiToken="${GITAUTH_API_TOKEN}" \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \
-            --values silta.yml \
-            --wait
+            --values silta.yml
+
+          echo "Log output from the deployment container"
+          kubectl logs job/${RELEASE_NAME}-post-release -n ${CIRCLE_PROJECT_REPONAME,,} -f --pod-running-timeout=3m
 
 workflows:
   version: 2

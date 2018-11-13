@@ -9,12 +9,14 @@ spec:
   selector:
     matchLabels:
       {{ include "drupal.release_labels" . | indent 6 }}
+      deployment: drupal
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         {{ include "drupal.release_labels" . | indent 8 }}
+        deployment: drupal
     spec:
       containers:
       # php-fpm container.

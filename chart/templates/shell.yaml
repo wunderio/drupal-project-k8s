@@ -3,20 +3,22 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-shell
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{ include "shell.release_labels" . | indent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{ include "drupal.release_labels" . | indent 6 }}
+      {{ include "shell.release_labels" . | indent 6 }}
+      deployment: shell
   template:
     metadata:
       labels:
-        {{ include "drupal.release_labels" . | indent 8 }}
+        {{ include "shell.release_labels" . | indent 8 }}
+        deployment: shell
     spec:
       containers:
       - name: shell
-        {{ include "drupal.shell-container" . | indent 8 }}
+        {{ include "shell.ssh-container" . | indent 8 }}
         resources:
 {{ .Values.php.resources | toYaml | indent 10 }}
       volumes:

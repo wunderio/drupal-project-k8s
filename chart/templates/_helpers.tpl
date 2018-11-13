@@ -3,6 +3,11 @@ app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}
 
+{{- define "shell.release_labels" }}
+app: shell
+release: {{ .Release.Name }}
+{{- end }}
+
 {{- define "drupal.domain" -}}
 {{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}
@@ -29,7 +34,7 @@ volumeMounts:
   {{ include "drupal.volumeMounts" . | indent 8 }}
 {{- end }}
 
-{{- define "drupal.shell-container" }}
+{{- define "shell.ssh-container" }}
 image: {{ .Values.shell.image | quote }}
 env:
   {{ include "drupal.env" . | indent 2 }}

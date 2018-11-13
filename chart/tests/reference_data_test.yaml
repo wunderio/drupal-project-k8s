@@ -22,8 +22,14 @@ tests:
         content:
           name: "reference-data-volume"
           persistentVolumeClaim:
-            claimName: foo-reference-data  
+            claimName: foo-reference-data
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/var/www/html/reference-data"
 
+            
   - it: takes reference data information
     set:
       environmentName: 'feature/FOO'
@@ -98,4 +104,8 @@ tests:
           name: "reference-data-volume"
           persistentVolumeClaim:
             claimName: foo-reference-data  
-  
+    - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/var/www/html/reference-data"  

@@ -17,9 +17,6 @@ spec:
       containers:
       - name: shell
         {{ include "drupal.shell-container" . | indent 8 }}
-        livenessProbe:
-          tcpSocket:
-            port: 22
         resources:
 {{ .Values.php.resources | toYaml | indent 10 }}
       volumes:

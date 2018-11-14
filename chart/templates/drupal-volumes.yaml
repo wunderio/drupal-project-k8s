@@ -29,6 +29,7 @@ spec:
       storage: {{ .Values.privateFiles.storage }}
 {{- end }}
 ---
+{{- if .Values.referenceData.enabled }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -44,4 +45,5 @@ spec:
   resources:
     requests:
       storage: {{ .Values.referenceData.storage }}
+{{- end }}
 {{- end }}

@@ -65,30 +65,44 @@ php:
   cron:
     - schedule: '0 * * * *'
       command: |
-        bootstrapped=$(drush status --field=bootstrap);
-        if [[ $bootstrapped = "Successful" ]];
-        then
-          drush cron;
-        fi;
+        if drush check-bootstrap; then
+          drush cron
+        fi
 
   # Post-installation hook.
   # This is run every time a new environment is created.
   postinstall:
     command: |
-      cd web;
-      conf_count=$(ls ../config/sync/ | wc -l);
-      if [ $conf_count -gt 1 ]; then drush site-install -n config_installer;
-      else drush site-install minimal -y;
-      fi;
+      if [ -f reference-data/db.sql.gz ]; then
+        echo "Importing reference database dump"
+        cat reference-data/db.sql.gz | gunzip | drush sql-cli
+
+        echo "Importing public files"
+        tar xf reference-data/public_files.tar.gz
+
+        drush cr
+        drush updatedb -n
+        if [ -f config/sync/core.extension.yml ]; then
+          drush config-import -n
+        fi
+
+      elif [ -f config/sync/core.extension.yml ]; then
+        echo "Installing Drupal from existing configuration"
+        drush site-install -n config_installer
+
+      else
+        echo "No configuration found, installing a plain drupal site"
+        drush site-install -n standard
+      fi
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
-      cd web;
-      conf_count=$(ls ../config/sync/ | wc -l);
-      if [ $conf_count -gt 1 ]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
-      fi;
+      drush updatedb -n
+      if [ -f config/sync/core.extension.yml ]; then
+        drush config-import -n
+      fi
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
@@ -117,26 +131,31 @@ privateFiles:
 
 # Configure reference data that will be used when creating new environments.
 referenceData:
+  enabled: true
+  
   # The name of the environment from which reference data will be copied.
   referenceEnvironment: 'master'
 
   schedule: '0 3 * * *'
   command: |
-    bootstrapped=$(drush status --field=bootstrap);
-    if [[ $bootstrapped = "Successful" ]];
-    then
-      DUMP_PATH=/var/reference-data/db-latest.sql;
+    if drush check-bootstrap; then
 
-      # NFS doesn't support replacing a file, so we delete it instead.
-      rm -f $DUMP_PATH;
-      if [ -f ../gdpr.json ]; then
-        export PATH=../vendor/bin:$PATH;
-        drush sql-dump --extra-dump="--gdpr-replacements-file=../gdpr.json" --result-file $DUMP_PATH;
+      if [ -d vendor/machbarmacher/gdpr-dump ] && [ -f gdpr.json ]; then
+
+        # NFS doesn't support replacing files, so we delete them instead.
+        rm -f reference-data/*
+
+        # Export database dump.
+        drush sql-dump --gzip --result-file ../reference-data/db.sql
+
+        # Export public files.
+        tar cz --exclude=css --exclude=js -f reference-data/public_files.tar.gz web/sites/default/files/
       else
-        drush sql-dump --result-file $DUMP_PATH;
+        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed and gdpr.json is present in the project root."
       fi
-    fi;
-
+    else
+      echo "Drupal is not installed, skipping reference database dump."
+    fi
 
   storage: 1G
   storageClassName: nfs
@@ -150,3 +169,6 @@ mariadb:
   db:
     name: drupal
     user: drupal
+  master:
+    persistence:
+      size: 1G

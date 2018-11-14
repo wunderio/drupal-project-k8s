@@ -1,6 +1,5 @@
 {{- define "drupal.release_labels" }}
 app: {{ .Values.app | quote }}
-version: {{ .Chart.Version }}
 release: {{ .Release.Name }}
 {{- end }}
 
@@ -29,8 +28,10 @@ volumeMounts:
   - name: drupal-private-files
     mountPath: /var/www/html/private
   {{- end }}
+  {{- if .Values.referenceData.enabled }}  
   - name: reference-data-volume
-    mountPath: /var/reference-data
+    mountPath: /var/www/html/reference-data
+  {{- end }}    
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true
@@ -64,9 +65,11 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+{{- if .Values.referenceData.enabled }}        
 - name: reference-data-volume
   persistentVolumeClaim:
     claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+{{- end }}
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

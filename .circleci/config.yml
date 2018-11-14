@@ -11,6 +11,13 @@ jobs:
 
       - run: helm unittest ./chart
 
+      - run: |
+          if ! grep machbarmacher/gdpr-dump composer.json; then
+            echo "Please install machbarmacher/gdpr-dump for sanitized database dumps."
+          elif [ ! -f gdpr.json ]; then
+            echo "machbarmacher/gdpr-dump is present but no gdpr.json was found."
+          fi
+
   build:
     docker:
       - image: wunderio/silta-circleci:v0.1
@@ -24,8 +31,6 @@ jobs:
 
       - run: |
           composer install -n --prefer-dist --ignore-platform-reqs --no-dev
-          composer config repositories.gdpr-dump-mods git https://github.com/Jancis/gdpr-dump
-          composer require machbarmacher/gdpr-dump:dev-mods -n --ignore-platform-reqs
 
       - save_cache:
           paths:
@@ -97,9 +102,10 @@ jobs:
             --set mariadb.rootUser.password=$DB_ROOT_PASS \
             --set mariadb.db.password=$DB_USER_PASS \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \
-            --values silta.yml \
-            --timeout=600 \
-            --wait
+            --values silta.yml
+
+          echo "Log output from the deployment container"
+          kubectl logs job/${RELEASE_NAME}-post-release -n ${CIRCLE_PROJECT_REPONAME,,} -f --pod-running-timeout=3m
 
 workflows:
   version: 2

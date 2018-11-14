@@ -97,8 +97,10 @@ jobs:
             --set mariadb.rootUser.password=$DB_ROOT_PASS \
             --set mariadb.db.password=$DB_USER_PASS \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \
-            --values silta.yml \
-            --wait
+            --values silta.yml
+
+          echo "Log output from the deployment container"
+          kubectl logs job/${RELEASE_NAME}-post-release -n ${CIRCLE_PROJECT_REPONAME,,} -f --pod-running-timeout=3m
 
 workflows:
   version: 2

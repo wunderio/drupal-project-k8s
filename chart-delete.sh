@@ -1,5 +1,5 @@
 if [ -z "$1" ]; then
-    echo "! Provide branch name as argument"
+    echo "! Provide release name as an argument"
     helm list --all
     exit 1;
 fi
@@ -8,23 +8,30 @@ if [ $2 ]; then
     NAMESPACE=$2
 else
   # Get the namespace from the helm chart
-  NAMESPACE=`helm ls | grep $1 | cut -f 7`
+  NAMESPACE=`helm ls | grep $1 | cut -f 6`
 fi
 
 if [ $NAMESPACE ]; then
-    echo Deleting release $1 in the namespace $NAMESPACE
 
     echo "* Deleting deployment"
     helm delete --purge $1
 
     echo "* Removing all resources tagged with this release"
-    kubectl delete all -l release=$1 -n $NAMESPACE
+    kubectl delete all -l release=$1 -n drupal-project-k8s
 
-    echo "* Removing all jobs tagged with this release"
-    kubectl delete job -l release=$1 -n $NAMESPACE
+    echo "* Doublecheck and remove the leftover resources"
+    for type in job pod pvc pv
+    do
+	echo $type ...
+	#kubectl get $type --namespace=$NAMESPACE | grep $1
+	#echo $(kubectl get $type -o custom-columns=:.metadata.name --namespace=$NAMESPACE | grep $1)
+        for resource in $(kubectl get $type -o custom-columns=:.metadata.name --namespace $NAMESPACE | grep $1);
+	do
+	    echo Removing $type $resource
+	    kubectl delete $type $resource --namespace=$NAMESPACE
+	done
+    done
 
-    echo "* Removing all persistent volume claims tagged with this release"
-    kubectl delete pvc -l release=$1 -n $NAMESPACE
 else
   echo "! No namespace could be found, provide it a as a parameter."
 fi

@@ -65,7 +65,7 @@ php:
   cron:
     - schedule: '0 * * * *'
       command: |
-        if [[ "$(drush status --field=bootstrap)" == "Successful" ]]; then
+        if drush check-bootstrap; then
           drush cron
         fi
 
@@ -131,6 +131,8 @@ privateFiles:
 
 # Configure reference data that will be used when creating new environments.
 referenceData:
+  enabled: true
+  
   # The name of the environment from which reference data will be copied.
   referenceEnvironment: 'master'
 

@@ -65,7 +65,7 @@ php:
   cron:
     - schedule: '0 * * * *'
       command: |
-        if [[ "$(drush status --field=bootstrap)" == "Successful" ]]; then
+        if drush check-bootstrap; then
           drush cron
         fi
 

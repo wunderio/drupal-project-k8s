@@ -12,7 +12,7 @@ jobs:
       - run: helm unittest ./chart
 
       - run: |
-          if grep machbarmacher/gdpr-dump composer.json; then
+          if ! grep machbarmacher/gdpr-dump composer.json; then
             echo "Please install machbarmacher/gdpr-dump for sanitized database dumps."
           elif [ ! -f gdpr.json ]; then
             echo "machbarmacher/gdpr-dump is present but no gdpr.json was found."

@@ -74,8 +74,16 @@ php:
   postinstall:
     command: |
       if [ -f reference-data/db.sql.gz ]; then
-        echo "Importing reference database dump"
-        cat reference-data/db.sql.gz | gunzip | drush sql-cli
+        TIME_WAITING=0
+        until drush check-bootstrap:db || [ $TIME_WAITING -gt 60 ]; do
+          sleep 5;
+          TIME_WAITING=$(( TIME_WAITING + 5 ))
+        done
+
+        if [ $TIME_WAITING -lt 60 ]; then
+          echo "Importing reference database dump"
+          cat reference-data/db.sql.gz | gunzip | drush sql-cli
+        fi
 
         echo "Importing public files"
         tar xf reference-data/public_files.tar.gz

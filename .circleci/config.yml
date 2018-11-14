@@ -1,8 +1,11 @@
 version: 2.1
-jobs:
-  validate:
+executors:
+  silta:
     docker:
       - image: wunderio/silta-circleci:v0.1
+jobs:
+  validate:
+    executor: silta
 
     steps:
       - checkout
@@ -19,8 +22,7 @@ jobs:
           fi
 
   build:
-    docker:
-      - image: wunderio/silta-circleci:v0.1
+    executor: silta
 
     steps:
       - checkout
@@ -73,8 +75,7 @@ jobs:
           docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
 
   deploy:
-    docker:
-      - image: wunderio/silta-circleci:v0.1
+    executor: silta
 
     steps:
       - checkout

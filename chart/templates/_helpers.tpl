@@ -17,7 +17,7 @@ release: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "drupal.referenceEnvironment" -}}
-{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower | trunc 50 | trimSuffix "-" }}}
+{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower | trunc 50 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "drupal.environment.hostname" -}}
@@ -58,7 +58,7 @@ volumeMounts:
   {{- if .Values.referenceData.enabled }}  
   - name: reference-data-volume
     mountPath: /var/www/html/reference-data
-  {{- end }}    
+  {{- end }}
   - name: php-conf
     mountPath: /etc/php7/php.ini
     readOnly: true

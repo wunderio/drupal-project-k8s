@@ -191,15 +191,15 @@ elasticsearch:
     persistence:
       enabled: false
       size: 256Mi
-    replicas: 0
+    replicas: 1
     heapSize: 128m
   master:
     persistence:
       enabled: false
-    replicas: 0
+    replicas: 1
     heapSize: 128m
   client:
-    replicas: 0
+    replicas: 1
     heapSize: 128m
 
 # Cluster configuration.

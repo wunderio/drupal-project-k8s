@@ -187,7 +187,7 @@ mariadb:
 elasticsearch:
   enabled: true
   data:
-    exposeHttp: true
+    exposeHttp: false
     persistence:
       enabled: false
       size: 256Mi

@@ -2,7 +2,7 @@ dependencies:
 - name: mariadb
   version: 4.x.x
   repository: https://kubernetes-charts.storage.googleapis.com/
-  condition: mariadb.enabled
+  condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: elasticsearch
   version: 1.13.x
   repository: https://kubernetes-charts.storage.googleapis.com/

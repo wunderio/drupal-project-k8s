@@ -15,4 +15,4 @@ vendor/**/Tests
 **/.git
 web/sites/**/files
 web/.dockerignore
-Dockerfile
+web/Dockerfile

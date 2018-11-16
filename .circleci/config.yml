@@ -69,7 +69,7 @@ jobs:
           docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-drupal:$CIRCLE_SHA1
 
           # Build the Shell image and push it to the repository.
-          docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell/Dockerfile .
+          docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell.Dockerfile .
           docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
 
   deploy:

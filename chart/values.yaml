@@ -189,28 +189,20 @@ elasticsearch:
   data:
     exposeHttp: false
     persistence:
-      enabled: true
+      enabled: false
       size: 256Mi
     replicas: 1
-    heapSize: 128Mi
+    heapSize: 128m
   master:
     persistence:
-      enabled: true
+      enabled: false
       size: 512Mi
     replicas: 1
-    heapSize: 256Mi
+    heapSize: 128m
   client:
     replicas: 1
-    heapSize: 128Mi
+    heapSize: 128m
   cluster:
     env:
-      MINIMUM_MASTER_NODES: 1 
-
-# Cluster configuration.
-clusterDomain: "silta.wdr.io"
-
-# Configure image pull secrets for the containers. This is not needed on GKE.
-# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-imagePullSecrets: []
-
-branchname: "default"
+      MINIMUM_MASTER_NODES: 1
+    name: es

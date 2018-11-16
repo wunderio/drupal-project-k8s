@@ -91,7 +91,7 @@ jobs:
           # Truncate long names
           if [ ${#BRANCHNAME} -ge 25 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;
           if [ ${#REPONAME} -ge 25 ]; then REPONAME=$REPONAME_TRUNCATED-$REPONAME_HASH; fi;
-          echo "export RELEASE_NAME='$REPONAME-$BRANCHNAME'" >> $BASH_ENV
+          echo "export RELEASE_NAME='$REPONAME--$BRANCHNAME'" >> $BASH_ENV
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json

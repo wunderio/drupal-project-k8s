@@ -192,16 +192,19 @@ elasticsearch:
       enabled: true
       size: 256Mi
     replicas: 1
-    heapSize: 128m
+    heapSize: 128Mi
   master:
     persistence:
       enabled: true
-      size: 256Mi
+      size: 512Mi
     replicas: 1
-    heapSize: 128m
+    heapSize: 256Mi
   client:
     replicas: 1
-    heapSize: 128m
+    heapSize: 128Mi
+  cluster:
+    env:
+      MINIMUM_MASTER_NODES: 1 
 
 # Cluster configuration.
 clusterDomain: "silta.wdr.io"

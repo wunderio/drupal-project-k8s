@@ -189,13 +189,14 @@ elasticsearch:
   data:
     exposeHttp: false
     persistence:
-      enabled: false
+      enabled: true
       size: 256Mi
     replicas: 1
     heapSize: 128m
   master:
     persistence:
-      enabled: false
+      enabled: true
+      size: 256Mi
     replicas: 1
     heapSize: 128m
   client:

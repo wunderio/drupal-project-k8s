@@ -16,7 +16,7 @@ class CheckBootstrapCommands extends DrushCommands implements SiteAliasManagerAw
    *
    * @command check-bootstrap:full
    * @aliases check-bootstrap, cb
-   * @bootstrap max
+   * @bootstrap max full
    */
   public function isBootstrapFull() {
     $this->checkBootstrapPhase(DRUSH_BOOTSTRAP_DRUPAL_FULL);
@@ -28,7 +28,7 @@ class CheckBootstrapCommands extends DrushCommands implements SiteAliasManagerAw
    * @see DRUSH_BOOTSTRAP_DRUPAL_DATABASE
    *
    * @command check-bootstrap:db
-   * @bootstrap max
+   * @bootstrap max db
    */
   public function isBootstrapDatabase() {
     $this->checkBootstrapPhase(DRUSH_BOOTSTRAP_DRUPAL_DATABASE);
@@ -40,7 +40,7 @@ class CheckBootstrapCommands extends DrushCommands implements SiteAliasManagerAw
    * @see DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION
    *
    * @command check-bootstrap:config
-   * @bootstrap max
+   * @bootstrap max config
    */
   public function isBootstrapConfiguration() {
     $this->checkBootstrapPhase(DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION);
@@ -52,7 +52,7 @@ class CheckBootstrapCommands extends DrushCommands implements SiteAliasManagerAw
    * @see DRUSH_BOOTSTRAP_DRUPAL_SITE
    *
    * @command check-bootstrap:site
-   * @bootstrap max
+   * @bootstrap max site
    */
   public function isBootstrapSite() {
     $this->checkBootstrapPhase(DRUSH_BOOTSTRAP_DRUPAL_SITE);
@@ -64,7 +64,7 @@ class CheckBootstrapCommands extends DrushCommands implements SiteAliasManagerAw
    * @see DRUSH_BOOTSTRAP_DRUPAL_ROOT
    *
    * @command check-bootstrap:root
-   * @bootstrap max
+   * @bootstrap max root
    */
   public function isBootstrapRoot() {
     $this->checkBootstrapPhase(DRUSH_BOOTSTRAP_DRUPAL_ROOT);

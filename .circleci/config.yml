@@ -106,6 +106,7 @@ jobs:
           if [[ "$( helm list --failed | grep $RELEASE_NAME  | cut -f2 )" -eq 1 ]]; then
             echo "Removing failed first release"
             helm delete --purge $RELEASE_NAME
+            sleep 30
           fi
 
           helm upgrade --install $RELEASE_NAME ./chart \

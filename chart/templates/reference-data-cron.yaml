@@ -16,7 +16,7 @@ spec:
           containers:
           - name: reference-data-cron
             {{ include "drupal.php-container" . | indent 12 }}
-            command: ["/bin/bash", "-c"]
+            command: ["/bin/sh", "-c"]
             args:
               - {{ .Values.referenceData.command | quote }}
             resources:

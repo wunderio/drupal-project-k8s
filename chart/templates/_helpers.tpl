@@ -122,6 +122,10 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+{{- if .Values.memcached.enabled }}
+- name: MEMCACHED_HOST
+  value: {{ .Release.Name }}-memcached
+{{- end }}
 - name: HASH_SALT
   valueFrom:
     secretKeyRef:

@@ -42,6 +42,8 @@ env:
     value: "{{ .Values.shell.gitAuth.apiToken }}"
   - name: GITAUTH_REPOSITORY_URL
     value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
+  - name: DRUSH_OPTIONS_URI
+    value: "http://{{- template "drupal.domain" . }}"
 ports:
   - containerPort: 22
 volumeMounts:

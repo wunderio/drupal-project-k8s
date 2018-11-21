@@ -103,6 +103,12 @@ jobs:
       - run: |
           helm dependency build ./chart
 
+          if [[ "$( helm list --failed | grep $RELEASE_NAME  | cut -f2 )" -eq 1 ]]; then
+            echo "Removing failed first release"
+            helm delete --purge $RELEASE_NAME
+            sleep 30
+          fi
+
           helm upgrade --install $RELEASE_NAME ./chart \
             --set environmentName=$CIRCLE_BRANCH \
             --set php.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 \

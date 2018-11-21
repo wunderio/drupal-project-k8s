@@ -194,3 +194,7 @@ mariadb:
   master:
     persistence:
       size: 1G
+
+memcached:
+  enabled: false
+  maxItemMemory: 128

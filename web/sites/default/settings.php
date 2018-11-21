@@ -67,6 +67,13 @@ if (getenv('PRIVATE_FILES_PATH')) {
 }
 
 /**
+ * Set the memcache server hostname when a memcached server is available
+ */
+if (getenv('MEMCACHED_HOST')) {
+  $settings['memcache']['servers'] = [getenv('MEMCACHED_HOST') . ':11211' => 'default'];
+}
+
+/**
  * Load local development override configuration, if available.
  *
  * Use settings.local.php to override variables on secondary (staging,

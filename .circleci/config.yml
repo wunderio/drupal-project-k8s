@@ -89,15 +89,9 @@ jobs:
           REPONAME_HASH=$(echo $REPONAME | shasum -a 256 | cut -c 1-4 )
           REPONAME_TRUNCATED=$(echo $REPONAME | cut -c 1-8 | sed 's/^\(.*\)-$/\1/' )
           # Truncate long names
-<<<<<<< HEAD
-          if [ ${#BRANCHNAME} -ge 10 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;
-          if [ ${#REPONAME} -ge 10 ]; then REPONAME=$REPONAME_TRUNCATED-$REPONAME_HASH; fi;
-          echo "export RELEASE_NAME='$REPONAME-$BRANCHNAME'" >> $BASH_ENV
-=======
           if [ ${#BRANCHNAME} -ge 25 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;
           if [ ${#REPONAME} -ge 25 ]; then REPONAME=$REPONAME_TRUNCATED-$REPONAME_HASH; fi;
           echo "export RELEASE_NAME='$REPONAME--$BRANCHNAME'" >> $BASH_ENV
->>>>>>> 8db2d28a9d1dd57edc78ef832e3a5cddfae93916
 
       - run: |
           echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json

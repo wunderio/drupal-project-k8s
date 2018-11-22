@@ -1,44 +1,62 @@
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
-  name: elastic
+  name: {{ .Release.Name }}-elastic
+  labels:
+    {{ include "elastic.release_labels" . | indent 6 }}
 spec:
+  type: NodePort
   ports:
-  - port: 9200
-    protocol: TCP
-    targetPort: 9200
+  - name: elastic
+    port: 9200
   selector:
-    run: elastic
-status:
-  loadBalancer: {}
+    {{ include "elastic.release_labels" . | indent 6 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
+  name: {{ .Release.Name }}-elastic
   labels:
-    run: elastic
-  name: elastic
+    {{ include "elastic.release_labels" . | indent 6 }}
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      run: elastic
-  strategy: {}
+      {{ include "elastic.release_labels" . | indent 8 }}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        run: elastic
+        {{ include "elastic.release_labels" . | indent 10 }}
     spec:
       containers:
       - image: docker.elastic.co/elasticsearch/elasticsearch:6.5.0
         name: elastic
         ports:
         - containerPort: 9200
-        resources: {}
+        resources:
+          requests:
+            cpu: "50m"
         env:
           - name: discovery.type
             value: single-node
-status: {}
+        volumeMounts:
+          - mountPath: "/usr/share/elasticsearch/data"
+            name: {{ .Release.Name }}-elastic-volume
+      volumes:
+        - name: {{ .Release.Name }}-elastic-volume
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-elastic-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-elastic-data
+  labels:
+    app: {{ .Values.app | quote }}
+    release: {{ .Release.Name }}
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 256Mi

@@ -7,7 +7,7 @@ Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
 Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
 {{- end }}
 
-{{- if and (.Values.shell.enabled) (ne .Values.referenceData.referenceEnvironment .Values.environmentName) }}
+{{- if .Values.shell.enabled }}
 SSH connection:
 
   ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -J www-admin@ssh.{{ .Values.clusterDomain }}

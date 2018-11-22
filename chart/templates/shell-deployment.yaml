@@ -1,4 +1,4 @@
-{{- if and (.Values.shell.enabled) (ne .Values.referenceData.referenceEnvironment .Values.environmentName) }}
+{{- if .Values.shell.enabled }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:

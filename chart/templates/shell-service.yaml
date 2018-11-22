@@ -1,4 +1,4 @@
-{{- if and (.Values.shell.enabled) (ne .Values.referenceData.referenceEnvironment .Values.environmentName) }}
+{{- if .Values.shell.enabled }}
 apiVersion: v1
 kind: Service
 metadata:

@@ -75,7 +75,7 @@ spec:
       volumes:
       - name: {{ .Release.Name }}-elastic-volume
         persistentVolumeClaim:
-        claimName: {{ .Release.Name }}-elastic-data
+          claimName: {{ .Release.Name }}-elastic-data
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

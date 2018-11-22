@@ -8,6 +8,11 @@ app: shell
 release: {{ .Release.Name }}
 {{- end }}
 
+{{- define "elastic.release_labels" }}
+app: elastic
+release: {{ .Release.Name }}
+{{- end }}
+
 {{- define "drupal.domain" -}}
 {{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}

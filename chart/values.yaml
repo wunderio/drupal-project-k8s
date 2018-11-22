@@ -198,23 +198,8 @@ mariadb:
 
 elasticsearch:
   enabled: true
-  data:
-    exposeHttp: false
-    persistence:
-      enabled: false
-      size: 256Mi
-    replicas: 1
-    heapSize: 128m
-  master:
-    persistence:
-      enabled: false
-      size: 512Mi
-    replicas: 1
-    heapSize: 128m
-  client:
-    replicas: 1
-    heapSize: 128m
-  cluster:
-    env:
-      MINIMUM_MASTER_NODES: 1
-    name: es
+  persistence:
+    size: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi

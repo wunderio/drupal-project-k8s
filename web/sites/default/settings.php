@@ -60,29 +60,20 @@ $settings['file_scan_ignore_directories'] = [
 $settings['php_storage']['twig']['directory'] = '/tmp';
 
 /**
- * If a volume has been set for private files, tell Drupal about it.
- */
-if (getenv('PRIVATE_FILES_PATH')) {
-  $settings['file_private_path'] = getenv('PRIVATE_FILES_PATH');
-}
-
-/**
- * Set the memcache server hostname when a memcached server is available
- */
-if (getenv('MEMCACHED_HOST')) {
-  $settings['memcache']['servers'] = [getenv('MEMCACHED_HOST') . ':11211' => 'default'];
-}
-
-/**
  * Load local development override configuration, if available.
  *
  * Use settings.local.php to override variables on secondary (staging,
  * development, etc) installations of this site. Typically used to disable
  * caching, JavaScript/CSS compression, re-routing of outgoing emails, and
  * other things that should not happen on development and testing sites.
- *
- * Keep this code block at the end of this file to take full effect.
  */
 if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
   include $app_root . '/' . $site_path . '/settings.local.php';
+}
+
+/**
+ * Silta cluster configuration overrides.
+ */
+if (getenv('SILTA_CLUSTER') && file_exists($app_root . '/' . $site_path . '/settings.silta.php')) {
+  include $app_root . '/' . $site_path . '/settings.silta.php';
 }

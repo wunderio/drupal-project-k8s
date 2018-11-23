@@ -200,6 +200,8 @@ elasticsearch:
   enabled: true
   persistence:
     size: 256Mi
+    storageClassName: nfs
   requests:
     cpu: 50m
     memory: 128Mi
+    heapSize: 100m

@@ -68,6 +68,10 @@ spec:
         env:
         - name: discovery.type
           value: single-node
+        - name: cluster.name
+          value: {{ .Release.Name }}-search
+        - name: ES_JAVA_OPTS
+          value: -Xms{{ .Values.elasticsearch.requests.heapSize }} -Xmx{{ .Values.elasticsearch.requests.heapSize }}
         volumeMounts:
         - mountPath: "/usr/share/elasticsearch/data"
           name: {{ .Release.Name }}-elastic-volume
@@ -85,7 +89,7 @@ metadata:
     app: {{ .Values.app | quote }}
     release: {{ .Release.Name }}
 spec:
-  storageClassName: nfs
+  storageClassName: {{ .Values.elasticsearch.persistence.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:

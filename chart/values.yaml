@@ -192,7 +192,6 @@ mariadb:
   db:
     name: drupal
     user: drupal
-    password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
   master:
     persistence:
       size: 1G
@@ -206,6 +205,7 @@ elasticsearch:
     cpu: 50m
     memory: 128Mi
     heapSize: 100m
+
 memcached:
   enabled: false
   maxItemMemory: 128

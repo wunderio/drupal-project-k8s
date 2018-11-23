@@ -47,6 +47,10 @@ env:
     value: "{{ .Values.shell.gitAuth.apiToken }}"
   - name: GITAUTH_REPOSITORY_URL
     value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
+  - name: DRUSH_OPTIONS_URI
+    value: "http://{{- template "drupal.domain" . }}"
+  - name: SILTA_CLUSTER
+    value: "1"
 ports:
   - containerPort: 22
 volumeMounts:
@@ -124,6 +128,10 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
+{{- end }}
+{{- if .Values.memcached.enabled }}
+- name: MEMCACHED_HOST
+  value: {{ .Release.Name }}-memcached
 {{- end }}
 - name: HASH_SALT
   valueFrom:

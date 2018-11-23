@@ -1,19 +1,5 @@
 <?php
 
-// @codingStandardsIgnoreFile
-
-// Database settings.
-$databases['default']['default'] = [
-  'database' =>  getenv('DB_NAME'),
-  'username' => getenv('DB_USER'),
-  'password' => getenv('DB_PASS'),
-  'host' => getenv('DB_HOST'),
-  'port' => '3306',
-  'driver' => 'mysql',
-  'prefix' => '',
-  'collation' => 'utf8mb4_general_ci',
-];
-
 if (getenv('LANDO_INFO')) {
   /*
    * Load database credentials from Lando.
@@ -31,9 +17,6 @@ if (getenv('LANDO_INFO')) {
 
 // Location of the site configuration files.
 $config_directories[CONFIG_SYNC_DIRECTORY] = '../config/sync';
-
-// Salt for one-time login links, cancel links, form tokens, etc.
-$settings['hash_salt'] = getenv('HASH_SALT');
 
 /**
  * Load services definition file.
@@ -53,11 +36,6 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 $settings['file_scan_ignore_directories'] = [
   'node_modules',
 ];
-
-/**
- * Generated twig files should not be on shared storage.
- */
-$settings['php_storage']['twig']['directory'] = '/tmp';
 
 /**
  * Load local development override configuration, if available.

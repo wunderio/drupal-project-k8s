@@ -1,10 +1,8 @@
 <?php
 
-// @codingStandardsIgnoreFile
-
 // Database settings.
 $databases['default']['default'] = [
-  'database' =>  getenv('DB_NAME'),
+  'database' => getenv('DB_NAME'),
   'username' => getenv('DB_USER'),
   'password' => getenv('DB_PASS'),
   'host' => getenv('DB_HOST'),

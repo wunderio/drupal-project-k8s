@@ -199,12 +199,12 @@ mariadb:
 elasticsearch:
   enabled: true
   persistence:
-    size: 256Mi
+    size: 512Mi
     storageClassName: nfs
   requests:
-    cpu: 50m
-    memory: 128Mi
-    heapSize: 100m
+    cpu: 25m
+    memory: 512Mi
+    heapSize: 512m
 
 memcached:
   enabled: false

@@ -55,7 +55,7 @@ spec:
             - SYS_RESOURCE
       containers:
       - name: elastic
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.5.0
+        image: docker.elastic.co/elasticsearch/elasticsearch:{{ .Values.elasticsearch.version }}
         ports:
         - containerPort: 9200
         resources:

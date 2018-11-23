@@ -198,6 +198,8 @@ mariadb:
 
 elasticsearch:
   enabled: true
+  #Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
+  version: 6.5.0
   persistence:
     size: 512Mi
     storageClassName: nfs

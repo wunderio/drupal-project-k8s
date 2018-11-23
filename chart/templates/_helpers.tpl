@@ -133,6 +133,10 @@ imagePullSecrets:
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
 {{- end }}
+{{- if .Values.elasticsearch.enabled }}
+- name: ELASTIC_HOST
+  value: {{ .Release.Name }}-elastic
+{{- end }}
 - name: HASH_SALT
   valueFrom:
     secretKeyRef:

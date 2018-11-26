@@ -3,11 +3,6 @@ app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}
 
-{{- define "shell.release_labels" }}
-app: shell
-release: {{ .Release.Name }}
-{{- end }}
-
 {{- define "drupal.domain" -}}
 {{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}
@@ -127,6 +122,10 @@ imagePullSecrets:
 {{- if .Values.memcached.enabled }}
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
+{{- end }}
+{{- if .Values.elasticsearch.enabled }}
+- name: ELASTIC_HOST
+  value: {{ .Release.Name }}-elastic
 {{- end }}
 - name: HASH_SALT
   valueFrom:

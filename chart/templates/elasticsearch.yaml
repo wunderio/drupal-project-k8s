@@ -62,9 +62,16 @@ spec:
           requests:
             memory: {{ .Values.elasticsearch.requests.memory }}
             cpu: {{ .Values.elasticsearch.requests.cpu }}
-        livenessProbe:
-          tcpSocket:
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
             port: 9200
+          initialDelaySeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /_cluster/health?local=true
+            port: 9200
+          initialDelaySeconds: 10
         env:
         - name: discovery.type
           value: single-node

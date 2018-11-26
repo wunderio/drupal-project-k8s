@@ -206,7 +206,7 @@ elasticsearch:
   requests:
     cpu: 25m
     memory: 512Mi
-    heapSize: 512m
+    heapSize: 256m
 
 memcached:
   enabled: false

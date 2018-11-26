@@ -1,32 +1,25 @@
 {{- if .Values.elasticsearch.enabled }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-elastic
-  labels:
-    {{ include "elastic.release_labels" . | indent 6 }}
-spec:
-  type: NodePort
-  ports:
-  - name: elastic
-    port: 9200
-  selector:
-    {{ include "elastic.release_labels" . | indent 6 }}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-elastic
   labels:
-    {{ include "elastic.release_labels" . | indent 6 }}
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      {{ include "elastic.release_labels" . | indent 8 }}
+      {{ include "drupal.release_labels" . | indent 6 }}
+      service: elasticsearch
   template:
     metadata:
       labels:
-        {{ include "elastic.release_labels" . | indent 10 }}
+        {{ include "drupal.release_labels" . | indent 8 }}
+        service: elasticsearch
+    #For pod updates, kill the current pod, stand up the new one
+    strategy:
+      type: Recreate
     spec:
       initContainers:
       # Refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
@@ -93,8 +86,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-elastic-data
   labels:
-    app: {{ .Values.app | quote }}
-    release: {{ .Release.Name }}
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
 spec:
   storageClassName: {{ .Values.elasticsearch.persistence.storageClassName }}
   accessModes:
@@ -102,4 +95,20 @@ spec:
   resources:
     requests:
       storage: {{ .Values.elasticsearch.persistence.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-elastic
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
+spec:
+  type: NodePort
+  ports:
+  - name: elastic
+    port: 9200
+  selector:
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
 {{- end }}

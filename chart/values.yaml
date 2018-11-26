@@ -197,16 +197,17 @@ mariadb:
       size: 1G
 
 elasticsearch:
-  enabled: true
+  enabled: false
   #Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
   version: 6.5.0
+  heapSize: 256m
   persistence:
     size: 512Mi
     storageClassName: nfs
-  requests:
-    cpu: 25m
-    memory: 512Mi
-    heapSize: 256m
+  resources:
+    requests:
+      cpu: 25m
+      memory: 512Mi
 
 memcached:
   enabled: false

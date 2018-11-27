@@ -155,3 +155,12 @@ imagePullSecrets:
   auth_basic_user_file /etc/nginx/.htaccess;
   {{- end }}
 {{- end }}
+
+{{- define "drupal.post-release-command" -}}
+set -e
+{{ if .Release.IsInstall }}
+{{ .Values.php.postinstall.command}}
+{{ else }}
+{{ .Values.php.postupgrade.command}}
+{{ end }}
+{{- end }}

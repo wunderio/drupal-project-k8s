@@ -12,7 +12,7 @@ metadata:
     "helm.sh/hook-delete-policy": "before-hook-creation"
 spec:
   completions: 1
-  backoffLimit: 1
+  backoffLimit: 0
   template:
     spec:
       restartPolicy: Never

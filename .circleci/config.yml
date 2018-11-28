@@ -7,6 +7,90 @@ orbs:
         docker:
           - image: wunderio/silta-circleci:v0.1
 
+    commands:
+      phpcs:
+        steps:
+          - run:
+              name: phpcs validation
+              command: phpcs --standard=phpcs.xml -s
+
+      drupal-composer-install:
+        steps:
+          - restore_cache:
+              keys:
+                - v1-dependencies-{{ checksum "composer.lock" }}
+
+          - run: |
+              composer install -n --prefer-dist --ignore-platform-reqs --no-dev
+
+          - save_cache:
+              paths:
+                - ./vendor
+                - ./web/core
+                - ./web/modules/contrib
+                - ./web/themes/contrib
+                - ./web/profiles/contrib
+                - ./web/libraries
+              key: v1-dependencies-{{ checksum "composer.lock" }}
+
+      yarn-install:
+        steps:
+          - restore_cache:
+              keys:
+                - v1-yarn-{{ checksum "yarn.lock" }}
+                - v1-yarn-
+
+          - run: yarn install
+
+          - save_cache:
+              paths:
+                - node_modules
+              key: v1-yarn-{{ checksum "yarn.lock" }}
+
+      drupal-docker-build:
+        steps:
+          - setup_remote_docker
+
+          - run: |
+              # Login to the docker registry.
+              echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
+
+              # Build the Nginx image and push it to the repository.
+              docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 -f silta/nginx.Dockerfile web
+              docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1
+
+              # Build the Drupal image and push it to the repository.
+              docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 -f silta/php.Dockerfile .
+              docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1
+
+              # Build the Shell image and push it to the repository.
+              docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell.Dockerfile .
+              docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
+
+      set-release-name:
+        steps:
+          - run: |
+              BRANCHNAME_LOWER=${CIRCLE_BRANCH,,}
+              BRANCHNAME=${BRANCHNAME_LOWER//[^[:alnum:]]/-}
+              BRANCHNAME_HASH=$(echo $BRANCHNAME | shasum -a 256 | cut -c 1-4 )
+              BRANCHNAME_TRUNCATED=$(echo $BRANCHNAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
+              REPONAME=${CIRCLE_PROJECT_REPONAME,,}
+              REPONAME_HASH=$(echo $REPONAME | shasum -a 256 | cut -c 1-4 )
+              REPONAME_TRUNCATED=$(echo $REPONAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
+              # Truncate long names
+              if [ ${#BRANCHNAME} -ge 25 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;
+              if [ ${#REPONAME} -ge 25 ]; then REPONAME=$REPONAME_TRUNCATED-$REPONAME_HASH; fi;
+              echo "export RELEASE_NAME='$REPONAME--$BRANCHNAME'" >> $BASH_ENV
+
+      gcloud-login:
+        steps:
+          - run: |
+              echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
+              gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+              gcloud config set project silta-204108
+              gcloud config set compute/zone europe-west2-a
+              gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+
 jobs:
   validate:
     executor: silta/silta
@@ -14,7 +98,7 @@ jobs:
     steps:
       - checkout
 
-      - run: phpcs --standard=phpcs.xml -s
+      - silta/phpcs
 
       - run: helm unittest ./chart
 
@@ -31,52 +115,11 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "composer.lock" }}
+      - silta/drupal-composer-install
 
-      - run: |
-          composer install -n --prefer-dist --ignore-platform-reqs --no-dev
+      - silta/yarn-install
 
-      - save_cache:
-          paths:
-            - ./vendor
-            - ./web/core
-            - ./web/modules/contrib
-            - ./web/themes/contrib
-            - ./web/profiles/contrib
-            - ./web/libraries
-          key: v1-dependencies-{{ checksum "composer.lock" }}
-
-      - restore_cache:
-          keys:
-            - v1-yarn-{{ checksum "yarn.lock" }}
-            - v1-yarn-
-
-      - run: yarn install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-yarn-{{ checksum "yarn.lock" }}
-
-      - setup_remote_docker
-
-      - run: |
-          #echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $DOCKER_REPO_HOST
-          echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
-
-          # Build the Nginx image and push it to the repository.
-          docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 -f silta/nginx.Dockerfile web
-          docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1
-
-          # Build the Drupal image and push it to the repository.
-          docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 -f silta/php.Dockerfile .
-          docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1
-
-          # Build the Shell image and push it to the repository.
-          docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell.Dockerfile .
-          docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
+      - silta/drupal-docker-build
 
   deploy:
     executor: silta/silta
@@ -84,26 +127,9 @@ jobs:
     steps:
       - checkout
 
-      # Set the release name for later reuse.
-      - run: |
-          BRANCHNAME_LOWER=${CIRCLE_BRANCH,,}
-          BRANCHNAME=${BRANCHNAME_LOWER//[^[:alnum:]]/-}
-          BRANCHNAME_HASH=$(echo $BRANCHNAME | shasum -a 256 | cut -c 1-4 )
-          BRANCHNAME_TRUNCATED=$(echo $BRANCHNAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
-          REPONAME=${CIRCLE_PROJECT_REPONAME,,}
-          REPONAME_HASH=$(echo $REPONAME | shasum -a 256 | cut -c 1-4 )
-          REPONAME_TRUNCATED=$(echo $REPONAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
-          # Truncate long names
-          if [ ${#BRANCHNAME} -ge 25 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;
-          if [ ${#REPONAME} -ge 25 ]; then REPONAME=$REPONAME_TRUNCATED-$REPONAME_HASH; fi;
-          echo "export RELEASE_NAME='$REPONAME--$BRANCHNAME'" >> $BASH_ENV
+      - silta/set-release-name
 
-      - run: |
-          echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
-          gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-          gcloud config set project silta-204108
-          gcloud config set compute/zone europe-west2-a
-          gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+      - silta/gcloud-login
 
       - run: |
           helm dependency build ./chart

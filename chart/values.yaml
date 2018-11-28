@@ -74,7 +74,7 @@ php:
   postinstall:
     command: |
       TIME_WAITING=0
-      until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST > /dev/null 2>&1; do
+      until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
         echo "Waiting for database..."; sleep 5
         TIME_WAITING=$((TIME_WAITING+5))
 

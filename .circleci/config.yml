@@ -179,6 +179,10 @@ jobs:
 
       - silta/gcloud-login
 
+      - run:
+          name: Build local helm dependencies
+          command: helm dependency build ./chart
+
       - silta/drupal-helm-deploy:
           chart_name: "./chart"
           chart_repository: ""

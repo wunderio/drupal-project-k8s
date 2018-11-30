@@ -195,6 +195,7 @@ workflows:
   commit:
     jobs:
       - silta/drupal-validate:
+          name: validate
           additional-validators:
             - run: helm unittest ./chart
             - run: |
@@ -209,6 +210,7 @@ workflows:
           context: global_nonprod
 
       - silta/drupal-deploy:
+          name: deploy
           # Use a local chart during development.
           chart_name: "./chart"
           chart_repository: ""

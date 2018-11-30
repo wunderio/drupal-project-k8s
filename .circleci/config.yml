@@ -2,11 +2,62 @@ version: 2.1
 
 orbs:
   silta:
+    # CircleCI executors
     executors:
       silta:
         docker:
           - image: wunderio/silta-circleci:v0.1
 
+    # CircleCI Jobs
+    jobs:
+      drupal-validate:
+        executor: silta
+        parameters:
+          additional-validators:
+            type: steps
+            default: []
+        steps:
+          - checkout
+          - phpcs
+          - steps: <<parameters.additional-validators>>
+
+      drupal-build:
+        executor: silta
+        parameters:
+          post-codebase-build:
+            type: steps
+            default: []
+        steps:
+          - checkout
+          - drupal-composer-install
+          - yarn-install
+          - steps: <<parameters.post-codebase-build>>
+          - drupal-docker-build
+
+      drupal-deploy:
+        executor: silta
+        parameters:
+          pre-release:
+            description: Steps to be executed before the Helm release is created.
+            type: steps
+            default: []
+          chart_name:
+            type: string
+            default: drupal
+          chart_repository:
+            type: string
+            default: https://wunderio.github.io/charts/
+
+        steps:
+          - checkout
+          - set-release-name
+          - gcloud-login
+          - steps: <<parameters.pre-release>>
+          - drupal-helm-deploy:
+              chart_name: <<parameters.chart_name>>
+              chart_repository: <<parameters.chart_repository>>
+
+    # CircleCI commands
     commands:
       phpcs:
         steps:
@@ -139,62 +190,33 @@ orbs:
               name: Release information
               command: helm status $RELEASE_NAME
 
-jobs:
-  validate:
-    executor: silta/silta
-
-    steps:
-      - checkout
-
-      - silta/phpcs
-
-      - run: helm unittest ./chart
-
-      - run: |
-          if ! grep machbarmacher/gdpr-dump composer.json; then
-            echo "Please install machbarmacher/gdpr-dump for sanitized database dumps."
-          elif [ ! -f gdpr.json ]; then
-            echo "machbarmacher/gdpr-dump is present but no gdpr.json was found."
-          fi
-
-  build:
-    executor: silta/silta
-
-    steps:
-      - checkout
-
-      - silta/drupal-composer-install
-
-      - silta/yarn-install
-
-      - silta/drupal-docker-build
-
-  deploy:
-    executor: silta/silta
-
-    steps:
-      - checkout
-
-      - silta/set-release-name
-
-      - silta/gcloud-login
-
-      - run:
-          name: Build local helm dependencies
-          command: helm dependency build ./chart
-
-      - silta/drupal-helm-deploy:
-          chart_name: "./chart"
-          chart_repository: ""
-
 workflows:
   version: 2
   commit:
     jobs:
-      - validate
-      - build:
+      - silta/drupal-validate:
+          additional-validators:
+            - run: helm unittest ./chart
+            - run: |
+                if ! grep machbarmacher/gdpr-dump composer.json; then
+                  echo "Please install machbarmacher/gdpr-dump for sanitized database dumps."
+                elif [ ! -f gdpr.json ]; then
+                  echo "machbarmacher/gdpr-dump is present but no gdpr.json was found."
+                fi
+
+      - silta/drupal-build:
+          name: build
           context: global_nonprod
-      - deploy:
+
+      - silta/drupal-deploy:
+          # Use a local chart during development.
+          chart_name: "./chart"
+          chart_repository: ""
+          pre-release:
+            - run:
+                name: Build local helm dependencies
+                command: helm dependency build ./chart
+
           context: global_nonprod
           requires:
             - build

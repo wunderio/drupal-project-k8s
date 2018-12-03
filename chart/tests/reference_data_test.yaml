@@ -3,8 +3,9 @@ templates:
   - drupal-deployment.yaml
   - drupal-volumes.yaml
   - reference-data-cron.yaml
+  - post-release.yaml
 tests:
-  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted
+  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted for the post-release job
     set:
       referenceData:
         referenceEnvironment: 'FOO'
@@ -16,14 +17,28 @@ tests:
     - hasDocuments:
         count: 0
       template: reference-data-cron.yaml
-    # Reference data volume is mounted in php container
-    - contains:
+    # Reference data volume is not mounted in php container
+    - notContains:
         path: spec.template.spec.volumes
         content:
           name: "reference-data-volume"
           persistentVolumeClaim:
             claimName: foo-reference-data
-    - contains:
+    - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/var/www/html/reference-data"
+    # Reference data volume is mounted in post-release job
+    - template: post-release.yaml
+      contains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference-data
+    - template: post-release.yaml
+      contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: "reference-data-volume"

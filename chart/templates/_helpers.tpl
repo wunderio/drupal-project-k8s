@@ -152,4 +152,10 @@ set -e
 {{ else }}
 {{ .Values.php.postupgrade.command}}
 {{ end }}
+
+{{- if and .Values.referenceData.enabled .Values.referenceData.afterDeployment }}
+{{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
+{{ .Values.referenceData.command }}
+{{- end }}
+{{- end }}
 {{- end }}

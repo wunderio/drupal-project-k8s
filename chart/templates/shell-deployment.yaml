@@ -24,7 +24,7 @@ spec:
         resources:
 {{ .Values.php.resources | toYaml | indent 10 }}
       volumes:
-        {{ include "drupal.volumes" . | indent 8}}
+        {{ include "shell.volumes" . | indent 8}}
       {{ include "drupal.imagePullSecrets" . | indent 6 }}
 {{- end }}
 ---

@@ -47,3 +47,19 @@ spec:
       storage: {{ .Values.referenceData.storage }}
 {{- end }}
 {{- end }}
+---
+{{- if .Values.shell.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-shell-keys
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
+spec:
+  storageClassName: {{ .Values.shell.storageClassName }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.referenceData.storage }}
+{{- end }}

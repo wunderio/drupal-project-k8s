@@ -41,6 +41,8 @@ ports:
   - containerPort: 22
 volumeMounts:
   {{ include "drupal.volumeMounts" . | indent 8 }}
+  - name: {{ .Release.Name }}-shell-keys
+    mountPath: /etc/ssh/keys
 {{- end }}
 
 {{- define "drupal.volumeMounts" }}
@@ -62,6 +64,13 @@ volumeMounts:
     mountPath: /etc/php7/php-fpm.d/www.conf
     readOnly: true
     subPath: www_conf
+{{- end }}
+
+{{- define "shell.volumes" }}
+{{ include "drupal.env" . }}
+- name: shell-keys
+  persistentVolumeClaim:
+    claimName: {{ .Release.Name }}-shell-keys
 {{- end }}
 
 {{- define "drupal.volumes" }}

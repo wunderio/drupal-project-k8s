@@ -124,6 +124,8 @@ orbs:
           - run:
               name: Set release name
               command: |
+                # Release name length is 37 chars long, which leaves max 16 chars for kubernetes resource name.
+                # Release name is prefixed with w because  it _HAS_ to start with alphabetic character. w 4 wunder.
                 BRANCHNAME_LOWER=${CIRCLE_BRANCH,,}
                 BRANCHNAME=${BRANCHNAME_LOWER//[^[:alnum:]]/-}
                 BRANCHNAME_HASH=$(echo $BRANCHNAME | shasum -a 256 | cut -c 1-4 )
@@ -141,11 +143,13 @@ orbs:
           - run:
               name: Google Cloud login
               command: |
+                # Save key, authenticate and set compute zone.
                 echo $GCLOUD_KEY_JSON > ${HOME}/gcloud-service-key.json
-                gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-                gcloud config set project silta-204108
-                gcloud config set compute/zone europe-west2-a
-                gcloud container clusters get-credentials silta-1 --zone europe-west2-a --project silta-204108
+                gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json --project $GCLOUD_PROJECT_NAME
+                gcloud config set compute/zone $GCLOUD_COMPUTE_ZONE
+
+                # Updates a kubeconfig file with appropriate credentials and endpoint information.
+                gcloud container clusters get-credentials $GCLOUD_CLUSTER_NAME --zone $GCLOUD_COMPUTE_ZONE --project $GCLOUD_PROJECT_NAME
 
       drupal-helm-deploy:
         parameters:

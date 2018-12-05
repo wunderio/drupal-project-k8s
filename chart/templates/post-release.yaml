@@ -27,6 +27,9 @@ spec:
           {{- if .Values.referenceData.enabled }}
           - name: reference-data-volume
             mountPath: /var/www/html/reference-data
+            {{- if ne .Values.referenceData.referenceEnvironment .Values.environmentName }}
+            readOnly: true
+            {{- end }}
           {{- end }}
       {{ include "drupal.imagePullSecrets" . | indent 6 }}
       volumes:

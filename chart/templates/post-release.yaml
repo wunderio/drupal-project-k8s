@@ -24,11 +24,15 @@ spec:
         - {{ include "drupal.post-release-command" . | quote }}
         volumeMounts:
           {{ include "drupal.volumeMounts" . | indent 8 }}
+          {{- if .Values.referenceData.enabled }}
           - name: reference-data-volume
             mountPath: /var/www/html/reference-data
+          {{- end }}
       {{ include "drupal.imagePullSecrets" . | indent 6 }}
       volumes:
         {{ include "drupal.volumes" . | indent 8 }}
+        {{- if .Values.referenceData.enabled }}
         - name: reference-data-volume
           persistentVolumeClaim:
             claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+        {{- end }}

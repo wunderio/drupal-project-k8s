@@ -31,6 +31,7 @@ tests:
         content:
           name: "reference-data-volume"
           mountPath: "/var/www/html/reference-data"
+          readOnly: true
 
   - it: is not mounted on the main deployment
     asserts:
@@ -47,7 +48,6 @@ tests:
         content:
           name: "reference-data-volume"
           mountPath: "/var/www/html/reference-data"
-
             
   - it: takes reference data information
     set:
@@ -103,6 +103,12 @@ tests:
       equal:
         path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
         value: "echo Hello World"
+
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/var/www/html/reference-data"
 
   - it: can be disabled
     set:

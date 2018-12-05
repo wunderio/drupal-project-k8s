@@ -13,13 +13,13 @@ orbs:
       drupal-validate:
         executor: silta
         parameters:
-          additional-validators:
+          post-validation:
             type: steps
             default: []
         steps:
           - checkout
           - phpcs
-          - steps: <<parameters.additional-validators>>
+          - steps: <<parameters.post-validation>>
 
       drupal-build:
         executor: silta
@@ -196,7 +196,7 @@ workflows:
     jobs:
       - silta/drupal-validate:
           name: validate
-          additional-validators:
+          post-validation:
             - run: helm unittest ./chart
             - run: |
                 if ! grep machbarmacher/gdpr-dump composer.json; then

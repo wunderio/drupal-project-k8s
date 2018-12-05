@@ -22,6 +22,8 @@ spec:
       # php-fpm container.
       - name: php
         {{ include "drupal.php-container" . | indent 8}}
+        volumeMounts:
+          {{ include "drupal.volumeMounts" . | indent 10 }}
         livenessProbe:
           tcpSocket:
             port: 9000

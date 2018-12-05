@@ -25,8 +25,6 @@ env: {{ include "drupal.env" . }}
 ports:
   - containerPort: 9000
     name: drupal
-volumeMounts:
-  {{ include "drupal.volumeMounts" . | indent 8 }}
 {{- end }}
 
 {{- define "shell.ssh-container" }}
@@ -51,10 +49,6 @@ volumeMounts:
   {{- if .Values.privateFiles.enabled }}
   - name: drupal-private-files
     mountPath: /var/www/html/private
-  {{- end }}
-  {{- if .Values.referenceData.enabled }}  
-  - name: reference-data-volume
-    mountPath: /var/www/html/reference-data
   {{- end }}
   - name: php-conf
     mountPath: /etc/php7/php.ini
@@ -89,11 +83,6 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
-{{- if .Values.referenceData.enabled }}        
-- name: reference-data-volume
-  persistentVolumeClaim:
-    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
-{{- end }}
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

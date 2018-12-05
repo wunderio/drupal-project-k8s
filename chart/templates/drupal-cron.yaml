@@ -16,6 +16,8 @@ spec:
           containers:
           - name: drupal-cron
             {{ include "drupal.php-container" $ | indent 12 }}
+            volumeMounts:
+              {{ include "drupal.volumeMounts" $ | indent 14 }}
             command: ["/bin/sh", "-c"]
             args:
               - {{ $job.command | quote }}

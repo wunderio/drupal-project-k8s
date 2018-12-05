@@ -163,7 +163,7 @@ referenceData:
   schedule: '0 3 * * *'
 
   # Update the reference data after deployments on the reference environment.
-  afterDeployment: true
+  updateAfterDeployment: true
 
   # The commands that is executed to export reference data.
   command: |

@@ -46,7 +46,7 @@ tests:
       # Simulate a deployment on the reference environment
       environmentName: reference-environment
       referenceData.referenceEnvironment: reference-environment
-      referenceData.afterDeployment: false
+      referenceData.updateAfterDeployment: false
       referenceData.command: baz
     asserts:
       - notMatchRegex:

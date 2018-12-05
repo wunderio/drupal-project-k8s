@@ -25,8 +25,6 @@ env: {{ include "drupal.env" . }}
 ports:
   - containerPort: 9000
     name: drupal
-volumeMounts:
-  {{ include "drupal.volumeMounts" . | indent 8 }}
 {{- end }}
 
 {{- define "shell.ssh-container" }}
@@ -51,10 +49,6 @@ volumeMounts:
   {{- if .Values.privateFiles.enabled }}
   - name: drupal-private-files
     mountPath: /var/www/html/private
-  {{- end }}
-  {{- if include "drupal.accessReferenceData" . }}
-  - name: reference-data-volume
-    mountPath: /var/www/html/reference-data
   {{- end }}
   - name: php-conf
     mountPath: /etc/php7/php.ini
@@ -89,21 +83,7 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
-{{- if include "drupal.accessReferenceData" . }}
-- name: reference-data-volume
-  persistentVolumeClaim:
-    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
 {{- end }}
-{{- end }}
-
-{{- define "drupal.accessReferenceData" -}}
-{{- if and .Values.referenceData.enabled -}}
-{{- /* Only mount reference data volumes for the post-release and reference-data-cron templates. */ -}}
-{{ if or (eq $.Template.Name "drupal/templates/post-release.yaml") (eq $.Template.Name "drupal/templates/reference-data-cron.yaml") -}}
-true
-{{- end -}}
-{{- end -}}
-{{- end -}}
 
 {{- define "drupal.imagePullSecrets" }}
 {{- if .Values.imagePullSecrets }}

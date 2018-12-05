@@ -16,6 +16,10 @@ spec:
           containers:
           - name: reference-data-cron
             {{ include "drupal.php-container" . | indent 12 }}
+            volumeMounts:
+              {{ include "drupal.volumeMounts" . | indent 12 }}
+              - name: reference-data-volume
+                mountPath: /var/www/html/reference-data
             command: ["/bin/sh", "-c"]
             args:
               - {{ .Values.referenceData.command | quote }}
@@ -24,6 +28,10 @@ spec:
           restartPolicy: OnFailure
           volumes:
             {{ include "drupal.volumes" . | indent 12 }}
+            - name: reference-data-volume
+              persistentVolumeClaim:
+                claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+
 
           {{ include "drupal.imagePullSecrets" . | indent 10 }}
 {{- end }}

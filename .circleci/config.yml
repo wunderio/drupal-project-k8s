@@ -24,14 +24,12 @@ orbs:
       drupal-build:
         executor: silta
         parameters:
-          post-codebase-build:
+          codebase-build:
             type: steps
             default: []
         steps:
           - checkout
-          - drupal-composer-install
-          - yarn-install
-          - steps: <<parameters.post-codebase-build>>
+          - steps: <<parameters.codebase-build>>
           - drupal-docker-build
 
       drupal-deploy:
@@ -208,6 +206,9 @@ workflows:
       - silta/drupal-build:
           name: build
           context: global_nonprod
+          codebase-build:
+            - silta/drupal-composer-install
+            - silta/yarn-install
 
       - silta/drupal-deploy:
           name: deploy

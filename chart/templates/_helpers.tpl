@@ -27,24 +27,6 @@ ports:
     name: drupal
 {{- end }}
 
-{{- define "shell.ssh-container" }}
-image: {{ .Values.shell.image | quote }}
-env:
-  {{ include "drupal.env" . | indent 2 }}
-  - name: GITAUTH_API_TOKEN
-    value: "{{ .Values.shell.gitAuth.apiToken }}"
-  - name: GITAUTH_REPOSITORY_URL
-    value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
-  - name: DRUSH_OPTIONS_URI
-    value: "http://{{- template "drupal.domain" . }}"
-ports:
-  - containerPort: 22
-volumeMounts:
-  {{ include "drupal.volumeMounts" . | indent 8 }}
-  - name: {{ .Release.Name }}-shell-keys
-    mountPath: /etc/ssh/keys
-{{- end }}
-
 {{- define "drupal.volumeMounts" }}
   - name: drupal-public-files
     mountPath: /var/www/html/web/sites/default/files
@@ -64,13 +46,6 @@ volumeMounts:
     mountPath: /etc/php7/php-fpm.d/www.conf
     readOnly: true
     subPath: www_conf
-{{- end }}
-
-{{- define "shell.volumes" }}
-{{ include "drupal.env" . }}
-- name: shell-keys
-  persistentVolumeClaim:
-    claimName: {{ .Release.Name }}-shell-keys
 {{- end }}
 
 {{- define "drupal.volumes" }}

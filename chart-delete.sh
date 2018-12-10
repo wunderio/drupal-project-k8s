@@ -20,7 +20,7 @@ if [ $NAMESPACE ]; then
     kubectl delete all -l release=$1 -n $NAMESPACE --grace-period=0
 
     echo "* Doublecheck and remove the leftover resources"
-    for type in job pod pvc pv
+    for type in deployment cronjob statefulset job pod pvc pv
     do
 	echo $type ...
 	#kubectl get $type --namespace=$NAMESPACE | grep $1

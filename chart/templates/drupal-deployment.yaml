@@ -18,10 +18,16 @@ spec:
         {{ include "drupal.release_labels" . | indent 8 }}
         deployment: drupal
     spec:
+      initContainers:
+      - name: wait-for-db
+        {{ include "drupal.php-container" . | indent 8 }}
+        command: ["/bin/sh", "-c"]
+        args:
+        - {{ include "drupal.wait-for-db-command" . | quote }}
       containers:
       # php-fpm container.
       - name: php
-        {{ include "drupal.php-container" . | indent 8}}
+        {{ include "drupal.php-container" . | indent 8 }}
         volumeMounts:
           {{ include "drupal.volumeMounts" . | indent 10 }}
         livenessProbe:

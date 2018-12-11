@@ -15,13 +15,11 @@ RELEASE_NAME="$PROJECT--$BRANCH"
 helm upgrade \
     --install $RELEASE_NAME ./chart \
     --set environmentName=$BRANCH \
-    --set php.image=wunderio/silta-drupal-test-images:php \
-    --set nginx.image=wunderio/silta-drupal-test-images:nginx \
-    --set shell.image=wunderio/silta-drupal-test-images:shell \
+    --set php.image=wunderio/silta-drupal-test-images:php-minimal \
+    --set nginx.image=wunderio/silta-drupal-test-images:nginx-minimal \
     --set mariadb.rootUser.password='abcdef1234' \
     --set mariadb.db.password='abcdef1234' \
-    --set shell.gitAuth.repositoryUrl="InvalidButItDoesntMatter" \
-    --set shell.gitAuth.apiToken="InvalidButItDoesntMatter" \
+    --set shell.enabled=false \
     --namespace=$PROJECT \
     --timeout 600
 

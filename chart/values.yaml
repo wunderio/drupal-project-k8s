@@ -73,17 +73,6 @@ php:
   # This is run every time a new environment is created.
   postinstall:
     command: |
-      TIME_WAITING=0
-      until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
-        echo "Waiting for database..."; sleep 5
-        TIME_WAITING=$((TIME_WAITING+5))
-
-        if [ $TIME_WAITING -gt 60 ]; then
-          echo "Database connection timeout"
-          exit 1
-        fi
-      done
-
       if [ -f reference-data/db.sql.gz ]; then
 
         echo "Importing reference database dump"

@@ -129,8 +129,24 @@ imagePullSecrets:
   {{- end }}
 {{- end }}
 
+{{- define "drupal.wait-for-db-command" }}
+TIME_WAITING=0
+  until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
+  echo "Waiting for database..."; sleep 5
+  TIME_WAITING=$((TIME_WAITING+5))
+
+  if [ $TIME_WAITING -gt 60 ]; then
+    echo "Database connection timeout"
+    exit 1
+  fi
+done
+{{- end }}
+
 {{- define "drupal.post-release-command" -}}
 set -e
+
+{{ include "drupal.wait-for-db-command" . }}
+
 {{ if .Release.IsInstall }}
 {{ .Values.php.postinstall.command}}
 {{ else }}

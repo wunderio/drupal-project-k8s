@@ -38,9 +38,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - drush check-bootstrap
+            - timeout -t 3 drush check-bootstrap
           periodSeconds: 3
-          timeoutSeconds: 3
         resources:
 {{ .Values.php.resources | toYaml | indent 10 }}
 

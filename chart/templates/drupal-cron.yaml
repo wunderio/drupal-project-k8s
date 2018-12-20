@@ -4,7 +4,7 @@ kind: CronJob
 metadata:
   name: {{ $.Release.Name }}-cron-{{ $index }}
   labels:
-    {{ include "drupal.release_labels" $ | indent 4 }}
+    {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
   schedule: {{ $job.schedule | quote }}
   concurrencyPolicy: Forbid

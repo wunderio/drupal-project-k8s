@@ -1,4 +1,4 @@
-{{- define "drupal.release_labels" }}
+{{- define "drupal.release_labels" -}}
 app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}

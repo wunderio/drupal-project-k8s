@@ -21,9 +21,9 @@ spec:
       containers:
       # php-fpm container.
       - name: php
-        {{ include "drupal.php-container" . | indent 8}}
+        {{- include "drupal.php-container" . | nindent 8}}
         volumeMounts:
-          {{ include "drupal.volumeMounts" . | indent 10 }}
+          {{- include "drupal.volumeMounts" . | nindent 10 }}
         livenessProbe:
           tcpSocket:
             port: 9000
@@ -34,7 +34,7 @@ spec:
             - -c
             - drush check-bootstrap
         resources:
-{{ .Values.php.resources | toYaml | indent 10 }}
+          {{- .Values.php.resources | toYaml | nindent 10 }}
 
       # Nginx container
       - name: nginx
@@ -72,10 +72,10 @@ spec:
             path: /
             port: 80
         resources:
-{{ .Values.nginx.resources | toYaml | indent 10 }}
+          {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
       volumes:
-        {{ include "drupal.volumes" . | indent 8}}
+        {{- include "drupal.volumes" . | nindent 8}}
         - name: nginx-conf
           configMap:
             name: {{ .Release.Name }}-nginx-conf
@@ -92,4 +92,4 @@ spec:
               - key: .htaccess
                 path: .htaccess
         {{- end }}
-      {{ include "drupal.imagePullSecrets" . | indent 6 }}
+      {{- include "drupal.imagePullSecrets" . | nindent 6 }}

@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      {{ include "drupal.release_labels" . | indent 6 }}
+      {{- include "drupal.release_labels" . | nindent 6 }}
       deployment: drupal
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        {{ include "drupal.release_labels" . | indent 8 }}
+        {{- include "drupal.release_labels" . | nindent 8 }}
         deployment: drupal
     spec:
       containers:

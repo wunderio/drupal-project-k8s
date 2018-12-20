@@ -114,7 +114,7 @@ php:
 
   # Custom php settings.
   php_ini:
-    loglevel: warn # Possible Values: alert, error, warning, notice, debug
+    loglevel: notice # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
 

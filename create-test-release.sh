@@ -25,5 +25,6 @@ helm upgrade \
 
 kubectl logs job/${RELEASE_NAME}-post-release -n $PROJECT -f
 
-# Wait to be sure that readiness checks have been propagated.
-sleep 20
+## Wait to be sure that readiness checks have been propagated.
+kubectl rollout status -w deployment/${RELEASE_NAME}-drupal -n $PROJECT
+sleep 3

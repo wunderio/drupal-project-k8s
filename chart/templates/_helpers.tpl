@@ -19,7 +19,7 @@ release: {{ .Release.Name }}
 {{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}
 {{- end -}}
 
-{{- define "drupal.php-container" }}
+{{- define "drupal.php-container" -}}
 image: {{ .Values.php.image | quote }}
 env: {{ include "drupal.env" . }}
 ports:
@@ -27,28 +27,28 @@ ports:
     name: drupal
 {{- end }}
 
-{{- define "drupal.volumeMounts" }}
-  - name: drupal-public-files
-    mountPath: /var/www/html/web/sites/default/files
-  {{- if .Values.privateFiles.enabled }}
-  - name: drupal-private-files
-    mountPath: /var/www/html/private
-  {{- end }}
-  - name: php-conf
-    mountPath: /etc/php7/php.ini
-    readOnly: true
-    subPath: php_ini
-  - name: php-conf
-    mountPath: /etc/php7/php-fpm.conf
-    readOnly: true
-    subPath: php-fpm_conf
-  - name: php-conf
-    mountPath: /etc/php7/php-fpm.d/www.conf
-    readOnly: true
-    subPath: www_conf
+{{- define "drupal.volumeMounts" -}}
+- name: drupal-public-files
+  mountPath: /var/www/html/web/sites/default/files
+{{- if .Values.privateFiles.enabled }}
+- name: drupal-private-files
+  mountPath: /var/www/html/private
+{{- end }}
+- name: php-conf
+  mountPath: /etc/php7/php.ini
+  readOnly: true
+  subPath: php_ini
+- name: php-conf
+  mountPath: /etc/php7/php-fpm.conf
+  readOnly: true
+  subPath: php-fpm_conf
+- name: php-conf
+  mountPath: /etc/php7/php-fpm.d/www.conf
+  readOnly: true
+  subPath: www_conf
 {{- end }}
 
-{{- define "drupal.volumes" }}
+{{- define "drupal.volumes" -}}
 - name: drupal-public-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-public-files

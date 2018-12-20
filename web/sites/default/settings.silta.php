@@ -32,4 +32,4 @@ if (getenv('MEMCACHED_HOST')) {
 /**
  * Generated twig files should not be on shared storage.
  */
-$settings['php_storage']['twig']['directory'] = '/tmp';
+$settings['php_storage']['twig']['directory'] = '../generated-php';

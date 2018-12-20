@@ -195,6 +195,10 @@ mariadb:
   master:
     persistence:
       size: 1G
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256M
 
 elasticsearch:
   enabled: false

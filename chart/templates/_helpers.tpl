@@ -135,7 +135,7 @@ TIME_WAITING=0
   echo "Waiting for database..."; sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
 
-  if [ $TIME_WAITING -gt 60 ]; then
+  if [ $TIME_WAITING -gt 90 ]; then
     echo "Database connection timeout"
     exit 1
   fi

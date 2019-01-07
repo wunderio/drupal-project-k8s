@@ -46,7 +46,7 @@
         <SystemSampler guiclass="SystemSamplerGui" testclass="SystemSampler" testname="Create helm release" enabled="true">
           <boolProp name="SystemSampler.checkReturnCode">false</boolProp>
           <stringProp name="SystemSampler.expectedReturnCode">0</stringProp>
-          <stringProp name="SystemSampler.command">./create-test-release.sh</stringProp>
+          <stringProp name="SystemSampler.command">./devtools/create-test-release.sh</stringProp>
           <elementProp name="SystemSampler.arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="Argument">
@@ -127,7 +127,7 @@
         <SystemSampler guiclass="SystemSamplerGui" testclass="SystemSampler" testname="Delete helm release" enabled="true">
           <boolProp name="SystemSampler.checkReturnCode">false</boolProp>
           <stringProp name="SystemSampler.expectedReturnCode">0</stringProp>
-          <stringProp name="SystemSampler.command">./chart-delete.sh</stringProp>
+          <stringProp name="SystemSampler.command">./devtools/chart-delete.sh</stringProp>
           <elementProp name="SystemSampler.arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="Argument">

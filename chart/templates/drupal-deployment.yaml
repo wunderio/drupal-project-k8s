@@ -18,6 +18,12 @@ spec:
         {{- include "drupal.release_labels" . | nindent 8 }}
         deployment: drupal
     spec:
+      initContainers:
+      - name: wait-for-db
+        {{ include "drupal.php-container" . | nindent 8 }}
+        command: ["/bin/sh", "-c"]
+        args:
+        - {{ include "drupal.wait-for-db-command" . | quote }}
       containers:
       # php-fpm container.
       - name: php
@@ -32,7 +38,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - drush check-bootstrap
+            - timeout -t 3 drush check-bootstrap
+          periodSeconds: 3
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 
@@ -71,6 +78,8 @@ spec:
           httpGet:
             path: /
             port: 80
+          periodSeconds: 3
+          timeoutSeconds: 3
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 

@@ -216,3 +216,13 @@ elasticsearch:
 memcached:
   enabled: false
   maxItemMemory: 128
+
+# Configure ambassador for routing inbound traffic. We typically enable ambassador on development 
+# environments, but disable it and instead use a dedicated ingress resource on production; some 
+# providers have limits on the number of dedicated ingress resources available in a cluster. 
+ambassador:
+  enabled: true
+  # Optional configuration arguments for ambassador. 
+  config:
+    prefix: /
+    timeout_ms: 30000

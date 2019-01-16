@@ -89,11 +89,15 @@ php:
 
       elif [ -f config/sync/core.extension.yml ]; then
         echo "Installing Drupal from existing configuration"
+        touch /var/www/html/web/sites/default/files/_deployment
         drush site-install -n config_installer
+        rm /var/www/html/web/sites/default/files/_deployment
 
       else
         echo "No configuration found, installing a plain drupal site"
+        touch /var/www/html/web/sites/default/files/_deployment
         drush site-install -n standard
+        rm /var/www/html/web/sites/default/files/_deployment
       fi
 
   # Post-upgrade hook.

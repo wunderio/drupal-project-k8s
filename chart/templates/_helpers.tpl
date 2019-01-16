@@ -142,8 +142,26 @@ TIME_WAITING=0
 done
 {{- end }}
 
+{{- define "drupal.wait-for-ref-fs-command" }}
+TIME_WAITING=0
+until touch /var/www/html/reference-data/_fs-test; do
+  echo "Waiting for reference-data fs..."; sleep 2
+  TIME_WAITING=$((TIME_WAITING+2))
+
+  if [ $TIME_WAITING -gt 20 ]; then
+    echo "Reference data filesystem timeout"
+    exit 1
+  fi
+done
+rm /var/www/html/reference-data/_fs-test
+{{- end }}
+
 {{- define "drupal.post-release-command" -}}
 set -e
+
+{{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
+{{ include "drupal.wait-for-ref-fs-command" . }}
+{{- end }}
 
 {{ include "drupal.wait-for-db-command" . }}
 

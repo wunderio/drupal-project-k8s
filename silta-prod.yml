@@ -2,6 +2,11 @@
 # Provide a high-availability deployment.
 replicas: 2
 
+# Uncomment these lines to disable basic auth protection.
+#nginx:
+# basicauth:
+#   enabled: false
+
 php:
   # Reserve more resources for our PHP containerss.
   resources:

@@ -180,7 +180,8 @@ orbs:
                   --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \
                   --set shell.gitAuth.apiToken="${GITAUTH_API_TOKEN}" \
                   --namespace=${CIRCLE_PROJECT_REPONAME,,} \
-                  --values silta.yml
+                  --values silta.yml \
+                  --values silta-prod.yml
 
           - run:
               name: Deployment log

@@ -38,7 +38,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - timeout -t 3 drush check-bootstrap
+            - if [ ! -f /var/www/html/web/sites/default/files/_deployment ]; then timeout -t 3 drush check-bootstrap; else exit 1; fi
           periodSeconds: 3
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}

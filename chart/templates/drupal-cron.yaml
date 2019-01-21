@@ -20,7 +20,7 @@ spec:
             {{- include "drupal.volumeMounts" $ | nindent 14 }}
             command: ["/bin/sh", "-c"]
             args:
-              - while [ -f /var/www/html/web/sites/default/files/_deployment ]; do sleep 2; done
+              - while [ {{ include "drupal.deployment-in-progress-test" . }} ]; do sleep 2; done
             resources:
               {{- $.Values.php.resources | toYaml | nindent 14 }}
           containers:

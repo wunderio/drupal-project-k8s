@@ -156,6 +156,10 @@ done
 rm /var/www/html/reference-data/_fs-test
 {{- end }}
 
+{{- define "drupal.deployment-in-progress-test" -}}
+-f /var/www/html/web/sites/default/files/_deployment
+{{- end -}}
+
 {{- define "drupal.post-release-command" -}}
 set -e
 
@@ -166,7 +170,9 @@ set -e
 {{ include "drupal.wait-for-db-command" . }}
 
 {{ if .Release.IsInstall }}
+touch /var/www/html/web/sites/default/files/_deployment
 {{ .Values.php.postinstall.command}}
+rm /var/www/html/web/sites/default/files/_deployment
 {{ else }}
 {{ .Values.php.postupgrade.command}}
 {{ end }}

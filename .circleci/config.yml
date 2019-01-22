@@ -47,7 +47,7 @@ orbs:
             default: https://wunderio.github.io/charts/
           silta_config:
             type: string
-            default: "silta.yml"
+            default: "silta/silta.yml"
 
         steps:
           - checkout
@@ -246,7 +246,7 @@ workflows:
                 command: helm dependency build ./chart
 
           context: global_nonprod
-          silta_config: silta.yml,silta-prod.yml
+          silta_config: silta/silta.yml,silta/silta-prod.yml
           filters:
             branches:
               only: master

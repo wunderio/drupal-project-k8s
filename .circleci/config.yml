@@ -159,13 +159,10 @@ orbs:
         parameters:
           chart_name:
             type: string
-            default: drupal
           chart_repository:
             type: string
-            default: https://wunderio.github.io/charts/
           silta_config:
             type: string
-            default: "silta.yml"
         steps:
           - run:
               name: Deploy helm release

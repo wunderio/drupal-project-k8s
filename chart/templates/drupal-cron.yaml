@@ -13,16 +13,6 @@ spec:
     spec:
       template:
         spec:
-          initContainers:
-          - name: wait-for-db
-            {{- include "drupal.php-container" $ | nindent 12 }}
-            volumeMounts:
-            {{- include "drupal.volumeMounts" $ | nindent 14 }}
-            command: ["/bin/sh", "-c"]
-            args:
-              - while [ {{ include "drupal.deployment-in-progress-test" . }} ]; do sleep 2; done
-            resources:
-              {{- $.Values.php.resources | toYaml | nindent 14 }}
           containers:
           - name: drupal-cron
             {{- include "drupal.php-container" $ | nindent 12 }}
@@ -30,7 +20,7 @@ spec:
               {{- include "drupal.volumeMounts" $ | nindent 14 }}
             command: ["/bin/sh", "-c"]
             args:
-              - {{ $job.command | quote }}
+              - if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]; then {{ $job.command | quote }} else exit 1; fi
             resources:
               {{- $.Values.php.resources | toYaml | nindent 14 }}
           restartPolicy: OnFailure

@@ -132,10 +132,10 @@ orbs:
                 # Release name is prefixed with w because  it _HAS_ to start with alphabetic character. w 4 wunder.
                 BRANCHNAME_LOWER=${CIRCLE_BRANCH,,}
                 BRANCHNAME=${BRANCHNAME_LOWER//[^[:alnum:]]/-}
-                BRANCHNAME_HASH=$(echo $BRANCHNAME | shasum -a 256 | cut -c 1-4 )
+                BRANCHNAME_HASH=$(echo -n $BRANCHNAME | shasum -a 256 | cut -c 1-4 )
                 BRANCHNAME_TRUNCATED=$(echo $BRANCHNAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
                 REPONAME=${CIRCLE_PROJECT_REPONAME,,}
-                REPONAME_HASH=$(echo $REPONAME | shasum -a 256 | cut -c 1-4 )
+                REPONAME_HASH=$(echo -n $REPONAME | shasum -a 256 | cut -c 1-4 )
                 REPONAME_TRUNCATED=$(echo $REPONAME | cut -c 1-15 | sed 's/^\(.*\)-$/\1/' )
                 # Truncate long names
                 if [ ${#BRANCHNAME} -ge 25 ]; then BRANCHNAME=$BRANCHNAME_TRUNCATED-$BRANCHNAME_HASH; fi;

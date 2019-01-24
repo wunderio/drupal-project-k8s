@@ -12,6 +12,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            {{- include "drupal.release_labels" $ | nindent 12 }}
         spec:
           containers:
           - name: drupal-cron

@@ -76,7 +76,7 @@ spec:
             port: 80
         readinessProbe:
           httpGet:
-            path: /
+            path: /robots.txt
             port: 80
           periodSeconds: 3
           timeoutSeconds: 3

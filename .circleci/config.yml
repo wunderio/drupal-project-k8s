@@ -13,28 +13,41 @@ orbs:
       drupal-validate:
         executor: silta
         parameters:
+          drupal-root:
+            type: string
+            default: "."
           post-validation:
             type: steps
             default: []
+        working_directory: ~/project/<<parameters.drupal-root>>
         steps:
-          - checkout
+          - checkout:
+              path: ~/project
           - phpcs
           - steps: <<parameters.post-validation>>
 
       drupal-build:
         executor: silta
         parameters:
+          drupal-root:
+            type: string
+            default: "."
           codebase-build:
             type: steps
             default: []
+        working_directory: ~/project/<<parameters.drupal-root>>
         steps:
-          - checkout
+          - checkout:
+              path: ~/project
           - steps: <<parameters.codebase-build>>
           - drupal-docker-build
 
       drupal-deploy:
         executor: silta
         parameters:
+          drupal-root:
+            type: string
+            default: "."
           pre-release:
             description: Steps to be executed before the Helm release is created.
             type: steps
@@ -48,9 +61,10 @@ orbs:
           silta_config:
             type: string
             default: "silta/silta.yml"
-
+        working_directory: ~/project/<<parameters.drupal-root>>
         steps:
-          - checkout
+          - checkout:
+              path: ~/project
           - set-release-name
           - gcloud-login
           - steps: <<parameters.pre-release>>

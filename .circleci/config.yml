@@ -40,12 +40,6 @@ orbs:
           - checkout:
               path: ~/project
           - steps: <<parameters.codebase-build>>
-          - get-docker-file-hash:
-              path: web
-              identifier: NGINX
-          - run:
-              command: |
-                echo $NGINX_HASH
           - drupal-docker-build
 
       drupal-deploy:
@@ -138,15 +132,34 @@ orbs:
         steps:
           - setup_remote_docker
 
+          - restore_cache:
+              keys:
+                - v1-docker-files-hash
+
+          - get-docker-file-hash:
+              path: web
+              identifier: NGINX
+
           - run:
               name: Build docker images
               command: |
                 # Login to the docker registry.
                 echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
 
-                # Build the Nginx image and push it to the repository.
-                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 -f silta/nginx.Dockerfile web
-                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1
+                # Make sure the directory for our hashes is present.
+                mkdir -p docker-files-hash
+
+                if grep -q $NGINX_HASH docker-files-hash/nginx;
+                then
+                  echo "This nginx image has already been built, the existing image from the Docker repository will be used"
+                else
+                  # Build the Nginx image and push it to the repository.
+                  docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$NGINX_HASH -f silta/nginx.Dockerfile web
+                  docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$NGINX_HASH
+
+                  # Keep track that the image for these files has been built.
+                  echo $NGINX_HASH >> docker-files-hash/nginx
+                fi
 
                 # Build the Drupal image and push it to the repository.
                 docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 -f silta/php.Dockerfile .
@@ -155,6 +168,11 @@ orbs:
                 # Build the Shell image and push it to the repository.
                 docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell.Dockerfile .
                 docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
+
+          - save_cache:
+              paths:
+                - docker-files-hash
+              key: v1-docker-files-hash
 
       set-release-name:
         steps:

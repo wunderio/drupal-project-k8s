@@ -130,8 +130,7 @@ orbs:
         steps:
           - run:
               command: |
-                HASH=`tar --sort=name --exclude-from=<<parameters.path>>/.dockerignore --mtime='2000-01-01 00:00Z' --clamp-mtime -cf - <<parameters.path>> | sha1sum`
-
+                HASH=`tar --sort=name --exclude-from=<<parameters.path>>/.dockerignore --mtime='2000-01-01 00:00Z' --clamp-mtime -cf - <<parameters.path>> | sha1sum | cut -c 1-40`
                 echo "export <<parameters.identifier>>_HASH='$HASH'" >> $BASH_ENV
 
 

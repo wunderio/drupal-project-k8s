@@ -132,10 +132,6 @@ orbs:
         steps:
           - setup_remote_docker
 
-          - restore_cache:
-              keys:
-                - v1-docker-files-hash-
-
           - get-docker-file-hash:
               path: web
               identifier: NGINX
@@ -144,6 +140,10 @@ orbs:
               path: "."
               identifier: PHP
 
+          - restore_cache:
+              keys:
+                - v1-docker-files-hash-
+
           - run:
               name: Build docker images
               command: |
@@ -151,9 +151,9 @@ orbs:
                 echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
 
                 # Make sure the directory for our hashes is present.
-                mkdir -p docker-files-hash
+                mkdir -p /tmp/docker-files-hash
 
-                if grep -q $NGINX_HASH docker-files-hash/nginx;
+                if grep -q $NGINX_HASH /tmp/docker-files-hash/nginx;
                 then
                   echo "This nginx image has already been built, the existing image from the Docker repository will be used"
                 else
@@ -162,10 +162,10 @@ orbs:
                   docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$NGINX_HASH
 
                   # Keep track that the image for these files has been built.
-                  echo $NGINX_HASH >> docker-files-hash/nginx
+                  echo $NGINX_HASH >> /tmp/docker-files-hash/nginx
                 fi
 
-                if grep -q $PHP_HASH docker-files-hash/php;
+                if grep -q $PHP_HASH /tmp/docker-files-hash/php;
                 then
                   echo "This php and shell images have already been built, the existing images from the Docker repository will be used."
                 else
@@ -178,13 +178,13 @@ orbs:
                   docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH
 
                   # Keep track that the image for these files has been built.
-                  echo $PHP_HASH >> docker-files-hash/php
+                  echo $PHP_HASH >> /tmp/docker-files-hash/php
                 fi
 
           - save_cache:
               paths:
-                - docker-files-hash
-              key: v1-docker-files-hash-{{ .BuildNum }}
+                - /tmp/docker-files-hash
+              key: v1-docker-files-hash-{{ epoch }}
 
       set-release-name:
         steps:

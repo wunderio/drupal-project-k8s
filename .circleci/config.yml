@@ -134,7 +134,7 @@ orbs:
 
           - restore_cache:
               keys:
-                - v1-docker-files-hash
+                - v1-docker-files-hash-
 
           - get-docker-file-hash:
               path: web
@@ -184,7 +184,7 @@ orbs:
           - save_cache:
               paths:
                 - docker-files-hash
-              key: v1-docker-files-hash
+              key: v1-docker-files-hash-{{ .BuildNum }}
 
       set-release-name:
         steps:

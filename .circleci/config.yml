@@ -140,6 +140,10 @@ orbs:
               path: web
               identifier: NGINX
 
+          - get-docker-file-hash:
+              path: "."
+              identifier: PHP
+
           - run:
               name: Build docker images
               command: |
@@ -161,13 +165,21 @@ orbs:
                   echo $NGINX_HASH >> docker-files-hash/nginx
                 fi
 
-                # Build the Drupal image and push it to the repository.
-                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 -f silta/php.Dockerfile .
-                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1
+                if grep -q $PHP_HASH docker-files-hash/php;
+                then
+                  echo "This php and shell images have already been built, the existing images from the Docker repository will be used."
+                else
+                  # Build the Drupal image and push it to the repository.
+                  docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$PHP_HASH -f silta/php.Dockerfile .
+                  docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$PHP_HASH
 
-                # Build the Shell image and push it to the repository.
-                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell.Dockerfile .
-                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
+                  # Build the Shell image and push it to the repository.
+                  docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH -f silta/shell.Dockerfile .
+                  docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH
+
+                  # Keep track that the image for these files has been built.
+                  echo $PHP_HASH >> docker-files-hash/php
+                fi
 
           - save_cache:
               paths:

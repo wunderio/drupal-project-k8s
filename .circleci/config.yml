@@ -40,6 +40,9 @@ orbs:
           - checkout:
               path: ~/project
           - steps: <<parameters.codebase-build>>
+          - get-docker-file-hash:
+              path: web
+              identifier: NGINX
           - drupal-docker-build
 
       drupal-deploy:
@@ -114,6 +117,20 @@ orbs:
               paths:
                 - node_modules
               key: v1-yarn-{{ checksum "yarn.lock" }}
+
+      get-docker-file-hash:
+        parameters:
+          path:
+            type: string
+          identifier:
+            type: string
+        steps:
+          - run:
+              command: |
+                <<parameters.identifier>>_HASH=`tar --sort=name --exclude-from=<<parameters.path>>/.dockerignore --mtime='2000-01-01 00:00Z' --clamp-mtime -cf - <<parameters.path>> | sha1sum`
+
+                echo $<<parameters.identifier>>_HASH >> $BASH_ENV
+
 
       drupal-docker-build:
         steps:

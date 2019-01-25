@@ -43,6 +43,9 @@ orbs:
           - get-docker-file-hash:
               path: web
               identifier: NGINX
+          - run:
+              command: |
+                echo $NGINX_HASH
           - drupal-docker-build
 
       drupal-deploy:
@@ -127,9 +130,9 @@ orbs:
         steps:
           - run:
               command: |
-                <<parameters.identifier>>_HASH=`tar --sort=name --exclude-from=<<parameters.path>>/.dockerignore --mtime='2000-01-01 00:00Z' --clamp-mtime -cf - <<parameters.path>> | sha1sum`
+                HASH=`tar --sort=name --exclude-from=<<parameters.path>>/.dockerignore --mtime='2000-01-01 00:00Z' --clamp-mtime -cf - <<parameters.path>> | sha1sum`
 
-                echo $<<parameters.identifier>>_HASH >> $BASH_ENV
+                echo "export <<parameters.identifier>>_HASH='$HASH'" >> $BASH_ENV
 
 
       drupal-docker-build:

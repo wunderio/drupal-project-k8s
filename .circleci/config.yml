@@ -279,9 +279,9 @@ orbs:
                 helm upgrade --install $RELEASE_NAME <<parameters.chart_name>> \
                   --repo "<<parameters.chart_repository>>" \
                   --set environmentName=$CIRCLE_BRANCH \
-                  --set php.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 \
-                  --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 \
-                  --set shell.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 \
+                  --set php.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$PHP_HASH \
+                  --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$NGINX_HASH \
+                  --set shell.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH \
                   --set mariadb.rootUser.password=$DB_ROOT_PASS \
                   --set mariadb.db.password=$DB_USER_PASS \
                   --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \

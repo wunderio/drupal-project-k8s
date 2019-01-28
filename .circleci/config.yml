@@ -26,6 +26,43 @@ orbs:
           - phpcs
           - steps: <<parameters.post-validation>>
 
+      drupal-build-deploy:
+        executor: silta
+        parameters:
+          drupal-root:
+            type: string
+            default: "."
+          codebase-build:
+            type: steps
+            default: []
+          pre-release:
+            description: Steps to be executed before the Helm release is created.
+            type: steps
+            default: []
+          chart_name:
+            type: string
+            default: drupal
+          chart_repository:
+            type: string
+            default: https://wunderio.github.io/charts/
+          silta_config:
+            type: string
+            default: "silta/silta.yml"
+        working_directory: ~/project/<<parameters.drupal-root>>
+        steps:
+          - checkout:
+              path: ~/project
+          - steps: <<parameters.codebase-build>>
+          - drupal-docker-build
+          - set-release-name
+          - gcloud-login
+          - steps: <<parameters.pre-release>>
+          - drupal-helm-deploy:
+              chart_name: <<parameters.chart_name>>
+              chart_repository: <<parameters.chart_repository>>
+              silta_config: <<parameters.silta_config>>
+
+      # Deprecated in favor of drupal-build-deploy.
       drupal-build:
         executor: silta
         parameters:
@@ -37,11 +74,13 @@ orbs:
             default: []
         working_directory: ~/project/<<parameters.drupal-root>>
         steps:
+          - run: echo "Deprecated, update to drupal-build-deploy in your CircleCI configuration."
           - checkout:
               path: ~/project
           - steps: <<parameters.codebase-build>>
           - drupal-docker-build
 
+      # Deprecated in favor of drupal-build-deploy.
       drupal-deploy:
         executor: silta
         parameters:
@@ -63,6 +102,7 @@ orbs:
             default: "silta/silta.yml"
         working_directory: ~/project/<<parameters.drupal-root>>
         steps:
+          - run: echo "Deprecated, update to drupal-build-deploy in your CircleCI configuration."
           - checkout:
               path: ~/project
           - set-release-name
@@ -274,18 +314,14 @@ workflows:
                   echo "machbarmacher/gdpr-dump is present but no gdpr.json was found."
                 fi
 
-      - silta/drupal-build:
-          name: build
-          context: global_nonprod
-          codebase-build:
-            - silta/drupal-composer-install
-            - silta/yarn-install
-
-      - silta/drupal-deploy:
-          name: deploy
+      - silta/drupal-build-deploy: &build-deploy
+          name: build-deploy
           # Use a local chart during development.
           chart_name: "./chart"
           chart_repository: ""
+          codebase-build:
+            - silta/drupal-composer-install
+            - silta/yarn-install
           pre-release:
             - run:
                 name: Build local helm dependencies
@@ -295,23 +331,12 @@ workflows:
           filters:
             branches:
               ignore: master
-          requires:
-            - build
 
-      - silta/drupal-deploy:
-          name: production-deploy
-          # Use a local chart during development.
-          chart_name: "./chart"
-          chart_repository: ""
-          pre-release:
-            - run:
-                name: Build local helm dependencies
-                command: helm dependency build ./chart
-
-          context: global_nonprod
+      - silta/drupal-build-deploy:
+          <<: *build-deploy
+          name: build-deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml
+          context: global_nonprod
           filters:
             branches:
               only: master
-          requires:
-            - build

@@ -155,19 +155,6 @@ orbs:
                 - node_modules
               key: v1-yarn-{{ checksum "yarn.lock" }}
 
-      get-docker-file-hash:
-        parameters:
-          path:
-            type: string
-          identifier:
-            type: string
-        steps:
-          - run:
-              name: Check for changes in <<parameters.path>> folder (<<parameters.identifier>>)
-              command: |
-                HASH=`tar --sort=name --exclude-from=<<parameters.path>>/.dockerignore --mtime='2000-01-01 00:00Z' --clamp-mtime -cf - <<parameters.path>> | sha1sum | cut -c 1-40`
-                echo "export <<parameters.identifier>>_HASH='$HASH'" >> $BASH_ENV
-
       build-docker-image:
         parameters:
           dockerfile:
@@ -178,10 +165,18 @@ orbs:
             type: string
         steps:
           - run:
-              name: Build docker image
+              name: Build <<parameters.identifier>> docker image
               command: |
                 IMAGE_URL=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-<<parameters.identifier>>
-                IMAGE_TAG=$<<parameters.identifier>>_HASH
+
+                # Take a hash of all files in the folder except those ignored by docker.
+                # Also make sure modification time or order play no role.
+                IMAGE_TAG=`tar \
+                  --sort=name \
+                  --exclude-from=<<parameters.path>>/.dockerignore \
+                  --mtime='2000-01-01 00:00Z' \
+                  --clamp-mtime \
+                  -cf - <<parameters.path>> | sha1sum | cut -c 1-40`
 
                 if gcloud container images list-tags $IMAGE_URL | grep -q $IMAGE_TAG;
                 then
@@ -191,18 +186,13 @@ orbs:
                   docker push $IMAGE_URL:$IMAGE_TAG
                 fi
 
+                # Persist the image tag so it is available during deployment.
+                echo "export <<parameters.identifier>>_HASH='$IMAGE_TAG'" >> $BASH_ENV
+
 
       drupal-docker-build:
         steps:
           - setup_remote_docker
-
-          - get-docker-file-hash:
-              path: web
-              identifier: nginx
-
-          - get-docker-file-hash:
-              path: "."
-              identifier: PHP
 
           - run:
               name: Login to the docker registry
@@ -213,22 +203,15 @@ orbs:
               path: web
               identifier: nginx
 
-          - run:
-              name: Build docker images
-              command: |
+          - build-docker-image:
+              dockerfile: silta/php.Dockerfile
+              path: "."
+              identifier: php
 
-                if gcloud container images list-tags $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php | grep -q $PHP_HASH;
-                then
-                  echo "This php and shell images have already been built, the existing images from the Docker repository will be used."
-                else
-                  # Build the Drupal image and push it to the repository.
-                  docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$PHP_HASH -f silta/php.Dockerfile .
-                  docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$PHP_HASH
-
-                  # Build the Shell image and push it to the repository.
-                  docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH -f silta/shell.Dockerfile .
-                  docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH
-                fi
+          - build-docker-image:
+              dockerfile: silta/shell.Dockerfile
+              path: "."
+              identifier: shell
 
       set-release-name:
         steps:

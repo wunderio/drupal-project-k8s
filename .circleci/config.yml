@@ -180,32 +180,22 @@ orbs:
               path: "."
               identifier: PHP
 
-          - restore_cache:
-              keys:
-                - v1-docker-files-hash-
-
           - run:
               name: Build docker images
               command: |
                 # Login to the docker registry.
                 echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
 
-                # Make sure the directory for our hashes is present.
-                mkdir -p /tmp/docker-files-hash
-
-                if grep -q $NGINX_HASH /tmp/docker-files-hash/nginx;
+                if gcloud container images list-tags $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx | grep -q $NGINX_HASH;
                 then
                   echo "This nginx image has already been built, the existing image from the Docker repository will be used"
                 else
                   # Build the Nginx image and push it to the repository.
                   docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$NGINX_HASH -f silta/nginx.Dockerfile web
                   docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$NGINX_HASH
-
-                  # Keep track that the image for these files has been built.
-                  echo $NGINX_HASH >> /tmp/docker-files-hash/nginx
                 fi
 
-                if grep -q $PHP_HASH /tmp/docker-files-hash/php;
+                if gcloud container images list-tags $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php | grep -q $PHP_HASH;
                 then
                   echo "This php and shell images have already been built, the existing images from the Docker repository will be used."
                 else
@@ -216,15 +206,7 @@ orbs:
                   # Build the Shell image and push it to the repository.
                   docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH -f silta/shell.Dockerfile .
                   docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH
-
-                  # Keep track that the image for these files has been built.
-                  echo $PHP_HASH >> /tmp/docker-files-hash/php
                 fi
-
-          - save_cache:
-              paths:
-                - /tmp/docker-files-hash
-              key: v1-docker-files-hash-{{ epoch }}
 
       set-release-name:
         steps:

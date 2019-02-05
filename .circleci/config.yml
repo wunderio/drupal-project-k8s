@@ -181,11 +181,12 @@ orbs:
               identifier: PHP
 
           - run:
+              name: Login to the docker registry
+              command: echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://$DOCKER_REPO_HOST
+
+          - run:
               name: Build docker images
               command: |
-                # Login to the docker registry.
-                echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
-
                 if gcloud container images list-tags $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx | grep -q $NGINX_HASH;
                 then
                   echo "This nginx image has already been built, the existing image from the Docker repository will be used"

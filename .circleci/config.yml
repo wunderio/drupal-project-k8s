@@ -198,7 +198,7 @@ orbs:
 
           - get-docker-file-hash:
               path: web
-              identifier: NGINX
+              identifier: nginx
 
           - get-docker-file-hash:
               path: "."
@@ -211,7 +211,7 @@ orbs:
           - build-docker-image:
               dockerfile: silta/nginx.Dockerfile
               path: web
-              identifier: NGINX
+              identifier: nginx
 
           - run:
               name: Build docker images
@@ -284,7 +284,7 @@ orbs:
                   --repo "<<parameters.chart_repository>>" \
                   --set environmentName=$CIRCLE_BRANCH \
                   --set php.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$PHP_HASH \
-                  --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$NGINX_HASH \
+                  --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$nginx_HASH \
                   --set shell.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$PHP_HASH \
                   --set mariadb.rootUser.password=$DB_ROOT_PASS \
                   --set mariadb.db.password=$DB_USER_PASS \

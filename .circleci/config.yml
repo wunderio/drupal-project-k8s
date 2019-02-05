@@ -53,9 +53,9 @@ orbs:
           - checkout:
               path: ~/project
           - steps: <<parameters.codebase-build>>
+          - gcloud-login
           - drupal-docker-build
           - set-release-name
-          - gcloud-login
           - steps: <<parameters.pre-release>>
           - drupal-helm-deploy:
               chart_name: <<parameters.chart_name>>

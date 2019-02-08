@@ -38,8 +38,10 @@ orbs:
                 )
 
                 for file in ${files[@]}; do
-                  if [ ! -f $file ]; then
-                    echo "$file is missing from the repository."
+                  if [ -f $file ]; then
+                    echo "✅ $file is present"
+                  else
+                    echo "❌ $file is missing from the repository."
                     exit 1
                   fi
                 done

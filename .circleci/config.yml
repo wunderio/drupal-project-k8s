@@ -27,10 +27,23 @@ orbs:
           - run:
               name: Silta basic checks
               command: |
-                if [ ! -f silta/silta.yml ]; then
-                  echo "silta/silty.yml is missing from the repository."
-                  exit 1
-                fi
+                files=(
+                  silta/silta.yml
+                  silta/silta-prod.yml
+                  silta/nginx.Dockerfile
+                  silta/php.Dockerfile
+                  silta/shell.Dockerfile
+                  web/sites/default/settings.silta.php
+                  web/robots.txt
+                )
+
+                for file in ${files[@]}; do
+                  if [ ! -f $file ]; then
+                    echo "$file is missing from the repository."
+                    exit 1
+                  fi
+                done
+
           - steps: <<parameters.post-validation>>
 
       drupal-build-deploy:

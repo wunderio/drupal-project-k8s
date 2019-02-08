@@ -26,6 +26,43 @@ orbs:
           - phpcs
           - steps: <<parameters.post-validation>>
 
+      drupal-build-deploy:
+        executor: silta
+        parameters:
+          drupal-root:
+            type: string
+            default: "."
+          codebase-build:
+            type: steps
+            default: []
+          pre-release:
+            description: Steps to be executed before the Helm release is created.
+            type: steps
+            default: []
+          chart_name:
+            type: string
+            default: drupal
+          chart_repository:
+            type: string
+            default: https://wunderio.github.io/charts/
+          silta_config:
+            type: string
+            default: "silta/silta.yml"
+        working_directory: ~/project/<<parameters.drupal-root>>
+        steps:
+          - checkout:
+              path: ~/project
+          - steps: <<parameters.codebase-build>>
+          - gcloud-login
+          - drupal-docker-build
+          - set-release-name
+          - steps: <<parameters.pre-release>>
+          - drupal-helm-deploy:
+              chart_name: <<parameters.chart_name>>
+              chart_repository: <<parameters.chart_repository>>
+              silta_config: <<parameters.silta_config>>
+
+      # Deprecated in favor of drupal-build-deploy.
       drupal-build:
         executor: silta
         parameters:
@@ -37,11 +74,30 @@ orbs:
             default: []
         working_directory: ~/project/<<parameters.drupal-root>>
         steps:
+          - run: echo "Deprecated, update to drupal-build-deploy in your CircleCI configuration."
           - checkout:
               path: ~/project
           - steps: <<parameters.codebase-build>>
-          - drupal-docker-build
+          - setup_remote_docker
+          - run:
+              name: Build docker images
+              command: |
+                # Login to the docker registry.
+                echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
 
+                # Build the Nginx image and push it to the repository.
+                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 -f silta/nginx.Dockerfile web
+                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1
+
+                # Build the Drupal image and push it to the repository.
+                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 -f silta/php.Dockerfile .
+                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1
+
+                # Build the Shell image and push it to the repository.
+                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell.Dockerfile .
+                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
+
+      # Deprecated in favor of drupal-build-deploy.
       drupal-deploy:
         executor: silta
         parameters:
@@ -63,15 +119,41 @@ orbs:
             default: "silta/silta.yml"
         working_directory: ~/project/<<parameters.drupal-root>>
         steps:
+          - run: echo "Deprecated, update to drupal-build-deploy in your CircleCI configuration."
           - checkout:
               path: ~/project
           - set-release-name
           - gcloud-login
           - steps: <<parameters.pre-release>>
-          - drupal-helm-deploy:
-              chart_name: <<parameters.chart_name>>
-              chart_repository: <<parameters.chart_repository>>
-              silta_config: <<parameters.silta_config>>
+          - run:
+              name: Deploy helm release
+              command: |
+                if [[ "$( helm list --failed | grep $RELEASE_NAME  | cut -f2 )" -eq 1 ]]; then
+                  echo "Removing failed first release"
+                  helm delete --purge $RELEASE_NAME
+                  sleep 30
+                fi
+
+                helm upgrade --install $RELEASE_NAME <<parameters.chart_name>> \
+                  --repo "<<parameters.chart_repository>>" \
+                  --set environmentName=$CIRCLE_BRANCH \
+                  --set php.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 \
+                  --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 \
+                  --set shell.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 \
+                  --set mariadb.rootUser.password=$DB_ROOT_PASS \
+                  --set mariadb.db.password=$DB_USER_PASS \
+                  --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \
+                  --set shell.gitAuth.apiToken="${GITAUTH_API_TOKEN}" \
+                  --namespace=${CIRCLE_PROJECT_REPONAME,,} \
+                  --values <<parameters.silta_config>>
+          - run:
+              name: Deployment log
+              when: always
+              command: |
+                kubectl logs job/${RELEASE_NAME}-post-release -n ${CIRCLE_PROJECT_REPONAME,,} -f --timestamps=true
+          - run:
+              name: Release information
+              command: helm status $RELEASE_NAME
 
     # CircleCI commands
     commands:
@@ -115,6 +197,41 @@ orbs:
                 - node_modules
               key: v1-yarn-{{ checksum "yarn.lock" }}
 
+      build-docker-image:
+        parameters:
+          dockerfile:
+            type: string
+          path:
+            type: string
+          identifier:
+            type: string
+        steps:
+          - run:
+              name: Build <<parameters.identifier>> docker image
+              command: |
+                IMAGE_URL=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-<<parameters.identifier>>
+
+                # Take a hash of all files in the folder except those ignored by docker.
+                # Also make sure modification time or order play no role.
+                IMAGE_TAG=`tar \
+                  --sort=name \
+                  --exclude-from=<<parameters.path>>/.dockerignore \
+                  --mtime='2000-01-01 00:00Z' \
+                  --clamp-mtime \
+                  -cf - <<parameters.path>> | sha1sum | cut -c 1-40`
+
+                if gcloud container images list-tags $IMAGE_URL | grep -q $IMAGE_TAG;
+                then
+                  echo "This <<parameters.identifier>> image has already been built, the existing image from the Docker repository will be used."
+                else
+                  docker build -t $IMAGE_URL:$IMAGE_TAG -f <<parameters.dockerfile>> <<parameters.path>>
+                  docker push $IMAGE_URL:$IMAGE_TAG
+                fi
+
+                # Persist the image tag so it is available during deployment.
+                echo "export <<parameters.identifier>>_HASH='$IMAGE_TAG'" >> $BASH_ENV
+
+
       npm-install-build:
         parameters:
           path:
@@ -152,22 +269,23 @@ orbs:
           - setup_remote_docker
 
           - run:
-              name: Build docker images
-              command: |
-                # Login to the docker registry.
-                echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://eu.gcr.io
+              name: Login to the docker registry
+              command: echo $GCLOUD_KEY_JSON | docker login -u _json_key --password-stdin https://$DOCKER_REPO_HOST
 
-                # Build the Nginx image and push it to the repository.
-                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 -f silta/nginx.Dockerfile web
-                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1
+          - build-docker-image:
+              dockerfile: silta/nginx.Dockerfile
+              path: web
+              identifier: nginx
 
-                # Build the Drupal image and push it to the repository.
-                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 -f silta/php.Dockerfile .
-                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1
+          - build-docker-image:
+              dockerfile: silta/php.Dockerfile
+              path: "."
+              identifier: php
 
-                # Build the Shell image and push it to the repository.
-                docker build -t $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 -f silta/shell.Dockerfile .
-                docker push $DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1
+          - build-docker-image:
+              dockerfile: silta/shell.Dockerfile
+              path: "."
+              identifier: shell
 
       set-release-name:
         steps:
@@ -222,9 +340,9 @@ orbs:
                 helm upgrade --install $RELEASE_NAME <<parameters.chart_name>> \
                   --repo "<<parameters.chart_repository>>" \
                   --set environmentName=$CIRCLE_BRANCH \
-                  --set php.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$CIRCLE_SHA1 \
-                  --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 \
-                  --set shell.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$CIRCLE_SHA1 \
+                  --set php.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-php:$php_HASH \
+                  --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$nginx_HASH \
+                  --set shell.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-shell:$shell_HASH \
                   --set mariadb.rootUser.password=$DB_ROOT_PASS \
                   --set mariadb.db.password=$DB_USER_PASS \
                   --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \
@@ -257,18 +375,14 @@ workflows:
                   echo "machbarmacher/gdpr-dump is present but no gdpr.json was found."
                 fi
 
-      - silta/drupal-build:
-          name: build
-          context: global_nonprod
-          codebase-build:
-            - silta/drupal-composer-install
-            - silta/yarn-install
-
-      - silta/drupal-deploy:
-          name: deploy
+      - silta/drupal-build-deploy: &build-deploy
+          name: build-deploy
           # Use a local chart during development.
           chart_name: "./chart"
           chart_repository: ""
+          codebase-build:
+            - silta/drupal-composer-install
+            - silta/yarn-install
           pre-release:
             - run:
                 name: Build local helm dependencies
@@ -278,23 +392,12 @@ workflows:
           filters:
             branches:
               ignore: master
-          requires:
-            - build
 
-      - silta/drupal-deploy:
-          name: production-deploy
-          # Use a local chart during development.
-          chart_name: "./chart"
-          chart_repository: ""
-          pre-release:
-            - run:
-                name: Build local helm dependencies
-                command: helm dependency build ./chart
-
-          context: global_nonprod
+      - silta/drupal-build-deploy:
+          <<: *build-deploy
+          name: build-deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml
+          context: global_nonprod
           filters:
             branches:
               only: master
-          requires:
-            - build

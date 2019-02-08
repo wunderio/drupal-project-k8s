@@ -24,6 +24,13 @@ orbs:
           - checkout:
               path: ~/project
           - phpcs
+          - run:
+              name: Silta basic checks
+              command: |
+                if [ ! -f silta/silta.yml ]; then
+                  echo "silta/silty.yml is missing from the repository."
+                  exit 1
+                fi
           - steps: <<parameters.post-validation>>
 
       drupal-build-deploy:

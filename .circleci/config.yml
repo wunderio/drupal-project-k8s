@@ -232,6 +232,38 @@ orbs:
                 echo "export <<parameters.identifier>>_HASH='$IMAGE_TAG'" >> $BASH_ENV
 
 
+      npm-install-build:
+        parameters:
+          path:
+            type: string
+            default: "."
+          build-command:
+            type: string
+            default: "npm run build"
+
+        steps:
+          - restore_cache:
+              keys:
+                - v1-npm-{{ checksum "<<parameters.path>>/package-lock.json" }}
+                - v1-npm-
+
+          - run:
+              name: Install frontend dependencies
+              command: |
+                cd <<parameters.path>>
+                npm install
+
+          - run:
+              name: Build frontend
+              command: |
+                cd <<parameters.path>>
+                <<parameters.build-command>>
+
+          - save_cache:
+              paths:
+                - <<parameters.path>>/node_modules
+              key: v1-npm-{{ checksum "<<parameters.path>>/package-lock.json" }}
+
       drupal-docker-build:
         steps:
           - setup_remote_docker

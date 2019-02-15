@@ -32,7 +32,7 @@ spec:
             {{- end }}
           {{- end }}
         resources:
-          {{- .Values.php.resources | toYaml | nindent 10 }}
+          {{- .Values.php.postinstall.resources | toYaml | nindent 10 }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}

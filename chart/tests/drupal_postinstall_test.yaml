@@ -73,25 +73,25 @@ tests:
             persistentVolumeClaim:
               claimName: RELEASE-NAME-public-files
 
-  - it: takes resource requests and limits
+  - it: can override default php resource requests and limits
     set:
-      php.resources:
+      php.postinstall.resources:
         requests:
-          cpu: 123m
-          memory: 1G
-        limits:
-          cpu: 234m
+          cpu: 124m
           memory: 2G
+        limits:
+          cpu: 235m
+          memory: 4G
     asserts:
       - equal:
           path: spec.template.spec.containers[0].resources.requests.cpu
-          value: 123m
+          value: 124m
       - equal:
           path: spec.template.spec.containers[0].resources.requests.memory
-          value: 1G
+          value: 2G
       - equal:
           path: spec.template.spec.containers[0].resources.limits.cpu
-          value: 234m
+          value: 235m
       - equal:
           path: spec.template.spec.containers[0].resources.limits.memory
-          value: 2G
+          value: 4G

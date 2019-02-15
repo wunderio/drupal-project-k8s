@@ -28,7 +28,7 @@ nginx:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 10m
+      cpu: 5m
       memory: 10M
   
   # Set of values to enable and use http basic authentication
@@ -57,7 +57,7 @@ php:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 128M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
@@ -197,8 +197,8 @@ mariadb:
       size: 1G
     resources:
       requests:
-        cpu: 100m
-        memory: 256M
+        cpu: 50m
+        memory: 128M
 
 elasticsearch:
   enabled: false

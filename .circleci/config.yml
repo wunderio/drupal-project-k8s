@@ -45,6 +45,10 @@ orbs:
                   fi
                 done
 
+                if grep "drush.*8" composer.json; then
+                  echo "❌ Silta is not compatible with drush 8."
+                fi
+
           - steps: <<parameters.post-validation>>
 
       drupal-build-deploy:

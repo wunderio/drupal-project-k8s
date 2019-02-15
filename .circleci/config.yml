@@ -34,7 +34,6 @@ orbs:
                   silta/php.Dockerfile
                   silta/shell.Dockerfile
                   web/sites/default/settings.silta.php
-                  web/robots.txt
                 )
 
                 for file in ${files[@]}; do

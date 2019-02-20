@@ -186,7 +186,7 @@ referenceData:
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 mariadb:
-  enabled: true
+  enabled: false
   replication:
     enabled: false
   db:
@@ -200,11 +200,22 @@ mariadb:
         cpu: 100m
         memory: 256M
 
+
+cloudsql:
+  enabled: true
+  db:
+    name: drupal
+    user: drupal
+    instanceName: 
+
+
 elasticsearch:
   enabled: false
   #Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
   version: 6.5.0
   heapSize: 256m
+  xpack:
+    enabled: false
   persistence:
     size: 512Mi
     storageClassName: nfs

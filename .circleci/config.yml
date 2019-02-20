@@ -391,13 +391,14 @@ workflows:
           context: global_nonprod
           filters:
             branches:
-              ignore: master
+              ignore: production
 
       - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the production environment.
           <<: *build-deploy
           name: build-deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml
           context: global_nonprod
           filters:
             branches:
-              only: master
+              only: production

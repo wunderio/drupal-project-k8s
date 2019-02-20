@@ -209,6 +209,8 @@ elasticsearch:
   #Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
   version: 6.5.0
   heapSize: 256m
+  xpack:
+    enabled: false
   persistence:
     size: 512Mi
     storageClassName: nfs

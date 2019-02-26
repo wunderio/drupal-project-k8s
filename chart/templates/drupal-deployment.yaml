@@ -33,6 +33,9 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 9000
+        readinessProbe:
+          exec:
+            command: ['/bin/sh', '-c', 'if [ {{ include "drupal.deployment-in-progress-test" . }} ]; then exit 1; fi']
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 

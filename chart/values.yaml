@@ -222,7 +222,7 @@ elasticsearch:
 # Memcache service overrides
 # see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml
 memcached:
-  enabled: true
+  enabled: false
   replicaCount: 1
   pdbMinAvailable: 1
   memcached:

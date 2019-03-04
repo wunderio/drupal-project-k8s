@@ -220,7 +220,7 @@ elasticsearch:
       memory: 512Mi
 
 memcached:
-  enabled: false
+  enabled: true
   maxItemMemory: 128
 
 # Configure ambassador for routing inbound traffic. We typically enable ambassador on development 

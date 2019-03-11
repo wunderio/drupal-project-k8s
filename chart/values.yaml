@@ -65,9 +65,9 @@ php:
   cron:
     - schedule: '0 * * * *'
       command: |
-        if drush check-bootstrap; then 
+        if drush check-bootstrap; then
           drush cron;
-        fi;
+        fi
 
   # Post-installation hook.
   # This is run every time a new environment is created.

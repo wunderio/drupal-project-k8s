@@ -24,6 +24,31 @@ orbs:
           - checkout:
               path: ~/project
           - phpcs
+          - run:
+              name: Silta basic checks
+              command: |
+                files=(
+                  silta/silta.yml
+                  silta/silta-prod.yml
+                  silta/nginx.Dockerfile
+                  silta/php.Dockerfile
+                  silta/shell.Dockerfile
+                  web/sites/default/settings.silta.php
+                )
+
+                for file in ${files[@]}; do
+                  if [ -f $file ]; then
+                    echo "✅ $file is present"
+                  else
+                    echo "❌ $file is missing from the repository."
+                    exit 1
+                  fi
+                done
+
+                if grep "drush.*8" composer.json; then
+                  echo "❌ Silta is not compatible with drush 8."
+                fi
+
           - steps: <<parameters.post-validation>>
 
       drupal-build-deploy:

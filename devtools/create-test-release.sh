@@ -23,7 +23,7 @@ helm upgrade \
     --namespace=$PROJECT \
     --timeout 600s
 
-kubectl logs job/${RELEASE_NAME}-post-release -n $PROJECT -f
+kubectl logs job/${RELEASE_NAME}-post-release --all-containers -n $PROJECT -f
 
 ## Wait to be sure that readiness checks have been propagated.
 kubectl rollout status -w deployment/${RELEASE_NAME}-drupal -n $PROJECT

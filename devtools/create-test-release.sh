@@ -21,7 +21,7 @@ helm upgrade \
     --set mariadb.db.password='abcdef1234' \
     --set shell.enabled=false \
     --namespace=$PROJECT \
-    --timeout 600
+    --timeout 600s
 
 kubectl logs job/${RELEASE_NAME}-post-release -n $PROJECT -f
 

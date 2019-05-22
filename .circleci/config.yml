@@ -73,19 +73,25 @@ orbs:
           silta_config:
             type: string
             default: "silta/silta.yml"
+          skip-deployment:
+            type: boolean
+            default: false
         working_directory: ~/project/<<parameters.drupal-root>>
         steps:
           - checkout:
               path: ~/project
           - steps: <<parameters.codebase-build>>
-          - gcloud-login
-          - drupal-docker-build
-          - set-release-name
-          - steps: <<parameters.pre-release>>
-          - drupal-helm-deploy:
-              chart_name: <<parameters.chart_name>>
-              chart_repository: <<parameters.chart_repository>>
-              silta_config: <<parameters.silta_config>>
+          - unless:
+              condition: <<parameters.skip-deployment>>
+              steps:
+                - gcloud-login
+                - drupal-docker-build
+                - set-release-name
+                - steps: <<parameters.pre-release>>
+                - drupal-helm-deploy:
+                    chart_name: <<parameters.chart_name>>
+                    chart_repository: <<parameters.chart_repository>>
+                    silta_config: <<parameters.silta_config>>
 
       # Deprecated in favor of drupal-build-deploy.
       drupal-build:

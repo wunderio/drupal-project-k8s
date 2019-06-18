@@ -159,6 +159,8 @@ data:
   www_conf: |
     [www]
     listen = [::]:9000
+    user = www-data
+    group = www-data
     pm = ondemand
     pm.max_children = 100
     pm.start_servers = 5
@@ -169,4 +171,5 @@ data:
     access.log = /proc/self/fd/2
     catch_workers_output = yes
     clear_env = no
+
     

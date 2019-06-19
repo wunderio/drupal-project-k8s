@@ -81,11 +81,11 @@ spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: {{ .Values.referenceEnvironment.storage }}
-  storageClassName: {{ .Values.referenceEnvironment.storageClassName }}
-  {{- if .Values.referenceEnvironment.csiDriverName }}
+    storage: {{ .Values.referenceData.storage }}
+  storageClassName: {{ .Values.referenceData.storageClassName }}
+  {{- if .Values.referenceData.csiDriverName }}
   csi:
-    driver: {{ .Values.referenceEnvironment.csiDriverName }}
+    driver: {{ .Values.referenceData.csiDriverName }}
     volumeHandle: data-id
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/reference-data

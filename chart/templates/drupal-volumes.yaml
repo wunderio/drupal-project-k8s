@@ -28,9 +28,9 @@ spec:
   storageClassName: {{ .Values.publicFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
-#  resources:
-#    requests:
-#      storage: {{ .Values.publicFiles.storage }}
+  resources:
+    requests:
+      storage: {{ .Values.publicFiles.storage }}
 ---
 {{- if .Values.privateFiles.enabled }}
 apiVersion: v1
@@ -64,9 +64,9 @@ spec:
   storageClassName: {{ .Values.privateFiles.storageClassName }}
   accessModes:
     - ReadWriteMany
-#  resources:
-#    requests:
-#      storage: {{ .Values.privateFiles.storage }}
+  resources:
+    requests:
+      storage: {{ .Values.privateFiles.storage }}
 {{- end }}
 ---
 {{- if .Values.referenceData.enabled }}
@@ -102,9 +102,9 @@ spec:
   storageClassName: {{ .Values.referenceData.storageClassName }}
   accessModes:
     - ReadWriteMany
-#  resources:
-#    requests:
-#      storage: {{ .Values.referenceData.storage }}
+  resources:
+    requests:
+      storage: {{ .Values.referenceData.storage }}
 {{- end }}
 {{- end }}
 ---

@@ -175,6 +175,7 @@ orbs:
                   --set mariadb.db.password=$DB_USER_PASS \
                   --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \
                   --set shell.gitAuth.apiToken="${GITAUTH_API_TOKEN}" \
+                  --set clusterDomain=$CLUSTER_DOMAIN \
                   --namespace=${CIRCLE_PROJECT_REPONAME,,} \
                   --values <<parameters.silta_config>>
           - run:
@@ -378,6 +379,7 @@ orbs:
                   --set mariadb.db.password=$DB_USER_PASS \
                   --set shell.gitAuth.repositoryUrl="${CIRCLE_REPOSITORY_URL}" \
                   --set shell.gitAuth.apiToken="${GITAUTH_API_TOKEN}" \
+                  --set clusterDomain=$CLUSTER_DOMAIN \
                   --namespace=${CIRCLE_PROJECT_REPONAME,,} \
                   --values <<parameters.silta_config>>
 

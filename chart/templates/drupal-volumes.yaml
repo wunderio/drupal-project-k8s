@@ -13,7 +13,6 @@ spec:
   {{- if .Values.publicFiles.csiDriverName }}
   csi:
     driver: {{ .Values.publicFiles.csiDriverName }}
-    volumeHandle: data-id
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/public-files
   {{- end }}
@@ -48,7 +47,6 @@ spec:
   {{- if .Values.privateFiles.csiDriverName }}
   csi:
     driver: {{ .Values.privateFiles.csiDriverName }}
-    volumeHandle: data-id
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/private-files
   {{- end }}
@@ -86,7 +84,6 @@ spec:
   {{- if .Values.referenceData.csiDriverName }}
   csi:
     driver: {{ .Values.referenceData.csiDriverName }}
-    volumeHandle: data-id
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/reference-data
   {{- end }}

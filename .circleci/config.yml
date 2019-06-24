@@ -206,6 +206,7 @@ orbs:
           - restore_cache:
               keys:
                 - v1-dependencies-{{ checksum "composer.lock" }}-<<parameters.install-dev-dependencies>>
+                - v1-dependencies-{{ checksum "composer.lock" }}
 
           - when:
               condition: <<parameters.install-dev-dependencies>>

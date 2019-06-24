@@ -23,6 +23,8 @@ orbs:
         steps:
           - checkout:
               path: ~/project
+          - drupal-composer-install:
+              install-dev-dependencies: true
           - phpcs
           - run:
               name: Silta basic checks

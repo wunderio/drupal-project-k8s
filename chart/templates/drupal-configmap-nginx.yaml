@@ -311,7 +311,7 @@ data:
             fastcgi_pass php;                                                                                                                              
         }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
-        location = /robots_test.txt {
+        location = /robots.txt {
           access_log off;
           {{- if not .Values.nginx.robotsTxt.allow }}
             add_header Content-Type text/plain;

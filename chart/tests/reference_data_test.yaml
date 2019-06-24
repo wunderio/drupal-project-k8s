@@ -13,7 +13,7 @@ tests:
     asserts:
     # Only public files PVC is defined.
     - hasDocuments:
-        count: 2
+        count: 3
       template: drupal-volumes.yaml
     - hasDocuments:
         count: 0
@@ -62,15 +62,15 @@ tests:
         foo: bar
     asserts:
     - hasDocuments:
-        count: 3
+        count: 5
       template: drupal-volumes.yaml
     - template: drupal-volumes.yaml
-      documentIndex: 1
+      documentIndex: 3
       equal:
         path: spec.storageClassName
         value: foo
     - template: drupal-volumes.yaml
-      documentIndex: 1
+      documentIndex: 3
       equal:
         path: spec.resources.requests.storage
         value: 123Gi
@@ -119,7 +119,7 @@ tests:
     asserts:
     - template: drupal-volumes.yaml
       hasDocuments:
-        count: 2
+        count: 3
     - template: reference-data-cron.yaml
       hasDocuments:
         count: 0

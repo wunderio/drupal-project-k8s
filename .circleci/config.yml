@@ -196,14 +196,28 @@ orbs:
               command: phpcs --standard=phpcs.xml -s
 
       drupal-composer-install:
+        parameters:
+          install-dev-dependencies:
+            type: boolean
+            default: false
         steps:
           - restore_cache:
               keys:
-                - v1-dependencies-{{ checksum "composer.lock" }}
+                - v1-dependencies-{{ checksum "composer.lock" }}-<<parameters.install-dev-dependencies>>
 
-          - run:
-              name: composer install
-              command: composer install -n --prefer-dist --ignore-platform-reqs --no-dev --optimize-autoloader
+          - when:
+              condition: <<parameters.install-dev-dependencies>>
+              steps:
+                - run:
+                    name: composer install
+                    command: composer install -n --prefer-dist --ignore-platform-reqs --optimize-autoloader
+
+          - unless:
+              condition: <<parameters.install-dev-dependencies>>
+              steps:
+                - run:
+                    name: composer install
+                    command: composer install -n --prefer-dist --ignore-platform-reqs --no-dev --optimize-autoloader
 
           - save_cache:
               paths:
@@ -213,7 +227,7 @@ orbs:
                 - ./web/themes/contrib
                 - ./web/profiles/contrib
                 - ./web/libraries
-              key: v1-dependencies-{{ checksum "composer.lock" }}
+              key: v1-dependencies-{{ checksum "composer.lock" }}-<<parameters.install-dev-dependencies>>
 
       yarn-install:
         steps:

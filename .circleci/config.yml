@@ -198,6 +198,7 @@ orbs:
               command: |
                 if [ -f vendor/bin/phpcs ]
                 then
+                  vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer
                   vendor/bin/phpcs --standard=phpcs.xml -s --colors
                 else
                   phpcs --standard=phpcs.xml -s --colors

@@ -195,7 +195,13 @@ orbs:
         steps:
           - run:
               name: phpcs validation
-              command: phpcs --standard=phpcs.xml -s
+              command: |
+                if [ -f vendor/bin/phpcs ]
+                then
+                  vendor/bin/phpcs --standard=phpcs.xml -s --colors
+                else
+                  phpcs --standard=phpcs.xml -s --colors
+                fi
 
       drupal-composer-install:
         parameters:

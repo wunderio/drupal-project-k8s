@@ -9,9 +9,11 @@ tests:
         storageClassName: foo
 
     asserts:
-      - equal:
+      - documentIndex: 1
+        equal:
           path: spec.storageClassName
           value: foo
-      - equal:
+      - documentIndex: 1
+        equal:
           path: spec.resources.requests.storage
           value: 123Gi

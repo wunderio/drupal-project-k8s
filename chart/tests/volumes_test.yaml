@@ -4,9 +4,11 @@ templates:
 tests:
   - it: public files volume should be configurable
     set:
-      publicFiles:
-        storage: 123Gi
-        storageClassName: foo
+      mounts:
+        - name: public-files
+          storage: 123Gi
+          storageClassName: foo
+          mountPath: /var/www/html/web/sites/default/files
 
     asserts:
       - documentIndex: 1

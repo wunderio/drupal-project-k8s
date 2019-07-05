@@ -3,27 +3,3 @@
 #
 # See https://github.com/wunderio/charts/blob/master/drupal/README.md
 # for all possible options.
-
-# Example: enable private files for Drupal.
-#privateFiles:
-#  enabled: true
-
-# Testing mounts
-mounts:
-  - name: public-files
-    storage: 1G
-    mountPath: /var/www/html/web/sites/default/files
-    storageClassName: silta-shared
-    csiDriverName: csi-rclone
-  - name: private-files
-    storage: 1G
-    mountPath: /var/www/html/private
-    storageClassName: silta-shared
-    csiDriverName: csi-rclone
-    readOnly: false
-  - name: custom-mount
-    storage: 1G
-    mountPath: /var/www/html/custom-mount
-    storageClassName: silta-shared
-    csiDriverName: csi-rclone
-    readOnly: false

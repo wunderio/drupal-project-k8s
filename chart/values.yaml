@@ -157,7 +157,6 @@ mounts:
   #   mountPath: /var/www/html/private
   #   storageClassName: silta-shared
   #   csiDriverName: csi-rclone
-  #   readOnly: false
   
 # Configure reference data that will be used when creating new environments.
 referenceData:

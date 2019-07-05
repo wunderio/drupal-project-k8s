@@ -31,7 +31,6 @@ ports:
 {{- range $index, $mount := $.Values.mounts }}
 - name: drupal-{{ $mount.name }}
   mountPath: {{ $mount.mountPath }}
-  readOnly: {{ $mount.readOnly | default false }}
 {{- end }}
 - name: php-conf
   mountPath: /etc/php7/php.ini

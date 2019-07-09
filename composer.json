@@ -32,7 +32,8 @@
         "wunderio/drupal-ping": "^1.0"
     },
     "require-dev": {
-        "webflo/drupal-core-require-dev": "~8.5"
+        "webflo/drupal-core-require-dev": "~8.5",
+        "zaporylie/composer-drupal-optimizations": "^1.0"
     },
     "conflict": {
         "drupal/drupal": "*"

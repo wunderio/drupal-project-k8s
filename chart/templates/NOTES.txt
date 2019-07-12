@@ -15,4 +15,8 @@ SSH connection:
 
   ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -J www-admin@ssh.{{ .Values.clusterDomain }}
 
+Importing a database dump:
+
+  ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -J www-admin@ssh.{{ .Values.clusterDomain }} "drush sql-cli" < my_database_dump.sql
+
 {{- end }}

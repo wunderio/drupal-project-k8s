@@ -19,4 +19,8 @@ Importing a database dump:
 
   ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -J www-admin@ssh.{{ .Values.clusterDomain }} "drush sql-cli" < my_database_dump.sql
 
+Importing files with rsync:
+
+  rsync -azv -e 'ssh -A -J www-admin@ssh.{{ .Values.clusterDomain }}' local_folder www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }}:remote_folder
+
 {{- end }}

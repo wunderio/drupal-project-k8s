@@ -195,6 +195,19 @@ referenceData:
   # Skips mounting the volume outside of the reference environment, only used programmatically.
   skipMounting: false
 
+# Parameters for sanitizing reference data with gdpr-dump.
+# Uses formatters from https://packagist.org/packages/fzaninotto/faker.
+gdprDump:
+  users_field_data:
+    name:
+      formatter: name
+    pass:
+      formatter: password
+    mail:
+      formatter: email
+    init:
+      formatter: clear
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 mariadb:

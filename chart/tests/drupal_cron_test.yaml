@@ -47,9 +47,11 @@ tests:
   - it: runs multiple jobs
     set:
       php.cron:
-        - command: foo
+        drupal-cron:
+          command: foo
           schedule: "0 * * * *"
-        - command: bar
+        project-cron:
+          command: bar
           schedule: "30 * * * *"
     asserts:
       - hasDocuments:

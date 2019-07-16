@@ -13,8 +13,10 @@ ports:
 
 {{- define "drupal.volumeMounts" -}}
 {{- range $index, $mount := $.Values.mounts }}
+{{- if eq $mount.enabled true }}
 - name: drupal-{{ $mount.name }}
   mountPath: {{ $mount.mountPath }}
+{{- end }}
 {{- end }}
 - name: php-conf
   mountPath: /etc/php7/php.ini
@@ -32,9 +34,11 @@ ports:
 
 {{- define "drupal.volumes" -}}
 {{- range $index, $mount := $.Values.mounts }}
+{{- if eq $mount.enabled true }}
 - name: drupal-{{ $mount.name }}
   persistentVolumeClaim:
     claimName: {{ $.Release.Name }}-{{ $mount.name }}
+{{- end }}
 {{- end }}
 - name: php-conf
   configMap:

@@ -1,5 +1,7 @@
 {{- range $index, $mount := .Values.mounts }}
+{{- if eq $mount.enabled true }}
 {{- if eq $mount.storageClassName "silta-shared" }}
+# Mount-enabled: {{ $mount.enabled  }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -38,6 +40,7 @@ spec:
     matchLabels:
       name: {{ $.Release.Name }}-{{ $mount.name }}
 ---
+{{- end -}}
 {{- end }}
 
 {{- if .Values.referenceData.enabled }}

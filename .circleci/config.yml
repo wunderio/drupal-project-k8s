@@ -25,7 +25,7 @@ workflows:
           chart_repository: ""
           codebase-build:
             - silta/drupal-composer-install
-            - silta/yarn-install
+            - silta/npm-install-build
           pre-release:
             - run:
                 name: Build local helm dependencies

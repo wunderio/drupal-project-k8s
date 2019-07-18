@@ -273,6 +273,10 @@ mariadb:
         cpu: 50m
         memory: 128M
 
+varnish:
+  enabled: true
+  resources: {}
+
 elasticsearch:
   enabled: false
   # Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list

@@ -1,0 +1,57 @@
+{{- if .Values.varnish.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-varnish
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: varnish
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "drupal.release_labels" . | nindent 6 }}
+      service: varnish
+  template:
+    metadata:
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+        service: varnish
+    #For pod updates, kill the current pod, stand up the new one
+    strategy:
+      type: Recreate
+    spec:
+      containers:
+      - name: varnish
+        image: amazeeio/varnish-drupal
+        ports:
+        - containerPort: 9200
+        resources:
+{{ .Values.varnish.resources | toYaml | indent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-varnish
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: varnish
+  annotations:
+{{- if .Values.ambassador.enabled }}
+    getambassador.io/config: |
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  {{ .Release.Name }}-drupal
+      host: varnish-{{ template "drupal.domain" . }}
+      service: {{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.cluster.local:80
+      {{- .Values.ambassador.config | toYaml | nindent 6 }}
+{{- end }}
+spec:
+  type: NodePort
+  ports:
+  - name: varnish
+    port: 9200
+  selector:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: varnish
+{{- end }}

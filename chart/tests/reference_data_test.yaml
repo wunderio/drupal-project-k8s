@@ -10,11 +10,6 @@ tests:
     set:
       referenceData:
         referenceEnvironment: 'FOO'
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
     # Only public files PVC is defined.
     - hasDocuments:
@@ -126,11 +121,6 @@ tests:
       referenceData:
         enabled: false
         referenceEnvironment: 'FOO'
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
     - template: drupal-volumes.yaml
       hasDocuments:

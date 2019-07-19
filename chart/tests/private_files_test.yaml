@@ -24,7 +24,6 @@ tests:
       mounts:
         private-files:
           enabled: true
-          name: private-files
           storage: 123Gi
           storageClassName: silta-shared
           mountPath: /foo/bar/private

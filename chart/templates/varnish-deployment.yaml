@@ -29,6 +29,7 @@ spec:
         env:
           VARNISH_BACKEND_HOST: {{ .Release.Name }}-drupal
           VARNISH_BACKEND_PORT: 80
+          LAGOON_PROJECT: 'not-a-lagoon-project'
         resources:
 {{ .Values.varnish.resources | toYaml | indent 10 }}
 ---

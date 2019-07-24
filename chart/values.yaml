@@ -29,11 +29,11 @@ autoscaling:
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: 60
+        targetAverageUtilization: 80
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: 60
+        targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
 #

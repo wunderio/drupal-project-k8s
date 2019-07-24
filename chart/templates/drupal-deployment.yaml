@@ -93,3 +93,16 @@ spec:
                 path: .htaccess
         {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Release.Name }}-drupal
+spec:
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Release.Name }}-drupal
+  targetCPUUtilizationPercentage: 80

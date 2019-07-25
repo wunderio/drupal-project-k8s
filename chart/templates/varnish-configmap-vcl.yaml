@@ -32,7 +32,9 @@ data:
     # These are used below to allow internal access to certain files
     # from trusted locations while not allowing access from the public internet.
     acl internal {
-      {{ .Values.varnish.internalACL }}
+      {{- range .Values.nginx.internalACL }}
+      {{ . | quote }};
+      {{- end }}
     }
 
     # Define the purge network access.
@@ -43,9 +45,8 @@ data:
 
     # List of upstream proxies we trust to set X-Forwarded-For correctly.
     acl upstream_proxy {
-        "127.0.0.1";
-        # TODO: trust all
-      }
+      {{ .Values.nginx.realipfrom | quote }};
+    }
 
     sub vcl_init {
       # Called when VCL is loaded, before any requests pass through it.
@@ -89,12 +90,16 @@ data:
       }
       
       # Add a unique header containing the client address
-      if (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
+      if (client.ip ~ upstream_proxy && req.http.X-Envoy-External-Address) {
+        set req.http.X-Forwarded-For = req.http.X-Envoy-External-Address;
+      } 
+      elseif (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
         set req.http.X-Forwarded-For = req.http.X-Real-IP;
-      } else {
+      } 
+      else {
         set req.http.X-Forwarded-For = client.ip;
       }
-
+      
       # Only deal with "normal" types
       if (req.method != "GET" &&
           req.method != "HEAD" &&

@@ -1,4 +1,11 @@
 {{- if .Values.varnish.enabled }}
+
+# TODO: 
+# - Secret
+# - Admin port
+# - PHP ENV with secret and admin port
+# - Tests
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,15 +30,28 @@ spec:
     spec:
       containers:
       - name: varnish
-        image: amazeeio/varnish-drupal
+        image: varnish:6.0 #stable
         ports:
-        - containerPort: 9200
-        env:
-          VARNISH_BACKEND_HOST: {{ .Release.Name }}-drupal
-          VARNISH_BACKEND_PORT: 80
-          LAGOON_PROJECT: 'not-a-lagoon-project'
+        - containerPort: 80
+        #- containerPort: 9200
+        # env:
+          # VARNISH_BACKEND_HOST: {{ .Release.Name }}-drupal
+          # VARNISH_BACKEND_PORT: 80
         resources:
 {{ .Values.varnish.resources | toYaml | indent 10 }}
+        volumeMounts:
+        - name: varnish-vcl
+          mountPath: /etc/varnish/default.vcl # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: default.vcl
+
+      volumes:
+        - name: varnish-vcl
+          configMap:
+            name: {{ .Release.Name }}-varnish-vcl
+            items:
+              - key: default.vcl
+                path: default.vcl
 ---
 apiVersion: v1
 kind: Service
@@ -41,20 +61,12 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
     service: varnish
   annotations:
-{{- if .Values.ambassador.enabled }}
-    getambassador.io/config: |
-      apiVersion: ambassador/v0
-      kind:  Mapping
-      name:  {{ .Release.Name }}-drupal
-      host: varnish-{{ template "drupal.domain" . }}
-      service: {{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.cluster.local:80
-      {{- .Values.ambassador.config | toYaml | nindent 6 }}
-{{- end }}
 spec:
   type: NodePort
+  externalTrafficPolicy: Local
   ports:
-  - name: varnish
-    port: 9200
+  - port: 80
+  #- port: 9200
   selector:
     {{- include "drupal.release_labels" . | nindent 4 }}
     service: varnish

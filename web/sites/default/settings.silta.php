@@ -41,3 +41,10 @@ if (getenv('MEMCACHED_HOST')) {
  * Generated twig files should not be on shared storage.
  */
 $settings['php_storage']['twig']['directory'] = '../generated-php';
+
+/**
+ * Make sure the dynamic environments are not blocked out as untrusted.
+ *
+ * Other hostnames wouldn't reach the pod in silta anyway.
+ */
+$settings['trusted_host_patterns'][] = '^.*$';

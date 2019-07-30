@@ -6,6 +6,9 @@ $databases['default']['default'] = [
   'username' => getenv('DB_USER'),
   'password' => getenv('DB_PASS'),
   'host' => getenv('DB_HOST'),
+  'port' => '3306',
+  'driver' => 'mysql',
+  'prefix' => '',
 ];
 
 // Salt for one-time login links, cancel links, form tokens, etc.

@@ -34,6 +34,10 @@ ports:
   mountPath: /etc/my.cnf.d/gdpr-dump.cnf
   readOnly: true
   subPath: gdpr-dump
+- name: settings
+  mountPath: /app/web/sites/default/settings.silta.php
+  readOnly: true
+  subPath: settings_silta_php
 {{- end }}
 
 {{- define "drupal.volumes" -}}
@@ -60,6 +64,9 @@ ports:
     items:
       - key: gdpr-dump
         path: gdpr-dump
+- name: settings
+  configMap:
+    name: {{ .Release.Name }}-settings
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

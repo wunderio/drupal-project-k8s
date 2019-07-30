@@ -51,19 +51,9 @@ ports:
 - name: php-conf
   configMap:
     name: {{ .Release.Name }}-php-conf
-    items:
-      - key: php_ini
-        path: php_ini
-      - key: php-fpm_conf
-        path: php-fpm_conf
-      - key: www_conf
-        path: www_conf
 - name: gdpr-dump
   configMap:
     name: {{ .Release.Name }}-gdpr-dump
-    items:
-      - key: gdpr-dump
-        path: gdpr-dump
 - name: settings
   configMap:
     name: {{ .Release.Name }}-settings

@@ -92,7 +92,8 @@ php:
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
     drupal:
-      schedule: '0 * * * *'
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
@@ -235,7 +236,8 @@ backup:
   enabled: false
 
   # Cron schedule when backups should be taken, this is expected to take place daily.
-  schedule: '0 2 * * *'
+  # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+  schedule: '~ 2 * * *'
 
   # How many daily backups to preserve.
   retention: 7

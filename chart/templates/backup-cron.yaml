@@ -1,0 +1,48 @@
+{{- if .Values.backup.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-backup
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            {{- include "drupal.php-container" . | nindent 12 }}
+            volumeMounts:
+              {{- include "drupal.volumeMounts" . | nindent 14 }}
+              - name: reference-data-volume
+                mountPath: /app/reference-data
+            command: ["/bin/bash", "-c"]
+            args:
+              - |
+                # Generate the id of the backup.
+                BACKUP_ID=`date +”%Y-%m-%d”`
+
+                # Create a folder for the backup
+                mkdir /backups/$BACKUP_ID
+
+                # Take a database dump.
+                drush sql-dump --gzip --result-file /backups/$BACKUP_ID/db.sql
+
+                # List content of backup folder
+                ls -lh /backups/$BACKUP_ID/
+            resources:
+              {{- .Values.php.resources | toYaml | nindent 14 }}
+          restartPolicy: OnFailure
+          volumes:
+            {{- include "drupal.volumes" . | nindent 12 }}
+            - name: backup
+              persistentVolumeClaim:
+                claimName: backup
+
+
+          {{- include "drupal.imagePullSecrets" . | nindent 10 }}
+{{- end }}
+---

@@ -231,19 +231,19 @@ gdprDump:
       formatter: clear
 
 backup:
-  # Whether backups should be taken for the current environment
+  # Whether backups should be taken for the current environment.
   enabled: false
 
-  # Cron schedule when backups should be taken
+  # Cron schedule when backups should be taken, this is expected to take place daily.
   schedule: '0 2 * * *'
 
   # How many daily backups to preserve.
   retention: 7
 
-  # If specified, replace environment content with the given backup
+  # If specified, replace environment content with the given backup.
   restoreId: null
 
-  # Specify how to restore a backup
+  # Specify how to restore a backup.
   restoreCommand: |
     # figure out how to restore
 

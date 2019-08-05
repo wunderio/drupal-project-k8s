@@ -18,21 +18,33 @@ spec:
             volumeMounts:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: backup
-                mountPath: /backup
+                mountPath: /backups
             command: ["/bin/bash", "-c"]
             args:
               - |
                 # Generate the id of the backup.
-                BACKUP_ID=`date +”%Y-%m-%d”`
+                BACKUP_ID=`date +%Y-%m-%d`
+                BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
 
                 # Create a folder for the backup
-                mkdir /backups/$BACKUP_ID
+                mkdir -p $BACKUP_LOCATION
 
                 # Take a database dump.
-                drush sql-dump --gzip --result-file /backups/$BACKUP_ID/db.sql
+                # TODO: take unsanitized dump
+                drush sql-dump --gzip --result-file $BACKUP_LOCATION/db.sql
+
+                {{ range $index, $mount := .Values.mounts -}}
+                {{- if eq $mount.enabled true -}}
+                # File backup for {{ $index }} volume.
+                tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+                {{- end -}}
+                {{- end }}
+
+                # Delete old backups
+                find /backups/ -mtime +{{ .Values.backup.retention }} -exec rm -r {} \;
 
                 # List content of backup folder
-                ls -lh /backups/$BACKUP_ID/
+                ls -lh /backups/*
             resources:
               {{- .Values.php.resources | toYaml | nindent 14 }}
           restartPolicy: OnFailure

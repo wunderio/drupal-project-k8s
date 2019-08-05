@@ -247,6 +247,10 @@ backup:
   restoreCommand: |
     # figure out how to restore
 
+  storage: 10G
+  storageClassName: silta-shared
+  csiDriverName: csi-rclone
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 mariadb:

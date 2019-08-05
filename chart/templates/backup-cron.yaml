@@ -17,8 +17,8 @@ spec:
             {{- include "drupal.php-container" . | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
-              - name: reference-data-volume
-                mountPath: /app/reference-data
+              - name: backup
+                mountPath: /backup
             command: ["/bin/bash", "-c"]
             args:
               - |

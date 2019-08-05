@@ -29,9 +29,21 @@ spec:
                 # Create a folder for the backup
                 mkdir -p $BACKUP_LOCATION
 
-                # Take a database dump.
-                # TODO: take unsanitized dump
-                drush sql-dump --gzip --result-file $BACKUP_LOCATION/db.sql
+                # Figure out which tables to skip.
+                IGNORE_TABLES=""
+                for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTables }}'` ;
+                do
+                  IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
+                done
+
+                # Take a database dump. We use the full path to bypass gdpr-dump
+                /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $DB_NAME $IGNORE_TABLES > /tmp/db.sql
+                /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORE_TABLES >> /tmp/db.sql
+
+                # Compress the database dump and copy it into the backup folder.
+                # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+                gzip -9 /tmp/db.sql
+                cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
                 {{ range $index, $mount := .Values.mounts -}}
                 {{- if eq $mount.enabled true -}}

@@ -251,6 +251,9 @@ backup:
   storageClassName: silta-shared
   csiDriverName: csi-rclone
 
+  # These tables will have their content ignored from the backups.
+  ignoreTables: '(cache|cache_.*)'
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 mariadb:

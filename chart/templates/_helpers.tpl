@@ -96,6 +96,17 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-elastic
 {{- end }}
+{{- if .Values.varnish.enabled }}
+- name: VARNISH_ADMIN_HOST
+  value: {{ .Release.Name }}-varnish
+- name: VARNISH_ADMIN_PORT
+  value: 6082
+- name: VARNISH_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets-varnish
+      key: secret
+{{- end }}
 - name: HASH_SALT
   valueFrom:
     secretKeyRef:

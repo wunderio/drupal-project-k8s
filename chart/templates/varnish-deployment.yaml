@@ -4,8 +4,8 @@
 # + Pass headers for remote_addr correctly
 # + test static resource caching and SESS passtrough
 # + Admin port
-# - Admin secret
-# - PHP ENV with secret and admin port
+# + Admin secret
+# + PHP ENV with host, secret and admin port
 # - Tests
 # - Cache type = file + set size
 
@@ -52,6 +52,9 @@ spec:
           mountPath: /etc/varnish/default.vcl # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
           subPath: default.vcl
+        - name: varnish-secret
+          mountPath: "/etc/varnish/secret"
+          readOnly: 
 
       volumes:
         - name: varnish-vcl
@@ -60,6 +63,9 @@ spec:
             items:
               - key: default.vcl
                 path: default.vcl
+        - name: varnish-secret
+          secret:
+            secretName: secret
 ---
 apiVersion: v1
 kind: Service

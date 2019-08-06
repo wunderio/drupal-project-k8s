@@ -254,7 +254,7 @@ backup:
   csiDriverName: csi-rclone
 
   # These tables will have their content ignored from the backups.
-  ignoreTables: '(cache|cache_.*)'
+  ignoreTableContent: '(cache|cache_.*)'
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.

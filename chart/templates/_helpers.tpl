@@ -100,12 +100,12 @@ imagePullSecrets:
 - name: VARNISH_ADMIN_HOST
   value: {{ .Release.Name }}-varnish
 - name: VARNISH_ADMIN_PORT
-  value: 6082
-- name: VARNISH_SECRET
+  value: "6082"
+- name: VARNISH_CONTROL_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-varnish
-      key: secret
+      key: control_key
 {{- end }}
 - name: HASH_SALT
   valueFrom:

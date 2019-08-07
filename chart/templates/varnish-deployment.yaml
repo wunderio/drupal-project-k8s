@@ -7,7 +7,8 @@
 # + Admin secret
 # + PHP ENV with host, secret and admin port
 # - Tests
-# - Cache type = file + set size
+# + Cache type = file + set size
+# - Partial includes for default vcl file that allow passtrough or custom error page
 
 apiVersion: apps/v1
 kind: Deployment
@@ -36,36 +37,38 @@ spec:
     spec:
       containers:
       - name: varnish
-        image: wunderio/drupal-varnish:v0.1.3
+        image: wunderio/drupal-varnish:v0.1.5
         ports:
         - containerPort: 80
           name: web
         - containerPort: 6082
           name: admin
         env:
+        - name: VARNISH_STORAGE_BACKEND
           # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
-          VARNISH_STORAGE_BACKEND: {{ .Values.varnish.storageBackend }}
+          value: {{ .Values.varnish.storageBackend | quote }}
         resources:
 {{ .Values.varnish.resources | toYaml | indent 10 }}
         volumeMounts:
         - name: varnish-vcl
-          mountPath: /etc/varnish/default.vcl # mount nginx-conf configmap volume to /etc/nginx
-          readOnly: true
+          mountPath: /etc/varnish/default.vcl
           subPath: default.vcl
+          readOnly: true
         - name: varnish-secret
           mountPath: "/etc/varnish/secret"
-          readOnly: 
+          subPath: control_key
+          readOnly: true
 
       volumes:
-        - name: varnish-vcl
-          configMap:
-            name: {{ .Release.Name }}-varnish-vcl
-            items:
-              - key: default.vcl
-                path: default.vcl
-        - name: varnish-secret
-          secret:
-            secretName: secret
+      - name: varnish-vcl
+        configMap:
+          name: {{ .Release.Name }}-varnish-vcl
+      - name: varnish-secret
+        secret:
+          secretName: {{ .Release.Name }}-secrets-varnish
+      #     items:
+      #       - key: secret
+      #         path: secret
 ---
 apiVersion: v1
 kind: Service

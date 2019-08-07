@@ -9,14 +9,14 @@ metadata:
     getambassador.io/config: |
       apiVersion: ambassador/v1
       kind:  Mapping
-      name:  {{ .Release.Name }}-drupal
+      name:  {{ .Release.Name }}-{{ include "drupal.endpoint" . }}
       host: {{ template "drupal.domain" . }}
-      service: {{- include "drupal.endpoint" . }}
+      service: {{ include "drupal.endpoint" . }}
       {{- .Values.ambassador.config | toYaml | nindent 6 }}
 {{- end }}
 {{- range $index, $domain := .Values.exposeDomains }}
       ---
-      apiVersion: ambassador/v0
+      apiVersion: ambassador/v1
       kind: Mapping
       name: {{ $.Release.Name }}-drupal-{{ $index }}
       host: {{ $domain }}

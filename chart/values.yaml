@@ -280,6 +280,10 @@ mariadb:
 varnish:
   enabled: true
   resources: {}
+  caching:
+    # file / malloc
+    type: file
+    size: 512M
 
 elasticsearch:
   enabled: false

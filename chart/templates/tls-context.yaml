@@ -1,0 +1,10 @@
+apiVersion: getambassador.io/v1
+kind: TLSContext
+metadata:
+  name: {{ .Release.Name }}-tls-context
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  hosts:
+    - {{ template "drupal.domain" . }}
+  secret: {{ .Release.Name }}-tls-cert

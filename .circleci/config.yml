@@ -34,7 +34,9 @@ workflows:
           context: global_nonprod
           filters:
             branches:
-              ignore: production
+              ignore: 
+                - production
+                - feature/slt-110
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.
@@ -45,3 +47,14 @@ workflows:
           filters:
             branches:
               only: production
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-test cluster environment.
+          <<: *build-deploy
+          name: build-deploy-test
+          silta_config: silta/silta.yml,silta/silta-test.yml
+          context: silta_test
+          filters:
+            branches:
+              only: feature/slt-110
+

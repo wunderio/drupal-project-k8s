@@ -30,10 +30,16 @@ ports:
   mountPath: /etc/php7/php-fpm.d/www.conf
   readOnly: true
   subPath: www_conf
+{{ if ne $.Template.Name "drupal/templates/backup-cron.yaml" -}}
 - name: gdpr-dump
   mountPath: /etc/my.cnf.d/gdpr-dump.cnf
   readOnly: true
   subPath: gdpr-dump
+{{- end }}
+- name: settings
+  mountPath: /app/web/sites/default/settings.silta.php
+  readOnly: true
+  subPath: settings_silta_php
 {{- end }}
 
 {{- define "drupal.volumes" -}}
@@ -47,19 +53,14 @@ ports:
 - name: php-conf
   configMap:
     name: {{ .Release.Name }}-php-conf
-    items:
-      - key: php_ini
-        path: php_ini
-      - key: php-fpm_conf
-        path: php-fpm_conf
-      - key: www_conf
-        path: www_conf
+{{ if ne $.Template.Name "drupal/templates/backup-cron.yaml" -}}
 - name: gdpr-dump
   configMap:
     name: {{ .Release.Name }}-gdpr-dump
-    items:
-      - key: gdpr-dump
-        path: gdpr-dump
+{{- end }}
+- name: settings
+  configMap:
+    name: {{ .Release.Name }}-settings
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
@@ -85,6 +86,8 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+- name: ERROR_LEVEL
+  value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
@@ -98,6 +101,8 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-drupal
       key: hashsalt
+- name: DRUPAL_CONFIG_PATH
+  value: {{ .Values.php.drupalConfigPath }}
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

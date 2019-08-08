@@ -20,6 +20,21 @@ app: drupal
 # Multiple pods make sense for high availability.
 replicas: 1
 
+# Enable autoscaling using HorizontalPodAutoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: 80
+
 # Domain names that will be mapped to this deployment.
 #
 # Note that the key is only used for documentation purposes, for example:
@@ -77,7 +92,8 @@ php:
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
     drupal:
-      schedule: '0 * * * *'
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
@@ -97,7 +113,7 @@ php:
 
         drush cr
         drush updatedb -y
-        if [ -f config/sync/core.extension.yml ]; then
+        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
         fi
       else
@@ -114,7 +130,7 @@ php:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y
-        if [ -f config/sync/core.extension.yml ]; then
+        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
         fi
       fi
@@ -126,11 +142,19 @@ php:
   # users to log in. If not provided, a random value will be used.
   hashsalt: "template-hash-salt"
 
+  # Set whether Drupal errors are displayed.
+  # This is a useful override for development environments.
+  errorLevel: "verbose"
+
   # Custom php settings.
   php_ini:
     loglevel: notice # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
+
+  # Define the location of the Drupal config files relative to the composer root.
+  # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
+  drupalConfigPath: "config/sync"
 
 
 # Configuration for everything that runs in shell container.
@@ -179,20 +203,14 @@ referenceData:
   # The commands that is executed to export reference data.
   command: |
     if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+      # NFS doesn't support replacing files, so we delete them instead.
+      rm -f reference-data/*
 
-      if [ -d vendor/machbarmacher/gdpr-dump ]; then
+      # Export database dump.
+      drush sql-dump --gzip --result-file ../reference-data/db.sql
 
-        # NFS doesn't support replacing files, so we delete them instead.
-        rm -f reference-data/*
-
-        # Export database dump.
-        drush sql-dump --gzip --result-file ../reference-data/db.sql
-
-        # Export public files.
-        tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
-      else
-        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed."
-      fi
+      # Export public files.
+      tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
     else
       echo "Drupal is not installed, skipping reference database dump."
     fi
@@ -202,7 +220,7 @@ referenceData:
   csiDriverName: csi-rclone
 
   # Skips mounting the volume outside of the reference environment, only used programmatically.
-  skipMounting: false
+  skipMount: false
 
 # Parameters for sanitizing reference data with gdpr-dump.
 # Uses formatters from https://packagist.org/packages/fzaninotto/faker.
@@ -216,6 +234,31 @@ gdprDump:
       formatter: email
     init:
       formatter: clear
+
+backup:
+  # Whether backups should be taken for the current environment.
+  enabled: false
+
+  # Cron schedule when backups should be taken, this is expected to take place daily.
+  # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+  schedule: '~ 2 * * *'
+
+  # How many daily backups to preserve.
+  retention: 7
+
+  # If specified, replace environment content with the given backup.
+  restoreId: null
+
+  # Specify how to restore a backup.
+  restoreCommand: |
+    # figure out how to restore
+
+  storage: 10G
+  storageClassName: silta-shared
+  csiDriverName: csi-rclone
+
+  # These tables will have their content ignored from the backups.
+  ignoreTableContent: '(cache|cache_.*)'
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.

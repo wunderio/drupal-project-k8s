@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
-  schedule: {{ $job.schedule | quote }}
+  schedule: {{ $job.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   backOffLimit: 3
   jobTemplate:
@@ -21,7 +21,7 @@ spec:
             {{- include "drupal.php-container" $ | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" $ | nindent 14 }}
-            command: ["/bin/sh", "-c"]
+            command: ["/bin/bash", "-c"]
             args:
               - |
                  if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]

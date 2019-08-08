@@ -17,3 +17,5 @@ web/sites/**/files
 web/.dockerignore
 Dockerfile
 composer.lock
+silta/silta*.yml
+charts

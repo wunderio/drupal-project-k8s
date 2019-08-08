@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-tls-context
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+  namespace: silta-cluster
 spec:
   hosts:
     - {{ template "drupal.domain" . }}

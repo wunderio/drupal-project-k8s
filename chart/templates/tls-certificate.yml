@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-tls-config
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+  namespace: silta-cluster
 spec:
   secretName: {{ .Release.Name }}-tls-cert
   duration: 2160h # 90d

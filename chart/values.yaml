@@ -22,7 +22,7 @@ replicas: 1
 
 # Enable autoscaling using HorizontalPodAutoscaler
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 3
   metrics:

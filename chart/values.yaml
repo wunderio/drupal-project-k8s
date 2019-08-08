@@ -1,7 +1,7 @@
 
 # Main domain of the cluster.
 # If using ambassador, subdomains of this domain will be created automatically for each environment.
-clusterDomain: "silta-test.wdr.io"
+clusterDomain: "silta.wdr.io"
 
 # An optional human-readable label for the environment, defaults to the release name.
 # We typically pass the branch name when we build dedicated environments per branch.

@@ -18,12 +18,6 @@ spec:
         {{- include "drupal.release_labels" . | nindent 8 }}
         deployment: drupal
     spec:
-      initContainers:
-      - name: wait-for-db
-        {{ include "drupal.php-container" . | nindent 8 }}
-        command: ["/bin/bash", "-c"]
-        args:
-        - {{ include "drupal.wait-for-db-command" . | quote }}
       containers:
       # php-fpm container.
       - name: php

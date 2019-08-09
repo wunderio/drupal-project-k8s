@@ -35,7 +35,8 @@ spec:
             port: 9000
         readinessProbe:
           exec:
-            command: ['/bin/bash', '-c', 'if [ {{ include "drupal.deployment-in-progress-test" . }} ]; then exit 1; fi']
+            # Prevent coming in during the installation process.
+            command: ['/bin/bash', '-c', 'if [ {{ include "drupal.installation-in-progress-test" . }} ]; then exit 1; fi']
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 

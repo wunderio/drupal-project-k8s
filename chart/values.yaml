@@ -278,12 +278,11 @@ mariadb:
         memory: 128M
 
 varnish:
-  enabled: true
+  enabled: false
   resources: {}
-  caching:
-    # file / malloc
-    type: file
-    size: 512M
+  # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
+  storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
+  # Inject custom code into vcl_recv subroutine
   vcl_recv_extra: |
 
 elasticsearch:

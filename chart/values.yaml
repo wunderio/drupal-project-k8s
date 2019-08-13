@@ -284,6 +284,7 @@ varnish:
     # file / malloc
     type: file
     size: 512M
+  vcl_recv_extra: |
 
 elasticsearch:
   enabled: false

@@ -1,15 +1,4 @@
 {{- if .Values.varnish.enabled }}
-
-# TODO:
-# + Pass headers for remote_addr correctly
-# + test static resource caching and SESS passtrough
-# + Admin port
-# + Admin secret
-# + PHP ENV with host, secret and admin port
-# - Tests
-# + Cache type = file + set size
-# - Partial includes for default vcl file that allow passtrough or custom error page
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -54,11 +43,22 @@ spec:
           mountPath: /etc/varnish/default.vcl
           subPath: default.vcl
           readOnly: true
+        - name: varnish-vcl
+          mountPath: /etc/varnish/includes/vcl_recv.vcl
+          subPath: vcl_recv.vcl
+          readOnly: true
+        - name: varnish-vcl
+          mountPath: /etc/varnish/includes/vcl_deliver.vcl
+          subPath: vcl_deliver.vcl
+          readOnly: true
+        - name: varnish-vcl
+          mountPath: /etc/varnish/includes/vcl_synth_500.vcl
+          subPath: vcl_synth_500.vcl
+          readOnly: true
         - name: varnish-secret
           mountPath: "/etc/varnish/secret"
           subPath: control_key
           readOnly: true
-
       volumes:
       - name: varnish-vcl
         configMap:
@@ -66,9 +66,7 @@ spec:
       - name: varnish-secret
         secret:
           secretName: {{ .Release.Name }}-secrets-varnish
-      #     items:
-      #       - key: secret
-      #         path: secret
+
 ---
 apiVersion: v1
 kind: Service

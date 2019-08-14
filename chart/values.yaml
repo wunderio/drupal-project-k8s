@@ -70,7 +70,6 @@ nginx:
   # Note that the key is only used for documentation purposes.
   internalACL:
     gke-internal: 10.0.0.0/8
-    vyper-hel: 94.237.33.88/32
 
   # Robots txt file blocked by default
   robotsTxt:

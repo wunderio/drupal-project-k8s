@@ -61,7 +61,6 @@ $config['system.logging']['error_level'] = getenv('ERROR_LEVEL');
  */
 if (getenv('VARNISH_ADMIN_HOST')) {
   $settings['reverse_proxy'] = TRUE;
-  // $settings['reverse_proxy_addresses']
 
   $config['varnish.settings']['varnish_version'] = 4;
   $config['varnish.settings']['varnish_control_terminal'] = getenv('VARNISH_ADMIN_HOST') . ':' . getenv('VARNISH_ADMIN_PORT');

@@ -24,7 +24,7 @@ www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Names
 {{- end -}}
 
 {{- define "drupal.endpoint" -}}
-{{- if .Values.ambassador.enabled -}}
+{{- if .Values.varnish.enabled -}}
 {{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.cluster.local:80
 {{- else -}}
 {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80

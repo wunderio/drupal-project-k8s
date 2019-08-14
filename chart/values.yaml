@@ -68,7 +68,7 @@ nginx:
   # from trusted locations while not allowing access from the public internet.
   # These addreses are also excluded from basicauth.
   # Note that the key is only used for documentation purposes.
-  internalACL:
+  noauthips:
     gke-internal: 10.0.0.0/8
 
   # Robots txt file blocked by default

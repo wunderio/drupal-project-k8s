@@ -33,7 +33,7 @@ data:
     # These are used below to allow internal access to certain files
     # from trusted locations while not allowing access from the public internet.
     acl internal {
-      {{- range .Values.nginx.internalACL }}
+      {{- range .Values.nginx.noauthips }}
       {{ . | quote }};
       {{- end }}
     }

@@ -23,6 +23,8 @@ workflows:
           # Use a local chart during development.
           chart_name: "./chart"
           chart_repository: ""
+          decrypt_files: silta/secrets.yml
+          silta_config: silta/silta.yml,silta/secrets.yml
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build

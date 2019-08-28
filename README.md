@@ -22,6 +22,21 @@ Have a look at the file for details, but in short this is how it works:
 - Install or update our helm chart while passing our custom images as parameters.
 - The helm chart executes the usual drush deployment commands.
 
+# Secrets
+
+Project can override values and do file encryption using [mozilla sops](https://github.com/mozilla/sops/releases)
+1. Import PGP key
+`# gpg --import ~/.ssh/silta-gpg.asc`
+2. Move keys to the secring (sops currently supports pgp1)
+`gpg --export-secret-keys >~/.gnupg/secring.gpg`
+3. Edit secrets file
+`sops silta/secrets.yml`
+
+Troubleshooting:
+ - Check the sops version. Has to be at least 3. Do *not* install via pip.
+ - "`Could not establish connection with gpg-agent`":
+   execute `export GPG_AGENT_INFO="$(gpgconf --list-dirs agent-socket):0:1"`
+
 ## GDPR sanitization
 
 SQL data dump for developers is parsed with [GDPR Dump](https://github.com/machbarmacher/gdpr-dump) project.

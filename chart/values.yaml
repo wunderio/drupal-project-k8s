@@ -305,3 +305,7 @@ ambassador:
   config:
     prefix: /
     timeout_ms: 30000
+
+mailhog:
+  enabled: true
+

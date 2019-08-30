@@ -12,7 +12,6 @@ Mailhog available at:
   {{- range $index, $domain := .Values.exposeDomains }}
   {{ $domain }}/mailhog
   {{- end }}
-
 {{- end }}
 
 {{ if .Values.nginx.basicauth.enabled -}}

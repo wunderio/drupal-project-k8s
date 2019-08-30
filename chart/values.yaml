@@ -309,7 +309,7 @@ ambassador:
 
 # TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
 mailhog:
-  enabled: true
+  enabled: false
   resources:
     requests:
       cpu: 5m
@@ -317,7 +317,7 @@ mailhog:
 
 # SMTP configuration passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
 smtp:
-  enabled: true
+  enabled: false
   # How to Setup SparkPost as your SMTP Relay: https://www.sparkpost.com/blog/setup-sparkpost-smtp-relay/
   # address: smtp.example.com:25
   # tls: false

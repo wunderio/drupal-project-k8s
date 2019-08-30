@@ -75,7 +75,7 @@ imagePullSecrets:
   {{- if .Values.mailhog.enabled }}
   value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
-  value: {{ .Values.smtp.address }} | quote
+  value: {{ .Values.smtp.address | quote }}
   {{- end }}
 - name: SMTP_TLS
   value: {{ .Values.smtp.tls | default false | quote }}

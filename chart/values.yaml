@@ -305,6 +305,7 @@ ambassador:
   config:
     prefix: /
     timeout_ms: 30000
+    use_websocket: true
 
 # TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
 mailhog:

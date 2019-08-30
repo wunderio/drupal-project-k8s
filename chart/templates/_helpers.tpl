@@ -134,7 +134,7 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-elastic
 {{- end }}
-{{- if .Values.smtp.enabled }}
+{{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
 {{ include "smtp.env" . }}
 {{- end}}
 - name: HASH_SALT

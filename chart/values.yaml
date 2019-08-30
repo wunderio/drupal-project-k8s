@@ -309,6 +309,10 @@ ambassador:
 # TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
 mailhog:
   enabled: true
+  resources:
+    requests:
+      cpu: 5m
+      memory: 10M
 
 # SMTP configuration passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
 smtp:

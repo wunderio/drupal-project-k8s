@@ -5,9 +5,9 @@ Your site is available here:
   {{ $domain }}
   {{- end }}
 
-
 {{ if .Values.mailhog.enabled -}}
 Mailhog available at:
+
   http://{{- template "drupal.domain" . }}/mailhog
   {{- range $index, $domain := .Values.exposeDomains }}
   {{ $domain }}/mailhog

@@ -156,8 +156,8 @@ data:
             {{- end }}
             deny all;
             
-            {{ if .Values.nginx.basicauth.noauthips }}
-            # Basic auth only allowed when at least one ip is whitelisted. Prevents using default credentials.
+            {{- if gt (len .Values.nginx.basicauth.noauthips) 1 -}}
+            # Basic auth only offered when at least one extra ip is whitelisted. Prevents using default credentials.
             auth_basic "Restricted";
             auth_basic_user_file /etc/nginx/.htaccess;
             {{- end}}

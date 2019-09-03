@@ -309,7 +309,7 @@ ambassador:
 
 # TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
 mailhog:
-  enabled: true
+  enabled: false
   resources:
     requests:
       cpu: 5m

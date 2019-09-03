@@ -137,6 +137,17 @@ imagePullSecrets:
 {{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
 {{ include "smtp.env" . }}
 {{- end}}
+{{- if .Values.varnish.enabled }}
+- name: VARNISH_ADMIN_HOST
+  value: {{ .Release.Name }}-varnish
+- name: VARNISH_ADMIN_PORT
+  value: "6082"
+- name: VARNISH_CONTROL_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets-varnish
+      key: control_key
+{{- end }}
 - name: HASH_SALT
   valueFrom:
     secretKeyRef:
@@ -158,7 +169,7 @@ imagePullSecrets:
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;
   allow 127.0.0.1;
-  {{- range .Values.nginx.basicauth.noauthips }}
+  {{- range .Values.nginx.internalACL }}
   allow {{ . }};
   {{- end }}
   deny all;

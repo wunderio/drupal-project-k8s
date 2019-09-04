@@ -7,6 +7,7 @@ metadata:
   annotations:
 {{- if .Values.ambassador.enabled }}
     getambassador.io/config: |
+      ---
       apiVersion: ambassador/v1
       kind:  Mapping
       name:  {{ include "drupal.endpoint" . }}
@@ -20,7 +21,7 @@ metadata:
       kind: Mapping
       name: {{ $.Release.Name }}-drupal-{{ $index }}
       host: {{ $domain.hostname }}
-      service: {{- include "drupal.endpoint" $ }}
+      service: {{ include "drupal.endpoint" $ }}
       {{- $.Values.ambassador.config | toYaml | nindent 6 }}
 {{- end }}
     domain: {{ template "drupal.domain" . }}

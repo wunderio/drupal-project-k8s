@@ -49,8 +49,8 @@ metadata:
   namespace: silta-cluster
 type: kubernetes.io/tls
 data:
-  tls.crt: {{ $domain.certificate.crt }}
-  tls.key: {{ $domain.certificate.crt }}
+  tls.crt: {{ $domain.certificate.crt | b64enc }}
+  tls.key: {{ $domain.certificate.key | b64enc }}
   {{- end }}
 ---
 apiVersion: getambassador.io/v1

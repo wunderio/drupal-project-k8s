@@ -96,6 +96,17 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-elastic
 {{- end }}
+{{- if .Values.varnish.enabled }}
+- name: VARNISH_ADMIN_HOST
+  value: {{ .Release.Name }}-varnish
+- name: VARNISH_ADMIN_PORT
+  value: "6082"
+- name: VARNISH_CONTROL_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets-varnish
+      key: control_key
+{{- end }}
 - name: HASH_SALT
   valueFrom:
     secretKeyRef:
@@ -117,7 +128,7 @@ imagePullSecrets:
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;
   allow 127.0.0.1;
-  {{- range .Values.nginx.basicauth.noauthips }}
+  {{- range .Values.nginx.noauthips }}
   allow {{ . }};
   {{- end }}
   deny all;
@@ -140,8 +151,8 @@ TIME_WAITING=0
 done
 {{- end }}
 
-{{- define "drupal.deployment-in-progress-test" -}}
--f /app/web/sites/default/files/_deployment
+{{- define "drupal.installation-in-progress-test" -}}
+-f /app/web/sites/default/files/_installing
 {{- end -}}
 
 {{- define "drupal.post-release-command" -}}
@@ -150,9 +161,9 @@ set -e
 {{ include "drupal.wait-for-db-command" . }}
 
 {{ if .Release.IsInstall }}
-touch /app/web/sites/default/files/_deployment
+touch /app/web/sites/default/files/_installing
 {{ .Values.php.postinstall.command}}
-rm /app/web/sites/default/files/_deployment
+rm /app/web/sites/default/files/_installing
 {{ else }}
 {{ .Values.php.postupgrade.command}}
 {{ end }}

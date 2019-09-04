@@ -47,7 +47,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
   namespace: silta-cluster
-type: Opaque
+type: kubernetes.io/tls
 data:
   tls.crt: {{ $domain.certificate.crt }}
   tls.key: {{ $domain.certificate.crt }}

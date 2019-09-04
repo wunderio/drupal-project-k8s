@@ -61,7 +61,6 @@ metadata:
   namespace: silta-cluster
 spec:
   hosts:
-    - {{ template "drupal.domain" $ }}
+    - {{ $domain.hostname }}
   secret: {{ $.Release.Name }}-tls-cert-{{ $index }}
 {{- end }}
-

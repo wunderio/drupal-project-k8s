@@ -2,7 +2,7 @@ Your site is available here:
 
   http://{{- template "drupal.domain" . }}
   {{- range $index, $domain := .Values.exposeDomains }}
-  {{ $domain }}
+  {{ $domain.hostname }}
   {{- end }}
 
 {{ if .Values.nginx.basicauth.enabled -}}

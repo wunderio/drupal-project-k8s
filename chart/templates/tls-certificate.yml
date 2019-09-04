@@ -17,3 +17,51 @@ spec:
     # We can reference ClusterIssuers by changing the kind here.
     # The default value is Issuer (i.e. a locally namespaced Issuer)
     kind: ClusterIssuer
+
+{{- range $index, $domain := .Values.exposeDomains }}
+  {{- if eq $domain.certificate.type "selfsigned" }}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-tls-conf-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+  namespace: silta-cluster
+spec:
+  secretName: {{ $.Release.Name }}-tls-cert-{{ $index }}
+  duration: 2160h
+  renewBefore: 150h 
+  commonName: {{ $domain.hostname }}
+  dnsNames:
+  - {{ $domain.hostname }}
+  issuerRef:
+    name: tls-selfsigned-issuer
+    kind: ClusterIssuer
+  {{- else if eq $domain.certificate.type "custom" -}}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-tls-cert-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+type: Opaque
+data:
+  tls.crt: {{ $domain.certificate.crt }}
+  tls.key: {{ $domain.certificate.crt }}
+  {{- end }}
+---
+apiVersion: getambassador.io/v1
+kind: TLSContext
+metadata:
+  name: {{ $.Release.Name }}-tls-ctx-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+  namespace: silta-cluster
+spec:
+  hosts:
+    - {{ template "drupal.domain" $ }}
+  secret: {{ $.Release.Name }}-tls-cert-{{ $index }}
+{{- end }}
+

@@ -1,7 +1,7 @@
 apiVersion: getambassador.io/v1
 kind: TLSContext
 metadata:
-  name: {{ .Release.Name }}-tls-context
+  name: {{ .Release.Name }}-tls-ctx
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   namespace: silta-cluster

@@ -38,7 +38,7 @@ spec:
   issuerRef:
     name: tls-selfsigned-issuer
     kind: ClusterIssuer
-  {{- else if eq $domain.certificate.type "custom" -}}
+  {{- else if eq $domain.certificate.type "custom" }}
 ---
 apiVersion: v1
 kind: Secret
@@ -46,6 +46,7 @@ metadata:
   name: {{ $.Release.Name }}-tls-cert-{{ $index }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
+  namespace: silta-cluster
 type: Opaque
 data:
   tls.crt: {{ $domain.certificate.crt }}

@@ -515,18 +515,32 @@ data:
       <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-      <link href="https://wunder.io/sites/default/files/error_page/style.css" rel="stylesheet" type="text/css">
-      <title>"} + resp.http.x-sitetitle + {" - Error loading the page</title>
+      <style>
+        body {
+          background-color: #ffffff;
+          font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+          text-align: center;
+          color: #656669;
+        }
+        #error-box {
+          margin-top: 100px;
+        }
+        #emoji {
+          font-size: 100px;
+        }
+      </style>
+      <title>"} + resp.http.x-sitetitle + {" - Something went wrong</title>
 
       </head>
 
       <body>
         <div id="error-box">
-          &nbsp;
           <div id="error-message">
-            <h1>Our best people are on the case!</h1>
-            <h2>Please check back shortly</h2>
-            <h3>Error loading the page</h3>
+            <span id="emoji">🤔</span>
+
+            <h1>Something went wrong, but it's not your fault.</h1>
+            <h2>We are working on it, please check back shortly.</h2>
+
           </div>
         </div>
 

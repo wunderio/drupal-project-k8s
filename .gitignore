@@ -28,6 +28,3 @@ node_modules
 
 # Ignore helm chart dependencies.
 chart/charts
-
-#Ignore unencryupted secrets
-secrets

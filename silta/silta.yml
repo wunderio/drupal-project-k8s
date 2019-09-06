@@ -6,6 +6,7 @@
 
 clusterDomain: "silta-test.wdr.io"
 certificate:
+  enabled: false
   # Possible types: letsencrypt, selfsigned, custom
   type: selfsigned
   # Only when certificate type is custom

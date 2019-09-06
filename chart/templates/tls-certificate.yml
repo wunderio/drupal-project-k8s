@@ -1,3 +1,4 @@
+{{- if .Values.certificate.enabled }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -17,7 +18,6 @@ spec:
     # We can reference ClusterIssuers by changing the kind here.
     # The default value is Issuer (i.e. a locally namespaced Issuer)
     kind: ClusterIssuer
-
 {{- range $index, $domain := .Values.exposeDomains }}
   {{- if eq $domain.certificate.type "selfsigned" }}
 ---
@@ -64,4 +64,5 @@ spec:
   hosts:
     - {{ $domain.hostname }}
   secret: {{ $.Release.Name }}-tls-cert-{{ $index }}
+{{- end }}
 {{- end }}

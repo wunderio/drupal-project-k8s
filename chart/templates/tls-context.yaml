@@ -1,3 +1,4 @@
+{{- if .Values.certificate.enabled }}
 apiVersion: getambassador.io/v1
 kind: TLSContext
 metadata:
@@ -9,3 +10,4 @@ spec:
   hosts:
     - {{ template "drupal.domain" . }}
   secret: {{ .Release.Name }}-tls-cert
+{{- end }}

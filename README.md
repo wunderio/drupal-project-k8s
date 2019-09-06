@@ -24,18 +24,24 @@ Have a look at the file for details, but in short this is how it works:
 
 # Secrets
 
-Project can override values and do file encryption using [mozilla sops](https://github.com/mozilla/sops/releases)
-1. Import PGP key
-`# gpg --import ~/.ssh/silta-gpg.asc`
-2. Move keys to the secring (sops currently supports pgp1)
-`gpg --export-secret-keys >~/.gnupg/secring.gpg`
-3. Edit secrets file
-`sops silta/secrets.yml`
+Project can override values and do file encryption using openssl.
+Encryption key has to be identical to the one in circleci context.
 
-Troubleshooting:
- - Check the sops version. Has to be at least 3. Do *not* install via pip.
- - "`Could not establish connection with gpg-agent`":
-   execute `export GPG_AGENT_INFO="$(gpgconf --list-dirs agent-socket):0:1"`
+Decrypting secrets file:
+```
+openssl enc -d -aes-256-cbc -pbkdf2 -in silta/secrets -out silta/secrets.dec
+```
+
+Encrypting secrets file:
+```
+openssl aes-256-cbc -pbkdf2 -in silta/secrets.dec -out silta/secrets
+```
+
+Secrets can be attached to circleci `drupal-build-deploy` job like this
+```
+decrypt_files: silta/secrets
+silta_config: silta/silta.yml,silta/secrets
+```
 
 ## GDPR sanitization
 

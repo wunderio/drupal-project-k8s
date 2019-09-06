@@ -39,6 +39,34 @@ autoscaling:
 #   www:        www.example.com
 exposeDomains: {}
 
+# Example of exposing 2 additional domains for this deployment, each with its own certificate
+# exposeDomains:
+#   production:
+#     hostname: production.example.com
+#     certificate:
+#       # Possible types: letsencrypt, selfsigned, custom
+#       type: custom
+#       # Only when certificate type is custom, these 2 values (crt,key) are need.
+#       # Provide both as plaintext (starts with '----BEGIN ', for example) 
+        # WARNING: Incorrect certificates will break deployment. 
+#       # Public key of certificate
+#       crt:
+#       # Private key of certificate
+#       key:       
+#   www:
+#     hostname: www.example.com
+#     certificate:
+#       type: selfsigned
+
+certificate:
+  # Enable HTTPS for this deployment
+  enabled:  true
+  # Possible types: letsencrypt, selfsigned, custom
+  type: selfsigned
+  # Only when certificate type is custom
+  # key: ""
+  # crt: ""
+
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'

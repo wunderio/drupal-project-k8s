@@ -37,7 +37,7 @@ Encrypting secrets file:
 openssl aes-256-cbc -pbkdf2 -in silta/secrets.dec -out silta/secrets
 ```
 
-Secrets can be attached to circleci `drupal-build-deploy` job like this
+Secret values can be attached to circleci `drupal-build-deploy` job like this
 ```
 decrypt_files: silta/secrets
 silta_config: silta/silta.yml,silta/secrets

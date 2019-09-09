@@ -3,3 +3,9 @@
 #
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
+
+referenceData:
+  enabled: true
+
+  # The name of the environment from which reference data will be copied.
+  referenceEnvironment: 'feature/cluster-change'

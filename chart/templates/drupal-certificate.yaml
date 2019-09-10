@@ -1,0 +1,63 @@
+# TODO:
+# - SSL NOTES 
+# - Custom certs
+# - Values switch 4 CertificateIssuer
+# - test REMOTE_ADDR trough varnish
+# - test REMOTE_ADDR in drupal
+# - Remove ambassador
+# - ambassador tests to traefik
+# - ingress for silta-cluster/deployment-remover
+
+{{- if .Values.ssl.enabled }}
+{{- if has .Values.ssl.issuer (list "selfsigned" "letsencrypt" "letsencrypt-staging") }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Release.Name }}-tls
+  dnsNames:
+  - {{ template "drupal.domain" . }}
+  issuerRef:
+    name: {{ .Values.ssl.issuer }}
+    kind: ClusterIssuer
+  acme:
+    config:
+      - http01:
+          ingress: {{ .Release.Name }}-drupal
+        domains:
+          - {{ template "drupal.domain" . }}
+---
+{{- end }}
+{{- end }}
+
+{{- range $index, $domain := .Values.exposeDomains }}
+{{- if $domain.ssl }}
+{{- if $domain.ssl.enabled }}
+{{- if has $domain.ssl.issuer (list "selfsigned" "letsencrypt" "letsencrypt-staging") }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  dnsNames:
+  - {{ $domain.hostname }}
+  issuerRef:
+    name: {{ $domain.ssl.issuer }}
+    kind: ClusterIssuer
+  acme:
+    config:
+      - http01:
+          ingress: {{ $.Release.Name }}-drupal
+        domains:
+          - {{ $domain.hostname }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

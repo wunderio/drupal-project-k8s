@@ -10,34 +10,3 @@ spec:
   selector:
     {{- include "drupal.release_labels" . | nindent 4 }}
     deployment: drupal
-
----
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: {{ .Release.Name }}-drupal
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    ingress.kubernetes.io/ssl-redirect: "false"
-spec:
-  rules:
-  - host: {{ template "drupal.domain" . }}
-    http:
-      paths:
-        - path: /
-          backend:
-            serviceName: {{ include "drupal.servicename" . }}
-            servicePort: 80
-            namespace: {{ .Release.Namespace }}
-  {{- range $index, $domain := .Values.exposeDomains }}
-  - host: {{ $domain.hostname }}
-    http:
-      paths:
-        - path: /
-          backend:
-            serviceName: {{ include "drupal.servicename" $ }}
-            servicePort: 80
-            namespace: {{ $.Release.Namespace }}
-   {{- end }}
-  

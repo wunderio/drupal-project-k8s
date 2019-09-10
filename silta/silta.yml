@@ -9,3 +9,18 @@ referenceData:
 
   # The name of the environment from which reference data will be copied.
   referenceEnvironment: 'feature/cluster-change'
+
+exposeDomains:
+  domain-test-1:
+    hostname: domain-test-1.silta-test.wdr.io
+  domain-test-2:
+    hostname: domain-test-2.silta-test.wdr.io
+    ssl:
+      enabled: true
+      issuer: letsencrypt
+  domain-test-3:
+    hostname: domain-test-3.silta-test.wdr.io
+    ssl:
+      enabled: true
+      issuer: letsencrypt-staging
+

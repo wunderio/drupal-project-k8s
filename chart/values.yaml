@@ -41,6 +41,15 @@ autoscaling:
 #     hostname: www.example.com
 exposeDomains: {}
 
+ssl:
+  # Enable HTTPS for this deployment
+  enabled:  true
+  # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  issuer: letsencrypt-staging
+  # Only when certificate type is custom
+  # key: ""
+  # crt: ""
+
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'

@@ -11,75 +11,76 @@ referenceData:
   referenceEnvironment: 'feature/cluster-change'
 
 exposeDomains:
-  domain-test-1:
-    hostname: domain-test-1.silta-test.wdr.io
-  domain-test-2:
-    hostname: domain-test-2.silta-test.wdr.io
+  domain-test-nossl:
+    hostname: domain-test-nossl.silta-test.wdr.io
+  domain-test-letsencrypt:
+    hostname: domain-test-letsencrypt.silta-test.wdr.io
     ssl:
       enabled: true
       issuer: letsencrypt
-  domain-test-3:
-    hostname: domain-test-3.silta-test.wdr.io
+  domain-test-letsencrypt-staging:
+    hostname: domain-test-letsencrypt-staging.silta-test.wdr.io
     ssl:
       enabled: true
       issuer: letsencrypt-staging    
-  domain-test-4:
-    hostname: domain-test-4.silta-test.wdr.io
+  domain-test-custom:
+    hostname: domain-test-custom.silta-test.wdr.io
     ssl:
       enabled: true
       issuer: custom
       key: |
         -----BEGIN PRIVATE KEY-----
-        MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCto2h79K1PPerY
-        VKi1vmKTV5+TPOLT7BQXLuc/+i9BNZQxFHrMFSTFZnO2h6LqkZqX9DNxN5Uvc0Zm
-        lgX3M66B1sgiDcSjQrG8XwHaAemhycaoofLMTDf2nF5vb/R6xnBHR2yCZgQOTZYA
-        mUAySwIGrCknggHP2d4gwzZ9SDOsYWKU7Z0OQI9pvDjBJ6KQZqrMEV3iMqtHmSRz
-        bKGvBg6ibmcJ8TY7Ja6Dcfm7vMgTPcTTLU3qXR2SEUqVnMzKq+niOX4ZxYN+X7hT
-        vAaRLO9o4Z6DSPnBPscji+IMQsRmL96p9RMeVNfVAqFrQSuTAZhjbAe0Q8AW2BlK
-        r8bntB0HAgMBAAECggEAI4uYEAf+koIyWSa7grj+pPsDB7knFgr18ekAHfCxS8AU
-        Hhf7K1wIswBOH8eUakB0TTcIcNzYBWarusRrZDeIObwmLBJ1dpZonA826dIKabxM
-        lqjQc1IHAszv6BAbFCcbRPwyEl+f5O2tD2JP6fvA5mzH3/aVOF95QWu08+Cb82WF
-        3AVTp6+Ii9ObspiPwXYchnjqkbv5hzhXyzaIc751a/vaTyTkbcVCzenV6FejJKNb
-        +I6EpKmbgP1Zcz0bEl1KNHU94a8c5BoVesF11+irl3JUb2sm46F0gWgHwugsQXoI
-        D4+kuv+zJwRFtcKydfikK1Q+v5ML9BlIwRC0RjAJwQKBgQDWGbcXPbRc8botc2JH
-        gKzRY/4Og78gi+Vtqq/+pDIkRp8ZkMbhw404N0myUN2qcQkCEfJrE7hpa6W8m35O
-        0vUPehhYLrafJ3nKBaFhWsUU20KpeLWpFlBrNXv86BKA6XnXA+3Tf+esQ6OOFrml
-        4/jFjcoUx2xyV+WaBs2K0McGTQKBgQDPnpFblixTh83/lW/TKUKDOPRNLmSsGnbS
-        9QnPRLRLPz0+6f3W72V3AAweKNHEtSnpJhYmZz1apUJKpUVzcdSIjRULOW1CUAxe
-        kNV7W/yfx4QrMzBtit4Fx1qsTFZxZ4ZfZNnUGa+cGRdkC42fxlTN37MovS3Keuqe
-        g6pC+uiCowKBgQCW+LkfvVYiuB3FkPh7XSP/3xe2Gna6t4tHwrWpxRTKebYU6/8i
-        EafSPUJNaDJ2zpBAknEzykseo1bSYX82jBFcIYdrHz2NiuOZblD2+m/AnkAqisDm
-        g6Kfhq5wjyEFIB3XXaDlo+q0kVmShznP3ap9e9dEwb8Z/hscerGTsla1fQKBgQCL
-        X/xeikqJbKJaUBw4mfsfki1WXq2QZ1ebOIn0TT/nP7XCtVwFXMI1h5+a43YmYiOX
-        c0ztTOMAJe6Bo78ix6iQXn1hApUZLhmPphTZ8h99t3c/dOausslnAbQZ9EkXahLn
-        mREt9GxSEvoD3Emfl4m4htKDp7PEuI0mCmdS/ZL2lwKBgCFrLGlDmZRyUZqG4W1U
-        60+58PKkrTd+v5AcKftc7YwtP07CLhcJkTtn2ya7FySbcDAIjpPUu/G/hAf8ApAh
-        ZtfcT1aZDsl3obPjT588KJtRaGyQs53rmuYDU6DLEwcZFMKdaJ91Lp4RIvOIUOkK
-        Guxo+tWjn6o1kOYAEEDpa5D/
+        MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1AnQnJXBJWw3A
+        QaIeGYtADheidJkuBemXYVv1LQd7+RursGdHvWK9uzJ+COpn2Eq3k6kKR//Rh+Oa
+        RlRSh3GseG1Pswjh+Ieg1dAwVXgl1TpoQfm8iYWiKl/8KdD8ww/2dEZ+SMGDtXyM
+        jIMIgTAY15KnyG1aGdQqXOMlfMO+CGk9xR9wWtILva33s38BLX62s3Tykry0SOog
+        uD3Fp7n6QsgUBaYB4E8MY3v6kykoFsxKHMe/1PizrSW8teZQqZ7QNWnD9L46OWbE
+        E4YePmJ+WPPJq/2wx707sbfB9kSVf+Gj/A1+um5Zfv6eJsrTn27A/16v35JkYhcH
+        o5Q+pSWZAgMBAAECggEAIzTd+Ls8ctgl/Y4GhUo8nnHfQPbi0GPQAmSqaS6f9QoH
+        ysYd4INCkFq3wHHlfdtA9SHgUCKe7Fc8+sXRItg7UOt/f2/4O1OGtc7AlpYZL2qg
+        2KR0eapZ9qe9UaOkhXU/RpVpHKj0ErUbC49M8TuHal2LpdzDADJj5PV6LNFulShj
+        tdTLyhrw07k/qCPuuBLvWQ+n4JJehBQt2UjdlWBFyejLP0E/aCtMzj3pLO1+8lhf
+        2A97IYReZnWn4rTHyz8rfO2c8rHzeuF2+/aQa/PDTQqRHg4G1o9AptkBMJnvVWQf
+        TVWq2LHtdf1qLAMk2sETKdC/GNBoaF4KZ4OdUR+svQKBgQDm6iLo91C7CAPzgmJ8
+        Wgn/Aw1oWmCgVKtuhPVpHO5yUhdPoQ50xjcIc1jaA6CbKDRrzCqbWqHqeFTe5RL7
+        Vwod+BzRHSxGjSIOdhAONaxx23epRqaUdBRl1vNa6hNmSmkGQCY2OzHDzzWE1KQu
+        ckPrWrjIBxGmYT4dFblACTDPdwKBgQDIrG5iwhZXjGjyPdCZ+rYtgGBSW9xqC9B0
+        ke0Rd01PPqQlpS8CnJajnLPOB8OAm3ZJG0A2dP6uLXI3nK3QH5S5VgkYNqksphp1
+        5hJ7nQ2/YE6ZujTuE06uK7wDHqL8MMqRNrWGAATRLoy1/OWLDPMK16/oBmwDF6Lt
+        M3yJp8SXbwKBgFee2IhV8AhITleETiKpd8mQOvIx+SBdgH97bDPqioBOrhHFJ1sg
+        K5nFSx3O6o51fw64diJlDbOO3YWGnuFIccpVb3nZ/Ab5Xsbl/cmmjDzX7lwJNwR1
+        15edLNJ+p8XUzm1Uwisp4wROCBzTI0mMikEwN5WPOR9NHuiiaZzm3+KZAoGBALC2
+        p75wDBysmP45USlHjoYjNq9QFZmNLdR5bLqkxH+0Ofisreku27jYlb4pOBBY1qEq
+        TjGmdWAMxTgT0Twlk2JiUT/xYqje3Q5VvJD+jMyqkoztXQ8KEY9vE/HrWLuce8XE
+        17VY7uUGiQL54WnBzYUOyukYPqW6es9HN7RA+O4hAoGAQk3WeMh448BOUxJRDLRK
+        IitxEdJ2l0wZst0rnP4RrvPAgGb0M0rsxAn37cD7b1Q7VhsIkckJfsRZyGTEWgQ7
+        RTwYhJdrUcoG+FtCbuhNJX386SJEeGDKgfKlxa4DYGIIo4o2HCCk95SU4Fy5gemW
+        N/a90beSt0vJ6Cy+jMCVQ0s=
         -----END PRIVATE KEY-----
       crt: |
         -----BEGIN CERTIFICATE-----
-        MIIEDTCCAvWgAwIBAgIUZdu3E02Eo3DgTrrc6zK3xNCd3/QwDQYJKoZIhvcNAQEL
-        BQAwgZUxCzAJBgNVBAYTAkxWMQ8wDQYDVQQIDAZMYXR2aWExETAPBgNVBAcMCFZh
-        bG1pZXJhMQ8wDQYDVQQKDAZXdW5kZXIxKDAmBgNVBAMMH2RvbWFpbi10ZXN0LTQu
-        c2lsdGEtdGVzdC53ZHIuaW8xJzAlBgkqhkiG9w0BCQEWGGphbmlzLmJlYnJpdGlz
-        QHd1bmRlci5pbzAeFw0xOTA5MTExMjU3MjlaFw0yMDA5MTAxMjU3MjlaMIGVMQsw
-        CQYDVQQGEwJMVjEPMA0GA1UECAwGTGF0dmlhMREwDwYDVQQHDAhWYWxtaWVyYTEP
-        MA0GA1UECgwGV3VuZGVyMSgwJgYDVQQDDB9kb21haW4tdGVzdC00LnNpbHRhLXRl
-        c3Qud2RyLmlvMScwJQYJKoZIhvcNAQkBFhhqYW5pcy5iZWJyaXRpc0B3dW5kZXIu
-        aW8wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCto2h79K1PPerYVKi1
-        vmKTV5+TPOLT7BQXLuc/+i9BNZQxFHrMFSTFZnO2h6LqkZqX9DNxN5Uvc0ZmlgX3
-        M66B1sgiDcSjQrG8XwHaAemhycaoofLMTDf2nF5vb/R6xnBHR2yCZgQOTZYAmUAy
-        SwIGrCknggHP2d4gwzZ9SDOsYWKU7Z0OQI9pvDjBJ6KQZqrMEV3iMqtHmSRzbKGv
-        Bg6ibmcJ8TY7Ja6Dcfm7vMgTPcTTLU3qXR2SEUqVnMzKq+niOX4ZxYN+X7hTvAaR
-        LO9o4Z6DSPnBPscji+IMQsRmL96p9RMeVNfVAqFrQSuTAZhjbAe0Q8AW2BlKr8bn
-        tB0HAgMBAAGjUzBRMB0GA1UdDgQWBBTdDJk1tuHsrK+VIOCVX+0mNMMIuzAfBgNV
-        HSMEGDAWgBTdDJk1tuHsrK+VIOCVX+0mNMMIuzAPBgNVHRMBAf8EBTADAQH/MA0G
-        CSqGSIb3DQEBCwUAA4IBAQAFDWQDOsvxORSVLvF/9kSCy7E1PRocKgAJ6g5eDKoO
-        EueHCWmuUFJOVZ4gpWB4vxBq/IawdHSke20z/CBHQHQ4bzb5HMMviq0u3msGjEWE
-        f4k+to7xsoUKyMpZgEjXpqBimXNpcGBJpuKgz23w+zhtpj7OpOBJ90BfRS+kusAD
-        2RAPmramHm/xURfy7ydAg7dI2u9bh8eNg3w9EN5HtJVQx8E9yRbKqr+fuggcYxUS
-        6n/5KFdMq2+Kypsi/Tbcw9cvNPUYogGTaa6jBZKMeWdlUDdYPtJh2w9nFQIWQdBf
-        f4GmHFoWjxlht41L0pKpPf7DrtXg9981KtpXQnfxVdiG
+        MIIDPzCCAiegAwIBAgIUe0NEJnh4ffNBsdKzT5/PTlFRoQYwDQYJKoZIhvcNAQEL
+        BQAwLzEtMCsGA1UEAwwkZG9tYWluLXRlc3QtY3VzdG9tLnNpbHRhLXRlc3Qud2Ry
+        LmlvMB4XDTE5MDkxMjEyMTk0MVoXDTIwMDkxMTEyMTk0MVowLzEtMCsGA1UEAwwk
+        ZG9tYWluLXRlc3QtY3VzdG9tLnNpbHRhLXRlc3Qud2RyLmlvMIIBIjANBgkqhkiG
+        9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtQJ0JyVwSVsNwEGiHhmLQA4XonSZLgXpl2Fb
+        9S0He/kbq7BnR71ivbsyfgjqZ9hKt5OpCkf/0YfjmkZUUodxrHhtT7MI4fiHoNXQ
+        MFV4JdU6aEH5vImFoipf/CnQ/MMP9nRGfkjBg7V8jIyDCIEwGNeSp8htWhnUKlzj
+        JXzDvghpPcUfcFrSC72t97N/AS1+trN08pK8tEjqILg9xae5+kLIFAWmAeBPDGN7
+        +pMpKBbMShzHv9T4s60lvLXmUKme0DVpw/S+OjlmxBOGHj5ifljzyav9sMe9O7G3
+        wfZElX/ho/wNfrpuWX7+nibK059uwP9er9+SZGIXB6OUPqUlmQIDAQABo1MwUTAd
+        BgNVHQ4EFgQUlTqJ/NfTuaLzaH72A8XUr5dRxqowHwYDVR0jBBgwFoAUlTqJ/NfT
+        uaLzaH72A8XUr5dRxqowDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+        AQEAcpXxKljcCgs7et0b2YYC63HJkgj4x2OWrHSP1grUoJ8QTmrsZA+Swkc4VYiM
+        3nWLR/oc/uffRYKisRGnKhwJbze6rDA4WUJPAKUJEkg6PyxfzNDOubV+4Y/AbWO2
+        bqn0qROgjFyXnoapWxbzAUdtY6j0nr3ut09A0rU9syxVSK5wKEa6w1eGaCoHFzFm
+        seH7IMCC5v7q+qrIf9npdhmGU5xEu6O4fbGkBDYZEnYlAleGVHWB3DzttSXFJE1Z
+        y31po8/IgxJd+/PaiSW9/GBGQ+o8VLr+tBEeQ+LFpdWlNBKJJnwYRxdRq/Kqmoec
+        jyj9OmdjZTJAwwqDdcs6TaRXxQ==
         -----END CERTIFICATE-----
 
+  domain-test-selfsigned:
+    hostname: domain-test-selfsigned.silta-test.wdr.io
+    ssl:
+      enabled: true
+      issuer: selfsigned

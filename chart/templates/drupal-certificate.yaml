@@ -1,7 +1,8 @@
 # TODO:
 # - SSL NOTES 
-# - Custom certs
-# - Values switch 4 CertificateIssuer
+# + Custom certs
+# + Values switch 4 CertificateIssuer
+# - selfsigned cert
 # - test REMOTE_ADDR trough varnish
 # - test REMOTE_ADDR in drupal
 # - Remove ambassador
@@ -30,8 +31,21 @@ spec:
         domains:
           - {{ template "drupal.domain" . }}
 ---
+{{- else if eq .Values.ssl.issuer "custom" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-tls
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.ssl.crt | b64enc }}
+  tls.key: {{ .Values.ssl.key | b64enc }}
+---
 {{- end }}
-{{- end }}
+
+# Certificates for exposeDomains 
 
 {{- range $index, $domain := .Values.exposeDomains }}
 {{- if $domain.ssl }}
@@ -57,6 +71,20 @@ spec:
         domains:
           - {{ $domain.hostname }}
 ---
+{{- else if eq $domain.ssl.issuer "custom" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-tls-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+type: kubernetes.io/tls
+data:
+  ca.crt: {{ $domain.ssl.ca | default "" | b64enc }}
+  tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
+  tls.key: {{ $domain.ssl.key | default "" | b64enc }}
+---
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

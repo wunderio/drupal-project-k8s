@@ -23,10 +23,14 @@ workflows:
           # Use a local chart during development.
           chart_name: "./chart"
           chart_repository: ""
+          silta_config: silta/silta.yml
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build
           pre-release:
+            - run:
+                name: Add codecentric repo for mailhog
+                command: helm repo add codecentric https://codecentric.github.io/helm-charts
             - run:
                 name: Build local helm dependencies
                 command: helm dependency build ./chart

@@ -22,7 +22,7 @@ replicas: 1
 
 # Enable autoscaling using HorizontalPodAutoscaler
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 3
   metrics:
@@ -30,17 +30,15 @@ autoscaling:
       resource:
         name: cpu
         targetAverageUtilization: 80
-    - type: Resource
-      resource:
-        name: memory
-        targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
-#
-# Note that the key is only used for documentation purposes, for example:
-#
-#   production: example.com
-#   www:        www.example.com
+# Example of exposing 2 additional domains for this deployment, each with its own certificate
+# Note that the key is only used for documentation purposes.
+# exposeDomains:
+#   production:
+#     hostname: example.com
+#   www:
+#     hostname: www.example.com
 exposeDomains: {}
 
 # These variables are build-specific and should be passed via the --set parameter.
@@ -64,17 +62,23 @@ nginx:
       username: silta
       password: demo
 
-    # Trust X-Forwarded-For from these hosts for getting external IP 
-    realipfrom: 10.0.0.0/8
+  # Trust X-Forwarded-For from these hosts for getting external IP 
+  realipfrom: 10.0.0.0/8
 
-    # Add IP addresses that should be excluded from basicauth.
-    # Note that the key is only used for documentation purposes.
-    noauthips:
-      gke-internal: 10.0.0.0/8
+  # Define the internal network access.
+  # These are used below to allow internal access to certain files
+  # from trusted locations while not allowing access from the public internet.
+  # These addreses are also excluded from basicauth.
+  # Note that the key is only used for documentation purposes.
+  noauthips:
+    gke-internal: 10.0.0.0/8
 
   # Robots txt file blocked by default
   robotsTxt:
     allow: false
+
+  # Extra configuration to pass to nginx as a file
+  extraConfig: |
 
 # Configuration for everything that runs in php containers.
 php:
@@ -92,7 +96,8 @@ php:
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
     drupal:
-      schedule: '0 * * * *'
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
@@ -140,6 +145,10 @@ php:
   # The hashsalt can be provided if you need to import an existing database and preserve the ability for
   # users to log in. If not provided, a random value will be used.
   hashsalt: "template-hash-salt"
+
+  # Set whether Drupal errors are displayed.
+  # This is a useful override for development environments.
+  errorLevel: "verbose"
 
   # Custom php settings.
   php_ini:
@@ -198,20 +207,14 @@ referenceData:
   # The commands that is executed to export reference data.
   command: |
     if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+      # NFS doesn't support replacing files, so we delete them instead.
+      rm -f reference-data/*
 
-      if [ -d vendor/machbarmacher/gdpr-dump ]; then
+      # Export database dump.
+      drush sql-dump --gzip --result-file ../reference-data/db.sql
 
-        # NFS doesn't support replacing files, so we delete them instead.
-        rm -f reference-data/*
-
-        # Export database dump.
-        drush sql-dump --gzip --result-file ../reference-data/db.sql
-
-        # Export public files.
-        tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
-      else
-        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed."
-      fi
+      # Export public files.
+      tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
     else
       echo "Drupal is not installed, skipping reference database dump."
     fi
@@ -236,6 +239,31 @@ gdprDump:
     init:
       formatter: clear
 
+backup:
+  # Whether backups should be taken for the current environment.
+  enabled: false
+
+  # Cron schedule when backups should be taken, this is expected to take place daily.
+  # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+  schedule: '~ 2 * * *'
+
+  # How many daily backups to preserve.
+  retention: 7
+
+  # If specified, replace environment content with the given backup.
+  restoreId: null
+
+  # Specify how to restore a backup.
+  restoreCommand: |
+    # figure out how to restore
+
+  storage: 10G
+  storageClassName: silta-shared
+  csiDriverName: csi-rclone
+
+  # These tables will have their content ignored from the backups.
+  ignoreTableContent: '(cache|cache_.*)'
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 mariadb:
@@ -252,6 +280,17 @@ mariadb:
       requests:
         cpu: 50m
         memory: 128M
+
+varnish:
+  enabled: false
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+  # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
+  storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
+  # Inject custom code into vcl_recv subroutine
+  vcl_recv_extra: |
 
 elasticsearch:
   enabled: false
@@ -285,3 +324,22 @@ ambassador:
   config:
     prefix: /
     timeout_ms: 30000
+    use_websocket: true
+
+# TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
+mailhog:
+  enabled: false
+  resources:
+    requests:
+      cpu: 5m
+      memory: 10M
+
+# SMTP configuration passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
+smtp:
+  enabled: false
+  # How to Setup SparkPost as your SMTP Relay: https://www.sparkpost.com/blog/setup-sparkpost-smtp-relay/
+  # address: smtp.example.com:25
+  # tls: false
+  # starttls: false
+  # username: ""
+  # password: ""

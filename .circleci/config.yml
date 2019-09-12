@@ -37,8 +37,7 @@ workflows:
           context: global_nonprod
           filters:
             branches:
-              ignore: 
-                - production
+              ignore: production
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

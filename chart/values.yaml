@@ -81,12 +81,9 @@ nginx:
     listen       80;
     server_name  extra.test;
 
-    #charset koi8-r;
-    #access_log  /var/log/nginx/host.access.log  main;
-
     location / {
-        root   return 200;
-    }
+        return 200 'domain extra.test';
+    }}
 # Configuration for everything that runs in php containers.
 php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.

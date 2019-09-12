@@ -77,13 +77,7 @@ nginx:
 
   # Extra configuration to pass to nginx as a file
   extraConfig: |
-    server {
-    listen       80;
-    server_name  extra.test;
 
-    location / {
-        return 200 'domain extra.test';
-    }}
 # Configuration for everything that runs in php containers.
 php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.

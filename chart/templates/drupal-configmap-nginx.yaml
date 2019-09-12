@@ -130,9 +130,10 @@ data:
                                               
     map $http_x_forwarded_proto $fastcgi_https {                                                        
         default $https;                                            
-        http '';                          
+        http '';
         https on;                          
     }                                      
+
 
     server {                               
         server_name drupal;                          

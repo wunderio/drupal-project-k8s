@@ -6,7 +6,7 @@
 # + test REMOTE_ADDR trough varnish
 # + test REMOTE_ADDR in drupal
 # - test mailhog websockets (optional)
-# - Remove ambassador
+# + Remove ambassador
 # - ambassador tests to traefik
 # - remove ambassador from silta-cluster
 # - ingress for silta-cluster/deployment-remover

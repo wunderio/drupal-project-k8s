@@ -30,7 +30,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $.Release.Name }}-drupal-{{ $index | adler32sum | trunc 4 }}
+  name: {{ $.Release.Name }}-drupal-{{ $index }}
   annotations:
     kubernetes.io/ingress.class: traefik
     {{- if $domain.ssl }}
@@ -46,7 +46,7 @@ spec:
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
   tls:
-  - secretName: {{ $.Release.Name }}-tls-{{ $index | adler32sum | trunc 4 }}
+  - secretName: {{ $.Release.Name }}-tls-{{ $index }}
   {{- end }}
   {{- end }}
   rules:

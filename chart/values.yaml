@@ -35,17 +35,18 @@ autoscaling:
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
 # Note that the key is only used for documentation purposes.
 # exposeDomains:
-#   production:
-#     hostname: example.com
-#   www:
-#     hostname: www.example.com
+#   - hostname: example.com
+#   - hostname: www.example.com
+#   -   ssl:
+#   -     enabled: true
+#   -     issuer: letsencrypt-staging
 exposeDomains: {}
 
 ssl:
   # Enable HTTPS for this deployment
   enabled:  true
   # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
-  issuer: letsencrypt-staging
+  issuer: letsencrypt
   # Only when certificate type is custom
   # ca: |
   # key: |

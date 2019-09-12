@@ -1,12 +1,14 @@
 # TODO:
-# - SSL NOTES 
+# + SSL NOTES 
 # + Custom certs
 # + Values switch 4 CertificateIssuer
 # + selfsigned cert
-# - test REMOTE_ADDR trough varnish
+# + test REMOTE_ADDR trough varnish
 # + test REMOTE_ADDR in drupal
+# - test mailhog websockets (optional)
 # - Remove ambassador
 # - ambassador tests to traefik
+# - remove ambassador from silta-cluster
 # - ingress for silta-cluster/deployment-remover
 
 {{- if .Values.ssl.enabled }}

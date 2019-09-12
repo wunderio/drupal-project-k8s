@@ -91,3 +91,6 @@ varnish:
 nginx:
   noauthips:
     wk-telia: 95.68.56.125/32
+
+mailhog:
+  enabled: true

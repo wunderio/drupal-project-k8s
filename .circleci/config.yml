@@ -35,7 +35,7 @@ workflows:
                 name: Build local helm dependencies
                 command: helm dependency build ./chart
 
-          context: silta_test
+          context: global_nonprod
           filters:
             branches:
               ignore: production

@@ -48,9 +48,9 @@ ssl:
   # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
   issuer: letsencrypt
   # Only when certificate type is custom
-  # ca: |
-  # key: |
-  # crt: |
+  # ca: ""
+  # key: ""
+  # crt: ""
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:

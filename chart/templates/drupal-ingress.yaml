@@ -5,10 +5,10 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
     {{- if .Values.ssl.enabled }}
-    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     ingress.kubernetes.io/ssl-redirect: "true"
     {{- else }}
-    traefik.ingress.kubernetes.io/frontend-entry-points: http
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
 spec:
@@ -37,10 +37,10 @@ metadata:
     {{- if $domain.ssl.enabled }}
     traefik.ingress.kubernetes.io/frontend-entry-points: http,https
     ingress.kubernetes.io/ssl-redirect: "true"
+    {{- end }}
     {{- else }}
     traefik.ingress.kubernetes.io/frontend-entry-points: http
     ingress.kubernetes.io/ssl-redirect: "false"
-    {{- end }}
     {{- end }}
 spec:
   {{- if $domain.ssl }}

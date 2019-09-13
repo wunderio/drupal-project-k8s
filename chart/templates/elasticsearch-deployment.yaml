@@ -57,12 +57,12 @@ spec:
           httpGet:
             path: /
             port: 9200
-          initialDelaySeconds: 5
+          initialDelaySeconds: 30
         livenessProbe:
           httpGet:
             path: /
             port: 9200
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
         env:
         - name: discovery.type
           value: single-node

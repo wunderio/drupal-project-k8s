@@ -55,12 +55,12 @@ spec:
 {{ .Values.elasticsearch.resources | toYaml | indent 10 }}
         readinessProbe:
           httpGet:
-            path: /_cluster/health
+            path: /
             port: 9200
           initialDelaySeconds: 5
         livenessProbe:
           httpGet:
-            path: /_cluster/health?local=true
+            path: /
             port: 9200
           initialDelaySeconds: 10
         env:

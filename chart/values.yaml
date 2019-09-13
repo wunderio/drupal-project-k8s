@@ -305,6 +305,9 @@ elasticsearch:
     requests:
       cpu: 100m
       memory: 512Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
 
 # Memcache service overrides
 # see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml

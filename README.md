@@ -42,22 +42,3 @@ Secret values can be attached to circleci `drupal-build-deploy` job like this
 decrypt_files: silta/secrets
 silta_config: silta/silta.yml,silta/secrets
 ```
-
-## GDPR sanitization
-
-SQL data dump for developers is parsed with [GDPR Dump](https://github.com/machbarmacher/gdpr-dump) project.
-You can create a `/gdpr.json` file with [Faker](https://packagist.org/packages/fzaninotto/faker) formatters that will allow replacing data as it's dumped from database using `mysqldump` / `drush sql-dump` command.  
-
-```
-{
-  "users_field_data": {
-    "name": {"formatter": "name"},
-    "pass": {"formatter": "password"},
-    "mail": {"formatter": "email"},
-    "init": {"formatter": "clear"}
-  }
-} 
-```
-Available formatters listed in [GDPR Dump project documentation](https://github.com/machbarmacher/gdpr-dump#using-gdpr-replacements). 
-
-You can also add extra elements and attributes, like `_cookies`, `_description` or `_purpose` to enrich the Personal Data information. Just make sure it's marked or prefixed so that it does not mess up GDPR dump when it looks for table data replacements.

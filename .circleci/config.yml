@@ -29,8 +29,8 @@ workflows:
             - silta/npm-install-build
           pre-release:
             - run:
-                name: Add codecentric repo for mailhog
-                command: helm repo add codecentric https://codecentric.github.io/helm-charts
+                name: Add elastic repo for elasticsearch
+                command: helm repo add elastic https://helm.elastic.co
             - run:
                 name: Build local helm dependencies
                 command: helm dependency build ./chart

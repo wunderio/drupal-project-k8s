@@ -9,7 +9,7 @@ dependencies:
   repository: https://codecentric.github.io/helm-charts
   version: 3.0.1
 - name: elasticsearch
-  repository: https://helm.elastic.co
-  version: 7.3.0
-digest: sha256:8057a5c5fcd762f48f903df58352f83c0b2ce124907e46211865b9184d0edc98
-generated: "2019-09-19T11:58:56.633255+02:00"
+  repository: https://storage.googleapis.com/charts.wdr.io
+  version: 7.3.2
+digest: sha256:78fa8147fe35f0423e708d24933048c6a7f29c653cf9e323fef901dd4a0ec99a
+generated: "2019-09-20T21:44:51.737295+02:00"

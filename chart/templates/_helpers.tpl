@@ -111,6 +111,8 @@ imagePullSecrets:
 {{- define "drupal.env" }}
 - name: SILTA_CLUSTER
   value: "1"
+- name: ENVIRONMENT_NAME
+  value: "{{ .Values.environmentName }}"
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
@@ -132,7 +134,7 @@ imagePullSecrets:
 {{- end }}
 {{- if .Values.elasticsearch.enabled }}
 - name: ELASTICSEARCH_HOST
-  value: {{ .Release.Name }}-elastic
+  value: {{ .Release.Name }}-es
 {{- end }}
 {{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
 {{ include "smtp.env" . }}

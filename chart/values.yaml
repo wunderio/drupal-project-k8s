@@ -267,7 +267,7 @@ gdprDump:
     pass:
       formatter: password
     mail:
-      formatter: email
+      formatter: safeEmailDomain
     init:
       formatter: clear
 

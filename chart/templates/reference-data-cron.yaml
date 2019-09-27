@@ -26,7 +26,9 @@ spec:
                 subPath: gdpr-dump
             command: ["/bin/bash", "-c"]
             args:
-              - {{ .Values.referenceData.command | quote }}
+              - |
+                {{ include "drupal.extract-reference-data" . | nindent 16 }}
+
             resources:
               {{- .Values.php.resources | toYaml | nindent 14 }}
           restartPolicy: OnFailure

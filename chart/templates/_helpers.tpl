@@ -222,7 +222,42 @@ rm /app/web/sites/default/files/_installing
 
 {{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
-{{ .Values.referenceData.command }}
+{{ include "drupal.extract-reference-data" . }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+
+{{- define "drupal.extract-reference-data" -}}
+if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+
+  BACKUP_LOCATION="/app/reference-data"
+
+  # Figure out which tables to skip.
+  IGNORE_TABLES=""
+  IGNORED_TABLES=""
+  for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.referenceData.ignoreTableContent }}'` ;
+  do
+  IGNORE_TABLES="$IGNORE_TABLES --ignore-table='$DB_NAME.$TABLE'";
+  IGNORED_TABLES="$IGNORED_TABLES '$TABLE'";
+  done
+
+  # Take a database dump. We use the full path to bypass gdpr-dump
+  mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+
+  # Compress the database dump and copy it into the backup folder.
+  # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+  gzip -9 /tmp/db.sql
+  cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
+
+  {{ range $index, $mount := .Values.mounts -}}
+  {{- if eq $mount.enabled true -}}
+  # File backup for {{ $index }} volume.
+  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+  {{- end -}}
+  {{- end }}
+else
+  echo "Drupal is not installed, skipping reference database dump."
+fi
 {{- end }}

@@ -30,12 +30,6 @@ ports:
   mountPath: /etc/php7/php-fpm.d/www.conf
   readOnly: true
   subPath: www_conf
-{{ if ne $.Template.Name "drupal/templates/backup-cron.yaml" -}}
-- name: gdpr-dump
-  mountPath: /etc/my.cnf.d/gdpr-dump.cnf
-  readOnly: true
-  subPath: gdpr-dump
-{{- end }}
 - name: settings
   mountPath: /app/web/sites/default/settings.silta.php
   readOnly: true
@@ -53,11 +47,6 @@ ports:
 - name: php-conf
   configMap:
     name: {{ .Release.Name }}-php-conf
-{{ if ne $.Template.Name "drupal/templates/backup-cron.yaml" -}}
-- name: gdpr-dump
-  configMap:
-    name: {{ .Release.Name }}-gdpr-dump
-{{- end }}
 - name: settings
   configMap:
     name: {{ .Release.Name }}-settings

@@ -6,3 +6,6 @@
 
 elasticsearch:
   enabled: true
+
+referenceData:
+  referenceEnvironment: 'feature/smaller-reference-data'

@@ -242,7 +242,13 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   IGNORED_TABLES="$IGNORED_TABLES '$TABLE'";
   done
 
-  # Take a database dump. We use the full path to bypass gdpr-dump
+  echo $PATH
+  which mysqldump
+  ls /home/.composer/
+  ls /home/.composer/vendor/
+  ls /home/.composer/vendor/bin/
+
+  # Take a database dump.
   mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
   mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
 

@@ -231,22 +231,16 @@ rm /app/web/sites/default/files/_installing
 {{- define "drupal.extract-reference-data" -}}
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
-  BACKUP_LOCATION="/app/reference-data"
+  REFERENCE_DATA_LOCATION="/app/reference-data"
 
   # Figure out which tables to skip.
   IGNORE_TABLES=""
   IGNORED_TABLES=""
   for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.referenceData.ignoreTableContent }}'` ;
   do
-  IGNORE_TABLES="$IGNORE_TABLES --ignore-table='$DB_NAME.$TABLE'";
-  IGNORED_TABLES="$IGNORED_TABLES '$TABLE'";
+    IGNORE_TABLES="$IGNORE_TABLES --ignore-table='$DB_NAME.$TABLE'";
+    IGNORED_TABLES="$IGNORED_TABLES '$TABLE'";
   done
-
-  echo $PATH
-  which mysqldump
-  ls /home/.composer/
-  ls /home/.composer/vendor/
-  ls /home/.composer/vendor/bin/
 
   # Take a database dump.
   mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
@@ -255,12 +249,12 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   gzip -9 /tmp/db.sql
-  cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
+  cp /tmp/db.sql.gz $REFERENCE_DATA_LOCATION/db.sql.gz
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   # File backup for {{ $index }} volume.
-  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+  tar -czP --exclude=css --exclude=js --exclude=styles -f $REFERENCE_DATA_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
   {{- end -}}
   {{- end }}
 else

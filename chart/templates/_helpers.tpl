@@ -205,7 +205,7 @@ done
 {{- end -}}
 
 {{- define "drupal.post-release-command" -}}
-set -e
+set -ex
 
 {{ include "drupal.wait-for-db-command" . }}
 {{ if .Values.elasticsearch.enabled }}
@@ -229,6 +229,7 @@ rm /app/web/sites/default/files/_installing
 
 
 {{- define "drupal.extract-reference-data" -}}
+set -ex
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
   REFERENCE_DATA_LOCATION="/app/reference-data"

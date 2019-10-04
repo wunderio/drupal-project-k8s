@@ -3,9 +3,3 @@
 #
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
-
-elasticsearch:
-  enabled: true
-
-referenceData:
-  referenceEnvironment: 'feature/smaller-reference-data'

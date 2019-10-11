@@ -8,7 +8,7 @@ if [ $2 ]; then
     NAMESPACE=$2
 else
   # Get the namespace from the helm chart
-  NAMESPACE=`helm ls | grep $1 | awk '{print $(NF)}'`
+  NAMESPACE=`helm ls $1 | grep $1 | awk '{print $(NF)}'`
 fi
 
 if [ $NAMESPACE ]; then

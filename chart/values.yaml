@@ -234,7 +234,7 @@ referenceData:
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
-  ignoreTableContent: '(cache|cache_.*)'
+  ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
 
   storage: 1G
   storageClassName: silta-shared

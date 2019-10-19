@@ -205,7 +205,7 @@ done
 {{- end -}}
 
 {{- define "drupal.post-release-command" -}}
-set -ex
+set -e
 
 {{ include "drupal.wait-for-db-command" . }}
 {{ if .Values.elasticsearch.enabled }}

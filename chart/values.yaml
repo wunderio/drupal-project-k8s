@@ -135,8 +135,14 @@ php:
         cat reference-data/db.sql.gz | gunzip | drush sql-cli
 
         if [ -f reference-data/public_files.tar.gz ]; then
+          # Deprecated location, only there for backward compatibility.
           echo "Importing public files"
           tar xf reference-data/public_files.tar.gz
+        else
+          if [ -f reference-data/public-files.tar ]; then
+            echo "Importing public files"
+            tar xf reference-data/public-files.tar
+          fi
         fi
 
         drush cr

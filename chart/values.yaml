@@ -234,20 +234,7 @@ referenceData:
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
-  # The commands that is executed to export reference data.
-  command: |
-    if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-      # NFS doesn't support replacing files, so we delete them instead.
-      rm -f reference-data/*
-
-      # Export database dump.
-      drush sql-dump --gzip --result-file ../reference-data/db.sql
-
-      # Export public files.
-      tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
-    else
-      echo "Drupal is not installed, skipping reference database dump."
-    fi
+  ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
 
   storage: 1G
   storageClassName: silta-shared

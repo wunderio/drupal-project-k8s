@@ -105,8 +105,11 @@ php:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 50m
-      memory: 128M
+      cpu: 25m
+      memory: 256M
+    limits:
+      cpu: 1000m
+      memory: 256M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   # When overriding this value, make sure to include the `drush cron` command.
@@ -119,6 +122,9 @@ php:
           drush cron;
         fi
 
+      # Set a nodeSelector specifically for cron jobs.
+      nodeSelector: {}
+
   # Post-installation hook.
   # This is run every time a new environment is created.
   postinstall:
@@ -128,8 +134,10 @@ php:
         echo "Importing reference database dump"
         cat reference-data/db.sql.gz | gunzip | drush sql-cli
 
-        echo "Importing public files"
-        tar xf reference-data/public_files.tar.gz
+        if [ -f reference-data/public_files.tar.gz ]; then
+          echo "Importing public files"
+          tar xf reference-data/public_files.tar.gz
+        fi
 
         drush cr
         drush updatedb -y
@@ -142,7 +150,10 @@ php:
     resources:
       requests:
         cpu: 500m
-        memory: 256M
+        memory: 512M
+      limits:
+        cpu: 1000m
+        memory: 512M
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
@@ -176,6 +187,9 @@ php:
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
   drupalConfigPath: "config/sync"
 
+  # Set a restriction on where the php pod are provisioned.
+  # This can be used for example to get a static IP for egress traffic.
+  nodeSelector: {}
 
 # Configuration for everything that runs in shell container.
 shell:
@@ -295,17 +309,26 @@ mariadb:
       size: 1G
     resources:
       requests:
-        cpu: 50m
+        cpu: 25m
         memory: 512M
       limits:
         cpu: 1000m
         memory: 512M
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+          - key: cloud.google.com/gke-nodepool
+            operator: NotIn
+            values:
+            - static-ip
 
 varnish:
   enabled: false
   resources:
     requests:
-      cpu: 50m
+      cpu: 25m
       memory: 32Mi
   # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
@@ -321,6 +344,7 @@ elasticsearch:
 
   replicas: 1
   minimumMasterNodes: 1
+  clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
@@ -335,6 +359,16 @@ elasticsearch:
     limits:
       cpu: 1000m
       memory: 512Mi
+
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      preference:
+        matchExpressions:
+        - key: cloud.google.com/gke-nodepool
+          operator: NotIn
+          values:
+          - static-ip
 
 # Memcache service overrides
 # see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml

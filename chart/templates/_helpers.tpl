@@ -243,7 +243,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     IGNORED_TABLES="$IGNORED_TABLES $TABLE";
   done
 
-  # Take a database dump.
+  echo "Dump reference database."
   mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST $IGNORE_TABLES $DB_NAME > /tmp/db.sql
   mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
 
@@ -254,10 +254,13 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
-  # File backup for {{ $index }} volume.
+  echo "Dump reference files for {{ $index }} volume."
   tar -czP --exclude=css --exclude=js --exclude=styles -f $REFERENCE_DATA_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
   {{- end -}}
   {{- end }}
+
+  # List content of reference data folder
+  ls -lh $REFERENCE_DATA_LOCATION/*
 else
   echo "Drupal is not installed, skipping reference database dump."
 fi

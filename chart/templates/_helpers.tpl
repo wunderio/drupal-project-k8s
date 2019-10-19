@@ -255,7 +255,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   echo "Dump reference files for {{ $index }} volume."
-  tar -czP --exclude=css --exclude=js --exclude=styles -f $REFERENCE_DATA_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+  tar -cP --exclude=css --exclude=js --exclude=styles -f $REFERENCE_DATA_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
   {{- end -}}
   {{- end }}
 

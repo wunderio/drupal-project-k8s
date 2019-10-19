@@ -229,7 +229,7 @@ rm /app/web/sites/default/files/_installing
 
 
 {{- define "drupal.extract-reference-data" -}}
-set -ex
+set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
   REFERENCE_DATA_LOCATION="/app/reference-data"

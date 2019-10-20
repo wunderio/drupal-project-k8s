@@ -243,7 +243,7 @@ referenceData:
   ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
 
   # Matching files will not be included in reference data.
-  ignoreFiles: '(css|js|styles)'
+  ignoreFiles: '.*/(css|js|styles)/.*'
 
   # Files larger than this will not be included in reference data.
   maxFileSize: '5M'

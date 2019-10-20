@@ -257,10 +257,19 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
+  # File backup for {{ $index }} volume.
   echo "Dump reference files for {{ $index }} volume."
-  mountPath={{ $mount.mountPath }}
-  relativeMountPath="${mountPath/\/app\//}"
-  tar -cP --exclude=css --exclude=js --exclude=styles -f $REFERENCE_DATA_LOCATION/{{ $index }}.tar "$relativeMountPath"
+
+  # We need relative path to create a tarball.
+  relativeMountPath=$(realpath --relative-base . "{{ $mount.mountPath }}")
+
+  # Get a list of matching files, and put them in a tarball.
+  find "$relativeMountPath" \
+    -regextype posix-extended \
+    -type f \
+    -size -"{{ $.Values.referenceData.maxFileSize }} \"
+    -not -regex ".*/{{ $.Values.referenceData.ignoreFiles }}.*" \
+    -exec echo '"{}"' \; | xargs tar cvPf $REFERENCE_DATA_LOCATION/{{ $index }}.tar
   {{- end -}}
   {{- end }}
 

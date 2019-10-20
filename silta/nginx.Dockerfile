@@ -1,5 +1,5 @@
 # Dockerfile for building nginx.
-FROM wunderio/drupal-nginx:v0.1.2
+FROM wunderio/drupal-nginx:latest
 
 COPY . /app/web
 

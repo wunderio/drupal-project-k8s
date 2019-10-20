@@ -267,7 +267,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   find "$relativeMountPath" \
     -regextype posix-extended \
     -type f \
-    -size -"{{ $.Values.referenceData.maxFileSize }} \"
+    -size -"{{ $.Values.referenceData.maxFileSize }}" \
     -not -regex ".*/{{ $.Values.referenceData.ignoreFiles }}.*" \
     -exec echo '"{}"' \; | xargs tar cvPf $REFERENCE_DATA_LOCATION/{{ $index }}.tar
   {{- end -}}

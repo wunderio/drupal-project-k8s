@@ -17,7 +17,7 @@ if [ $NAMESPACE ]; then
     helm delete --purge $1
 
     echo "* Removing all resources tagged with this release"
-    kubectl delete all -l release=$1 -n $NAMESPACE --grace-period=0 --force
+    kubectl delete all -l release=$1 -n $NAMESPACE
 
     echo "* Doublecheck and remove the leftover resources"
     for type in deployment cronjob statefulset job pod pvc pv
@@ -28,7 +28,7 @@ if [ $NAMESPACE ]; then
         for resource in $(kubectl get $type -o custom-columns=:.metadata.name --namespace $NAMESPACE | grep $1);
 	do
 	    echo Removing $type $resource
-	    kubectl delete $type $resource --namespace=$NAMESPACE --grace-period=0 --force
+	    kubectl delete $type $resource --namespace=$NAMESPACE
 	done
     done
 

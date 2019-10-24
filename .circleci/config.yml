@@ -22,6 +22,7 @@ workflows:
                 elif [ ! -f gdpr.json ]; then
                   echo "machbarmacher/gdpr-dump is present but no gdpr.json was found."
                 fi
+          context: global_nonprod
 
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy

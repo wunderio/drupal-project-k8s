@@ -13,11 +13,6 @@ workflows:
             - run:
                 name: Helm unit tests
                 command: helm unittest ./chart
-            - silta/gcloud-login
-            - run:
-                name: Dry-run helm install
-                command: helm install --dry-run ./chart
-          context: global_nonprod
 
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
@@ -35,7 +30,9 @@ workflows:
             - run:
                 name: Build local helm dependencies
                 command: helm dependency build ./chart
-
+            - run:
+                name: Dry-run helm install
+                command: helm install --dry-run ./chart
           context: global_nonprod
           filters:
             branches:

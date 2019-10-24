@@ -13,6 +13,7 @@ workflows:
             - run:
                 name: Helm unit tests
                 command: helm unittest ./chart
+            - silta/gcloud-login
             - run:
                 name: Dry-run helm install
                 command: helm install --dry-run ./chart

@@ -10,7 +10,12 @@ workflows:
       - silta/drupal-validate:
           name: validate
           post-validation:
-            - run: helm unittest ./chart
+            - run:
+                name: Helm unit tests
+                command: helm unittest ./chart
+            - run:
+                name: Dry-run helm install
+                command: helm install --dry-run ./chart
             - run: |
                 if ! grep machbarmacher/gdpr-dump composer.json; then
                   echo "Please install machbarmacher/gdpr-dump for sanitized database dumps."

@@ -3,6 +3,11 @@
 #
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
+php:
+  env:
+    NEWRELIC_ENABLED: true
+    NEWRELIC_LICENSE: abv1234
+    NEWRELIC_LOG_LEVEL: warning
 
 varnish:
   enabled: true

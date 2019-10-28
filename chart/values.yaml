@@ -197,6 +197,10 @@ php:
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
 
+  newrelic:
+    enabled: true
+    license: '' # Overriden in secrets file
+
 # Configuration for everything that runs in shell container.
 shell:
   enabled: true

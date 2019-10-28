@@ -143,6 +143,17 @@ imagePullSecrets:
       key: hashsalt
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
+{{- if .Values.php.newrelic.enabled }}
+- name: NEWRELIC_ENABLED
+  value: "true"
+- name: NEWRELIC_LICENSE
+  value: "{{ .Values.php.newrelic.license }}"
+# Fake lagoon variables for amazee php image 
+- name: LAGOON_PROJECT
+  value: "{{ .Release.Namespace }}"
+- name: LAGOON_GIT_SAFE_BRANCH
+  value: "{{ .Values.environmentName }}"
+{{- end }}
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

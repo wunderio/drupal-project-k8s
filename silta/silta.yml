@@ -3,10 +3,6 @@
 #
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
-php:
-  newrelic:
-    enabled: true
-    license: '' # Overriden in secrets file
 
 varnish:
   enabled: true

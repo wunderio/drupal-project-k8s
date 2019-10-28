@@ -198,8 +198,8 @@ php:
   nodeSelector: {}
 
   newrelic:
-    enabled: true
-    license: '' # Overriden in secrets file
+    enabled: false
+    license: '' # Override in secrets file
 
 # Configuration for everything that runs in shell container.
 shell:

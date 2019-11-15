@@ -30,7 +30,7 @@ ports:
   mountPath: /etc/php7/php-fpm.d/www.conf
   readOnly: true
   subPath: www_conf
-- name: settings
+- name: config
   mountPath: /app/web/sites/default/settings.silta.php
   readOnly: true
   subPath: settings_silta_php
@@ -44,12 +44,9 @@ ports:
     claimName: {{ $.Release.Name }}-{{ $index }}
 {{- end }}
 {{- end }}
-- name: php-conf
+- name: config
   configMap:
-    name: {{ .Release.Name }}-php-conf
-- name: settings
-  configMap:
-    name: {{ .Release.Name }}-settings
+    name: {{ .Release.Name }}-drupal
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

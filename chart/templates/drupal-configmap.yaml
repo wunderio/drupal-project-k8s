@@ -1,10 +1,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-php-conf
+  name: {{ .Release.Name }}-drupal
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
+  gdpr-dump: |
+    [mysqldump]
+    gdpr-replacements='{{ .Values.gdprDump | toJson }}'
+
+  settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}
+
   php_ini: |
     [PHP]
     engine = On
@@ -58,7 +64,7 @@ data:
 
     [Date]
     date.timezone = Europe/Helsinki
-    
+
     [Pdo_mysql]
     pdo_mysql.cache_size = 2000
     pdo_mysql.default_socket =
@@ -146,15 +152,15 @@ data:
     opcache.log_verbosity_level = 2
 
     [igbinary]
-    igbinary.compact_strings=1                                           
-  
+    igbinary.compact_strings=1
+
 
   php-fpm_conf: |
     [global]
     error_log = /proc/self/fd/2
     log_level = {{ .Values.php.php_ini.loglevel }} ; Possible Values: alert, error, warning, notice, debug
     daemonize = no
-    include=/etc/php7/php-fpm.d/*.conf                                               
+    include=/etc/php7/php-fpm.d/*.conf
 
   www_conf: |
     [www]

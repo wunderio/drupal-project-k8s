@@ -1,6 +1,6 @@
 suite: drupal ConfigMaps
 templates:
-  - drupal-configmap-php.yaml
+  - drupal-configmap.yaml
   - drupal-configmap-nginx.yaml
 tests:
   - it: is a ConfigMap

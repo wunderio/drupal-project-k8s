@@ -18,15 +18,15 @@ ports:
   mountPath: {{ $mount.mountPath }}
 {{- end }}
 {{- end }}
-- name: php-conf
+- name: config
   mountPath: /etc/php7/php.ini
   readOnly: true
   subPath: php_ini
-- name: php-conf
+- name: config
   mountPath: /etc/php7/php-fpm.conf
   readOnly: true
   subPath: php-fpm_conf
-- name: php-conf
+- name: config
   mountPath: /etc/php7/php-fpm.d/www.conf
   readOnly: true
   subPath: www_conf

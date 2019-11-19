@@ -8,7 +8,7 @@ metadata:
 spec:
   schedule: {{ $job.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
-  backOffLimit: 3
+  startingDeadlineSeconds: 3600
   jobTemplate:
     spec:
       template:
@@ -24,15 +24,16 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
+                 set -ex
                  if [ ! {{ include "drupal.installation-in-progress-test" . }} ]
                  then
-                  {{ $job.command | nindent 18 -}}
+                  {{ $job.command | nindent 18 }}; 
                  else
                    exit 1
                  fi
             resources:
               {{- $.Values.php.resources | toYaml | nindent 14 }}
-          restartPolicy: OnFailure
+          restartPolicy: Never
           nodeSelector:
             {{ if $job.nodeSelector }}
             {{- $job.nodeSelector | toYaml | nindent 12 }}

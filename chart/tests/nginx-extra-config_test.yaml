@@ -1,6 +1,7 @@
 suite: additional nginx configuration file
 templates:
   - drupal-deployment.yaml
+  - drupal-configmap.yaml
 tests:
   - it: populates extraConfig variable and check if its configmap gets mad
     set:

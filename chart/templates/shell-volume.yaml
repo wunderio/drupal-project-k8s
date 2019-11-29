@@ -17,6 +17,7 @@ spec:
     volumeHandle: {{ .Release.Name }}-reference-data
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/sshd
+      umask: "077"
   {{- end }}
 ---
 apiVersion: v1

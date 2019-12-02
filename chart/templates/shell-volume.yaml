@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Release.Name }}-sshd
+  name: {{ .Release.Name }}-ssh-keys
   labels:
-    name: {{ .Release.Name }}-sshd
+    name: {{ .Release.Name }}-ssh-keys
 spec:
   accessModes:
     - ReadWriteMany
@@ -16,14 +16,14 @@ spec:
     driver: {{ .Values.shell.mount.csiDriverName }}
     volumeHandle: {{ .Release.Name }}-reference-data
     volumeAttributes:
-      remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/sshd
+      remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/ssh-keys
       umask: "077"
   {{- end }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-sshd
+  name: {{ .Release.Name }}-ssh-keys
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
@@ -36,6 +36,6 @@ spec:
 {{- if eq .Values.shell.mount.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-sshd
+      name: {{ .Release.Name }}-ssh-keys
 {{- end }}
 {{- end }}

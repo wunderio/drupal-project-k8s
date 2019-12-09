@@ -97,6 +97,8 @@ imagePullSecrets:
 {{- define "drupal.env" }}
 - name: SILTA_CLUSTER
   value: "1"
+- name: PROJECT_NAME
+  value: "{{ .Values.projectName | default .Release.Namespace }}"
 - name: ENVIRONMENT_NAME
   value: "{{ .Values.environmentName }}"
 {{- if .Values.mariadb.enabled }}
@@ -148,11 +150,6 @@ imagePullSecrets:
   value: "true"
 - name: NEWRELIC_LICENSE
   value: "{{ .Values.php.newrelic.license }}"
-# Fake lagoon variables for amazee php image 
-- name: LAGOON_PROJECT
-  value: "{{ .Release.Namespace }}"
-- name: LAGOON_GIT_SAFE_BRANCH
-  value: "{{ .Values.environmentName }}"
 {{- end }}
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}

@@ -9,3 +9,7 @@ varnish:
 
 elasticsearch:
   enabled: true
+
+php:
+  newrelic:
+    license: 'TEST-123' # Overriden in secrets file

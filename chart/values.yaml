@@ -47,6 +47,11 @@ autoscaling:
 #   -     issuer: letsencrypt-staging
 exposeDomains: {}
 
+# Add prefixes to the generated per-branch domains, to be used for projects that need to respond
+# on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
+# domainPrefixes: ['en', 'fi']
+domainPrefixes: []
+
 ssl:
   # Enable HTTPS for this deployment
   enabled:  true
@@ -151,6 +156,7 @@ php:
         drush updatedb -y
         if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
+          drush cr
         fi
       else
         printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
@@ -172,6 +178,7 @@ php:
         drush updatedb -y
         if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
+          drush cr
         fi
       fi
 

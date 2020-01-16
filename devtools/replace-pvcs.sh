@@ -11,6 +11,7 @@ pv_names=$(kubectl get pvc -n $namespace -l release=$release | grep silta-shared
 
 kubectl delete pvc -n $namespace $pvc_names &
 kubectl delete pv $pv_names &
+kubectl delete jobs -n $namespace -l release=$release &
 kubectl delete pods -n $namespace -l app=drupal,release=$release &
 
 until [[ -z $(kubectl get pvc -n $namespace -l release=$release | grep silta-shared) ]]

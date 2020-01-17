@@ -33,7 +33,8 @@ helm3 upgrade --install $target_release_name wunderio/drupal \
   $domain \
   --set referenceData.enabled=false \
   --set elasticsearch.volumeClaimTemplate.resources.requests.storage=1Gi \
-  --namespace=$namespace
+  --namespace=$namespace \
+  --no-hooks
 
 kubectl get statefulset -n "$namespace" -l "release=${target_release_name}" -o name | xargs -n 1 kubectl rollout status -n "$namespace"
 kubectl get deployment -n "$namespace" -l "release=${target_release_name}" -o name | xargs -n 1 kubectl rollout status -n "$namespace"

@@ -20,6 +20,6 @@ do
   sleep 1
 done
 
-~/Downloads/helm3 upgrade -n $namespace $release wunderio/drupal --no-hooks --reuse-values
+helm upgrade -n $namespace $release wunderio/drupal --no-hooks --reuse-values
 
 kubectl get deployment -n "$namespace" -l "release=$release" -o name | xargs -n 1 kubectl rollout status -n "$namespace"

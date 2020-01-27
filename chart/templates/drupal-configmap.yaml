@@ -237,6 +237,8 @@ data:
         add_header                  Strict-Transport-Security max-age=31536000;
         add_header                  X-XSS-Protection '1; mode=block';
 
+        map_hash_bucket_size 128;
+
         map $uri $no_slash_uri {
             ~^/(?<no_slash>.*)$ $no_slash;
         }
@@ -307,10 +309,21 @@ data:
         https on;
     }
 
+    {{- if .Values.nginx.redirects }}
+    # Custom redirects
+    map '$scheme://$host$request_uri' $redirect_uri {
+        {{- .Values.nginx.redirects | nindent 8 -}}
+    }
+    {{- end }}
 
     server {
         server_name drupal;
         listen 80;
+
+        # Redirects to specified path if map returns anything
+        if ($redirect_uri) {
+    	    return 301 $redirect_uri;
+        }
 
         root /app/web;
         index index.php;

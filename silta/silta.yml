@@ -9,3 +9,19 @@ varnish:
 
 elasticsearch:
   enabled: true
+
+exposeDomains:
+  - hostname: feature-redirects-exposedomain.drupal-project-k8s.silta.wdr.io
+    ssl:
+      enabled: true
+      issuer: letsencrypt-staging
+
+nginx:
+  redirects: |
+    /test1 / ;
+    /test2 /test2-redirect ;
+    http://feature-redirects.drupal-project-k8s.silta.wdr.io/test3 /test3-redirect ;
+    '~feature-redirects.drupal-project-k8s.silta.wdr.io/test4$' /test4-redirect ;
+    ~/test5$ /test5-redirect ;
+    ~/test6 /test6-redirect ;
+    http://feature-redirects-exposedomain.drupal-project-k8s.silta.wdr.io/test7 /test7-redirect ;

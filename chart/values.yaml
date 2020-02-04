@@ -42,9 +42,9 @@ autoscaling:
 # exposeDomains:
 #   - hostname: example.com
 #   - hostname: www.example.com
-#   -   ssl:
-#   -     enabled: true
-#   -     issuer: letsencrypt-staging
+#     ssl:
+#       enabled: true
+#       issuer: letsencrypt-staging
 exposeDomains: {}
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
@@ -112,7 +112,6 @@ php:
       cpu: 1m
       memory: 128M
     limits:
-      cpu: 1000m
       memory: 512M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
@@ -166,7 +165,6 @@ php:
         cpu: 500m
         memory: 512M
       limits:
-        cpu: 1000m
         memory: 512M
 
   # Post-upgrade hook.
@@ -174,7 +172,6 @@ php:
   postupgrade:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        drush cr
         drush updatedb -y
         if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
@@ -322,13 +319,14 @@ mariadb:
     user: drupal
   master:
     persistence:
+      # Database storage disk space allocation
+      # Request assistance from ops team after changing this on existing deployment.
       size: 1G
     resources:
       requests:
         cpu: 25m
         memory: 384M
       limits:
-        cpu: 1000m
         memory: 512M
     affinity:
       nodeAffinity:
@@ -377,7 +375,6 @@ elasticsearch:
       cpu: 200m
       memory: 512Mi
     limits:
-      cpu: 1000m
       memory: 1Gi
 
   nodeAffinity:

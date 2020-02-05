@@ -4,7 +4,7 @@ version: 0.3.0
 apiVersion: v2
 dependencies:
 - name: mariadb
-  version: 4.4.2
+  version: 7.3.x
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: memcached

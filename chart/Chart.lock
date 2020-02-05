@@ -1,7 +1,7 @@
 dependencies:
 - name: mariadb
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 4.4.2
+  version: 7.3.7
 - name: memcached
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 3.0.2
@@ -11,5 +11,5 @@ dependencies:
 - name: elasticsearch
   repository: https://helm.elastic.co
   version: 7.4.1
-digest: sha256:be9ac822ffbfd2bbc81594e113698a8911f9ea89f285aff7d7444845b5e8f7fc
-generated: "2020-01-22T10:29:48.720252+01:00"
+digest: sha256:b2d99beaa15e766318618c9cff525bcf7e63956795d73b860b666e869fc68db2
+generated: "2020-02-05T15:04:20.126058+01:00"

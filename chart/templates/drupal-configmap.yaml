@@ -310,9 +310,21 @@ data:
     }
 
     {{- if .Values.nginx.redirects }}
-    # Custom redirects
+    # Custom redirects with full url matching
     map '$scheme://$host$request_uri' $redirect_uri {
-        {{- .Values.nginx.redirects | nindent 8 -}}
+        {{- range .Values.nginx.redirects }}
+        {{- if contains "://" .from }}
+        {{ .from | squote }} {{ .to | squote }};
+        {{- end }}
+        {{- end }}
+    }
+    # Custom redirects with absolute path matching
+    map $request_uri $redirect_uri_local {
+        {{- range .Values.nginx.redirects }}
+        {{- if not ( contains "://" .from ) }}
+        {{ .from | squote }} {{ .to | squote }};
+        {{- end }}
+        {{- end }}
     }
     {{- end }}
 
@@ -323,6 +335,9 @@ data:
         # Redirects to specified path if map returns anything
         if ($redirect_uri) {
     	    return 301 $redirect_uri;
+        }
+        if ($redirect_uri_local) {
+    	    return 301 $redirect_uri_local;
         }
 
         root /app/web;

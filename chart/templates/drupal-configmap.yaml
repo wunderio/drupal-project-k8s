@@ -332,6 +332,7 @@ data:
         server_name drupal;
         listen 80;
 
+        {{- if .Values.nginx.redirects }}
         # Redirects to specified path if map returns anything
         if ($redirect_uri) {
     	    return 301 $redirect_uri;
@@ -339,6 +340,7 @@ data:
         if ($redirect_uri_local) {
     	    return 301 $redirect_uri_local;
         }
+        {{- end }}
 
         root /app/web;
         index index.php;

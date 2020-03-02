@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
     auto-downscale/down: "false"
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}"}}'
 spec:
   type: NodePort
   externalTrafficPolicy: Local

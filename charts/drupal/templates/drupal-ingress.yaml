@@ -78,3 +78,16 @@ spec:
 
 ---
 {{- end }}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-gcloud
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: {{ include "drupal.servicename" . }}
+          servicePort: 80

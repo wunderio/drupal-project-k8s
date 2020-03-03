@@ -4,9 +4,6 @@
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
 
-varnish:
-  enabled: true
-
 elasticsearch:
   enabled: true
 

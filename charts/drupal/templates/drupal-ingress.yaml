@@ -13,7 +13,7 @@ metadata:
     {{- end }}
 
     auto-downscale/services: {{ .Release.Name }}-drupal
-    auto-downscale/deployments: {{ .Release.Name }}-drupal
+    auto-downscale/deployments: {{ .Release.Name }}-drupal,{{ template "drupal.environment.hostname" . }}-shell
 spec:
   {{- if .Values.ssl.enabled }}
   tls:

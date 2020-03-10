@@ -13,7 +13,11 @@ metadata:
     {{- end }}
 
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" .Release.Time "UTC" }}
-    auto-downscale/services: {{ .Release.Name }}-drupal
+    auto-downscale/services: {{ if .Values.varnish.enabled -}}
+      {{ .Release.Name }}-drupal
+    {{- else -}}
+      {{ .Release.Name }}-drupal
+    {{- end}}
     auto-downscale/deployments: {{ .Release.Name }}-drupal,{{ template "drupal.environment.hostname" . }}-shell
 spec:
   {{- if .Values.ssl.enabled }}

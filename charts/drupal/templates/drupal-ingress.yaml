@@ -12,6 +12,7 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
 
+    auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" .Release.Time "UTC" }}
     auto-downscale/services: {{ .Release.Name }}-drupal
     auto-downscale/deployments: {{ .Release.Name }}-drupal,{{ template "drupal.environment.hostname" . }}-shell
 spec:

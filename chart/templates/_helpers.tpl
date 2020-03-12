@@ -19,7 +19,7 @@ ports:
 {{- end }}
 {{- end }}
 - name: config
-  mountPath: /etc/php7/php.ini
+  mountPath: /usr/local/etc/php/conf.d/silta.ini
   readOnly: true
   subPath: php_ini
 - name: config

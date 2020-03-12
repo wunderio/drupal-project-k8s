@@ -23,14 +23,6 @@ ports:
   readOnly: true
   subPath: php_ini
 - name: config
-  mountPath: /etc/php7/php-fpm.conf
-  readOnly: true
-  subPath: php-fpm_conf
-- name: config
-  mountPath: /etc/php7/php-fpm.d/www.conf
-  readOnly: true
-  subPath: www_conf
-- name: config
   mountPath: /app/web/sites/default/settings.silta.php
   readOnly: true
   subPath: settings_silta_php

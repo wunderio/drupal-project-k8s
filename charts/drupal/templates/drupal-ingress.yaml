@@ -18,7 +18,10 @@ metadata:
     {{- else -}}
       {{ .Release.Name }}-drupal
     {{- end}}
-    auto-downscale/deployments: {{ .Release.Name }}-drupal,{{ template "drupal.environment.hostname" . }}-shell
+    auto-downscale/deployments: {{ .Release.Name }}-drupal
+    {{- if .Values.shell.enabled -}}
+    ,{{ template "drupal.environment.hostname" . }}-shell
+    {{- end }}
 spec:
   {{- if .Values.ssl.enabled }}
   tls:

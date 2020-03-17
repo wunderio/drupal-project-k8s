@@ -109,7 +109,7 @@ php:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 3m
+      cpu: 5m
       memory: 128M
     limits:
       memory: 512M
@@ -127,6 +127,14 @@ php:
 
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
+
+      # Set resources specifically for cron jobs.
+      resources:
+        requests:
+          cpu: 500m
+          memory: 512M
+        limits:
+          memory: 512M
 
   # Post-installation hook.
   # This is run every time a new environment is created.
@@ -225,6 +233,10 @@ shell:
     storageClassName: silta-shared
     csiDriverName: csi-rclone
     storage: 1M
+
+  # Set a restriction on where the shell pod are provisioned.
+  # This can be used for example to get a static IP for egress traffic.
+  nodeSelector: {}
 
 # Configure the dynamically mounted volumes
 mounts:

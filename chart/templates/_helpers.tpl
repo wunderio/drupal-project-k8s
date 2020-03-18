@@ -267,16 +267,14 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # File backup for {{ $index }} volume.
   echo "Dump reference files for {{ $index }} volume."
 
-  # We need relative path to create a tarball.
-  relativeMountPath=$(realpath --relative-base . "{{ $mount.mountPath }}")
+  # Update reference data files.
+  rsync -rvu "{{ $mount.mountPath }}" \
+    --max-size="{{ $.Values.referenceData.maxFileSize }}" \
+    {{ range $folderIndex, $folderPattern := $.Values.referenceData.ignoreFolders -}}
+    --exclude="{{ $folderPattern }}" \
+    {{ end -}}
+    $REFERENCE_DATA_LOCATION/{{ $index }}
 
-  # Get a list of matching files, and put them in a tarball.
-  find "$relativeMountPath" \
-    -regextype posix-extended \
-    -type f \
-    -size -"{{ $.Values.referenceData.maxFileSize }}" \
-    -not -regex "{{ $.Values.referenceData.ignoreFiles }}" \
-    -exec echo '"{}"' \; | xargs tar cPf $REFERENCE_DATA_LOCATION/{{ $index }}.tar
   {{- end -}}
   {{- end }}
 

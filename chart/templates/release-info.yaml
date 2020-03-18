@@ -4,6 +4,5 @@ metadata:
   name: {{ .Release.Name }}-release
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
-    branchName: {{ regexReplaceAll "[^[:alnum:]]" .Values.branchName "-" | quote }}
 data: 
   branchName: {{ .Values.branchName | quote }}

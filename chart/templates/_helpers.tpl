@@ -221,11 +221,13 @@ set -e
 
 {{ if .Release.IsInstall }}
 touch /app/web/sites/default/files/_installing
+{{- if .Values.referenceData.enabled }}
+{{ include "drupal.import-reference-data" . }}
+{{- end }}
 {{ .Values.php.postinstall.command}}
 rm /app/web/sites/default/files/_installing
-{{ else }}
-{{ .Values.php.postupgrade.command}}
 {{ end }}
+{{ .Values.php.postupgrade.command}}
 
 {{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
@@ -274,7 +276,6 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     --exclude="{{ $folderPattern }}" \
     {{ end -}}
     $REFERENCE_DATA_LOCATION/{{ $index }}
-
   {{- end -}}
   {{- end }}
 
@@ -282,5 +283,27 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   ls -lh $REFERENCE_DATA_LOCATION/*
 else
   echo "Drupal is not installed, skipping reference database dump."
+fi
+{{- end }}
+
+{{- define "drupal.import-reference-data" -}}
+if [ -f reference-data/db.sql.gz ]; then
+
+  echo "Dropping old database"
+  drush sql-drop -y
+
+  echo "Importing reference database dump"
+  cat reference-data/db.sql.gz | gunzip | drush sql-cli
+
+  {{ range $index, $mount := .Values.mounts -}}
+  {{- if eq $mount.enabled true -}}
+  if [ -d "reference-data/{{ $index }}" ]; then
+    echo "Importing public files"
+    rsync -r "reference-data/{{ $index}}/" "{{ $mount.mountPath }}"
+  fi
+  {{- end -}}
+  {{- end }}
+else
+  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
 {{- end }}

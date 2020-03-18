@@ -53,6 +53,13 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "networkPolicy": { 
+      "type": "object",
+      "properties": {
+        "allowNamespaces": { "type": "array" }
+      },
+      "additionalProperties": false
+    },
     "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
     "ssl": { "type": "object" },

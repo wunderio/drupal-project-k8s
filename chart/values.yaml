@@ -36,6 +36,11 @@ autoscaling:
         name: cpu
         targetAverageUtilization: 80
 
+# Whitelist namespaces / projects that can connect containers in your project release.
+# silta-cluster and your current namespace is always whitelisted.
+# networkPolicy:
+#   allowNamespaces: ['silta-cluster']
+
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
 # Note that the key is only used for documentation purposes.

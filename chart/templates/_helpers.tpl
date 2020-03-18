@@ -243,9 +243,6 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
   REFERENCE_DATA_LOCATION="/app/reference-data"
 
-  # Clean up existing reference data.
-  rm -f $REFERENCE_DATA_LOCATION/*
-
   # Figure out which tables to skip.
   IGNORE_TABLES=""
   IGNORED_TABLES=""

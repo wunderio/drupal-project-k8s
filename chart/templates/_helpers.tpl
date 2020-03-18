@@ -295,8 +295,8 @@ if [ -f reference-data/db.sql.gz ]; then
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   if [ -d "reference-data/{{ $index }}" ]; then
-    echo "Importing public files"
-    rsync -r "reference-data/{{ $index}}/" "{{ $mount.mountPath }}"
+    echo "Importing {{ $index }} files"
+    rsync -r "reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
   fi
   {{- end -}}
   {{- end }}

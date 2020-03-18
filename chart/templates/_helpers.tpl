@@ -240,9 +240,6 @@ rm /app/web/sites/default/files/_installing
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-
-  REFERENCE_DATA_LOCATION="/app/reference-data"
-
   # Figure out which tables to skip.
   IGNORE_TABLES=""
   IGNORED_TABLES=""
@@ -259,7 +256,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   gzip -9 /tmp/db.sql
-  cp /tmp/db.sql.gz $REFERENCE_DATA_LOCATION/db.sql.gz
+  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
@@ -273,31 +270,31 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     --exclude="{{ $folderPattern }}" \
     {{ end -}}
     --delete
-    $REFERENCE_DATA_LOCATION/{{ $index }}
+    /app/reference-data/{{ $index }}
   {{- end -}}
   {{- end }}
 
   # List content of reference data folder
-  ls -lh $REFERENCE_DATA_LOCATION/*
+  ls -lh /app/reference-data/*
 else
   echo "Drupal is not installed, skipping reference database dump."
 fi
 {{- end }}
 
 {{- define "drupal.import-reference-data" -}}
-if [ -f reference-data/db.sql.gz ]; then
+if [ -f /app/reference-data/db.sql.gz ]; then
 
   echo "Dropping old database"
   drush sql-drop -y
 
   echo "Importing reference database dump"
-  cat reference-data/db.sql.gz | gunzip | drush sql-cli
+  cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
-  if [ -d "reference-data/{{ $index }}" ]; then
+  if [ -d "/app/reference-data/{{ $index }}" ]; then
     echo "Importing {{ $index }} files"
-    rsync -r "reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
+    rsync -r "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
   fi
   {{- end -}}
   {{- end }}

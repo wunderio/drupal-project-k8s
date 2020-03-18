@@ -12,6 +12,9 @@ projectName: ""
 # This name is mainly used to create nice subdomains for each environment.
 environmentName: ""
 
+# Repository branch name. This will be filled automatically by CI.
+branchName: ""
+
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []

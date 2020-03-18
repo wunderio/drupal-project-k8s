@@ -268,7 +268,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   echo "Dump reference files for {{ $index }} volume."
 
   # Update reference data files.
-  rsync -rvu "{{ $mount.mountPath }}" \
+  rsync -rvu "{{ $mount.mountPath }}/" \
     --max-size="{{ $.Values.referenceData.maxFileSize }}" \
     {{ range $folderIndex, $folderPattern := $.Values.referenceData.ignoreFolders -}}
     --exclude="{{ $folderPattern }}" \

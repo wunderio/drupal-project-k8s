@@ -26,7 +26,7 @@ tests:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
           pattern: 'foo'
-      - notMatchRegex:
+      - matchRegex:
           path: spec.template.spec.containers[0].args[0]
           pattern: 'bar'
 

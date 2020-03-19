@@ -273,9 +273,6 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     /app/reference-data/{{ $index }}
   {{- end -}}
   {{- end }}
-
-  # List content of reference data folder
-  ls -lh /app/reference-data/*
 else
   echo "Drupal is not installed, skipping reference database dump."
 fi

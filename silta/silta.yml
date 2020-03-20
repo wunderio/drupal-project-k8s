@@ -9,3 +9,7 @@ varnish:
 
 elasticsearch:
   enabled: true
+
+mounts:
+  private-files:
+    enabled: true

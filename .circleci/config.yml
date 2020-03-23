@@ -17,7 +17,7 @@ workflows:
           post-validation:
             - run:
                 name: Helm unit tests
-                command: helm unittest ./chart
+                command: helm unittest ./charts/drupal
 
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
@@ -26,7 +26,7 @@ workflows:
           executor: silta-latest
 
           # Use a local chart during development.
-          chart_name: "./chart"
+          chart_name: "./charts/drupal"
           chart_repository: ""
           silta_config: silta/silta.yml
           codebase-build:
@@ -38,10 +38,10 @@ workflows:
                 command: |
                   helm repo add elastic https://helm.elastic.co
                   helm repo add codecentric https://codecentric.github.io/helm-charts
-                  helm dependency build ./chart
+                  helm dependency build ./charts/drupal
             - run:
                 name: Dry-run helm install
-                command: helm install --dry-run --generate-name ./chart
+                command: helm install --dry-run --generate-name ./charts/drupal
           context: global_nonprod
           filters:
             branches:

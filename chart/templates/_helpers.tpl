@@ -271,7 +271,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     {{ end -}}
     --delete \
     /app/reference-data/{{ $index }}
-  {{- end -}}
+  {{ end -}}
   {{- end }}
 else
   echo "Drupal is not installed, skipping reference database dump."
@@ -293,7 +293,7 @@ if [ -f /app/reference-data/db.sql.gz ]; then
     echo "Importing {{ $index }} files"
     rsync -r "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
   fi
-  {{- end -}}
+  {{ end -}}
   {{- end }}
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"

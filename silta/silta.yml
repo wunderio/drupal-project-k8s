@@ -8,4 +8,4 @@ varnish:
   enabled: true
 
 elasticsearch:
-  enabled: false
+  enabled: true

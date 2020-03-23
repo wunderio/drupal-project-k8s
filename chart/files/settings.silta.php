@@ -66,8 +66,6 @@ $settings['reverse_proxy_addresses'] = [];
  * Override varnish config when varnish environment variables are defined.
  */
 if (getenv('VARNISH_ADMIN_HOST')) {
-  // $settings['reverse_proxy_addresses'][] = gethostbyname(getenv('VARNISH_ADMIN_HOST'));
-
   $config['varnish.settings']['varnish_version'] = 4;
   $config['varnish.settings']['varnish_control_terminal'] = getenv('VARNISH_ADMIN_HOST') . ':' . getenv('VARNISH_ADMIN_PORT');
   $config['varnish.settings']['varnish_control_key'] = trim(getenv('VARNISH_CONTROL_KEY'));

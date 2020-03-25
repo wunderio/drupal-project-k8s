@@ -219,15 +219,17 @@ set -e
 {{- end }}
 
 {{ include "drupal.wait-for-db-command" . }}
-{{ if .Values.elasticsearch.enabled }}
-{{ include "drupal.wait-for-elasticsearch-command" . }}
-{{ end }}
 
 {{ if .Release.IsInstall }}
 touch /app/web/sites/default/files/_installing
 {{- if .Values.referenceData.enabled }}
 {{ include "drupal.import-reference-db" . }}
 {{- end }}
+
+{{ if .Values.elasticsearch.enabled }}
+{{ include "drupal.wait-for-elasticsearch-command" . }}
+{{ end }}
+
 {{ .Values.php.postinstall.command}}
 rm /app/web/sites/default/files/_installing
 {{ end }}

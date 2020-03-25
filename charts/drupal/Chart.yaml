@@ -19,3 +19,6 @@ dependencies:
   version: 7.5.x
   repository: https://helm.elastic.co
   condition: elasticsearch.enabled
+- name: silta-release
+  version: 0.1.0
+  repository: file://../silta-release

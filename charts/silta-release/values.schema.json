@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "branchName": { "type": "string" },
+    "networkPolicy": {
+      "type": "object",
+      "properties": {
+        "allowNamespaces": { "type": "array" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

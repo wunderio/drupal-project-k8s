@@ -5,4 +5,4 @@ metadata:
   labels:
     release: {{ .Release.Name }}
 data:
-  branchName: {{ default "" .Values.branchName | quote }}
+  branchName: {{ .Values.branchName | quote }}

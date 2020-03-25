@@ -6,7 +6,12 @@
     "networkPolicy": {
       "type": "object",
       "properties": {
-        "allowNamespaces": { "type": "array" }
+        "allowNamespaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
       "additionalProperties": false
     }

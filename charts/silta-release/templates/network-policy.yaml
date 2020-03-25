@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-np
+  labels:
+    release: {{ .Release.Name }}
+spec:
+  podSelector:
+    matchLabels:
+      release: {{ .Release.Name }}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Release.Namespace }}
+    - namespaceSelector:
+        matchLabels:
+          name: silta-cluster
+    {{- if (index .Values "networkPolicy") }}
+    {{- if (index .Values.networkPolicy "allowNamespaces") }}
+    {{- range $index, $namespace := .Values.networkPolicy.allowNamespaces }}
+    - namespaceSelector:
+        matchLabels:
+          name: {{ $namespace }}
+    {{- end }}
+    {{- end }}
+    {{- end }}

@@ -27,4 +27,4 @@
 node_modules
 
 # Ignore helm chart dependencies.
-chart/*/charts
+charts/*/charts

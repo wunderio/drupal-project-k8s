@@ -1,8 +1,3 @@
 
 # Keep track of the git branch from which the release was created.
 branchName: ""
-
-# Whitelist namespaces / projects that can connect to containers in your project release.
-# "silta-cluster" and your current namespace are always whitelisted.
-networkPolicy:
-  allowNamespaces: []

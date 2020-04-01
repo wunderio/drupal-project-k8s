@@ -3,18 +3,6 @@
   "additionalProperties": false,
   "properties": {
     "branchName": { "type": "string" },
-    "networkPolicy": {
-      "type": "object",
-      "properties": {
-        "allowNamespaces": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
     "global": { "type": "object"}
   }
 }

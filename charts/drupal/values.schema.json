@@ -1,7 +1,15 @@
 {
   "type": "object",
   "if": {
-    "properties": { "branchName": { "const": "production" }}
+    "properties": {
+      "silta-release": {
+        "type": "object",
+        "properties": {
+          "branchName": { "const": "production"}
+        },
+        "required": ["branchName"]
+      }
+    }
   },
   "then": {
     "properties": {

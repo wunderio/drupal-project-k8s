@@ -5,15 +5,17 @@
 # Allow access to drupal or varnish pods from the ingress in the silta-cluster namespace
 {{- $id := "allow-ingress" -}}
 {{- $podSelectors := dict "silta-ingress" "allow" -}}
+{{- $context := . -}}
 {{- $from := list (dict "namespaceSelector" (dict "matchLabels" (dict "name" "silta-cluster"))) -}}
-{{- $params := mergeOverwrite $ (dict "id" $id "additionalPodSelectors" $podSelectors "from" $from) -}}
+{{- $params := mergeOverwrite $context (dict "id" $id "additionalPodSelectors" $podSelectors "from" $from) -}}
 {{ include "silta-release.networkPolicy" $params }}
 ---
 # Iterate through exceptions
 {{- range $index, $accessDefinition := .Values.ingressAccess -}}
+{{- $context := $ -}}
 {{- $podSelectors := $accessDefinition.additionalPodSelector -}}
 {{- $from := $accessDefinition.from -}}
-{{- $params := mergeOverwrite $ (dict "id" $index "additionalPodSelectors" $podSelectors "from" $from) -}}
+{{- $params := mergeOverwrite $context (dict "id" $index "additionalPodSelectors" $podSelectors "from" $from) -}}
 {{ include "silta-release.networkPolicy" $params }}
 ---
 {{ end }}

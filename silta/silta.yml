@@ -24,3 +24,10 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+    allowESaccess:
+      additionalPodSelector:
+        chart: elasticsearch
+      from:
+        - namespaceSelector:
+            matchLabels:
+              name: drupal-project

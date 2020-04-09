@@ -12,7 +12,7 @@
 ---
 # Iterate through exceptions
 {{- range $index, $accessDefinition := .Values.ingressAccess -}}
-{{- $context := $ -}}
+{{- $context := omit $ "additionalPodSelectors" -}}
 {{- $podSelectors := $accessDefinition.additionalPodSelector -}}
 {{- $from := $accessDefinition.from -}}
 {{- $params := mergeOverwrite $context (dict "id" $index "additionalPodSelectors" $podSelectors "from" $from) -}}

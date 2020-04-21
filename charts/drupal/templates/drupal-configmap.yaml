@@ -55,7 +55,7 @@ data:
     opcache.enable_cli = 0
     opcache.memory_consumption = 256
     ; XX
-    opcache.memory_consumption = 128
+    ; opcache.memory_consumption = 128
     opcache.interned_strings_buffer = 32
     opcache.use_cwd = ${PHP_OPCACHE_USE_CWD}
     opcache.validate_timestamps = 0

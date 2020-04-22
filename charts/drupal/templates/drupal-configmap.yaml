@@ -180,6 +180,9 @@ data:
     
     clear_env = no
 
+    ; Custom configuration below
+    {{ .Values.php.fpm.extraConfig | nindent 4 }}
+
   drupal_conf: |
 
     ## Nginx FCGI specific directives.

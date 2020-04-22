@@ -13,3 +13,21 @@ elasticsearch:
 mounts:
   private-files:
     enabled: true
+
+# Allow access from another namespace for testing purposes.
+silta-release:
+  ingressAccess:
+    test:
+      additionalPodSelector:
+        app: drupal
+      from:
+        - namespaceSelector:
+            matchLabels:
+              name: drupal-project
+    allowESaccess:
+      additionalPodSelector:
+        chart: elasticsearch
+      from:
+        - namespaceSelector:
+            matchLabels:
+              name: drupal-project

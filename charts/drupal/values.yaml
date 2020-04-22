@@ -1,4 +1,7 @@
 
+# Configuration for the wunderio/silta-release subchart.
+silta-release: {}
+
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
@@ -177,6 +180,7 @@ php:
     loglevel: notice # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
+    memory_limit: 256M
     # Custom php settings block. May override parameters previously defined. 
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
@@ -389,6 +393,9 @@ memcached:
   pdbMinAvailable: 0
   memcached:
     maxItemMemory: 128
+  resources:
+    requests:
+      memory: 128Mi
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml

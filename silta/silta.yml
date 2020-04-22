@@ -31,3 +31,12 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+# Configuration for everything that runs in php containers.
+php:
+  fpm:
+    extraConfig: |
+      pm.max_children = 2
+      pm.start_servers = 1
+      pm.min_spare_servers = 1
+      pm.max_spare_servers = 1

@@ -62,7 +62,10 @@ data:
 
     [igbinary]
     igbinary.compact_strings=1
-
+    
+    ; Custom configuration below
+    {{ .Values.php.php_ini.extraConfig | nindent 4 }}
+    
   nginx_conf: |
     user                            nginx;
     worker_processes                auto;

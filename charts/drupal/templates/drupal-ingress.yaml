@@ -12,7 +12,7 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
 
-    {{- if .Values.silta-release.downscaler.enabled }}
+    {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" .Release.Time "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
     auto-downscale/services: {{ if .Values.varnish.enabled -}}

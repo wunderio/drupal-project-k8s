@@ -15,11 +15,7 @@ metadata:
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" .Release.Time "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
-    auto-downscale/services: {{ if .Values.varnish.enabled -}}
-      {{ .Release.Name }}-drupal
-    {{- else -}}
-      {{ .Release.Name }}-drupal
-    {{- end }}
+    auto-downscale/services: {{ include "drupal.servicename" . }}
     {{- end }}
 spec:
   {{- if .Values.ssl.enabled }}

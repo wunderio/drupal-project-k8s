@@ -532,6 +532,7 @@ data:
 
         ## Run the update from the web interface with Drupal 7.
         location = /update.php {
+            return 404;
             include fastcgi.conf;
             fastcgi_param  SCRIPT_FILENAME    $document_root/update.php;
             fastcgi_pass php;
@@ -539,6 +540,7 @@ data:
 
         ## Run the install from the web interface with Drupal 7.
         location = /install.php {
+            return 404;
             include fastcgi.conf;
             fastcgi_param  SCRIPT_FILENAME    $document_root/install.php;
             fastcgi_pass php;
@@ -546,6 +548,7 @@ data:
 
         ## Run the install from the web interface with Drupal 8.
         location = /core/install.php {
+            return 404;
             include fastcgi.conf;
             fastcgi_param  SCRIPT_FILENAME    $document_root/core/install.php;
             fastcgi_pass php;

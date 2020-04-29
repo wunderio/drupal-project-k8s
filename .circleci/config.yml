@@ -28,7 +28,7 @@ workflows:
           # Use a local chart during development.
           chart_name: "./charts/drupal"
           chart_repository: ""
-          silta_config: silta/silta.yml
+          silta_config: silta/silta.yml,silta/silta-dev.yml
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build

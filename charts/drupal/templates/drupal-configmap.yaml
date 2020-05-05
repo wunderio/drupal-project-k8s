@@ -530,23 +530,13 @@ data:
             fastcgi_pass php;
         }
 
-        ## Disallow these scripts as they are not used in current workflow, Drupal 7.
-        location = /update.php {
+        ## Disallow these update scripts as they are not used in current workflow, Drupal 7/8.
+        location ~ ^/(update.php|core/update.php) {
             return 404;
         }
 
-        ## Disallow these scripts as they are not used in current workflow, Drupal 7.
-        location = /install.php {
-            return 404;
-        }
-
-        ## Disallow these scripts as they are not used in current workflow, Drupal 8.
-        location = /core/install.php {
-            return 404;
-        }
-        
-        ## Disallow these scripts as they are not used in current workflow, Drupal 8.
-        location = /core/update.php {
+        ## Disallow these install cripts as they are not used in current workflow, Drupal 7/8.
+        location ~ ^/(install.php|core/install.php) {
             return 404;
         }
 

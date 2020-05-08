@@ -65,6 +65,7 @@ data:
 
     [instana]
     ; Disable Twig instrumentation, it causes issues when used with Drupal.
+    ; See https://docs.instana.io/ecosystem/php/#tracing
     instana.disabled_instrumentation=2097152
     
     ; Custom configuration below

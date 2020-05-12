@@ -4,7 +4,6 @@ metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
     auto-downscale/down: "false"
-    cloud.google.com/neg: '{"ingress": true}'
     beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}"}}'
 spec:
   type: NodePort

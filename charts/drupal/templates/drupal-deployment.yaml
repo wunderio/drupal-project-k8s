@@ -80,6 +80,10 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 

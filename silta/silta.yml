@@ -10,6 +10,9 @@ varnish:
 elasticsearch:
   enabled: true
 
+memcached:
+  enabled: true
+
 mounts:
   private-files:
     enabled: true

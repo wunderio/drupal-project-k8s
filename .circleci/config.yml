@@ -48,6 +48,7 @@ workflows:
               ignore:
                 - production
                 - feature/test-cluster
+                - /feature\/test-cluster-.*/
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
@@ -57,7 +58,9 @@ workflows:
           context: silta_test
           filters:
             branches:
-              only: feature/test-cluster
+              only: 
+                - feature/test-cluster
+                - /feature\/test-cluster-.*/
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

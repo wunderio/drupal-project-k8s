@@ -155,6 +155,13 @@ imagePullSecrets:
   value: {{ $mount.mountPath }}
 {{- end }}
 {{- end }}
+{{ $proxy := ( index .Values "silta-release" ) }}
+{{ if $proxy.enabled }}
+- name: HTTP_PROXY
+  value: {{ $proxy.url }}
+- name: HTTPS_PROXY
+  value: {{ $proxy.url }}
+{{- end }}
 {{- end }}
 
 {{- define "drupal.tolerations" -}}

@@ -35,7 +35,7 @@ ports:
   readOnly: false
   subPath: php_fpm_d_custom
 - name: config
-  mountPath: /home/.ssh/config
+  mountPath: /app/.ssh/config
   readOnly: true
   subPath: ssh_config
 {{- end }}

@@ -158,9 +158,9 @@ imagePullSecrets:
 {{ $proxy := ( index .Values "silta-release" ).proxy }}
 {{ if $proxy.enabled }}
 - name: HTTP_PROXY
-  value: {{ $proxy.url }}:{{ $proxy.port }}
+  value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: HTTPS_PROXY
-  value: {{ $proxy.url }}:{{ $proxy.port }}
+  value: "{{ $proxy.url }}:{{ $proxy.port }}"
 {{- end }}
 {{- end }}
 

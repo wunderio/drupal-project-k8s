@@ -23,5 +23,6 @@ ingressAccess: {}
 proxy:
   enabled: false
   url: 'silta-proxy-test-proxy.silta-cluster'
+  port: 80
   username: null
   password:

@@ -34,6 +34,10 @@ ports:
   mountPath: /usr/local/etc/php-fpm.d/zz-custom.conf
   readOnly: false
   subPath: php_fpm_d_custom
+- name: config
+  mountPath: /home/.ssh/config
+  readOnly: true
+  subPath: ssh_config
 {{- end }}
 
 {{- define "drupal.volumes" -}}

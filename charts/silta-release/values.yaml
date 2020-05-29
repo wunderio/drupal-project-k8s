@@ -24,5 +24,3 @@ proxy:
   enabled: false
   url: 'silta-cluster-proxy.silta-cluster'
   port: 80
-  username: null
-  password: null

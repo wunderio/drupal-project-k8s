@@ -161,10 +161,17 @@ imagePullSecrets:
 {{- end }}
 {{ $proxy := ( index .Values "silta-release" ).proxy }}
 {{ if $proxy.enabled }}
+# The http_proxy needs to be defined in lowercase.
+# The HTTPS_PROXY needs to be defined in uppercase.
+# It is recommended to define both in both cases.
+- name: http_proxy
+  value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: HTTP_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
-- name: HTTPS_PROXY
+- name: https_proxy
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
+- name: HTTPS_PROXY
+value: "{{ $proxy.url }}:{{ $proxy.port }}"
 {{- end }}
 {{- end }}
 

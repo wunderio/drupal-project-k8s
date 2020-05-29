@@ -155,7 +155,7 @@ imagePullSecrets:
   value: {{ $mount.mountPath }}
 {{- end }}
 {{- end }}
-{{ $proxy := ( index .Values "silta-release" ) }}
+{{ $proxy := ( index .Values "silta-release" ).proxy }}
 {{ if $proxy.enabled }}
 - name: HTTP_PROXY
   value: {{ $proxy.url }}

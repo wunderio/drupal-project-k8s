@@ -17,3 +17,11 @@ branchName: ""
 #          matchLabels:
 #            name: other-namespace
 ingressAccess: {}
+
+# Add information regarding an HTTP proxy.
+# Note that it's up to subchart to use this information.
+proxy:
+  enabled: false
+  url: 'silta-proxy-test-proxy.silta-cluster'
+  username: null
+  password:

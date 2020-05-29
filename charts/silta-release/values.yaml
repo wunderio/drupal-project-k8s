@@ -22,7 +22,7 @@ ingressAccess: {}
 # Note that it's up to subchart to use this information.
 proxy:
   enabled: false
-  url: 'silta-proxy-test-proxy.silta-cluster'
+  url: 'silta-cluster-proxy.silta-cluster'
   port: 80
   username: null
   password: null

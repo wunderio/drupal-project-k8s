@@ -611,5 +611,5 @@ data:
 {{ if $proxy.enabled }}
   ssh_config: |
     Host *
-    ProxyCommand=nc -X connect -x {{ $proxy.url }}:{{ $proxy.port }} %h %p"
+    ProxyCommand=nc -X connect -x {{ $proxy.url }}:{{ $proxy.port }} %h %p
 {{- end }}

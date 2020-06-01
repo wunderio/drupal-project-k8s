@@ -34,8 +34,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-php:
-  cron:
-    drupal:
-      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
-      schedule: '* * * * *'

@@ -34,3 +34,8 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+php:
+  cron:
+    drupal:
+      schedule: '1 * * * *'

@@ -5,17 +5,17 @@
 # for all possible options.
 
 varnish:
-  enabled: false
+  enabled: true
 
 elasticsearch:
-  enabled: false
+  enabled: true
 
 memcached:
-  enabled: false
+  enabled: true
 
 mounts:
   private-files:
-    enabled: false
+    enabled: true
 
 # Allow access from another namespace for testing purposes.
 silta-release:
@@ -34,8 +34,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-php:
-  cron:
-    drupal:
-      schedule: '1 * * * *'

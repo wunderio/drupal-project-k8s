@@ -35,20 +35,30 @@ SSH connection (limited access through VPN):
 
   ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }}
 
-Importing a database dump:
+Downloading data from server
+  
+  Database: 
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-dump" > my_database_dump.sql
 
-  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < my_database_dump.sql
-
-Downloading a file from server:
-
+  File or folder:
   rsync -chavzP -e "ssh -A -J {{ include "drupal.jumphost" . }}" {{ include "drupal.shellHost" . }}:/app/remote-filename ./
 
 {{ range $index, $mount := .Values.mounts -}}
 {{ if eq $mount.enabled true -}}
-Importing files to {{ $index }}:
+  Files from {{ $index }}:
+  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }} local_folder/ 
+{{ end -}}
+{{ end -}}
 
+Importing data into server (use this with caution!)
+  
+  Database:
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < my_database_dump.sql
+
+{{ range $index, $mount := .Values.mounts -}}
+{{ if eq $mount.enabled true -}}
+  Importing files to {{ $index }}:
   rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
-
 {{ end -}}
 {{ end -}}
 {{- end -}}

@@ -1,5 +1,5 @@
 {{ $protocol := .Values.ssl.enabled | ternary "https" "http" -}}
-Your site is available here:
+Your site is available at:
 
   {{ $protocol }}://{{- template "drupal.domain" . }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
@@ -15,7 +15,8 @@ Your site is available here:
   {{- end }}
   {{- end }}
 
-{{ if .Values.mailhog.enabled -}}
+{{- if .Values.mailhog.enabled }}
+  
 Mailhog available at:
 
   http://{{- template "drupal.domain" . }}/mailhog
@@ -24,12 +25,15 @@ Mailhog available at:
   {{- end }}
 {{- end }}
 
-{{ if .Values.nginx.basicauth.enabled -}}
-Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
-Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
+{{- if .Values.nginx.basicauth.enabled }}
+
+Basic access authentication credentials:
+
+  Username: {{ .Values.nginx.basicauth.credentials.username }}
+  Password: {{ .Values.nginx.basicauth.credentials.password }}
 {{- end }}
 
-{{ if .Values.shell.enabled }}
+{{- if .Values.shell.enabled }}
 
 SSH connection (limited access through VPN):
 
@@ -37,28 +41,28 @@ SSH connection (limited access through VPN):
 
 Downloading data from server
   
-  Database: 
+  Downloading database: 
   ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-dump" > my_database_dump.sql
 
-  File or folder:
-  rsync -chavzP -e "ssh -A -J {{ include "drupal.jumphost" . }}" {{ include "drupal.shellHost" . }}:/app/remote-filename ./
-
-{{ range $index, $mount := .Values.mounts -}}
-{{ if eq $mount.enabled true -}}
-  Files from {{ $index }}:
+  {{ range $index, $mount := .Values.mounts -}}
+  {{ if eq $mount.enabled true -}}
+  Downloading files from {{ $index }}:
   rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }} local_folder/ 
-{{ end -}}
-{{ end -}}
+  {{ end }}
+  {{ end -}}
+
+  Downloading any file or folder:
+  rsync -chavzP -e "ssh -A -J {{ include "drupal.jumphost" . }}" {{ include "drupal.shellHost" . }}:/app/remote-filename ./
 
 Importing data into server (use this with caution!)
   
-  Database:
+  Importing database:
   ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < my_database_dump.sql
 
-{{ range $index, $mount := .Values.mounts -}}
-{{ if eq $mount.enabled true -}}
-  Importing files to {{ $index }}:
+  {{ range $index, $mount := .Values.mounts -}}
+  {{ if eq $mount.enabled true -}}
+  Uploading files to {{ $index }}:
   rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
-{{ end -}}
-{{ end -}}
-{{- end -}}
+  {{ end }}
+  {{ end -}}
+  {{- end -}}

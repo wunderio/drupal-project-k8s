@@ -216,23 +216,33 @@ done
 {{- define "drupal.post-release-command" -}}
 set -e
 
+{{ if .Values.backup.restoreId -}}
+{{ include "drupal.import-backup-files" . }}
+{{- end }}
+
 {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
 {{ include "drupal.import-reference-files" . }}
 {{- end }}
 
 {{ include "drupal.wait-for-db-command" . }}
 
-{{ if .Release.IsInstall }}
+{{ if or .Release.IsInstall .Values.backup.restoreId }}
 touch /app/web/sites/default/files/_installing
 {{- if .Values.referenceData.enabled }}
 {{ include "drupal.import-reference-db" . }}
+{{- end }}
+
+{{- if .Values.backup.restoreId }}
+{{ include "drupal.import-backup-db" . }}
 {{- end }}
 
 {{ if .Values.elasticsearch.enabled }}
 {{ include "drupal.wait-for-elasticsearch-command" . }}
 {{ end }}
 
+{{ if and .Release.IsInstall ( not .Values.backup.restoreId ) }}
 {{ .Values.php.postinstall.command}}
+{{ end }}
 rm /app/web/sites/default/files/_installing
 {{ end }}
 {{ .Values.php.postupgrade.command}}
@@ -305,12 +315,41 @@ else
 fi
 {{- end }}
 
+{{- define "drupal.import-backup-db" -}}
+if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
+  echo "Dropping old database"
+  drush sql-drop -y
+
+  echo "Importing backup database dump"
+  gunzip -c /backups/{{ $.Values.backup.restoreId }}/db.sql.gz > /tmp/backup-data-db.sql
+  pv /tmp/backup-data-db.sql | drush sql-cli
+
+  # Clear caches before doing anything else.
+  drush cr
+else
+  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
+fi
+{{- end }}
+
 {{- define "drupal.import-reference-files" -}}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
     echo "Importing {{ $index }} files"
     for f in /app/reference-data/{{ $index }}/*; do
+      rsync -r --temp-dir=/tmp/ $f "{{ $mount.mountPath }}" &
+    done
+  fi
+  {{ end -}}
+  {{- end }}
+{{- end }}
+
+{{- define "drupal.import-backup-files" -}}
+  {{ range $index, $mount := .Values.mounts -}}
+  {{- if eq $mount.enabled true -}}
+  if [ -d "/backups/{{ $.Values.backup.restoreId }}/{{ $index }}" ] && [ -n "$(ls /backups/{{ $.Values.backup.restoreId }}/{{ $index }})" ]; then
+    echo "Importing {{ $index }} files"
+    for f in /backups/{{ $.Values.backup.restoreId }}/{{ $index }}/*; do
       rsync -r --temp-dir=/tmp/ $f "{{ $mount.mountPath }}" &
     done
   fi

@@ -39,6 +39,11 @@ spec:
             {{- end }}
           {{- end -}}
           {{- end }}
+          {{- if .Values.backup.restoreId }}
+          - name: {{ .Release.Name }}-backup
+            mountPath: /backups
+            readOnly: true
+          {{- end }}
         resources:
           {{- .Values.php.postinstall.resources | toYaml | nindent 10 }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
@@ -50,4 +55,9 @@ spec:
           persistentVolumeClaim:
             claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
         {{- end -}}
+        {{- end -}}
+        {{- if .Values.backup.restoreId -}}
+        - name: {{ .Release.Name }}-backup
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-backup
         {{- end -}}

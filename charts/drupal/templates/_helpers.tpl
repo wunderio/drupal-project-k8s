@@ -345,14 +345,15 @@ fi
 {{- end }}
 
 {{- define "drupal.import-backup-files" -}}
-  {{ range $index, $mount := .Values.mounts -}}
-  {{- if eq $mount.enabled true -}}
-  if [ -d "/backups/{{ $.Values.backup.restoreId }}/{{ $index }}" ] && [ -n "$(ls /backups/{{ $.Values.backup.restoreId }}/{{ $index }})" ]; then
-    echo "Importing {{ $index }} files"
-    for f in /backups/{{ $.Values.backup.restoreId }}/{{ $index }}/*; do
-      rsync -r --temp-dir=/tmp/ $f "{{ $mount.mountPath }}" &
-    done
-  fi
-  {{ end -}}
-  {{- end }}
+{{ range $index, $mount := .Values.mounts -}}
+{{- if eq $mount.enabled true }}
+echo "Deleting old files"
+rm -rf {{ $mount.mountPath }}/*
+rm -rf {{ $mount.mountPath }}/.*
+echo "Restoring {{ $index }} volume backup."
+echo "copying to mount dir"
+#cp /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz {{ $mount.mountPath }}
+tar -xvzf /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz -C {{ $mount.mountPath }} --strip-components=5
+{{- end -}}
+{{- end }}
 {{- end }}

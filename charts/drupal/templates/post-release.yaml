@@ -56,7 +56,7 @@ spec:
             claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
         {{- end -}}
         {{- end -}}
-        {{- if .Values.backup.restoreId -}}
+        {{- if .Values.backup.restoreId }}
         - name: {{ .Release.Name }}-backup
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-backup

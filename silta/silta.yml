@@ -16,6 +16,8 @@ memcached:
 mounts:
   private-files:
     enabled: true
+backup:
+  enabled: true
 
 # Allow access from another namespace for testing purposes.
 silta-release:

@@ -351,9 +351,7 @@ echo "Deleting old files"
 rm -rf {{ $mount.mountPath }}/*
 rm -rf {{ $mount.mountPath }}/.*
 echo "Restoring {{ $index }} volume backup."
-echo "copying to mount dir"
-#cp /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz {{ $mount.mountPath }}
-tar -xvzf /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz -C {{ $mount.mountPath }} --strip-components=5
+tar -xvzf /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz -C /
 {{- end -}}
 {{- end }}
 {{- end }}

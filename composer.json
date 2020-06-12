@@ -23,6 +23,7 @@
         "drupal/memcache": "^2.0",
         "drupal/monolog": "^1.1",
         "drupal/purge": "^3.0",
+        "drupal/purge_purger_http": "^1.0",
         "drupal/simplei": "^1.0",
         "drupal/warden": "*",
         "drush/drush": "^10.0.2",

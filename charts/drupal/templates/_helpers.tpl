@@ -171,7 +171,7 @@ imagePullSecrets:
 - name: https_proxy
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: HTTPS_PROXY
-value: "{{ $proxy.url }}:{{ $proxy.port }}"
+  value: "{{ $proxy.url }}:{{ $proxy.port }}"
 {{- end }}
 {{- end }}
 

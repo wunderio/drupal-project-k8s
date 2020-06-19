@@ -172,6 +172,10 @@ imagePullSecrets:
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
+- name: no_proxy
+  value: .svc.cluster.local,{{ .Release.Name }}-es
+- name: NO_PROXY
+  value: .svc.cluster.local,{{ .Release.Name }}-es
 {{- end }}
 {{- end }}
 

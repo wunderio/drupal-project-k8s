@@ -37,3 +37,4 @@ silta-release:
 
   proxy:
     enabled: true
+    no_proxy: ".example.com"

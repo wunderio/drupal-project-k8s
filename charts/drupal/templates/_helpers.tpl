@@ -245,11 +245,13 @@ touch /app/web/sites/default/files/_installing
 {{- if .Values.referenceData.enabled }}
 {{ include "drupal.import-reference-db" . }}
 {{- end }}
+{{- end }}
 
 {{ if .Values.elasticsearch.enabled }}
 {{ include "drupal.wait-for-elasticsearch-command" . }}
 {{ end }}
 
+{{ if .Release.IsInstall }}
 {{ .Values.php.postinstall.command}}
 rm /app/web/sites/default/files/_installing
 {{ end }}

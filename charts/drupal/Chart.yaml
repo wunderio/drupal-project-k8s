@@ -4,7 +4,7 @@ version: 0.3.40
 apiVersion: v2
 dependencies:
 - name: mariadb
-  version: 4.4.x
+  version: 7.5.x
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: memcached

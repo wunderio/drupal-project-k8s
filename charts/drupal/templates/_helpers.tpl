@@ -235,51 +235,50 @@ done
 -f /app/web/sites/default/files/_installing
 {{- end -}}
 
+
 {{- define "drupal.post-release-command" -}}
-set -e
+  set -e
 
+  {{ if .Values.backup.restoreId -}}
+    {{ include "drupal.backup-command" . }}
+    {{ include "drupal.import-backup-files" . }}
+  {{- end }}
 
-{{ if .Values.backup.restoreId -}}
-{{ include "drupal.backup-command" . }}
-{{ include "drupal.import-backup-files" . }}
-{{- end }}
+  {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
+    {{ include "drupal.import-reference-files" . }}
+  {{- end }}
 
-{{ if and .Release.IsInstall .Values.referenceData.enabled -}}
-{{ include "drupal.import-reference-files" . }}
-{{- end }}
+  {{ include "drupal.wait-for-db-command" . }}
 
-{{ include "drupal.wait-for-db-command" . }}
+  {{ if or .Release.IsInstall .Values.backup.restoreId }}
+    touch /app/web/sites/default/files/_installing
+    {{- if .Values.referenceData.enabled }}
+      {{ include "drupal.import-reference-db" . }}
+    {{- end }}
+  {{- end }}
 
-{{ if or .Release.IsInstall .Values.backup.restoreId }}
-touch /app/web/sites/default/files/_installing
-{{- if .Values.referenceData.enabled }}
-{{ include "drupal.import-reference-db" . }}
-{{- end }}
-{{- end }}
+  {{- if .Values.backup.restoreId }}
+    {{ include "drupal.import-backup-db" . }}
+  {{- end }}
 
-{{- if .Values.backup.restoreId }}
-{{ include "drupal.import-backup-db" . }}
-{{- end }}
+  {{ if .Values.elasticsearch.enabled }}
+    {{ include "drupal.wait-for-elasticsearch-command" . }}
+  {{ end }}
 
-{{ if .Values.elasticsearch.enabled }}
-{{ include "drupal.wait-for-elasticsearch-command" . }}
-{{ end }}
+  {{ if and .Release.IsInstall ( not .Values.backup.restoreId ) }}
+    {{ .Values.php.postinstall.command}}
+    rm /app/web/sites/default/files/_installing
+    {{ end }}
+  {{ .Values.php.postupgrade.command}}
 
-{{ if and .Release.IsInstall ( not .Values.backup.restoreId ) }}
-{{ .Values.php.postinstall.command}}
-{{ end }}
-rm /app/web/sites/default/files/_installing
-{{ end }}
-{{ .Values.php.postupgrade.command}}
+  # Wait for background imports to complete.
+  wait
 
-# Wait for background imports to complete.
-wait
-
-{{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
-{{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
-{{ include "drupal.extract-reference-data" . }}
-{{- end }}
-{{- end }}
+  {{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
+    {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
+      {{ include "drupal.extract-reference-data" . }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 

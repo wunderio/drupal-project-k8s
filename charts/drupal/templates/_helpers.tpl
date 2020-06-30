@@ -239,36 +239,27 @@ done
 {{- define "drupal.post-release-command" -}}
   set -e
 
-  {{ if .Values.backup.restoreId -}}
-    {{ include "drupal.backup-command" . }}
-    {{ include "drupal.import-backup-files" . }}
-  {{- end }}
-
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}
   {{- end }}
 
   {{ include "drupal.wait-for-db-command" . }}
 
-  {{ if or .Release.IsInstall .Values.backup.restoreId }}
+  {{ if .Release.IsInstall }}
     touch /app/web/sites/default/files/_installing
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
   {{- end }}
 
-  {{- if .Values.backup.restoreId }}
-    {{ include "drupal.import-backup-db" . }}
-  {{- end }}
-
   {{ if .Values.elasticsearch.enabled }}
     {{ include "drupal.wait-for-elasticsearch-command" . }}
   {{ end }}
 
-  {{ if or .Release.IsInstall .Values.backup.restoreId }}
-    {{ .Values.php.postinstall.command}}
+  {{ if .Release.IsInstall }}
+    {{ .Values.php.postinstall.command }}
     rm /app/web/sites/default/files/_installing
-    {{ end }}
+  {{ end }}
   {{ .Values.php.postupgrade.command}}
 
   # Wait for background imports to complete.
@@ -279,6 +270,27 @@ done
       {{ include "drupal.extract-reference-data" . }}
     {{- end }}
   {{- end }}
+{{- end }}
+
+{{- define "drupal.restore-backup-command" -}}
+  set -e
+
+  {{ include "drupal.wait-for-db-command" . }}
+  {{ include "drupal.backup-command" . }}
+
+  touch /app/web/sites/default/files/_installing
+  
+  {{ include "drupal.import-backup-files" . }}
+
+  {{ include "drupal.import-backup-db" . }}
+
+  {{ if .Values.elasticsearch.enabled }}
+    {{ include "drupal.wait-for-elasticsearch-command" . }}
+  {{ end }}
+
+  {{ .Values.php.postRestoreCommand }}
+  rm /app/web/sites/default/files/_installing
+
 {{- end }}
 
 
@@ -382,9 +394,9 @@ fi
 
 {{- define "drupal.backup-command" -}}
 set -e
-  {{ include "drupal.wait-for-db-command" . }}
+
   # Generate the id of the backup.
-  BACKUP_ID=`date +%Y-%m-%d_%H-%M-%S`
+  BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
   BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
 
   # Figure out which tables to skip.

@@ -23,7 +23,11 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
         - |
-            {{ include "drupal.post-release-command" . | nindent 12 }}
+            {{- if .Values.backup.restoreId }}
+            {{- include "drupal.restore-backup-command" . | nindent 12 }}
+            {{- else -}}
+            {{- include "drupal.post-release-command" . | nindent 12 }}
+            {{- end }}
         volumeMounts:
           {{- if not .Values.backup.restoreId }}
           - name: config

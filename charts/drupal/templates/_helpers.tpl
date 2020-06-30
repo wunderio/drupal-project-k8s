@@ -276,18 +276,23 @@ done
   set -e
 
   {{ include "drupal.wait-for-db-command" . }}
-  {{ include "drupal.backup-command" . }}
 
-  touch /app/web/sites/default/files/_installing
+  # Make backup of current deployment
+  {{ include "drupal.backup-command" . }}
   
+  # Restore files from targeted backup
   {{ include "drupal.import-backup-files" . }}
 
+  touch /app/web/sites/default/files/_installing
+
+  # Restore db from targeted backup
   {{ include "drupal.import-backup-db" . }}
 
   {{ if .Values.elasticsearch.enabled }}
     {{ include "drupal.wait-for-elasticsearch-command" . }}
   {{ end }}
 
+  # Running custom commands after restored backup
   {{ .Values.php.postRestoreCommand }}
   rm /app/web/sites/default/files/_installing
 

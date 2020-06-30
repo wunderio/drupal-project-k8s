@@ -216,9 +216,10 @@ done
 {{- define "drupal.post-release-command" -}}
 set -e
 
+
 {{ if .Values.backup.restoreId -}}
-{{ include "drupal.import-backup-files" . }}
 {{ include "drupal.backup-command" . }}
+{{ include "drupal.import-backup-files" . }}
 {{- end }}
 
 {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
@@ -359,7 +360,7 @@ fi
 
 {{- define "drupal.backup-command" -}}
 set -e
-
+  {{ include "drupal.wait-for-db-command" . }}
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d_%H-%M-%S`
   BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"

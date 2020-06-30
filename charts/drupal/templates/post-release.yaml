@@ -25,10 +25,12 @@ spec:
         - |
             {{ include "drupal.post-release-command" . | nindent 12 }}
         volumeMounts:
+          {{- if not .Values.backup.restoreId }}
           - name: config
             mountPath: /etc/my.cnf.d/gdpr-dump.cnf
             readOnly: true
             subPath: gdpr-dump
+          {{- end }}
           {{- include "drupal.volumeMounts" . | nindent 10 }}
           {{- if .Values.referenceData.enabled }}
           {{- if or (eq .Values.referenceData.referenceEnvironment .Values.environmentName) (not .Values.referenceData.skipMount) }}

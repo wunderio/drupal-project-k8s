@@ -265,7 +265,7 @@ done
     {{ include "drupal.wait-for-elasticsearch-command" . }}
   {{ end }}
 
-  {{ if and .Release.IsInstall ( not .Values.backup.restoreId ) }}
+  {{ if or .Release.IsInstall .Values.backup.restoreId }}
     {{ .Values.php.postinstall.command}}
     rm /app/web/sites/default/files/_installing
     {{ end }}

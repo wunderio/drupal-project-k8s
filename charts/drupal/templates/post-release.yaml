@@ -44,7 +44,7 @@ spec:
           {{- if .Values.backup.restoreId }}
           - name: {{ .Release.Name }}-backup
             mountPath: /backups
-            readOnly: true
+            readOnly: false
           {{- end }}
         resources:
           {{- .Values.php.postinstall.resources | toYaml | nindent 10 }}

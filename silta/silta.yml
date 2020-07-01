@@ -16,9 +16,6 @@ memcached:
 mounts:
   private-files:
     enabled: true
-backup:
-  enabled: true
-  schedule: '5 15 * * *'
 
 # Allow access from another namespace for testing purposes.
 silta-release:

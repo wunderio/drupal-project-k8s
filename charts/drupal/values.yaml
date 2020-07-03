@@ -98,6 +98,8 @@ nginx:
   # Note that the key is only used for documentation purposes.
   noauthips:
     gke-internal: 10.0.0.0/8
+    gce-health-check-1: 130.211.0.0/22
+    gce-health-check-2: 35.191.0.0/16
 
   # Security headers
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:

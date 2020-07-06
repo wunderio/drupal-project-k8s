@@ -400,7 +400,7 @@ elasticsearch:
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
   # Disable service links that cause a slow startup.
-  enableServiceLinks: true
+  enableServiceLinks: false
 
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m

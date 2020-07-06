@@ -47,10 +47,17 @@ autoscaling:
 # exposeDomains:
 #   - hostname: example.com
 #   - hostname: www.example.com
+#     type: gke
 #     ssl:
 #       enabled: true
 #       issuer: letsencrypt-staging
 exposeDomains: []
+
+exposeDomainsDefaults:
+  type: traefik
+  ssl:
+    enabled: true
+    issuer: letsencrypt
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.

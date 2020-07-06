@@ -17,6 +17,10 @@ mounts:
   private-files:
     enabled: true
 
+exposeDomains:
+  - hostname: gke-ingress-test.silta.wdr.io
+    type: gke
+
 # Allow access from another namespace for testing purposes.
 silta-release:
   ingressAccess:

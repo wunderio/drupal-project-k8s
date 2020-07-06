@@ -64,6 +64,10 @@ metadata:
     {{- end }}
     {{- end }}
 
+    {{ if $domain.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ $domain.staticIpAddressName }}
+    {{- end }}
+
 spec:
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}

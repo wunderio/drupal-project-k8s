@@ -20,6 +20,7 @@ mounts:
 exposeDomains:
   - hostname: gke-ingress-test.silta.wdr.io
     type: gke
+    staticIpAddressName: gke-ingress-test
 
 # Allow access from another namespace for testing purposes.
 silta-release:

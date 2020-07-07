@@ -99,7 +99,7 @@ spec:
   acme:
     config:
       - http01:
-          ingress: {{ $.Release.Name }}-drupal
+          ingress: {{ $.Release.Name }}-drupal-{{ $index }}
         domains:
           - {{ $domain.hostname }}
 ---

@@ -48,6 +48,7 @@ autoscaling:
 #   - hostname: example.com
 #   - hostname: www.example.com
 #     type: gke
+#     staticIpAddressName: example-com-production
 #     ssl:
 #       enabled: true
 #       issuer: letsencrypt-staging
@@ -55,6 +56,9 @@ exposeDomains: []
 
 exposeDomainsDefaults:
   type: traefik
+  # The name of the reserved static IP address.
+  # It is best to first reserve the IP address and then add it here.
+  staticIpAddressName: null
   ssl:
     enabled: true
     issuer: letsencrypt

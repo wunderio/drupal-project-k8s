@@ -66,6 +66,7 @@ metadata:
 
     {{ if $domain.staticIpAddressName }}
     acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: letsencrypt
     kubernetes.io/ingress.global-static-ip-name: {{ $domain.staticIpAddressName }}
     {{- end }}
 

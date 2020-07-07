@@ -65,6 +65,7 @@ metadata:
     {{- end }}
 
     {{ if $domain.staticIpAddressName }}
+    acme.cert-manager.io/http01-edit-in-place: "true"
     kubernetes.io/ingress.global-static-ip-name: {{ $domain.staticIpAddressName }}
     {{- end }}
 

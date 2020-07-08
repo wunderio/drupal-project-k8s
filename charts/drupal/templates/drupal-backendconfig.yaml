@@ -4,10 +4,4 @@ metadata:
   name: {{ .Release.Name }}-drupal
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
-spec:
-  cdn:
-    cachePolicy:
-      includeHost: true
-      includeProtocol: true
-      includeQueryString: false
-    enabled: true
+spec: {}

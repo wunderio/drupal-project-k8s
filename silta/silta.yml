@@ -5,7 +5,7 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   enabled: true
@@ -16,6 +16,11 @@ memcached:
 mounts:
   private-files:
     enabled: true
+
+exposeDomains:
+  - hostname: gke-ingress-test.silta.wdr.io
+    type: gke
+    staticIpAddressName: gke-ingress-test
 
 # Allow access from another namespace for testing purposes.
 silta-release:

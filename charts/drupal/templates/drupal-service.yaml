@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-drupal
+  annotations:
+    auto-downscale/down: "false"
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: NodePort
+  # We explicitly unset this, in case the application is currently downscaled.
+  externalName: null
+  ports:
+    - port: 80
+  selector:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    deployment: drupal

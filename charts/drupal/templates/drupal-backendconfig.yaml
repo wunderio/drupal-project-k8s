@@ -1,0 +1,7 @@
+apiVersion: cloud.google.com/v1beta1
+kind: BackendConfig
+metadata:
+  name: {{ .Release.Name }}-drupal
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec: {}

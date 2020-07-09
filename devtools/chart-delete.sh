@@ -1,37 +1,28 @@
 if [ -z "$1" ]; then
-    echo "! Provide release name as an argument"
-    helm list --all
+    echo "! Provide release namespace as the first argument"
+    kubectl get ns
     exit 1;
 fi
 
-if [ $2 ]; then
-    NAMESPACE=$2
-else
-  # Get the namespace from the helm chart
-  NAMESPACE=`helm ls $1 | grep $1 | awk '{print $(NF)}'`
+NAMESPACE=$1
+
+if [ -z "$2" ]; then
+  echo "! Provide release name as the second argument"
+  helm list --all -n $NAMESPACE
+  exit 1;
 fi
 
-if [ $NAMESPACE ]; then
+RELEASE_NAME=$2
 
-    echo "* Deleting release"
-    helm delete --purge $1
+echo  "* Deleting jobs associated with $RELEASE_NAME"
+kubectl delete job -l release=$RELEASE_NAME -n $NAMESPACE --ignore-not-found=true
 
-    echo "* Removing all resources tagged with this release"
-    kubectl delete all -l release=$1 -n $NAMESPACE
+echo "* Deleting release $RELEASE_NAME"
+helm delete -n $NAMESPACE $RELEASE_NAME
 
-    echo "* Doublecheck and remove the leftover resources"
-    for type in deployment cronjob statefulset job pod pvc pv
-    do
-	echo $type ...
-	#kubectl get $type --namespace=$NAMESPACE | grep $1
-	#echo $(kubectl get $type -o custom-columns=:.metadata.name --namespace=$NAMESPACE | grep $1)
-        for resource in $(kubectl get $type -o custom-columns=:.metadata.name --namespace $NAMESPACE | grep $1);
-	do
-	    echo Removing $type $resource
-	    kubectl delete $type $resource --namespace=$NAMESPACE
-	done
-    done
+echo "* Delete leftover pvcs from statefulsets"
+kubectl delete pvc -l release=$RELEASE_NAME -n $NAMESPACE --ignore-not-found=true
+kubectl delete pvc -l app="${RELEASE_NAME}-es" -n $NAMESPACE --ignore-not-found=true
 
-else
-  echo "! No namespace could be found, provide it a as a parameter."
-fi
+echo "* Removing any additional resources tagged with this release"
+kubectl delete all -l release=$RELEASE_NAME -n $NAMESPACE --ignore-not-found=true

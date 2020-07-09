@@ -1,0 +1,44 @@
+{{- if .Values.backup.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-backup
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    cronjob-type: backup
+spec:
+  schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          enableServiceLinks: false
+          containers:
+          - name: backup
+            {{- include "drupal.php-container" . | nindent 12 }}
+            volumeMounts:
+              {{- include "drupal.volumeMounts" . | nindent 14 }}
+              - name: {{ .Release.Name }}-backup
+                mountPath: /backups
+            command: ["/bin/bash", "-c"]
+            args:
+              - |
+                {{ include "drupal.backup-command" . | nindent 16 }}
+            resources:
+              {{- .Values.backup.resources | toYaml | nindent 14 }}
+          restartPolicy: Never
+          volumes:
+            {{- include "drupal.volumes" . | nindent 12 }}
+            - name: {{ .Release.Name }}-backup
+              persistentVolumeClaim:
+                claimName: {{ .Release.Name }}-backup
+
+
+          {{- include "drupal.imagePullSecrets" . | nindent 10 }}
+{{- end }}
+---

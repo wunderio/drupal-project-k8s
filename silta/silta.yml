@@ -5,7 +5,36 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   enabled: true
+
+memcached:
+  enabled: true
+
+mounts:
+  private-files:
+    enabled: true
+
+# Allow access from another namespace for testing purposes.
+silta-release:
+  ingressAccess:
+    test:
+      additionalPodSelector:
+        app: drupal
+      from:
+        - namespaceSelector:
+            matchLabels:
+              name: drupal-project
+    allowESaccess:
+      additionalPodSelector:
+        chart: elasticsearch
+      from:
+        - namespaceSelector:
+            matchLabels:
+              name: drupal-project
+
+  proxy:
+    enabled: true
+    no_proxy: ".example.com"

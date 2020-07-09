@@ -1,4 +1,9 @@
 
+exposeDomains:
+  - hostname: gke-ingress-test.silta.wdr.io
+    type: gke
+    staticIpAddressName: gke-ingress-test
+
 # Provide a high-availability, autoscaling deployment.
 replicas: 2
 autoscaling:

@@ -1,0 +1,9 @@
+suite: drupal service
+templates:
+  - drupal-service.yaml
+tests:
+  - it: is a service
+    asserts:
+      - isKind:
+          of: Service
+

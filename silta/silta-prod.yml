@@ -1,5 +1,6 @@
 
 exposeDomains:
+  - hostname: drupal-project-k8s.wdr.io
   - hostname: gke-ingress-test.silta.wdr.io
     type: gke
     staticIpAddressName: gke-ingress-test

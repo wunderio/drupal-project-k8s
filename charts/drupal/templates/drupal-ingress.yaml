@@ -84,7 +84,7 @@ spec:
   - host: {{ $domain.hostname }}
     http:
       paths:
-      - path: /*
+      - path: {{ if eq $domain.type "gke" }}/*{{ else }}/{{ end }}
         backend:
           serviceName: {{ include "drupal.servicename" $ }}
           servicePort: 80

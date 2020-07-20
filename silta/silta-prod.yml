@@ -1,9 +1,11 @@
 
 exposeDomains:
-  - hostname: drupal-project-k8s.wdr.io
-  - hostname: gke-ingress-test.silta.wdr.io
-    type: gke
-    staticIpAddressName: gke-ingress-test
+  prod-traefik:
+    hostname: drupal-project-k8s.wdr.io
+  prod-gke:
+    hostname: gke-ingress-test.silta.wdr.io
+      type: gke
+      staticIpAddressName: gke-ingress-test
 
 # Provide a high-availability, autoscaling deployment.
 replicas: 2

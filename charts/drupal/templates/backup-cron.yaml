@@ -25,10 +25,22 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: {{ .Release.Name }}-backup
                 mountPath: /backups
+              - name: sql-storage
+                mountPath: /opt/sql-dir
             command: ["/bin/bash", "-c"]
             args:
               - |
                 {{ include "drupal.backup-command" . | nindent 16 }}
+          - name: mariadb
+            image: docker.io/bitnami/mariadb:10.2.32
+            env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: password
+            - name: MARIADB_DATABASE
+              value: drupal
+            ports:
+            - containerPort: 3306
+              name: mariadb
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
@@ -37,7 +49,6 @@ spec:
             - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
                 claimName: {{ .Release.Name }}-backup
-
 
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}

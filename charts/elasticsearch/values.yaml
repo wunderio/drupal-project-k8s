@@ -48,9 +48,10 @@ secretMounts: []
 #  - name: elastic-certificates
 #    secretName: elastic-certificates
 #    path: /usr/share/elasticsearch/config/certs
+#    defaultMode: 0755
 
 image: "docker.elastic.co/elasticsearch/elasticsearch"
-imageTag: "7.6.2"
+imageTag: "7.8.1-SNAPSHOT"
 imagePullPolicy: "IfNotPresent"
 
 podAnnotations: {}
@@ -95,6 +96,7 @@ volumeClaimTemplate:
 
 rbac:
   create: false
+  serviceAccountAnnotations: {}
   serviceAccountName: ""
 
 podSecurityPolicy:
@@ -117,6 +119,9 @@ podSecurityPolicy:
 
 persistence:
   enabled: true
+  labels:
+    # Add default labels for the volumeClaimTemplate fo the StatefulSet
+    enabled: false
   annotations: {}
 
 extraVolumes: []
@@ -157,6 +162,11 @@ nodeAffinity: {}
 # The default is to deploy all pods serially. By setting this to parallel all pods are started at
 # the same time when bootstrapping the cluster
 podManagementPolicy: "Parallel"
+
+# The environment variables injected by service links are not used, but can lead to slow Elasticsearch boot times when
+# there are many services in the current namespace.
+# If you experience slow pod startups you probably want to set this to `false`.
+enableServiceLinks: true
 
 protocol: http
 httpPort: 9200
@@ -204,7 +214,7 @@ readinessProbe:
   successThreshold: 3
   timeoutSeconds: 5
 
-# https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html#request-params wait_for_status
+# https://www.elastic.co/guide/en/elasticsearch/reference/7.8/cluster-health.html#request-params wait_for_status
 clusterHealthCheckParams: "wait_for_status=green&timeout=1s"
 
 ## Use an alternate scheduler.

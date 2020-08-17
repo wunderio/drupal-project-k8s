@@ -84,8 +84,10 @@ def test_defaults():
     assert c["volumeMounts"][0]["mountPath"] == "/usr/share/elasticsearch/data"
     assert c["volumeMounts"][0]["name"] == uname
 
+    # volumeClaimTemplates
     v = r["statefulset"][uname]["spec"]["volumeClaimTemplates"][0]
     assert v["metadata"]["name"] == uname
+    assert "labels" not in v["metadata"]
     assert v["spec"]["accessModes"] == ["ReadWriteOnce"]
     assert v["spec"]["resources"]["requests"]["storage"] == "30Gi"
 
@@ -479,6 +481,20 @@ def test_adding_multiple_persistence_annotations():
     assert annotations["world"] == "hello"
 
 
+def test_enabling_persistence_label_in_volumeclaimtemplate():
+    config = """
+persistence:
+  labels:
+    enabled: true
+"""
+    r = helm_template(config)
+    volume_claim_template_labels = r["statefulset"][uname]["spec"][
+        "volumeClaimTemplates"
+    ][0]["metadata"]["labels"]
+    statefulset_labels = r["statefulset"][uname]["metadata"]["labels"]
+    assert volume_claim_template_labels == statefulset_labels
+
+
 def test_adding_a_secret_mount():
     config = """
 secretMounts:
@@ -504,6 +520,24 @@ secretMounts:
     secretName: elastic-certs
     path: /usr/share/elasticsearch/config/certs
     subPath: cert.crt
+"""
+    r = helm_template(config)
+    s = r["statefulset"][uname]["spec"]["template"]["spec"]
+    assert s["containers"][0]["volumeMounts"][-1] == {
+        "mountPath": "/usr/share/elasticsearch/config/certs",
+        "subPath": "cert.crt",
+        "name": "elastic-certificates",
+    }
+
+
+def test_adding_a_secret_mount_with_default_mode():
+    config = """
+secretMounts:
+  - name: elastic-certificates
+    secretName: elastic-certs
+    path: /usr/share/elasticsearch/config/certs
+    subPath: cert.crt
+    defaultMode: 0755
 """
     r = helm_template(config)
     s = r["statefulset"][uname]["spec"]["template"]["spec"]
@@ -555,6 +589,22 @@ podAnnotations:
             "iam.amazonaws.com/role"
         ]
         == "es-role"
+    )
+
+
+def test_adding_serviceaccount_annotations():
+    config = """
+rbac:
+  create: true
+  serviceAccountAnnotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::111111111111:role/k8s.clustername.namespace.serviceaccount
+"""
+    r = helm_template(config)
+    assert (
+        r["serviceaccount"][uname]["metadata"]["annotations"][
+            "eks.amazonaws.com/role-arn"
+        ]
+        == "arn:aws:iam::111111111111:role/k8s.clustername.namespace.serviceaccount"
     )
 
 
@@ -1280,3 +1330,17 @@ fullnameOverride: "customfullName"
 
     assert "customfullName" in r["statefulset"]
     assert "customfullName" in r["service"]
+
+
+def test_initial_master_nodes_when_using_full_name_override():
+    config = """
+fullnameOverride: "customfullName"
+"""
+    r = helm_template(config)
+    env = r["statefulset"]["customfullName"]["spec"]["template"]["spec"]["containers"][
+        0
+    ]["env"]
+    assert {
+        "name": "cluster.initial_master_nodes",
+        "value": "customfullName-0," + "customfullName-1," + "customfullName-2,",
+    } in env

@@ -1,6 +1,6 @@
 # OSS
 
-This example deploy a 3 nodes Elasticsearch 7.6.2 cluster using
+This example deploy a 3 nodes Elasticsearch 7.8.1-SNAPSHOT cluster using
 [Elasticsearch OSS][] version.
 
 ## Usage
@@ -20,4 +20,4 @@ You can also run [goss integration tests][] using `make test`
 
 
 [elasticsearch oss]: https://www.elastic.co/downloads/elasticsearch-oss
-[goss integration tests]: https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/oss/test/goss.yaml
+[goss integration tests]: https://github.com/elastic/helm-charts/tree/7.8/elasticsearch/examples/oss/test/goss.yaml

@@ -292,6 +292,9 @@ done
     {{ include "drupal.wait-for-elasticsearch-command" . }}
   {{ end }}
 
+  # Run postupgrade commands from normal deployment
+  {{ .Values.php.postupgrade.command }}
+
   # Running custom commands after restored backup
   {{ .Values.php.postRestoreCommand }}
   rm /app/web/sites/default/files/_installing

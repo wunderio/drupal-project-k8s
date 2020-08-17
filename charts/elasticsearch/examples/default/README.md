@@ -1,6 +1,6 @@
 # Default
 
-This example deploy a 3 nodes Elasticsearch 7.6.2 cluster using
+This example deploy a 3 nodes Elasticsearch 7.8.1-SNAPSHOT cluster using
 [default values][].
 
 
@@ -21,5 +21,5 @@ This example deploy a 3 nodes Elasticsearch 7.6.2 cluster using
 You can also run [goss integration tests][] using `make test`
 
 
-[goss integration tests]: https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/default/test/goss.yaml
-[default values]: https://github.com/elastic/helm-charts/tree/master/elasticsearch/values.yaml
+[goss integration tests]: https://github.com/elastic/helm-charts/tree/7.8/elasticsearch/examples/default/test/goss.yaml
+[default values]: https://github.com/elastic/helm-charts/tree/7.8/elasticsearch/values.yaml

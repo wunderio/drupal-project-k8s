@@ -401,7 +401,12 @@ fi
 {{- end }}
 
 {{- define "drupal.backup-command" -}}
-set -e
+  {{ include "drupal.backup-command.dump-database" . }}
+  {{ include "drupal.backup-command.archive-store-backup" . }}
+{{- end }}
+
+{{- define "drupal.backup-command.dump-database" -}}
+  set -e
 
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
@@ -421,7 +426,10 @@ set -e
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
   echo "Database backup complete."
+{{- end }}
 
+{{- define "drupal.backup-command.archive-store-backup" -}}
+  
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
@@ -444,4 +452,12 @@ set -e
 
   # List content of backup folder
   ls -lh /backups/*
+{{- end }}
+
+{{- define "drupal.backup-command.validate-database-dump" -}}
+  set -e
+
+  mysql -uroot -p$MARIADB_ROOT_PASSWORD $MARIADB_DATABASE < /tmp/db.sql
+
+
 {{- end }}

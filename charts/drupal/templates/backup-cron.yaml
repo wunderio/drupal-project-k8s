@@ -25,6 +25,8 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: {{ .Release.Name }}-backup
                 mountPath: /backups
+              - name: {{ .Release.Name }}-shared-volume
+                mountPath: /tmp/signal
             command: ["/bin/bash", "-c"]
             args:
               - |
@@ -41,12 +43,17 @@ spec:
               name: mariadb
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
+            volumeMounts:
+              - name: {{ .Release.Name }}-shared-volume
+                mountPath: /tmp/signal
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
                 claimName: {{ .Release.Name }}-backup
+            - name: {{ .Release.Name }}-shared-volume
+              emptyDir: {}  
 
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}

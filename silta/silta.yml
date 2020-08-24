@@ -38,6 +38,3 @@ silta-release:
   proxy:
     enabled: true
     no_proxy: ".example.com"
-
-# backendConfig customizations for Drupal service
-backendConfig: null

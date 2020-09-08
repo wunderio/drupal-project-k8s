@@ -18,7 +18,7 @@
 {{- end -}}
 
 {{- define "drupal.environment.hostname" -}}
-{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}
+{{ regexReplaceAll "[^[:alnum:]]" ( .Values.environmentName ) "-" | lower | trunc 50 | trimSuffix "-" }}
 {{- end -}}
 
 # SSH-related hosts

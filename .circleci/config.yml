@@ -20,8 +20,7 @@ workflows:
                 command: helm unittest ./charts/drupal --helm3
 
       - silta/drupal-build-deploy: &build-deploy
-          name: build-deploy-1
-          release-suffix: k8s-1
+          name: build-deploy
 
           # Use the latest orb version.
           executor: silta-latest
@@ -29,36 +28,7 @@ workflows:
           # Use a local chart during development.
           chart_name: "./charts/drupal"
           chart_repository: ""
-          silta_config: silta/silta.yml,silta/silta-1.yml
-          codebase-build:
-            - silta/drupal-composer-install
-            - silta/npm-install-build
-          pre-release:
-            - run:
-                name: Build local helm chart
-                command: |
-                  helm repo add elastic https://helm.elastic.co
-                  helm repo add codecentric https://codecentric.github.io/helm-charts
-                  helm dependency build ./charts/drupal
-            - run:
-                name: Dry-run helm install
-                command: helm install --dry-run --generate-name ./charts/drupal
-          context: global_nonprod
-          filters:
-            branches:
-              ignore: production
-
-      - silta/drupal-build-deploy:
-          name: build-deploy-2
-          release-suffix: k8s-2
-
-          # Use the latest orb version.
-          executor: silta-latest
-
-          # Use a local chart during development.
-          chart_name: "./charts/drupal"
-          chart_repository: ""
-          silta_config: silta/silta.yml,silta/silta-2.yml
+          silta_config: silta/silta.yml
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build

@@ -21,7 +21,7 @@
         "drupal-composer/drupal-scaffold": "^2.2",
         "drupal/core-recommended": "^8.8",
         "drupal/memcache": "^2.0",
-        "drupal/monolog": "^1.1",
+        "drupal/monolog": "^2.0",
         "drupal/purge": "^3.0",
         "drupal/purge_purger_http": "^1.0",
         "drupal/simplei": "^1.0",

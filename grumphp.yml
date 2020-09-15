@@ -15,8 +15,10 @@ parameters:
       run_on: ['web/modules/custom', 'web/themes/custom']
     ecs:
       run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
-    yaml_lint: ~
-    json_lint: ~
+    yaml_lint: 
+      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites', 'silta', '.circleci']
+    json_lint:
+      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
   extensions:
     - Wunderio\GrumPHP\Task\PhpCompatibility\PhpCompatibilityExtensionLoader
     - Wunderio\GrumPHP\Task\PhpCheckSyntax\PhpCheckSyntaxExtensionLoader

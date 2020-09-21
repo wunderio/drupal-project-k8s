@@ -1,29 +1,35 @@
+{{ $context_ingress := (index .Values "silta-release").ingress.default }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
     kubernetes.io/ingress.class: traefik
-    {{- if .Values.ssl.enabled }}
+    {{- if $context_ingress.tls.enabled }}
+    {{- if eq $context_ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
-    ingress.kubernetes.io/ssl-redirect: "true"
-    {{- else }}
-    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
-    ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
-
+    {{- if (index $context_ingress.tls "https-redirect") }}
+    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- end }}
+    {{- else }}
+    {{- if eq $context_ingress.type "traefik" }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
+    {{- end }}
+    {{- if (index $context_ingress.tls "https-redirect") }}
+    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- end }}
+    {{- end }}
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
     auto-downscale/services: {{ include "drupal.servicename" . }}
     {{- end }}
 spec:
-  {{- if .Values.ssl.enabled }}
+  {{- if $context_ingress.tls.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
-  {{- range $index, $prefix := .Values.domainPrefixes }}
-  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
-  {{- end }}
   {{- end }}
   rules:
   - host: {{ include "drupal.domain" . | quote }}
@@ -34,7 +40,7 @@ spec:
           serviceName: {{ include "drupal.servicename" . }}
           servicePort: 80
 {{- range $index, $prefix := .Values.domainPrefixes }}
-  - host: '{{$prefix}}.{{ template "drupal.domain" $ }}'
+  - host: '{{ $prefix }}.{{ template "drupal.domain" $ }}'
     http:
       paths:
       - path: /
@@ -43,51 +49,3 @@ spec:
           servicePort: 80
 {{- end }}
 ---
-
-{{- range $index, $domain := .Values.exposeDomains }}
-{{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: {{ $.Release.Name }}-drupal-{{ $index }}
-  annotations:
-    {{ if eq $domain.type "traefik" }}
-    kubernetes.io/ingress.class: traefik
-    {{- if $domain.ssl }}
-    {{- if $domain.ssl.enabled }}
-    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
-    ingress.kubernetes.io/ssl-redirect: "true"
-    {{- end }}
-    {{- else }}
-    traefik.ingress.kubernetes.io/frontend-entry-points: http
-    ingress.kubernetes.io/ssl-redirect: "false"
-    {{- end }}
-    {{- end }}
-
-    {{ if eq $domain.type "gke" }}
-    acme.cert-manager.io/http01-edit-in-place: "true"
-    cert-manager.io/cluster-issuer: letsencrypt
-    {{- end }}
-
-    {{ if $domain.staticIpAddressName }}
-    kubernetes.io/ingress.global-static-ip-name: {{ $domain.staticIpAddressName }}
-    {{- end }}
-
-spec:
-  {{- if $domain.ssl }}
-  {{- if $domain.ssl.enabled }}
-  tls:
-  - secretName: {{ $.Release.Name }}-tls-{{ $index }}
-  {{- end }}
-  {{- end }}
-  rules:
-  - host: {{ $domain.hostname }}
-    http:
-      paths:
-      - path: {{ if eq $domain.type "gke" }}/*{{ else }}/{{ end }}
-        backend:
-          serviceName: {{ include "drupal.servicename" $ }}
-          servicePort: 80
-
----
-{{- end }}

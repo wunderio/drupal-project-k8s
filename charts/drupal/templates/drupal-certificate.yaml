@@ -1,5 +1,8 @@
-{{- if .Values.ssl.enabled }}
-{{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{ $context_ingress := (index .Values "silta-release").ingress.default }}
+{{ $context_tls := (index (index .Values "silta-release").tls "built-in") }}
+
+{{- if $context_ingress.tls.enabled }}
+{{- if has $context_tls.issuer (list "letsencrypt" "letsencrypt-staging") }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -10,8 +13,11 @@ spec:
   secretName: {{ .Release.Name }}-tls
   dnsNames:
   - {{ include "drupal.domain" . | quote }}
+  {{- range $index, $prefix := .Values.domainPrefixes }}
+  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
+  {{- end }}
   issuerRef:
-    name: {{ .Values.ssl.issuer }}
+    name: {{ $context_tls.issuer }}
     kind: ClusterIssuer
   acme:
     config:
@@ -19,31 +25,13 @@ spec:
           ingress: {{ .Release.Name }}-drupal
         domains:
           - {{ template "drupal.domain" . }}
----
-{{- range $index, $prefix := .Values.domainPrefixes }}
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: {{ $.Release.Name }}-crt-p{{ $index }}
-  labels:
-    {{- include "drupal.release_labels" $ | nindent 4 }}
-spec:
-  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
-  dnsNames:
-  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
-  issuerRef:
-    name: {{ $.Values.ssl.issuer }}
-    kind: ClusterIssuer
-  acme:
-    config:
-      - http01:
-          ingress: {{ $.Release.Name }}-drupal
-        domains:
+          {{- range $index, $prefix := .Values.domainPrefixes }}
           - '{{$prefix}}.{{ include "drupal.domain" $ }}'
----
-{{- end }}
+          {{- end }}
 
-{{- else if eq .Values.ssl.issuer "selfsigned" }}
+---
+
+{{- else if eq $context_tls.issuer "selfsigned" }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -57,12 +45,15 @@ spec:
   commonName: {{ template "drupal.domain" . }}
   dnsNames:
   - {{ template "drupal.domain" . }}
+  {{- range $index, $prefix := .Values.domainPrefixes }}
+  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
+  {{- end }}
   issuerRef:
-    name: {{ .Values.ssl.issuer }}
+    name: {{ $context_tls.issuer }}
     kind: ClusterIssuer
 ---
 
-{{- else if eq .Values.ssl.issuer "custom" }}
+{{- else if eq $context_tls.issuer "custom" }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -71,74 +62,11 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 type: kubernetes.io/tls
 data:
-  tls.crt: {{ .Values.ssl.crt | b64enc }}
-  tls.key: {{ .Values.ssl.key | b64enc }}
+  tls.ca: {{ $context_tls.ca | b64enc }}
+  tls.crt: {{ $context_tls.crt | b64enc }}
+  tls.key: {{ $context_tls.key | b64enc }}
 ---
 {{- end }}
 
-# Certificates for exposeDomains 
 
-{{- range $index, $domain := .Values.exposeDomains }}
-{{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
-{{- if $domain.ssl }}
-{{- if $domain.ssl.enabled }}
-{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: {{ $.Release.Name }}-crt-{{ $index }}
-  labels:
-    {{- include "drupal.release_labels" $ | nindent 4 }}
-spec:
-  secretName: {{ $.Release.Name }}-tls-{{ $index }}
-  dnsNames:
-  - {{ $domain.hostname }}
-  issuerRef:
-    name: {{ $domain.ssl.issuer }}
-    kind: ClusterIssuer
-  acme:
-    config:
-      - http01:
-          ingress: {{ $.Release.Name }}-drupal-{{ $index }}
-        domains:
-          - {{ $domain.hostname }}
----
-
-{{- else if eq $domain.ssl.issuer "selfsigned" }}
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: {{ $.Release.Name }}-crt-{{ $index }}
-  labels:
-    {{- include "drupal.release_labels" $ | nindent 4 }}
-  # namespace: silta-cluster
-spec:
-  secretName: {{ $.Release.Name }}-tls-{{ $index }}
-  duration: 2160h
-  renewBefore: 150h 
-  commonName: {{ $domain.hostname }}
-  dnsNames:
-  - {{ $domain.hostname }}
-  issuerRef:
-    name: {{ $domain.ssl.issuer }}
-    kind: ClusterIssuer
----
-
-{{- else if eq $domain.ssl.issuer "custom" }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ $.Release.Name }}-tls-{{ $index }}
-  labels:
-    {{- include "drupal.release_labels" $ | nindent 4 }}
-type: kubernetes.io/tls
-data:
-  ca.crt: {{ $domain.ssl.ca | default "" | b64enc }}
-  tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
-  tls.key: {{ $domain.ssl.key | default "" | b64enc }}
----
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
 {{- end }}

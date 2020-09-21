@@ -28,6 +28,8 @@
         "no_proxy": { "type": "string"}
       }
     },
-    "global": { "type": "object"}
+    "global": { "type": "object"},
+    "ingress": { "type": "object" },
+    "tls": { "type": "object" }
   }
 }

@@ -1,9 +1,3 @@
-
-# Configuration for the wunderio/silta-release subchart.
-silta-release:
-  downscaler:
-    enabled: true
-
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
@@ -45,43 +39,77 @@ autoscaling:
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
 # Note that the key is only used for documentation purposes.
 # exposeDomains:
-#   - hostname: example.com
-#   - hostname: www.example.com
-#     type: gke
-#     staticIpAddressName: example-com-production
+#   example:
+#     hostname: example.com
+#   example2:
+#     hostname: example1.com
+#     # TLS certificates. Reference to a key under `silta-release.tls`
+#     tls: myCert
+#     # Reference to a key under `silta-release.ingress`
+#     ingress: gke
+#     # THIS WILL BE DEPRECIATED SOON, SEE `tls` key above
 #     ssl:
 #       enabled: true
 #       issuer: letsencrypt-staging
+#   example_www:
+#     hostname: www.example.com
+#   example_no_https:
+#     hostname: insecure.example.com
+#     tls: false
+
 exposeDomains: []
 
-exposeDomainsDefaults:
-  type: traefik
-  # The name of the reserved static IP address.
-  # It is best to first reserve the IP address and then add it here.
-  staticIpAddressName: null
-  ssl:
+silta-release:
+
+  # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
+  downscaler:
     enabled: true
-    issuer: letsencrypt
+
+  ingress:
+    default:
+      type: traefik
+      tls:
+        enabled: true
+        https-redirect: false
+
+    gke:
+      type: gke
+      # staticIpAddressName: example-com-production
+      backendConfig:
+        # cdn:
+        #   enabled: true
+        securityPolicy: silta-ingress
+
+  tls:
+
+    # This is used by exposed domains by default.
+    built-in:
+      # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+      issuer: letsencrypt
+      # # Only when certificate type is custom
+      # ca: ".."
+      # key: ".."
+      # crt: ".."
+    
+    # This is used by exposed domains by default.
+    default:
+      # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+      issuer: letsencrypt
+
+    # # This can be used by exposed domains with the `certificate` key.
+    # myCert:
+    #   issuer: custom
+    #   # Only when certificate type is custom
+    #   ca: "..."
+    #   key: ""
+    #   crt: ""
+
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
 # domainPrefixes: ['en', 'fi']
 domainPrefixes: []
 
-# backendConfig customisations for Drupal service
-backendConfig:
- securityPolicy:
-   name: "silta-ingress"
-
-ssl:
-  # Enable HTTPS for this deployment
-  enabled:  true
-  # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
-  issuer: letsencrypt
-  # Only when certificate type is custom
-  # ca: ""
-  # key: ""
-  # crt: ""
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
@@ -217,7 +245,7 @@ php:
 
   # PHP settings
   php_ini:
-    loglevel: notice # Possible Values: alert, error, warning, notice, debug
+    loglevel: notice  # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M

@@ -38,3 +38,40 @@ silta-release:
   proxy:
     enabled: true
     no_proxy: ".example.com"
+
+
+# exposeDomains:
+#   prod:
+#     hostname: example.com
+#   prod1:
+#     hostname: example1.com
+#     # TLS certificates. Reference to a key under `silta-release.tls`
+#     tls: myCert
+#     # Reference to a key under `silta-release.ingress`
+#     ingress: gke
+#   prod_www:
+#     hostname: www.example.com
+#   prod_no_https:
+#     hostname: insecure.example.com
+#     tls: false
+
+
+# silta-release:
+#   # ingress:
+#     # gke:
+#     #   backendConfig: {}
+#     #   staticIpAddressName: example-com-production
+#   tls:
+#     # This can be used by exposed domains with the `tls` key.
+#     myCert:
+#       issuer: custom
+#       # Only when certificate type is custom
+#       ca: "..."
+#       key: "..."
+#       crt: "..."
+
+domainPrefixes: 
+  - test1
+  - test2
+  - test0
+  - test3

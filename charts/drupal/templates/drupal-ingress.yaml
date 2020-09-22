@@ -30,6 +30,9 @@ spec:
   {{- if $context_ingress.tls.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
+  {{- range $index, $prefix := .Values.domainPrefixes }}
+  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  {{- end }}
   {{- end }}
   rules:
   - host: {{ include "drupal.domain" . | quote }}

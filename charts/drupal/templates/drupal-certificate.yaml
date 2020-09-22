@@ -13,9 +13,6 @@ spec:
   secretName: {{ .Release.Name }}-tls
   dnsNames:
   - {{ include "drupal.domain" . | quote }}
-  {{- range $index, $prefix := .Values.domainPrefixes }}
-  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
-  {{- end }}
   issuerRef:
     name: {{ $context_tls.issuer }}
     kind: ClusterIssuer
@@ -25,11 +22,29 @@ spec:
           ingress: {{ .Release.Name }}-drupal
         domains:
           - {{ template "drupal.domain" . }}
-          {{- range $index, $prefix := .Values.domainPrefixes }}
-          - '{{$prefix}}.{{ include "drupal.domain" $ }}'
-          {{- end }}
-
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  dnsNames:
+  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
+  issuerRef:
+    name: {{ $context_tls.issuer }}
+    kind: ClusterIssuer
+  acme:
+    config:
+      - http01:
+          ingress: {{ $.Release.Name }}-drupal
+        domains:
+          - '{{$prefix}}.{{ include "drupal.domain" $ }}'
+---
+{{- end }}
 
 {{- else if eq $context_tls.issuer "selfsigned" }}
 apiVersion: certmanager.k8s.io/v1alpha1
@@ -45,9 +60,6 @@ spec:
   commonName: {{ template "drupal.domain" . }}
   dnsNames:
   - {{ template "drupal.domain" . }}
-  {{- range $index, $prefix := .Values.domainPrefixes }}
-  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
-  {{- end }}
   issuerRef:
     name: {{ $context_tls.issuer }}
     kind: ClusterIssuer
@@ -67,6 +79,5 @@ data:
   tls.key: {{ $context_tls.key | b64enc }}
 ---
 {{- end }}
-
 
 {{- end }}

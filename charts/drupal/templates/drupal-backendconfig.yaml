@@ -1,11 +1,10 @@
-{{ $context_ingress := (index .Values "silta-release").ingress.default }}
 apiVersion: cloud.google.com/v1beta1
 kind: BackendConfig
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
-{{ if $context_ingress.backendConfig }} 
+{{ if .Values.backendConfig }} 
 spec:
-  {{- toYaml $context_ingress.backendConfig | nindent 2 }}
+  {{- toYaml .Values.backendConfig | nindent 2 }}
 {{- end }}

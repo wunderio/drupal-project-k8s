@@ -39,6 +39,14 @@ autoscaling:
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
 # Note that the key is only used for documentation purposes.
 # exposeDomains:
+#   - hostname: example.com
+#   - hostname: www.example.com
+#     type: gce
+#     staticIpAddressName: example-com-production
+
+
+
+# exposeDomains:
 #   example:
 #     hostname: example.com
 #   example2:
@@ -46,8 +54,7 @@ autoscaling:
 #     # TLS certificates. Reference to a key under `silta-release.tls`
 #     tls: myCert
 #     # Reference to a key under `silta-release.ingress`
-#     ingress: gke
-#     # THIS WILL BE DEPRECIATED SOON, SEE `tls` key above
+#     ingress: gce
 #     ssl:
 #       enabled: true
 #       issuer: letsencrypt-staging
@@ -57,7 +64,16 @@ autoscaling:
 #     hostname: insecure.example.com
 #     tls: false
 
-exposeDomains: []
+exposeDomains: {}
+
+exposeDomainsDefaults:
+  ingress: default
+  ssl:
+    enabled: true
+    issuer: letsencrypt
+
+
+
 
 silta-release:
 
@@ -68,48 +84,41 @@ silta-release:
   ingress:
     default:
       type: traefik
-      tls:
-        enabled: true
-        https-redirect: false
+      tls: true
+      redirect-https: true
 
-    gke:
-      type: gke
-      # staticIpAddressName: example-com-production
-      backendConfig:
-        # cdn:
-        #   enabled: true
-        securityPolicy: silta-ingress
+    gce:
+      type: gce
+      # backendConfig:
+      #   # cdn:
+      #   #   enabled: true
+      #   securityPolicy: silta-ingress
+      # The name of the reserved static IP address.
+      # It is best to first reserve the IP address and then add it here.
+      staticIpAddressName: null
 
-  tls:
 
-    # This is used by exposed domains by default.
-    built-in:
-      # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
-      issuer: letsencrypt
-      # # Only when certificate type is custom
-      # ca: ".."
-      # key: ".."
-      # crt: ".."
-    
-    # This is used by exposed domains by default.
-    default:
-      # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
-      issuer: letsencrypt
 
-    # # This can be used by exposed domains with the `certificate` key.
-    # myCert:
-    #   issuer: custom
-    #   # Only when certificate type is custom
-    #   ca: "..."
-    #   key: ""
-    #   crt: ""
-
+# backendConfig customisations for Drupal service
+backendConfig:
+ securityPolicy:
+   name: "silta-ingress"
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
 # domainPrefixes: ['en', 'fi']
 domainPrefixes: []
 
+# Settings for default site provided by this deployment
+ssl:
+  # Enable HTTPS for this deployment
+  enabled:  true
+  # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  issuer: letsencrypt
+  # Only when certificate type is custom
+  # ca: ""
+  # key: ""
+  # crt: ""
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:

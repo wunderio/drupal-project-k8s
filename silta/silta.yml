@@ -17,6 +17,10 @@ mounts:
   private-files:
     enabled: true
 
+nginx:
+  basicauth:
+    enabled: false
+
 # Allow access from another namespace for testing purposes.
 silta-release:
   ingressAccess:
@@ -40,38 +44,52 @@ silta-release:
     no_proxy: ".example.com"
 
 
-# exposeDomains:
-#   prod:
-#     hostname: example.com
-#   prod1:
-#     hostname: example1.com
-#     # TLS certificates. Reference to a key under `silta-release.tls`
-#     tls: myCert
-#     # Reference to a key under `silta-release.ingress`
-#     ingress: gke
-#   prod_www:
-#     hostname: www.example.com
-#   prod_no_https:
-#     hostname: insecure.example.com
-#     tls: false
+  ingress:
+    nonssl:
+      type: traefik
+      tls: false
+      redirect-https: false
+    gce:
+      # backendConfig: {}
+      staticIpAddressName: example-exposedomains-global    
+    gce-regional:
+      type: gce
+      # backendConfig:
+      #   # cdn:
+      #   #   enabled: true
+      #   securityPolicy: silta-ingress
+      # backendConfig: {}
+      staticIpAddressName: example-exposedomains-regional
 
-
-# silta-release:
-#   # ingress:
-#     # gke:
-#     #   backendConfig: {}
-#     #   staticIpAddressName: example-com-production
-#   tls:
-#     # This can be used by exposed domains with the `tls` key.
-#     myCert:
-#       issuer: custom
-#       # Only when certificate type is custom
-#       ca: "..."
-#       key: "..."
-#       crt: "..."
+exposeDomains:
+  example1:
+    hostname: example1.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
+  example2:
+    hostname: example2.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
+    # Reference to a key under `silta-release.ingress`
+    ingress: gce-regional
+  example3:
+    hostname: example3.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
+    # Reference to a key under `silta-release.ingress`
+    ingress: gce-regional
+  example4:
+    hostname: example4.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
+    ssl: 
+      # This will be deprecated in favor of `silta-release.ingress.[ingress].ssl.enabled`
+      enabled: false
+    ingress: nonssl
+  example5:
+    hostname: example5.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
+  example6:
+   hostname: example6.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
+   ingress: gce
+  example7:
+    hostname: example7.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
+    ingress: gce-regional
 
 domainPrefixes: 
   - test1
   - test2
   - test0
   - test3
+  - test4

@@ -29,7 +29,6 @@
       }
     },
     "global": { "type": "object"},
-    "ingress": { "type": "object" },
-    "tls": { "type": "object" }
+    "ingress": { "type": "object" }
   }
 }

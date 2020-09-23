@@ -1,4 +1,4 @@
-{{ $protocol := (index .Values "silta-release").ingress.default.tls.enabled | ternary "https" "http" -}}
+{{ $protocol := (index .Values "silta-release").ingress.default.tls | ternary "https" "http" -}}
 Your site is available at:
 
   {{ $protocol }}://{{- template "drupal.domain" . }}

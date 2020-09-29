@@ -1,4 +1,4 @@
-{{- $ingress := (index .Values "silta-release").ingress.default }}
+{{- $ingress := .Values.ingress.default }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -15,12 +15,9 @@ metadata:
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     {{- end }}
     {{- end }}
-    {{- if (index $ingress "redirect-https") }}
-    ingress.kubernetes.io/ssl-redirect: "true"
-    {{- else }}
-    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- if (hasKey $ingress "redirect-https") }}
+    ingress.kubernetes.io/ssl-redirect: {{ (index $ingress "redirect-https") | quote }}
     {{- end }}
-
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
@@ -53,16 +50,11 @@ spec:
 {{- end }}
 ---
 
-
 # Ingresses for exposeDomains 
-{{- range $ingress_index, $ingress := (index $.Values "silta-release").ingress }}
+{{- range $ingress_index, $ingress := $.Values.ingress }}
 
-# ingress_index: {{ $ingress_index }}
-# ingress.tls: {{ $ingress }}
-{{- $ingress := mergeOverwrite (deepCopy (index $.Values "silta-release").ingress.default) $ingress }}
-# ingress.tls: {{ $ingress }}
+{{- $ingress := mergeOverwrite (deepCopy $.Values.ingress.default) $ingress }}
 
-# Count domains using this ingress 
 {{- $ingress_in_use := false }}
 {{- range $domain_index, $domain := $.Values.exposeDomains }}
   {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
@@ -74,7 +66,6 @@ spec:
 {{- end }}
 
 {{- if $ingress_in_use }}
-# Template
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -91,7 +82,7 @@ metadata:
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     {{- end }}
     {{- end }}
-    {{- if (index $ingress "redirect-https") }}
+    {{- if (hasKey $ingress "redirect-https") }}
     ingress.kubernetes.io/ssl-redirect: {{ (index $ingress "redirect-https") | quote }}
     {{- end }}
     {{- if eq $ingress.type "gce" }}

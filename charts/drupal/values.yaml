@@ -1,3 +1,9 @@
+# Subchart with few functionality that is reused for our other charts
+silta-release:
+  # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
+  downscaler:
+    enabled: true
+
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
@@ -37,23 +43,12 @@ autoscaling:
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
-# Note that the key is only used for documentation purposes.
-# exposeDomains:
-#   - hostname: example.com
-#   - hostname: www.example.com
-#     type: gce
-#     staticIpAddressName: example-com-production
-
-
-
 # exposeDomains:
 #   example:
 #     hostname: example.com
 #   example2:
 #     hostname: example1.com
-#     # TLS certificates. Reference to a key under `silta-release.tls`
-#     tls: myCert
-#     # Reference to a key under `silta-release.ingress`
+#     # Reference to a key under `ingress`
 #     ingress: gce
 #     ssl:
 #       enabled: true
@@ -61,9 +56,9 @@ autoscaling:
 #   example_www:
 #     hostname: www.example.com
 #   example_no_https:
-#     hostname: insecure.example.com
-#     tls: false
-
+#    hostname: insecure.example.com
+#      ssl: 
+#        enabled: false
 exposeDomains: {}
 
 exposeDomainsDefaults:
@@ -72,32 +67,16 @@ exposeDomainsDefaults:
     enabled: true
     issuer: letsencrypt
 
-
-
-
-silta-release:
-
-  # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
-  downscaler:
-    enabled: true
-
-  ingress:
-    default:
-      type: traefik
-      tls: true
-      redirect-https: true
-
-    gce:
-      type: gce
-      # backendConfig:
-      #   # cdn:
-      #   #   enabled: true
-      #   securityPolicy: silta-ingress
-      # The name of the reserved static IP address.
-      # It is best to first reserve the IP address and then add it here.
-      staticIpAddressName: null
-
-
+ingress:
+  default:
+    type: traefik
+    tls: true
+    redirect-https: true
+  gce:
+    type: gce
+    # The name of the reserved static IP address.
+    # It is best to first reserve the IP address and then add it here.
+    staticIpAddressName: null
 
 # backendConfig customisations for Drupal service
 backendConfig:

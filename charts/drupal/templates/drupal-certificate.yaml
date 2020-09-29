@@ -1,4 +1,4 @@
-{{ $context_ingress := (index .Values "silta-release").ingress.default }}
+{{ $context_ingress := .Values.ingress.default }}
 {{ $context_ssl := .Values.ssl }}
 
 {{- if $context_ingress.tls }}

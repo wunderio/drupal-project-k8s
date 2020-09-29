@@ -66,6 +66,7 @@
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
     "ssl": { "type": "object" },
     "backendConfig": { "type": "object" },
+    "ingress": { "type": "object" },
 
     "nginx": {
       "type": "object",

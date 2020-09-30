@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
-    kubernetes.io/ingress.class: {{ $ingress.type }}
+    kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
     {{- if eq $ingress.type "traefik" }}
@@ -18,6 +18,13 @@ metadata:
     {{- if (hasKey $ingress "redirect-https") }}
     ingress.kubernetes.io/ssl-redirect: {{ (index $ingress "redirect-https") | quote }}
     {{- end }}
+    {{- if eq $ingress.type "gce" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    {{- if $ingress.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
+    {{- end }}
+    
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
@@ -71,7 +78,7 @@ kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-drupal-{{ $ingress_index }}
   annotations:
-    kubernetes.io/ingress.class: {{ $ingress.type }}
+    kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
     {{- if eq $ingress.type "traefik" }}
@@ -89,7 +96,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
-    kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 spec:
   tls:

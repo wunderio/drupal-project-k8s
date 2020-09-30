@@ -42,7 +42,7 @@ autoscaling:
         targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
-# Example of exposing 2 additional domains for this deployment, each with its own certificate
+# Example of exposing 2 additional domains for this deployment, each with its own certificate.
 # exposeDomains:
 #   example:
 #     hostname: example.com
@@ -76,7 +76,7 @@ ingress:
     type: gce
     # The name of the reserved static IP address.
     # It is best to first reserve the IP address and then add it here.
-    staticIpAddressName: null
+    # staticIpAddressName: null
 
 # backendConfig customisations for Drupal service
 backendConfig:

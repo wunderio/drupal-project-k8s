@@ -17,10 +17,6 @@ mounts:
   private-files:
     enabled: true
 
-nginx:
-  basicauth:
-    enabled: false
-
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:
@@ -42,46 +38,3 @@ silta-release:
             matchLabels:
               name: drupal-project
 
-ingress:
-  nonssl:
-    type: traefik
-    tls: false
-    redirect-https: false
-  gce:
-    staticIpAddressName: example-exposedomains-global    
-  gce-regional:
-    type: gce
-    staticIpAddressName: example-exposedomains-regional
-
-exposeDomains:
-  example1:
-    hostname: example1.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
-  example2:
-    hostname: example2.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
-    # Reference to a key under `ingress`
-    ingress: gce-regional
-  example3:
-    hostname: example3.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
-    # Reference to a key under `ingress`
-    ingress: gce-regional
-  example4:
-    hostname: example4.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
-    ssl: 
-      # This will be deprecated in favor of `ingress.[ingress].tls`
-      enabled: false
-    ingress: nonssl
-  example5:
-    hostname: example5.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
-  example6:
-   hostname: example6.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
-   ingress: gce
-  example7:
-    hostname: example7.feature-exposedomains-v2.drupal-project-k8s.dev.wdr.io
-    ingress: gce-regional
-
-domainPrefixes: 
-  - test1
-  - test2
-  - test0
-  - test3
-  - test4

@@ -19,6 +19,9 @@ mounts:
 
 # Allow access from another namespace for testing purposes.
 silta-release:
+  proxy:
+    enabled: true
+    no_proxy: ".example.com"
   ingressAccess:
     test:
       additionalPodSelector:
@@ -35,6 +38,3 @@ silta-release:
             matchLabels:
               name: drupal-project
 
-  proxy:
-    enabled: true
-    no_proxy: ".example.com"

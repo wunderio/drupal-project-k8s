@@ -41,9 +41,12 @@ data:
 
     # Define the purge network access.
     # These are used below to allow cache purging via BAN.
-    # acl purge {
-    #   "127.0.0.1";
-    # }
+    acl purge {
+      "127.0.0.1";
+      {{- range .Values.nginx.noauthips }}
+      {{ . | quote }};
+      {{- end }}
+    }
 
     # List of upstream proxies we trust to set X-Forwarded-For correctly.
     acl upstream_proxy {

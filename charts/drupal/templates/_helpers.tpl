@@ -1,6 +1,15 @@
+
+{{- define "drupal.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "drupal.release_labels" -}}
 app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
+app.kubernetes.io/name: {{ .Values.app | quote }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ template "drupal.chart" . }}
 {{- end }}
 
 {{- define "drupal.php-container" -}}

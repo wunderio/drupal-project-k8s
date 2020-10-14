@@ -38,3 +38,17 @@ silta-release:
             matchLabels:
               name: drupal-project
 
+exposeDomains:
+  prod:
+    hostname: k8s-test-ip.silta.wdr.io
+    ingress: gce
+    ssl:
+      enabled: true
+      issuer: letsencrypt
+
+ingress:
+  gce:
+    staticIpAddressName: k8s-test-ip
+
+# Remove backendConfig defaults for Drupal service
+# backendConfig: null

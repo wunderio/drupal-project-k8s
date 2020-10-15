@@ -3,6 +3,7 @@
 #
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
+# trigger2
 
 varnish:
   enabled: false

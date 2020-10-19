@@ -17,8 +17,14 @@ mounts:
   private-files:
     enabled: true
 
+backup:
+  enabled: true
+
 # Allow access from another namespace for testing purposes.
 silta-release:
+  proxy:
+    enabled: true
+    no_proxy: ".example.com"
   ingressAccess:
     test:
       additionalPodSelector:
@@ -34,9 +40,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-  proxy:
-    enabled: true
-    no_proxy: ".example.com"
-backup:
-  enabled: true

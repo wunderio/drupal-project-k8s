@@ -42,7 +42,7 @@ workflows:
             - run:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal
-          context: global_nonprod
+          context: silta_dev
           filters:
             branches:
               ignore: production

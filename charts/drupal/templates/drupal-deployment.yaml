@@ -8,7 +8,7 @@ spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      {{- include "drupal.release_labels" . | nindent 6 }}
+      {{- include "drupal.release_selector_labels" . | nindent 6 }}
       deployment: drupal
   template:
     metadata:
@@ -101,6 +101,7 @@ spec:
       affinity:
         podAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
+          # Preferrably keep pods on the same node as the database.
           - weight: 1
             podAffinityTerm:
               labelSelector:
@@ -114,6 +115,20 @@ spec:
                   values:
                   - mariadb
               topologyKey: kubernetes.io/hostname
+          # Preferrably keep pods in the same zone as the database.
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: release
+                  operator: In
+                  values:
+                  - "{{ .Release.Name }}"
+                - key: mariadb
+                  operator: In
+                  values:
+                  - mariadb
+              topologyKey: topology.kubernetes.io/zone
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 10

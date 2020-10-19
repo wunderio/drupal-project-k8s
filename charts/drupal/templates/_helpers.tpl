@@ -1,6 +1,18 @@
-{{- define "drupal.release_labels" -}}
+{{- define "drupal.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "drupal.release_selector_labels" -}}
 app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
+{{- end }}
+
+{{- define "drupal.release_labels" -}}
+{{- include "drupal.release_selector_labels" . }}
+app.kubernetes.io/name: {{ .Values.app | quote }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ template "drupal.chart" . }}  
 {{- end }}
 
 {{- define "drupal.php-container" -}}
@@ -78,7 +90,7 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-smtp
       key: password
-# Duplicate SMTP env variables for ssmtp bundled with amazee php image 
+# Duplicate SMTP env variables for ssmtp bundled with amazee php image
 - name: SSMTP_MAILHUB
   {{- if .Values.mailhog.enabled }}
   value: "{{ .Release.Name }}-mailhog:1025"
@@ -173,9 +185,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
@@ -279,7 +291,7 @@ done
 
   # Make backup of current deployment
   {{ include "drupal.backup-command" . }}
-  
+
   # Restore files from targeted backup
   {{ include "drupal.import-backup-files" . }}
 
@@ -417,7 +429,7 @@ fi
   IGNORED_TABLES=""
   for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTableContent }}'` ;
   do
-    IGNORE_TABLES="$IGNORE_TABLES --ignore-table='$DB_NAME.$TABLE'";
+    IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
     IGNORED_TABLES="$IGNORED_TABLES $TABLE";
   done
 

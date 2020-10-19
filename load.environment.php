@@ -1,20 +1,20 @@
 <?php
 
 /**
+ * @file
+ * Environment loader.
+ *
  * This file is included very early. See autoload.files in composer.json and
- * https://getcomposer.org/doc/04-schema.md#files
+ * https://getcomposer.org/doc/04-schema.md#files.
  */
 
 use Dotenv\Dotenv;
-use Dotenv\Exception\InvalidPathException;
 
 /**
- * Load any .env file. See /.env.example.
+ * Load any .env file.
+ *
+ * See /.env.example. All of the defined variables are available
+ * in the $_ENV and $_SERVER super-globals: "$username = $_ENV['USERNAME'];".
  */
-$dotenv = new Dotenv(__DIR__);
-try {
-  $dotenv->load();
-}
-catch (InvalidPathException $e) {
-  // Do nothing. Production environments rarely use .env files.
-}
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();

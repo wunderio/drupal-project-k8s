@@ -78,6 +78,10 @@ ingress:
     # It is best to first reserve the IP address and then add it here.
     # staticIpAddressName: null
 
+# Infrastructure related settings.
+cluster: 
+  vpcNative: false
+
 # backendConfig customisations for Drupal service
 backendConfig:
  securityPolicy:
@@ -415,6 +419,8 @@ mariadb:
               - static-ip
 
 varnish:
+  # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
+  # to configure varnish for Your site correctly.
   enabled: false
   resources:
     requests:
@@ -424,6 +430,9 @@ varnish:
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
   # Inject custom code into vcl_recv subroutine
   vcl_recv_extra: |
+  
+  # Additional cookie based rules
+  vcl_extra_cookies: |
 
 elasticsearch:
   enabled: false

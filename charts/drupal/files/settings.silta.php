@@ -51,8 +51,9 @@ if (getenv('MEMCACHED_HOST')) {
 }
 
 /**
- * Set the cache backend to use memcache when a memcache server is set
- * and if memcache backend class is defined.
+ * Set the cache backend to use memcache.
+ *
+ * Make sure that memcache host is set and memcache backend class is defined.
  */
 if (getenv('MEMCACHED_HOST') && class_exists('\Drupal\memcache\MemcacheBackend')) {
   $settings['cache']['default'] = 'cache.backend.memcache';

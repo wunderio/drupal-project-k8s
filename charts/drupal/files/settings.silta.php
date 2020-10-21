@@ -45,10 +45,16 @@ if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
 
 /**
  * Set the memcache server hostname when a memcached server is available.
- * Set the cache backend to use memcache when a memcache server is available.
  */
 if (getenv('MEMCACHED_HOST')) {
   $settings['memcache']['servers'] = [getenv('MEMCACHED_HOST') . ':11211' => 'default'];
+}
+
+/**
+ * Set the cache backend to use memcache when a memcache server is set
+ * and if memcache backend class is defined.
+ */
+if (getenv('MEMCACHED_HOST') && class_exists('\Drupal\memcache\MemcacheBackend')) {
   $settings['cache']['default'] = 'cache.backend.memcache';
 }
 

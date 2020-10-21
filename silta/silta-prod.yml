@@ -10,6 +10,10 @@ ingress:
   gce:
     staticIpAddressName: gke-ingress-test
 
+# TODO: Move this to orb
+cluster:
+  vpcNative: true
+
 # Provide a high-availability, autoscaling deployment.
 replicas: 2
 autoscaling:

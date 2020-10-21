@@ -33,6 +33,9 @@ spec:
                 {{ include "drupal.backup-command" . | nindent 16 }}
           - name: mariadb
             image: docker.io/bitnami/mariadb:10.2.32
+            args:
+              - |
+                {{ include "mariadb.db-validation" . | nindent 16 }}
             env:
             - name: MARIADB_ROOT_PASSWORD
               value: password

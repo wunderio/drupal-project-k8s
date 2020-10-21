@@ -473,3 +473,18 @@ fi
 
 
 {{- end }}
+
+{{- define "mariadb.db-validation" -}}
+  set -e
+  
+  /opt/bitnami/scripts/mariadb/run.sh
+  touch /tmp/signal/_running
+
+  while  true ; do
+    if [ -f /tmp/signal/_done ]; then
+      exit
+    fi
+    sleep 2
+  done
+
+{{- end }}

@@ -18,6 +18,7 @@ spec:
       template:
         spec:
           enableServiceLinks: false
+          shareProcessNamespace: true
           containers:
           - name: backup
             {{- include "drupal.php-container" . | nindent 12 }}

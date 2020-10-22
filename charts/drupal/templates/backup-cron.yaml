@@ -31,11 +31,12 @@ spec:
             args:
               - |
                 {{ include "drupal.backup-command" . | nindent 16 }}
+            securityContext:
+              capabilities:
+                add:
+                  - SYS_PTRACE
           - name: mariadb
             image: docker.io/bitnami/mariadb:10.2.32
-            args:
-              - |
-                {{ include "mariadb.db-validation" . | nindent 16 }}
             env:
             - name: MARIADB_ROOT_PASSWORD
               value: password
@@ -49,6 +50,10 @@ spec:
             volumeMounts:
               - name: {{ .Release.Name }}-shared-volume
                 mountPath: /tmp/signal
+            securityContext:
+              capabilities:
+                add:
+                  - SYS_PTRACE
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

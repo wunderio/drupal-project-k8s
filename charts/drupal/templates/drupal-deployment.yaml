@@ -21,6 +21,7 @@ spec:
         configMap-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
     spec:
       enableServiceLinks: false
+      shareProcessNamespace: true
       containers:
       # php-fpm container.
       - name: php

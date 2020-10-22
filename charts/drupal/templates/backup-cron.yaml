@@ -32,8 +32,7 @@ spec:
             args:
               - |
                 {{ include "drupal.backup-command" . | nindent 16 }}
-                sleep 10
-                mysqld_pid=$(pgrep mysqld) && kill -INT $mysqld 
+                {{ include "mariadb.db-validation" . | nindent 16 }}
             securityContext:
               capabilities:
                 add:

@@ -476,15 +476,16 @@ fi
 
 {{- define "mariadb.db-validation" -}}
   set -e
-  
-  /opt/bitnami/scripts/mariadb/run.sh
-  touch /tmp/signal/_running
 
-  while  true ; do
-    if [ -f /tmp/signal/_done ]; then
-      exit
-    fi
-    sleep 2
-  done
+  echo "Sleeping 10 seconds..."
+  sleep 10s
+  ps -A
+  mysqld_pid=$(pgrep mysqld)
+  
+  mysql -udrupal -ppassword drupal < /tmp/db.sql
+  drush sql:query "SELECT * FROM users WHERE uid=1" --db-url=mysql://drupal:password@localhost:3306/drupal
+
+  kill -TERM $mysqld_pid
+  echo "Killed ${mysqld_pid}"
 
 {{- end }}

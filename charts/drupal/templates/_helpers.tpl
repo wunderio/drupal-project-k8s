@@ -475,7 +475,6 @@ fi
 {{- end }}
 
 {{- define "mariadb.db-validation" -}}
-  set -x
 
   # Dont quit immediately on error, otherwise mariadb container below will linger
   set +e
@@ -496,7 +495,7 @@ fi
   mysqld_pid=$(pgrep mysqld)
   
   mysql -uroot -ppassword drupal --protocol=tcp < /tmp/db.sql
-  drush sql:query "SELECT * FROM users WHERE uid=1" --db-url=mysql://root:password@127.0.0.1:3306/drupal
+  drush status --fields=bootstrap --db-url=mysql://root:password@127.0.0.1:3306/drupal
 
   kill -TERM $mysqld_pid && echo "Killed ${mysqld_pid}"
 

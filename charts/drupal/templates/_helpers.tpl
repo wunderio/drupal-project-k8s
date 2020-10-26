@@ -482,7 +482,7 @@ fi
 
   TIME_WAITING=0
   echo "Waiting for database.";
-  until mysqladmin status --connect_timeout=2 -udrupal -ppassword -h localhost --protocol=tcp --silent; do
+  until mysqladmin status --connect_timeout=2 -uroot -ppassword -h 127.0.0.1 --protocol=tcp --silent; do
     echo -n "."
     sleep 5
     TIME_WAITING=$((TIME_WAITING+5))
@@ -495,10 +495,9 @@ fi
 
   mysqld_pid=$(pgrep mysqld)
   
-  mysql -udrupal -ppassword drupal --protocol=tcp < /tmp/db.sql
-  drush sql:query "SELECT * FROM users WHERE uid=1"
+  mysql -uroot -ppassword drupal --protocol=tcp < /tmp/db.sql
+  drush sql:query "SELECT * FROM users WHERE uid=1" --db-url=mysql://root:password@127.0.0.1:3306/drupal
 
-  kill -TERM $mysqld_pid
-  echo "Killed ${mysqld_pid}"
+  kill -TERM $mysqld_pid && echo "Killed ${mysqld_pid}"
 
 {{- end }}

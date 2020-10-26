@@ -494,9 +494,9 @@ fi
 
   mysqld_pid=$(pgrep mysqld)
   
-  mysql -uroot -p{{ .db_password }} drupal --protocol=tcp < /tmp/db1.sql
+  mysql -uroot -p{{ .db_password }} drupal --protocol=tcp < /tmp/db.sql
   drush status --fields=bootstrap --db-url=mysql://root:{{ .db_password }}@127.0.0.1:3306/drupal
 
-  kill -TERM $mysqld_pid && echo "Killed ${mysqld_pid}"
+  #kill -TERM $mysqld_pid && echo "Killed ${mysqld_pid}"
 
 {{- end }}

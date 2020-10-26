@@ -37,6 +37,13 @@ spec:
               capabilities:
                 add:
                   - SYS_PTRACE
+            lifecycle:
+              preStop:
+                exec:
+                  command: [
+                    # Gracefully shutdown nginx
+                    "/bin/bash", "-c", "kill -TERM `pgrep mysqld`"
+                  ]
           - name: mariadb
             image: docker.io/bitnami/mariadb:10.2.32
             imagePullPolicy: IfNotPresent

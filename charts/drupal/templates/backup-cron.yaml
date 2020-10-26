@@ -26,8 +26,6 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: {{ .Release.Name }}-backup
                 mountPath: /backups
-              - name: {{ .Release.Name }}-shared-volume
-                mountPath: /tmp/signal
             command: ["/bin/bash", "-c"]
             args:
               - |
@@ -39,6 +37,7 @@ spec:
                   - SYS_PTRACE
           - name: mariadb
             image: docker.io/bitnami/mariadb:10.2.32
+            imagePullPolicy: IfNotPresent
             env:
             - name: MARIADB_ROOT_PASSWORD
               value: password
@@ -49,9 +48,6 @@ spec:
               name: mariadb
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
-            volumeMounts:
-              - name: {{ .Release.Name }}-shared-volume
-                mountPath: /tmp/signal
             securityContext:
               capabilities:
                 add:
@@ -62,9 +58,6 @@ spec:
             - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
                 claimName: {{ .Release.Name }}-backup
-            - name: {{ .Release.Name }}-shared-volume
-              emptyDir: {}  
-
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 ---

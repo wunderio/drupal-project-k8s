@@ -445,7 +445,7 @@ fi
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
-  gzip -9 /tmp/db.sql
+  gzip -k9 /tmp/db.sql
 
   # Create a folder for the backup
   mkdir -p $BACKUP_LOCATION
@@ -475,15 +475,18 @@ fi
 {{- end }}
 
 {{- define "mariadb.db-validation" -}}
-  set -e
+  set -x
 
-  echo "Sleeping 10 seconds..."
-  sleep 10s
-  ps -A
+  export DB_HOST=127.0.0.1
+  export DB_USER=root
+  export DB_PASS=password
+
+  {{ include "drupal.wait-for-db-command" . }}
+
   mysqld_pid=$(pgrep mysqld)
   
-  mysql -udrupal -ppassword drupal < /tmp/db.sql
-  drush sql:query "SELECT * FROM users WHERE uid=1" --db-url=mysql://drupal:password@localhost:3306/drupal
+  mysql -udrupal -ppassword drupal --protocol tcp < /tmp/db.sql
+  drush sql:query "SELECT * FROM users WHERE uid=1"
 
   kill -TERM $mysqld_pid
   echo "Killed ${mysqld_pid}"

@@ -1,5 +1,6 @@
 {{- if .Values.backup.enabled }}
-{{- $db_password := randAscii 20 }}
+{{- $db_password := randAlphaNum 20 }}
+{{- $params := dict "db_password" $db_password  -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -30,8 +31,8 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
-                {{ include "drupal.backup-command" . | nindent 16 }}
-                {{ include "mariadb.db-validation" . | nindent 16 }}
+                {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
+                {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
             securityContext:
               capabilities:
                 add:

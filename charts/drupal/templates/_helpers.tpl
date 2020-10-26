@@ -477,15 +477,25 @@ fi
 {{- define "mariadb.db-validation" -}}
   set -x
 
-  export DB_HOST=127.0.0.1
-  export DB_USER=root
-  export DB_PASS=password
+  # Dont quit immediately on error, otherwise mariadb container below will linger
+  set +e
 
-  {{ include "drupal.wait-for-db-command" . }}
+  TIME_WAITING=0
+  echo "Waiting for database.";
+  until mysqladmin status --connect_timeout=2 -udrupal -ppassword -h localhost --protocol=tcp --silent; do
+    echo -n "."
+    sleep 5
+    TIME_WAITING=$((TIME_WAITING+5))
+
+    if [ $TIME_WAITING -gt 90 ]; then
+      echo "Database connection timeout"
+      exit 1
+    fi
+  done
 
   mysqld_pid=$(pgrep mysqld)
   
-  mysql -udrupal -ppassword drupal --protocol tcp < /tmp/db.sql
+  mysql -udrupal -ppassword drupal --protocol=tcp < /tmp/db.sql
   drush sql:query "SELECT * FROM users WHERE uid=1"
 
   kill -TERM $mysqld_pid

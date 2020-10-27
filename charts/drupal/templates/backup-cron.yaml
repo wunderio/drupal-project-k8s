@@ -17,10 +17,8 @@ spec:
   suspend: false
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 300
       template:
-        metadata:
-          annotations:
-            nrmitchi.com/sidecars: mariadb
         spec:
           enableServiceLinks: false
           shareProcessNamespace: true

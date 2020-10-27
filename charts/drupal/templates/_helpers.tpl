@@ -477,26 +477,29 @@ fi
 {{- define "mariadb.db-validation" -}}
 
   # Dont quit immediately on error, otherwise mariadb container below will linger
-  set +e
+  set -e
+
+  function stop_db {
+    mysqld_pid=$(pgrep mysqld)
+    kill -TERM $mysqld_pid && echo "Killed ${mysqld_pid}"
+  }
+  trap stop_db EXIT
 
   TIME_WAITING=0
   echo "Waiting for database.";
   until mysqladmin status --connect_timeout=2 -uroot -p{{ .db_password }} -h 127.0.0.1 --protocol=tcp --silent; do
     echo -n "."
-    sleep 5
-    TIME_WAITING=$((TIME_WAITING+5))
+    sleep 1
+    TIME_WAITING=$((TIME_WAITING+1))
 
-    if [ $TIME_WAITING -gt 90 ]; then
+    if [ $TIME_WAITING -gt 20 ]; then
       echo "Database connection timeout"
       exit 1
     fi
   done
 
-  mysqld_pid=$(pgrep mysqld)
   
-  mysql -uroot -p{{ .db_password }} drupal --protocol=tcp < /tmp/db.sql
+  mysql -uroot -p{{ .db_password }} drupal --protocol=tcp < /tmp/db1.sql
   drush status --fields=bootstrap --db-url=mysql://root:{{ .db_password }}@127.0.0.1:3306/drupal
-
-  #kill -TERM $mysqld_pid && echo "Killed ${mysqld_pid}"
 
 {{- end }}

@@ -466,13 +466,6 @@ fi
   ls -lh /backups/*
 {{- end }}
 
-{{- define "drupal.backup-command.validate-database-dump" -}}
-  set -e
-
-  mysql -uroot -p$MARIADB_ROOT_PASSWORD $MARIADB_DATABASE < /tmp/db.sql
-
-
-{{- end }}
 
 {{- define "mariadb.db-validation" -}}
   set -e

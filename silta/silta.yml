@@ -37,3 +37,7 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+backup:
+  # Whether backups should be taken for the current environment.
+  enabled: true

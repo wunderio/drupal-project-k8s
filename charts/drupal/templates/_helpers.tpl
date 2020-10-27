@@ -499,7 +499,7 @@ fi
   done
 
   
-  mysql -uroot -p{{ .db_password }} drupal --protocol=tcp < /tmp/db1.sql
+  mysql -uroot -p{{ .db_password }} drupal --protocol=tcp < /tmp/db.sql
   drush status --fields=bootstrap --db-url=mysql://root:{{ .db_password }}@127.0.0.1:3306/drupal
 
 {{- end }}

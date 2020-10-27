@@ -21,8 +21,6 @@ spec:
         configMap-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
     spec:
       enableServiceLinks: false
-      #For debugging, delete before merge
-      shareProcessNamespace: true
       containers:
       # php-fpm container.
       - name: php
@@ -38,10 +36,6 @@ spec:
             command: ['/bin/bash', '-c', 'if [ {{ include "drupal.installation-in-progress-test" . }} ]; then exit 1; fi']
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
-        securityContext:
-          capabilities:
-            add:
-              - SYS_PTRACE
 
       # Nginx container
       - name: nginx
@@ -88,10 +82,6 @@ spec:
             port: 80
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
-        securityContext:
-          capabilities:
-            add:
-              - SYS_PTRACE
 
       volumes:
         {{- include "drupal.volumes" . | nindent 8}}

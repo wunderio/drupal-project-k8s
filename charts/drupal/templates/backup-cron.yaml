@@ -22,6 +22,7 @@ spec:
       template:
         spec:
           enableServiceLinks: false
+          #Lets us kill DB process (in mariadb container) from backup container
           shareProcessNamespace: true
           containers:
           - name: backup
@@ -37,6 +38,7 @@ spec:
                 {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
             securityContext:
               capabilities:
+                #For shareProcessNamespace
                 add:
                   - SYS_PTRACE
           - name: mariadb
@@ -54,6 +56,7 @@ spec:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
             securityContext:
               capabilities:
+                #For shareProcessNamespace
                 add:
                   - SYS_PTRACE
           restartPolicy: Never

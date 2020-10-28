@@ -22,7 +22,7 @@ spec:
       template:
         spec:
           enableServiceLinks: false
-          #Lets us kill DB process (in mariadb container) from backup container
+          # Lets us kill DB process (in mariadb container) from backup container
           shareProcessNamespace: true
           containers:
           - name: backup
@@ -42,7 +42,7 @@ spec:
                 add:
                   - SYS_PTRACE
           - name: mariadb
-            image: docker.io/bitnami/mariadb:10.2.32
+            image: docker.io/bitnami/mariadb:10.2
             imagePullPolicy: IfNotPresent
             env:
             - name: MARIADB_ROOT_PASSWORD

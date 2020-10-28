@@ -497,7 +497,7 @@ fi
   done
 
   
-  mysql -uroot -p{{ .db_password }} drupal --protocol=tcp < /tmp/db.sql
+  mysql -u $DB_USER -p$DB_PASS $DB_NAME --protocol=tcp < /tmp/db.sql
   drush status --fields=bootstrap
 
 {{- end }}

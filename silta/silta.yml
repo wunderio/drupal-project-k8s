@@ -37,3 +37,6 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+backup:
+  enabled: true

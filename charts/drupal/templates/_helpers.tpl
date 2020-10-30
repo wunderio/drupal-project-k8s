@@ -365,7 +365,9 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   pv /tmp/reference-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drush cr
+  drupal_major_version=$(drush status --fields=drupal-version  | sed -nre 's/^[^0-9]*([0-9]+).*/\1/p')
+  if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
+  else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
@@ -381,7 +383,9 @@ if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
   pv /tmp/backup-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drush cr
+  drupal_major_version=$(drush status --fields=drupal-version  | sed -nre 's/^[^0-9]*([0-9]+).*/\1/p')
+  if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
+  else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi

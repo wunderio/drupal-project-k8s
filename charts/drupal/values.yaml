@@ -214,13 +214,19 @@ php:
   postupgrade:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        # This first cache rebuild is unfortunately needed for the common case where a Drupal or
-        # contrib module flaw requires a rebuild before running database updates.
-        drush cr
-        drush updatedb -y
-        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
-          drush config-import -y
-          drush cr
+        drupal_major_version=$(drush status --fields=drupal-version  | sed -nre 's/^[^0-9]*([0-9]+).*/\1/p')
+        if [[ $drupal_major_version -eq 7 ]] ; then
+          drush cache-clear all
+          drush updatedb -y
+        else
+          # This first cache rebuild is unfortunately needed for the common case where a Drupal or
+          # contrib module flaw requires a rebuild before running database updates.
+          drush cache-rebuild
+          drush updatedb -y
+          if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
+            drush config-import -y
+            drush cache-rebuild
+          fi
         fi
       fi
 

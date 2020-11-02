@@ -365,7 +365,7 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   pv /tmp/reference-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drupal_major_version=$(drush status --fields=drupal-version  | sed -nre 's/^[^0-9]*([0-9]+).*/\1/p')
+  drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
   if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
   else drush cache-rebuild; fi
 else
@@ -383,7 +383,7 @@ if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
   pv /tmp/backup-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drupal_major_version=$(drush status --fields=drupal-version  | sed -nre 's/^[^0-9]*([0-9]+).*/\1/p')
+  drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
   if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
   else drush cache-rebuild; fi
 else

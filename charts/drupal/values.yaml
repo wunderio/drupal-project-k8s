@@ -513,3 +513,30 @@ smtp:
   # starttls: false
   # username: ""
   # password: ""
+
+# Solr.  
+solr:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
+  image: geerlingguy/solr
+  imageTag: 8.x
+
+  # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
+  # Solr init container will contents of this folder to actual solr container.
+  # Note: Configuration folder is not synced with shell container, drupal image rebuild required to update!
+  confLocation: /app/silta/solr/conf
+
+  # Kubernetes resource assignments.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128M
+
+  persistence:
+    data:
+      size: 1Gi
+      storageClassName: standard
+      # Provide driver name if using CSI driver backed storage class (optional).
+      # csiDriverName: csi-driver-name
+      accessModes: 
+        - ReadWriteOnce 

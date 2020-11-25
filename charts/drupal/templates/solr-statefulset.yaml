@@ -1,0 +1,100 @@
+{{- if .Values.solr.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-solr
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  serviceName: {{ .Release.Name }}-solr-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "drupal.release_selector_labels" . | nindent 6 }}
+      statefulset: solr
+  template:
+    metadata:
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+        statefulset: solr
+      # annotations:
+        # TODO: CHECKSUM CONF FILES AND SCHEMAS TO TRIGGER POD RESTART?
+        # configMap-checksum: 
+    spec:
+      enableServiceLinks: false
+      initContainers:
+      # Copy solr config from php container, it's the only way to avoid extra image build
+      - name: conf-import
+        image: {{ .Values.php.image | quote }}
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -ex
+            cp -arv "{{ .Values.solr.confLocation }}/." "/var/solr/search/conf/"
+        volumeMounts:
+        - name: running-conf
+          mountPath: /var/solr/search/conf
+      containers:
+      - name: solr
+        image: {{ printf "%s:%s" .Values.solr.image .Values.solr.imageTag | quote }}
+        ports:
+        - containerPort: 8983
+        command: ["/opt/solr/bin/solr"]
+        args: ["start", "-p", "8983", "-f", "-force"]
+        
+        livenessProbe:
+          tcpSocket:
+            port: 8983
+        # livenessProbe:
+        #   initialDelaySeconds:  .Values.livenessProbe.initialDelaySeconds 
+        #   periodSeconds:  .Values.livenessProbe.periodSeconds 
+        #   httpGet:
+        #     scheme: " .Values.tls.enabled | ternary "HTTPS" "HTTP" "
+        #     path: /solr/admin/info/system
+        #     port:  .Values.port 
+        # readinessProbe:
+        #   initialDelaySeconds:  .Values.readinessProbe.initialDelaySeconds 
+        #   periodSeconds:  .Values.readinessProbe.periodSeconds 
+        #   httpGet:
+        #     scheme: HTTP
+        #     path: /solr/admin/info/system
+        #     port:  .Values.port 
+
+        #volumeMounts:
+        # volumes:
+        # # If you have one core:
+        # - ./mysearch:/var/solr/mysearch:rw
+        # # If you have multiple cores:
+        # - ./cores:/var/solr/cores:rw
+
+        volumeMounts:
+        - name: {{ .Release.Name }}-solr-data
+          mountPath: /var/solr/search/data
+        - name: running-conf
+          mountPath: /var/solr/search/conf
+        # - name: {{ .Release.Name }}-solr-conf
+        #   mountPath: /tmp/solr-conf-source
+
+        resources:
+          {{- .Values.solr.resources | toYaml | nindent 10 }}
+      volumes:
+      - name: running-conf
+        emptyDir: {}
+      # - name: {{ .Release.Name }}-solr-conf
+      #   persistentVolumeClaim:
+      #     claimName: {{ .Release.Name }}-solr-conf
+      
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Release.Name }}-solr-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.solr.persistence.data.storageClassName }}
+      {{- if .Values.solr.persistence.data.csiDriverName }}
+      csiDriverName: {{ .Values.solr.persistence.data.csiDriverName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.solr.persistence.data.size }}
+      accessModes: {{ .Values.solr.persistence.data.accessModes }}
+{{- end }}

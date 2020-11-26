@@ -161,6 +161,11 @@ imagePullSecrets:
       key: hashsalt
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
+{{- if .Values.solr.enabled }}
+- name: SOLR_HOST
+  value: {{ .Release.Name }}-solr
+{{- end }}
+# Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -185,9 +190,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 

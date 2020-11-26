@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
-  serviceName: {{ .Release.Name }}-solr-svc
+  serviceName: {{ .Release.Name }}-solr
   replicas: 1
   selector:
     matchLabels:
@@ -17,9 +17,6 @@ spec:
       labels:
         {{- include "drupal.release_labels" . | nindent 8 }}
         statefulset: solr
-      # annotations:
-        # TODO: CHECKSUM CONF FILES AND SCHEMAS TO TRIGGER POD RESTART?
-        # configMap-checksum: 
     spec:
       enableServiceLinks: false
       initContainers:
@@ -30,59 +27,55 @@ spec:
         args:
           - |
             set -ex
+            echo "name={{ .Values.solr.coreName }}" > /var/solr/search/core.properties
             cp -arv "{{ .Values.solr.confLocation }}/." "/var/solr/search/conf/"
         volumeMounts:
-        - name: running-conf
-          mountPath: /var/solr/search/conf
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /var/solr/search
       containers:
       - name: solr
         image: {{ printf "%s:%s" .Values.solr.image .Values.solr.imageTag | quote }}
         ports:
         - containerPort: 8983
-        command: ["/opt/solr/bin/solr"]
-        args: ["start", "-p", "8983", "-f", "-force"]
-        
+        command: {{ .Values.solr.command }}
+        args:
+          {{- range .Values.solr.commandArgs }}
+          - {{ . | quote }}
+          {{- end }}
+          - "-m"
+          - "{{ .Values.solr.javaProcessMemory }}"
         livenessProbe:
+          initialDelaySeconds: 30
           tcpSocket:
             port: 8983
-        # livenessProbe:
-        #   initialDelaySeconds:  .Values.livenessProbe.initialDelaySeconds 
-        #   periodSeconds:  .Values.livenessProbe.periodSeconds 
-        #   httpGet:
-        #     scheme: " .Values.tls.enabled | ternary "HTTPS" "HTTP" "
-        #     path: /solr/admin/info/system
-        #     port:  .Values.port 
-        # readinessProbe:
-        #   initialDelaySeconds:  .Values.readinessProbe.initialDelaySeconds 
-        #   periodSeconds:  .Values.readinessProbe.periodSeconds 
-        #   httpGet:
-        #     scheme: HTTP
-        #     path: /solr/admin/info/system
-        #     port:  .Values.port 
-
-        #volumeMounts:
-        # volumes:
-        # # If you have one core:
-        # - ./mysearch:/var/solr/mysearch:rw
-        # # If you have multiple cores:
-        # - ./cores:/var/solr/cores:rw
-
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          httpGet:
+            scheme: HTTP
+            path: /solr/admin/info/system
+            port:  8983
         volumeMounts:
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /var/solr/search
         - name: {{ .Release.Name }}-solr-data
           mountPath: /var/solr/search/data
-        - name: running-conf
-          mountPath: /var/solr/search/conf
-        # - name: {{ .Release.Name }}-solr-conf
-        #   mountPath: /tmp/solr-conf-source
+        # Compatability mount: solr 8 core location
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /var/solr/data/search
+        - name: {{ .Release.Name }}-solr-data
+          mountPath: /var/solr/data/search/data
+        # Compatability mount: older solr versions have different core location
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /opt/solr/example/solr/search
+        - name: {{ .Release.Name }}-solr-data
+          mountPath: /opt/solr/example/solr/search/data
 
         resources:
           {{- .Values.solr.resources | toYaml | nindent 10 }}
       volumes:
-      - name: running-conf
+      - name: {{ .Release.Name }}-core-dir
         emptyDir: {}
-      # - name: {{ .Release.Name }}-solr-conf
-      #   persistentVolumeClaim:
-      #     claimName: {{ .Release.Name }}-solr-conf
       
   volumeClaimTemplates:
   - metadata:

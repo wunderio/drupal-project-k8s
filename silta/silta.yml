@@ -37,6 +37,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-solr:
-  enabled: true

@@ -4,10 +4,7 @@ orbs:
   silta: silta/silta@dev:master
 
 executors:
-  silta-latest:
-    docker:
-      - image: wunderio/silta-circleci:latest
-  silta-gcr:
+  custom-executor:
     docker:
       - image: eu.gcr.io/silta-images/cicd:circleci-php7.3-node12-composer1-v0.1
 
@@ -25,8 +22,8 @@ workflows:
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
 
-          # Use the latest orb version.
-          executor: silta-gcr
+          # Use custom executor.
+          executor: custom-executor
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"

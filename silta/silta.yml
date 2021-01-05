@@ -5,13 +5,13 @@
 # for all possible options.
 
 varnish:
-  enabled: false
+  enabled: true
 
 elasticsearch:
   enabled: true
 
 memcached:
-  enabled: true
+  enabled: false
 
 mounts:
   private-files:

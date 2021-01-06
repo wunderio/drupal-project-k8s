@@ -255,6 +255,10 @@ php:
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
   drupalConfigPath: "config/sync"
 
+  # Define Drupal version to be able to use different settings.php and do other core specific tasks.
+  # This variable is exposed as $DRUPAL_CORE_VERSION in the container.
+  drupalCoreVersion: "8"
+
   # Set a restriction on where the php pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}

@@ -14,7 +14,7 @@ data:
   {{- else -}}
   {{- $settings_file := "files/settings.silta.php" -}}
   {{- end -}}
-  settings_silta_php: |{{ .Files.Get {{$settings_file}} | nindent 4 }}
+  settings_silta_php: |{{ .Files.Get $settings_file | nindent 4 }}
 
   silta_services_yml: |{{ .Files.Get "files/silta.services.yml" | nindent 4 }}
 

@@ -162,7 +162,7 @@ imagePullSecrets:
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
 - name: DRUPAL_CORE_VERSION
-  value: {{ .Values.php.drupalCoreVersion }}
+  value: {{ .Values.php.drupalCoreVersion | quote }}
 {{- if .Values.solr.enabled }}
 - name: SOLR_HOST
   value: {{ .Release.Name }}-solr

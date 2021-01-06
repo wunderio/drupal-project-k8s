@@ -214,8 +214,7 @@ php:
   postupgrade:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
-        if [[ $drupal_major_version -eq 7 ]] ; then
+        if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
           drush cache-clear all
           drush updatedb -y
         else

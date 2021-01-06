@@ -513,3 +513,42 @@ smtp:
   # starttls: false
   # username: ""
   # password: ""
+
+# Solr.  
+solr:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
+  image: geerlingguy/solr
+  imageTag: latest
+
+  # Solr 4.x and 5.x does not support "-force" argument (optional override)
+  command: ["/opt/solr/bin/solr"]
+  commandArgs: ["start", "-p", "8983", "-f", "-force"]
+
+  # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
+  # Solr init container will contents of this folder to actual solr container.
+  # Note: Configuration folder is not synced with shell container, drupal image rebuild required to update!
+  confLocation: /app/silta/solr/conf
+
+  coreName: search
+
+  # Sets the min (-Xms) and max (-Xmx) heap size for the JVM process
+  javaProcessMemory: 256m
+
+  # Kubernetes resource assignments.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512M
+    limits:
+      cpu: 500m
+      memory: 768M
+
+  persistence:
+    data:
+      size: 1Gi
+      storageClassName: standard
+      # Provide driver name if using CSI driver backed storage class (optional).
+      # csiDriverName: csi-driver-name
+      accessModes: 
+        - ReadWriteOnce 

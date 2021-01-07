@@ -17,6 +17,11 @@ mounts:
   private-files:
     enabled: true
 
+php:
+  postupgrade:
+    afterCommand: |
+      drush pml
+
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:

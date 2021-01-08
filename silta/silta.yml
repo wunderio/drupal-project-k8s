@@ -50,7 +50,7 @@ nginx:
       username: silta
       password: silta
 
-  # content_security_policy: "upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; base-uri 'self'; object-src 'self'; connect-src wss: https:; font-src 'self' fonts.gstatic.com"
+  content_security_policy: "upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; base-uri 'self'; object-src 'self'; connect-src wss: https:; font-src 'self' fonts.gstatic.com"
 
   # # Add IP addresses that should be excluded from basicauth
   # noauthips:

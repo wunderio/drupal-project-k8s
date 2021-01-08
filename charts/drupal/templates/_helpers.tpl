@@ -281,7 +281,7 @@ done
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
-  {{ .Values.php.postupgrade.afterCommand }}
+    {{ .Values.php.postupgrade.afterCommand }}
   {{- end }}
 
   # Wait for background imports to complete.

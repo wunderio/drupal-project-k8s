@@ -4,15 +4,15 @@
 // CHANGE THIS.
 // $settings['hash_salt'] = 'abc';
 
-if ((isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on")
-  || (isset($_SERVER["HTTP_X_FORWARDED_PROTO"]) && $_SERVER["HTTP_X_FORWARDED_PROTO"] == "https")
-  || (isset($_SERVER["HTTP_HTTPS"]) && $_SERVER["HTTP_HTTPS"] == "on")
-) {
-  $_SERVER["HTTPS"] = "on";
+// if ((isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on")
+//   || (isset($_SERVER["HTTP_X_FORWARDED_PROTO"]) && $_SERVER["HTTP_X_FORWARDED_PROTO"] == "https")
+//   || (isset($_SERVER["HTTP_HTTPS"]) && $_SERVER["HTTP_HTTPS"] == "on")
+// ) {
+//   $_SERVER["HTTPS"] = "on";
 
-  // Tell Drupal we're using HTTPS (url() for one depends on this).
-  $settings['https'] = TRUE;
-}
+//   // Tell Drupal we're using HTTPS (url() for one depends on this).
+//   $settings['https'] = TRUE;
+// }
 
 // @codingStandardsIgnoreStart
 if (isset($_SERVER['REMOTE_ADDR'])) {

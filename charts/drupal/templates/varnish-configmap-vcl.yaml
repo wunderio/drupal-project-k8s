@@ -250,6 +250,14 @@ data:
     }
 
     sub vcl_synth {
+
+      if (resp.status == 401) {
+        set resp.http.Content-Type = "text/html; charset=utf-8";
+        set resp.http.WWW-Authenticate = "Basic realm=Secured";
+        synthetic("<HTML><HEAD><TITLE>Error 401</TITLE></HEAD><BODY><H1>401 Unauthorized</H1></BODY></HTML>");
+        return (deliver);
+      }
+
       if (resp.status == 720) {
         # We use this special error status 720 to force redirects with 301 (permanent) redirects
         # To use this, call the following from anywhere in vcl_recv: return (synth(720, "http://host/new.html"));

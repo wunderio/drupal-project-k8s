@@ -49,6 +49,7 @@ workflows:
                 - production
                 - feature/test-cluster
                 - /feature\/test-cluster-.*/
+                - feature/backup-validation-sidecar
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
@@ -61,6 +62,7 @@ workflows:
               only: 
                 - feature/test-cluster
                 - /feature\/test-cluster-.*/
+                - feature/backup-validation-sidecar
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

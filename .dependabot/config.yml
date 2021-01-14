@@ -6,6 +6,3 @@ update_configs:
   - package_manager: "php:composer"
     directory: "/"
     update_schedule: "live"
-  - package_manager: "docker"
-    directory: "/"
-    update_schedule: "weekly"

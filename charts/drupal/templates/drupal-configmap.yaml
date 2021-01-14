@@ -9,8 +9,11 @@ data:
     [mysqldump]
     gdpr-replacements='{{ .Values.gdprDump | toJson }}'
 
+  {{- if eq .Values.php.drupalCoreVersion "7" }}
+  settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
+  {{- else }}
   settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}
-
+  {{- end }}
   silta_services_yml: |{{ .Files.Get "files/silta.services.yml" | nindent 4 }}
 
   php_ini: |
@@ -194,11 +197,6 @@ data:
     pm.process_idle_timeout = 60s
     pm.max_requests = 500
     
-    access.log = /proc/self/fd/2
-    catch_workers_output = yes
-    
-    clear_env = no
-
     ; Custom configuration below
     {{ .Values.php.fpm.extraConfig | nindent 4 }}
 

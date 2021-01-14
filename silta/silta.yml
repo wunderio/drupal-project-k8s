@@ -11,7 +11,7 @@ elasticsearch:
   enabled: true
 
 memcached:
-  enabled: true
+  enabled: false
 
 mounts:
   private-files:
@@ -37,3 +37,4 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+

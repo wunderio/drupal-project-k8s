@@ -5,13 +5,13 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   enabled: true
 
 memcached:
-  enabled: false
+  enabled: true
 
 mounts:
   private-files:
@@ -37,30 +37,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-# These variables are build-specific and should be passed via the --set parameter.
-nginx:
-
-  # Set of values to enable and use http basic authentication
-  # It is implemented only for very basic protection (like web crawlers)
-  basicauth:
-
-    # Define username and password
-    credentials:
-      username: silta
-      password: silta
-
-  # content_security_policy: "upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; base-uri 'self'; object-src 'self'; connect-src wss: https:; font-src 'self' fonts.gstatic.com"
-
-  # # Add IP addresses that should be excluded from basicauth
-  # noauthips:
-  #   hel-office: 84.20.132.177/32
-  #   tku-office: 194.111.72.99/32
-  #   # copied from conf/stage.yml
-  #   address1: 87.94.15.10
-  #   address2: 94.237.27.124
-  #   address3: 94.237.33.88
-  #   address4: 83.136.248.231
-  #   address5: 94.237.27.95
-  #   address6: 127.0.0.1
-  #   address7: 194.89.156.118

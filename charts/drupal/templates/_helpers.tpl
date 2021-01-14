@@ -497,6 +497,9 @@ fi
 
   TIME_WAITING=0
   echo "Waiting for database.";
+
+  echo "DB INFO - u: $DB_USER - h: $DB_HOST"
+
   until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
     sleep 1s
@@ -508,8 +511,10 @@ fi
     fi
   done
 
-  
+  echo "Importing dump for validation"
   mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp < /tmp/db.sql
   drush status --fields=bootstrap
+  
+  drush status
 
 {{- end }}

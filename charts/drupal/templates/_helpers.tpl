@@ -482,12 +482,12 @@ fi
 {{- define "mariadb.db-validation" -}}
   set -e
 
-  # Stop DB container when exiting this shell (backup container has done its job)
-  function stop_db {
-    mysqld_pid=$(pgrep mysqld)
-    kill -TERM $mysqld_pid && echo "Killed MariaDB, PID ${mysqld_pid}"
-  }
-  trap stop_db EXIT ERR
+  # # Stop DB container when exiting this shell (backup container has done its job)
+  # function stop_db {
+  #   mysqld_pid=$(pgrep mysqld)
+  #   kill -TERM $mysqld_pid && echo "Killed MariaDB, PID ${mysqld_pid}"
+  # }
+  # trap stop_db EXIT ERR
 
 
   export DB_USER=root 

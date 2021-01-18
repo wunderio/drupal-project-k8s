@@ -480,6 +480,7 @@ fi
 
 
 {{- define "mariadb.db-validation" -}}
+  
   set -e
 
   # # Stop DB container when exiting this shell (backup container has done its job)
@@ -489,7 +490,6 @@ fi
   # }
   # trap stop_db EXIT ERR
 
-
   export DB_USER=root 
   export DB_PASS={{ .db_password }}
   export DB_HOST=127.0.0.1
@@ -497,8 +497,6 @@ fi
 
   TIME_WAITING=0
   echo "Waiting for database.";
-
-  echo "DB INFO - u: $DB_USER - h: $DB_HOST"
 
   until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
@@ -514,7 +512,5 @@ fi
   echo "Importing dump for validation"
   mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp < /tmp/db.sql
   drush status --fields=bootstrap
-  
-  drush status
 
 {{- end }}

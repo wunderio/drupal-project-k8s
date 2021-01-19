@@ -7,6 +7,9 @@ executors:
   custom-executor:
     docker:
       - image: eu.gcr.io/silta-images/cicd:circleci-php7.3-node12-composer1-v0.1
+  cicd80:
+    docker:
+      - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
 
 workflows:
   version: 2
@@ -14,6 +17,10 @@ workflows:
     jobs:
       - silta/drupal-validate:
           name: validate
+          
+          # Use custom executor.
+          executor: cicd80
+          
           post-validation:
             - run:
                 name: Helm unit tests
@@ -23,7 +30,7 @@ workflows:
           name: build-deploy
 
           # Use custom executor.
-          executor: custom-executor
+          executor: cicd80
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"

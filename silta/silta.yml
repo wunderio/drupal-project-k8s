@@ -37,10 +37,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-
-# Enable backups.
-backup:
-  enabled: true
-  schedule: '*/30 * * * *'
-  retention: 1

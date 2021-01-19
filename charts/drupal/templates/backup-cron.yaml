@@ -11,11 +11,15 @@ metadata:
 spec:
   schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
   suspend: false
   jobTemplate:
     spec:
+      # This is a fallback for sidecar termination failure.
+      # Two hours should be enough for backup/validation actions.
+      activeDeadlineSeconds: 7200
       backoffLimit: 2
       template:
         metadata:

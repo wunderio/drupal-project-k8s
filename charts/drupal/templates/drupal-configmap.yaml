@@ -50,8 +50,11 @@ data:
     [Assertion]
     zend.assertions = -1
 
-    [mbstring]
-    mbstring.internal_encoding = UTF-8
+    ; TODO: Use global internal encoding; 
+    ; TODO: Move to image Dockerfiles; 
+    ; TODO: Remove from chart;
+    ; [mbstring]
+    ; mbstring.internal_encoding = UTF-8
 
     [opcache]
     opcache.enable = 1

@@ -4,9 +4,12 @@ orbs:
   silta: silta/silta@dev:master
 
 executors:
-  custom-executor:
+  cicd73:
     docker:
       - image: eu.gcr.io/silta-images/cicd:circleci-php7.3-node12-composer1-v0.1
+  cicd74:
+    docker:
+      - image: eu.gcr.io/silta-images/cicd:circleci-php7.4-node14-composer1-v0.1
   cicd80:
     docker:
       - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1

@@ -48,4 +48,3 @@ if (getenv('LANDO_INFO') && file_exists($app_root . '/' . $site_path . '/setting
 if (getenv('SILTA_CLUSTER') && file_exists($app_root . '/' . $site_path . '/settings.silta.php')) {
   include $app_root . '/' . $site_path . '/settings.silta.php';
 }
-

@@ -1289,16 +1289,16 @@
         },
         {
             "name": "drupal/core",
-            "version": "9.0.10",
+            "version": "9.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core.git",
-                "reference": "8a0cdab9f6a0e2f48b4886b31d050dca034e6049"
+                "reference": "41697df079ae8aa64fa45b61976f50e7a2998d7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core/zipball/8a0cdab9f6a0e2f48b4886b31d050dca034e6049",
-                "reference": "8a0cdab9f6a0e2f48b4886b31d050dca034e6049",
+                "url": "https://api.github.com/repos/drupal/core/zipball/41697df079ae8aa64fa45b61976f50e7a2998d7f",
+                "reference": "41697df079ae8aa64fa45b61976f50e7a2998d7f",
                 "shasum": ""
             },
             "require": {
@@ -1324,7 +1324,7 @@
                 "laminas/laminas-diactoros": "^2.1",
                 "laminas/laminas-feed": "^2.12",
                 "masterminds/html5": "^2.1",
-                "pear/archive_tar": "^1.4.11",
+                "pear/archive_tar": "^1.4.12",
                 "php": "^7.3",
                 "psr/log": "^1.0",
                 "stack/builder": "^1.0",
@@ -1529,7 +1529,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Drupal is an open source content management platform powering millions of websites and applications.",
-            "time": "2020-12-03T20:54:37+00:00"
+            "time": "2021-01-19T23:10:53+00:00"
         },
         {
             "name": "drupal/core-composer-scaffold",
@@ -1580,16 +1580,16 @@
         },
         {
             "name": "drupal/core-recommended",
-            "version": "9.0.10",
+            "version": "9.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-recommended.git",
-                "reference": "9008b2fed0fd25bb84e34a9e1ade04545c8fd8f7"
+                "reference": "9750cd44badc2ba6f3dc4ff419e04421b7b60da6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-recommended/zipball/9008b2fed0fd25bb84e34a9e1ade04545c8fd8f7",
-                "reference": "9008b2fed0fd25bb84e34a9e1ade04545c8fd8f7",
+                "url": "https://api.github.com/repos/drupal/core-recommended/zipball/9750cd44badc2ba6f3dc4ff419e04421b7b60da6",
+                "reference": "9750cd44badc2ba6f3dc4ff419e04421b7b60da6",
                 "shasum": ""
             },
             "require": {
@@ -1598,7 +1598,7 @@
                 "doctrine/annotations": "1.10.3",
                 "doctrine/lexer": "1.2.1",
                 "doctrine/reflection": "1.2.1",
-                "drupal/core": "9.0.10",
+                "drupal/core": "9.0.11",
                 "egulias/email-validator": "2.1.17",
                 "guzzlehttp/guzzle": "6.5.4",
                 "guzzlehttp/promises": "v1.3.1",
@@ -1609,7 +1609,7 @@
                 "laminas/laminas-stdlib": "3.2.1",
                 "laminas/laminas-zendframework-bridge": "1.0.4",
                 "masterminds/html5": "2.7.0",
-                "pear/archive_tar": "1.4.11",
+                "pear/archive_tar": "1.4.12",
                 "pear/console_getopt": "v1.4.3",
                 "pear/pear-core-minimal": "v1.10.10",
                 "pear/pear_exception": "v1.0.1",
@@ -1658,7 +1658,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Locked core dependencies; require this project INSTEAD OF drupal/core.",
-            "time": "2020-12-03T20:54:37+00:00"
+            "time": "2021-01-19T23:10:53+00:00"
         },
         {
             "name": "drupal/simplei",
@@ -2748,16 +2748,16 @@
         },
         {
             "name": "pear/archive_tar",
-            "version": "1.4.11",
+            "version": "1.4.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Archive_Tar.git",
-                "reference": "17d355cb7d3c4ff08e5729f29cd7660145208d9d"
+                "reference": "19bb8e95490d3e3ad92fcac95500ca80bdcc7495"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/17d355cb7d3c4ff08e5729f29cd7660145208d9d",
-                "reference": "17d355cb7d3c4ff08e5729f29cd7660145208d9d",
+                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/19bb8e95490d3e3ad92fcac95500ca80bdcc7495",
+                "reference": "19bb8e95490d3e3ad92fcac95500ca80bdcc7495",
                 "shasum": ""
             },
             "require": {
@@ -2810,7 +2810,17 @@
                 "archive",
                 "tar"
             ],
-            "time": "2020-11-19T22:10:24+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/mrook",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/michielrook",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2021-01-18T19:32:54+00:00"
         },
         {
             "name": "pear/console_getopt",

@@ -504,7 +504,7 @@ fi
     fi
   done
 
-  echo "Importing dump for validation"
+  echo "Importing database dump for validation"
   mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp < /tmp/db.sql
   drush status --fields=bootstrap
 

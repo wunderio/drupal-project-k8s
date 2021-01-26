@@ -439,6 +439,8 @@ varnish:
     requests:
       cpu: 25m
       memory: 32Mi
+  image: eu.gcr.io/silta-images/varnish
+  imageTag: 6-v0.1
   # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
   # Inject custom code into vcl_recv subroutine

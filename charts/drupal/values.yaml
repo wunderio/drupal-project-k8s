@@ -510,6 +510,11 @@ memcached:
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
   enabled: false
+  image:
+    # Set image repository to "mailhog/mailhog" to reenable logging.
+    repository: eu.gcr.io/silta-images/silta-mailhog
+    # Set image tag to "" to reenable logging.
+    tag: silent
   resources:
     requests:
       cpu: 1m

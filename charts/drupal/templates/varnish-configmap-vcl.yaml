@@ -540,7 +540,7 @@ data:
           font-size: 100px;
         }
       </style>
-      <title>"} + resp.http.x-sitetitle + {" - Something went wrong</title>
+      <title>Something went wrong</title>
 
       </head>
 

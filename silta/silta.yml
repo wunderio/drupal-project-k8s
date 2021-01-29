@@ -13,9 +13,6 @@ elasticsearch:
 memcached:
   enabled: false
 
-mailhog:
-  enabled: true
-
 mounts:
   private-files:
     enabled: true

@@ -435,7 +435,7 @@ mariadb:
   enabled: true
   replication:
     enabled: false
-  db: &mariadb-db
+  db:
     name: drupal
     user: drupal
   master:

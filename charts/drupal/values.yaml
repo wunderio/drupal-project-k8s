@@ -472,7 +472,7 @@ mariadb-galera:
   rootUser:
     password: drupal
 
-  replicaCount: 2
+  replicaCount: 1
 
   # initdbScripts:
   #   my_init_script.sh: |

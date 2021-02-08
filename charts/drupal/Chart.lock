@@ -5,6 +5,9 @@ dependencies:
 - name: pxc-db
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.3
+- name: mariadb-galera
+  repository: https://charts.bitnami.com/bitnami
+  version: 5.5.1
 - name: memcached
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 4.2.27

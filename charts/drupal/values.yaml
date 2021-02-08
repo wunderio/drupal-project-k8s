@@ -561,6 +561,30 @@ mariadb:
               - static-ip
   enableServiceLinks: false
 
+
+mariadb-galera:
+  enabled: true
+  # galera:
+  #   name: ""
+  db:
+    name: drupal
+    user: drupal
+    password: drupal
+  rootUser:
+    password: drupal
+
+  replicaCount: 2
+
+  # initdbScripts:
+  #   my_init_script.sh: |
+  #     #!/bin/sh
+  #     if [[ $(hostname) == *-0  ]]; then
+  #       echo "First node"
+  #       mysql -P 3306 -uroot -prandompassword -e "create database new_database";
+  #     else
+  #       echo "No first node"
+  #     fi
+
 varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
   # to configure varnish for Your site correctly.

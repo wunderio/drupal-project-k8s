@@ -10,6 +10,10 @@ dependencies:
   version: 1.12.x
   repository: https://percona.github.io/percona-helm-charts/
   condition: pxc-db.enabled
+- name: mariadb-galera
+  version: 5.5.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: mariadb-galera.enabled,drupal.mariadb-galera.enabled,global.mariadb-galera.enabled
 - name: memcached
   version: 4.2.x
   repository: https://storage.googleapis.com/charts.wdr.io

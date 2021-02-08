@@ -7,6 +7,10 @@ dependencies:
   version: 7.5.x
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
+- name: mariadb-galera
+  version: 5.5.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: mariadb-galera.enabled,drupal.mariadb-galera.enabled,global.mariadb-galera.enabled
 - name: memcached
   version: 4.2.x
   repository: https://charts.bitnami.com/bitnami

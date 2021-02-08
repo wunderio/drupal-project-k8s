@@ -584,6 +584,7 @@ mariadb-galera:
       limits:
         memory: 512M
 
+  podManagementPolicy: Parallel
   replicaCount: 2
 
   affinity:

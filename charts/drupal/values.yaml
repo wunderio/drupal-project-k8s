@@ -526,7 +526,7 @@ mariadb:
     tag: 10.6.15-debian-11-r24
   replication:
     enabled: false
-  db: &mariadb-db
+  db:
     name: drupal
     user: drupal
   master:

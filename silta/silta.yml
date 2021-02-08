@@ -37,3 +37,9 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+# mariadb-galera:
+#   galera:
+#     bootstrap:
+#       bootstrapFromNode: 0
+#       forceSafeToBootstrap: true

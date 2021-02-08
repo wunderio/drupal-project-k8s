@@ -126,11 +126,11 @@ imagePullSecrets:
 - name: DB_NAME
   value: "{{ .Values.mariadb.db.name }}"
 - name: DB_HOST
-  value: {{ .Release.Name }}-mariadb
+  value: {{ .Release.Name }}-mariadb-galera
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-mariadb
+      name: {{ .Release.Name }}-mariadb-galera
       key: mariadb-password
 {{- end }}
 - name: ERROR_LEVEL

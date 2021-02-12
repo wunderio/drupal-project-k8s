@@ -7,3 +7,9 @@ varnish:
 
 memcached:
   enabled: false
+
+# TODO: Figure out backendConfig defaults for Drupal service
+backendConfig: null
+
+cluster:
+  type: aws

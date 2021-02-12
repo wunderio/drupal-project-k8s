@@ -58,16 +58,16 @@ workflows:
                   sudo apt install -y awscli git python3
                   curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator && chmod +x ./aws-iam-authenticator && sudo mv ./aws-iam-authenticator /bin/aws-iam-authenticator
 
-                  if [ ! -z "$AWS_SECRET_ACCESS_KEY" ]
-                  then
-                    # Create repository (Because AWS wants a dedicated repository per project)
-                    # Either that, or change the image name to be part of image tag (which does not sound great)
-                    namespace="${CIRCLE_PROJECT_REPONAME,,}"
-                    if ! aws ecr describe-repositories --repository-name "silta-container-registry/$namespace" &>/dev/null ; then
-                      echo "Creating remore image repository"
-                      aws ecr create-repository --repository-name "silta-container-registry/$namespace"
-                    fi
-                  fi          
+                  # if [ ! -z "$AWS_SECRET_ACCESS_KEY" ]
+                  # then
+                  #   # Create repository (Because AWS wants a dedicated repository per project)
+                  #   # Either that, or change the image name to be part of image tag (which does not sound great)
+                  #   namespace="${CIRCLE_PROJECT_REPONAME,,}"
+                  #   if ! aws ecr describe-repositories --repository-name "silta-container-registry/$namespace" &>/dev/null ; then
+                  #     echo "Creating remore image repository"
+                  #     aws ecr create-repository --repository-name "silta-container-registry/$namespace"
+                  #   fi
+                  # fi          
           pre-release:
             - run:
                 name: Build local helm chart

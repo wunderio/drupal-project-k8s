@@ -13,3 +13,7 @@ backendConfig: null
 
 cluster:
   type: aws
+
+silta-release:
+  proxy:
+    enabled: false

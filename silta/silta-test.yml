@@ -1,9 +1,3 @@
 # Configure reference data that will be used when creating new environments.
 referenceData:
   enabled: false
-
-varnish:
-  enabled: false
-
-memcached:
-  enabled: false

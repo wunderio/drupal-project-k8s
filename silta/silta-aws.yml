@@ -2,18 +2,7 @@
 referenceData:
   enabled: false
 
-varnish:
-  enabled: false
-
-memcached:
-  enabled: false
-
-# TODO: Figure out backendConfig defaults for Drupal service
-backendConfig: null
-
+# Should be overriden by CI
 cluster:
   type: aws
 
-silta-release:
-  proxy:
-    enabled: false

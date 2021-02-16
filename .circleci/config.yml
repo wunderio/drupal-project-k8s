@@ -42,6 +42,7 @@ workflows:
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build
+
           pre-release:
             - run:
                 name: Build local helm chart
@@ -51,12 +52,40 @@ workflows:
                   helm dependency build ./charts/drupal
             - run:
                 name: Dry-run helm install
-                command: helm install --dry-run --generate-name ./charts/drupal
+                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           context: silta_dev
           filters:
             branches:
               ignore:
                 - production
+                - feature/test-cluster
+                - /feature\/test-cluster\/.*/
+                - feature/aws-cluster
+                - /feature\/aws-cluster\/.*/
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-test cluster environment.
+          <<: *build-deploy
+          name: build-deploy-test
+          silta_config: silta/silta.yml,silta/silta-test.yml
+          context: silta_test
+          filters:
+            branches:
+              only: 
+                - feature/test-cluster
+                - /feature\/test-cluster\/.*/
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-test cluster environment.
+          <<: *build-deploy
+          name: build-deploy-aws
+          silta_config: silta/silta.yml,silta/silta-aws.yml
+          context: silta_aws
+          filters:
+            branches:
+              only: 
+                - feature/aws-cluster
+                - /feature\/aws-cluster\/.*/
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

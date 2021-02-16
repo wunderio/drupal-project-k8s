@@ -1,8 +1,7 @@
 version: 2.1
 
 orbs:
-  # silta: silta/silta@dev:master
-  silta: silta/silta@dev:aws
+  silta: silta/silta@dev:master
 
 executors:
   cicd73:
@@ -14,12 +13,6 @@ executors:
   cicd80:
     docker:
       - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
-
-# jobs:
-#   get-aws-tools:
-#     executor: silta
-#     steps:
-
   
 workflows:
   version: 2
@@ -49,14 +42,6 @@ workflows:
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build
-            - run:
-                name: AWS Tool Setup (TODO - Move to Dockerfile)
-                command: |
-                  # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                  # unzip awscliv2.zip
-                  # sudo ./aws/install
-                  sudo apt install -y awscli git python3
-                  curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator && chmod +x ./aws-iam-authenticator && sudo mv ./aws-iam-authenticator /bin/aws-iam-authenticator
 
           pre-release:
             - run:

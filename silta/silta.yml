@@ -40,3 +40,12 @@ silta-release:
 
 solr:
   enabled: true
+  persistence:
+    data:
+      size: 1Gi
+      # Error: UPGRADE FAILED: cannot patch "feature-storageclassname-solr" with kind StatefulSet: StatefulSet.apps "feature-storageclassname-solr" is invalid: spec: Forbidden: updates to statefulset spec for fields other than 'replicas', 'template', and 'updateStrategy' are forbidden
+      # storageClassName: standard
+      # Provide driver name if using CSI driver backed storage class (optional).
+      # csiDriverName: csi-driver-name
+      accessModes: 
+        - ReadWriteOnce 

@@ -163,8 +163,8 @@ data:
         set beresp.do_esi = true;
       }
 
-      # Files with Content-Length >= 7 digits (~ 10+ Mb) should be piped
-      if ( beresp.http.Content-Length ~ "[0-9]{8,}" ) {
+      # Pipe files larger than {{ int .Values.varnish.cache_skip_size }} bytes
+      if (std.integer(beresp.http.Content-Length, 0) > {{ int .Values.varnish.cache_skip_size }} ) {
         set bereq.http.x-error-reason = "oversize";
         return (error);
       }

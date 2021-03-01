@@ -5,7 +5,7 @@
 # for all possible options.
 
 varnish:
-  enabled: false
+  enabled: true
 
 elasticsearch:
   enabled: true

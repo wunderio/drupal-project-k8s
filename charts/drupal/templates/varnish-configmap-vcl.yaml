@@ -163,8 +163,8 @@ data:
         set beresp.do_esi = true;
       }
 
-      # Pipe files larger than {{ int .Values.varnish.cache_skip_size }} bytes
-      if (std.integer(beresp.http.Content-Length, 0) > {{ int .Values.varnish.cache_skip_size }} ) {
+      # Pipe files larger than {{ int .Values.varnish.cache_skip_size }} megabytes
+      if (std.integer(beresp.http.Content-Length, 0) > {{ mul ( int .Values.varnish.cache_skip_size ) 1024 1024 }} ) {
         set bereq.http.x-error-reason = "oversize";
         return (error);
       }

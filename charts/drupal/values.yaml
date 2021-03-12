@@ -80,12 +80,13 @@ ingress:
 
 # Infrastructure related settings.
 cluster: 
+  type: gke
   vpcNative: false
 
 # backendConfig customisations for Drupal service
 backendConfig:
- securityPolicy:
-   name: "silta-ingress"
+  securityPolicy:
+    name: "silta-ingress"
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
@@ -449,6 +450,8 @@ varnish:
   status_500_html: ""
   # Additional cookie based rules
   vcl_extra_cookies: ""
+  # Do not cache files larger than 3 megabytes (use integers).
+  cache_skip_size: 3
 
 elasticsearch:
   enabled: false
@@ -562,7 +565,7 @@ solr:
   persistence:
     data:
       size: 1Gi
-      storageClassName: standard
+      # storageClassName: standard
       # Provide driver name if using CSI driver backed storage class (optional).
       # csiDriverName: csi-driver-name
       accessModes: 

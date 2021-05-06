@@ -547,11 +547,9 @@ solr:
   # Solr init container will contents of this folder to actual solr container.
   # Note: Configuration folder is not synced with shell container, drupal image rebuild required to update!
   confLocation: /app/silta/solr/conf
-
   coreName: search
 
-  # Sets the min (-Xms) and max (-Xmx) heap size for the JVM process
-  javaProcessMemory: 256m
+  readinessProbeUrl: /solr/admin/info/system
 
   # Kubernetes resource assignments.
   resources:

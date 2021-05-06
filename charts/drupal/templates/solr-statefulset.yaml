@@ -51,7 +51,7 @@ spec:
           periodSeconds: 20
           httpGet:
             scheme: HTTP
-            path: /solr/admin/info/system
+            path: {{ .Values.solr.readinessProbeUrl }}
             port:  8983
         volumeMounts:
         - name: {{ .Release.Name }}-core-dir

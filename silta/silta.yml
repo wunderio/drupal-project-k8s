@@ -37,3 +37,17 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+exposeDomains:
+  annotation-test:
+    hostname: drupal-project-k8s-annotation-test.wdr.io
+    ingress: test
+    
+ingress:
+  test:
+    type: traefik
+    tls: true
+    redirect-https: true
+    extraAnnotations:
+      networking.gke.io/suppress-firewall-xpn-error: "true"
+      test-annotation2: "true"

@@ -35,7 +35,7 @@ metadata:
     {{- end }}
 
     {{- if $ingress.extraAnnotations }}
-    {{ $ingress.extraAnnotations | toYaml }}
+    {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
     
     {{- if (index .Values "silta-release").downscaler.enabled }}
@@ -124,7 +124,7 @@ metadata:
     {{- end }}
     
     {{- if $ingress.extraAnnotations }}
-    {{ $ingress.extraAnnotations | toYaml }}
+    {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
 spec:
   {{- if $ingress.tls }}

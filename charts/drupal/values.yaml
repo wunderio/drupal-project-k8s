@@ -78,8 +78,8 @@ ingress:
     # It is best to first reserve the IP address and then add it here.
     # staticIpAddressName: null
     # Custom ingress annotations
-    # extraAnnotations: |
-    #   networking.gke.io/suppress-firewall-xpn-error: true
+    # extraAnnotations:
+    #   networking.gke.io/suppress-firewall-xpn-error: "true"
 
 # Infrastructure related settings.
 cluster:

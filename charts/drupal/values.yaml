@@ -457,6 +457,24 @@ varnish:
   vcl_extra_cookies: ""
   # Do not cache files larger than 3 megabytes (use integers).
   cache_skip_size: 3
+  # Maximum amount of connections
+  max_connections: 300
+  # Probe URL
+  probe_url: "/robots.txt"
+  # Check the health of each backend every n seconds
+  probe_interval: 5s
+  # Probe timeout after n seconds.
+  probe_timeout: 1s
+  # If {{threshold}} out of the last {{window}} polls succeeded the backend is..
+  probe_window: 5
+  # ..considered healthy, otherwise it will be marked as sick
+  probe_threshold: 3
+  # How long to wait before we receive a first byte from our backend?
+  first_byte_timeout: 300s
+  # How long to wait for a backend connection?
+  connect_timeout: 10s
+  # How long to wait between bytes received from our backend?
+  between_bytes_timeout: 10s
 
 elasticsearch:
   enabled: false

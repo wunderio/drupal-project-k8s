@@ -15,19 +15,19 @@ data:
     backend prod1_http1 {
       .host = "{{ .Release.Name }}-drupal";
       .port = "80";
-      .max_connections = 300;
+      .max_connections = {{ int .Values.varnish.max_connections }};
 
       .probe = {
-        .url       = "/robots.txt"; 
-        .interval  = 5s; # check the health of each backend every n seconds
-        .timeout   = 1s; # timing out after n seconds
-        .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is
-        .threshold = 3;  # considered healthy, otherwise it will be marked as sick
+        .url       = {{ .Values.varnish.probe_url }}; 
+        .interval  = {{ .Values.varnish.probe_interval }}; # check the health of each backend every n seconds
+        .timeout   = {{ .Values.varnish.probe_timeout }}; # timing out after n seconds
+        .window    = {{ int .Values.varnish.probe_window }};  # If 3 out of the last 5 polls succeeded the backend is
+        .threshold = {{ int .Values.varnish.probe_threshold }};  # considered healthy, otherwise it will be marked as sick
       }
 
-      .first_byte_timeout     = 300s;    # How long to wait before we receive a first byte from our backend?
-      .connect_timeout        = 10s;     # How long to wait for a backend connection?
-      .between_bytes_timeout  = 10s;     # How long to wait between bytes received from our backend?
+      .first_byte_timeout     = {{ .Values.varnish.first_byte_timeout }};    # How long to wait before we receive a first byte from our backend?
+      .connect_timeout        = {{ .Values.varnish.connect_timeout }};     # How long to wait for a backend connection?
+      .between_bytes_timeout  = {{ .Values.varnish.between_bytes_timeout }};     # How long to wait between bytes received from our backend?
     }
  
     # Define the internal network access.

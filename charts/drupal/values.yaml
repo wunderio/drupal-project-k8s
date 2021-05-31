@@ -457,6 +457,20 @@ varnish:
   vcl_extra_cookies: ""
   # Do not cache files larger than 3 megabytes (use integers).
   cache_skip_size: 3
+  # https://varnish-cache.org/docs/6.0/reference/vcl.html#backend-definition
+  backend_config: |
+    .max_connections = 300;
+    .probe = {
+      .url       = "/robots.txt";
+      .interval  = 5s; # check the health of each backend every n seconds
+      .timeout   = 5s; # timing out after n seconds
+      .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is
+      .threshold = 3;  # considered healthy, otherwise it will be marked as sick
+    }
+
+    .first_byte_timeout     = 300s;    # How long to wait before we receive a first byte from our backend?
+    .connect_timeout        = 10s;     # How long to wait for a backend connection?
+    .between_bytes_timeout  = 10s;     # How long to wait between bytes received from our backend?
 
 elasticsearch:
   enabled: false

@@ -15,7 +15,7 @@ data:
     backend prod1_http1 {
       .host = "{{ .Release.Name }}-drupal";
       .port = "80";
-      {{ .Values.varnish.backend_config }}
+      {{- .Values.varnish.backend_config | nindent 6 }}
     }
  
     # Define the internal network access.

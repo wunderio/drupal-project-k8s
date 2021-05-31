@@ -462,15 +462,14 @@ varnish:
     .max_connections = 300;
     .probe = {
       .url       = "/robots.txt";
-      .interval  = 5s; # check the health of each backend every n seconds
-      .timeout   = 5s; # timing out after n seconds
-      .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is
-      .threshold = 3;  # considered healthy, otherwise it will be marked as sick
+      .interval  = 5s;
+      .timeout   = 5s;
+      .window    = 5;
+      .threshold = 3;
     }
-
-    .first_byte_timeout     = 300s;    # How long to wait before we receive a first byte from our backend?
-    .connect_timeout        = 10s;     # How long to wait for a backend connection?
-    .between_bytes_timeout  = 10s;     # How long to wait between bytes received from our backend?
+    .first_byte_timeout     = 300s;
+    .connect_timeout        = 10s;
+    .between_bytes_timeout  = 10s;
 
 elasticsearch:
   enabled: false

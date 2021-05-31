@@ -464,7 +464,7 @@ varnish:
   # Check the health of each backend every n seconds
   probe_interval: 5s
   # Probe timeout after n seconds.
-  probe_timeout: 1s
+  probe_timeout: 5s
   # If {{threshold}} out of the last {{window}} polls succeeded the backend is..
   probe_window: 5
   # ..considered healthy, otherwise it will be marked as sick

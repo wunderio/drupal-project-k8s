@@ -45,3 +45,7 @@ exposeDomains:
       enabled: true
       issuer: custom
       existingTLSSecret: tlstest-tls
+
+ssl:
+  issuer: custom
+  existingTLSSecret: tlstest-tls

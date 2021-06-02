@@ -37,3 +37,10 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+exposeDomains:
+  tlstest:
+    hostname: tlstest.dev.wdr.io
+    ssl:
+      enabled: true
+      existingTLSSecret: tlstest-tls

@@ -43,4 +43,5 @@ exposeDomains:
     hostname: tlstest.dev.wdr.io
     ssl:
       enabled: true
+      issuer: custom
       existingTLSSecret: tlstest-tls

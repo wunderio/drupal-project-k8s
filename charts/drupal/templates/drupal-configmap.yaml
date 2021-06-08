@@ -270,7 +270,7 @@ data:
         }
         {{- end }}
 
-        root /app/web;
+        root /app/{{ .Values.appPath }};
         index index.php;
 
         include fastcgi.conf;

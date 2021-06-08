@@ -35,11 +35,11 @@ ports:
   readOnly: true
   subPath: php_ini
 - name: config
-  mountPath: /app/web/sites/default/settings.silta.php
+  mountPath: /app/{{ .Values.appPath }}/sites/default/settings.silta.php
   readOnly: true
   subPath: settings_silta_php
 - name: config
-  mountPath: /app/web/sites/default/silta.services.yml
+  mountPath: /app/{{ .Values.appPath }}/sites/default/silta.services.yml
   readOnly: true
   subPath: silta_services_yml
 - name: config
@@ -251,7 +251,7 @@ done
 {{- end }}
 
 {{- define "drupal.installation-in-progress-test" -}}
--f /app/web/sites/default/files/_installing
+-f /app/{{ .Values.appPath }}/sites/default/files/_installing
 {{- end -}}
 
 
@@ -265,7 +265,7 @@ done
   {{ include "drupal.wait-for-db-command" . }}
 
   {{ if .Release.IsInstall }}
-    touch /app/web/sites/default/files/_installing
+    touch /app/{{ .Values.appPath }}/sites/default/files/_installing
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
@@ -277,7 +277,7 @@ done
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm /app/web/sites/default/files/_installing
+    rm /app/{{ .Values.appPath }}/sites/default/files/_installing
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
@@ -305,7 +305,7 @@ done
   # Restore files from targeted backup
   {{ include "drupal.import-backup-files" . }}
 
-  touch /app/web/sites/default/files/_installing
+  touch /app/{{ .Values.appPath }}/sites/default/files/_installing
 
   # Restore db from targeted backup
   {{ include "drupal.import-backup-db" . }}
@@ -319,7 +319,7 @@ done
 
   # Running custom commands after restored backup
   {{ .Values.php.postRestoreCommand }}
-  rm /app/web/sites/default/files/_installing
+  rm /app/{{ .Values.appPath }}/sites/default/files/_installing
 
 {{- end }}
 

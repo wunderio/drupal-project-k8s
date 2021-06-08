@@ -33,3 +33,5 @@ mounts:
 
 cluster:
   type: ""
+
+appPath: web

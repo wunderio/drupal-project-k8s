@@ -12,7 +12,7 @@ release: {{ .Release.Name }}
 app.kubernetes.io/name: {{ .Values.app | quote }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-helm.sh/chart: {{ template "drupal.chart" . }}  
+helm.sh/chart: {{ template "drupal.chart" . }}
 {{- end }}
 
 {{- define "drupal.php-container" -}}
@@ -251,7 +251,7 @@ done
 {{- end }}
 
 {{- define "drupal.installation-in-progress-test" -}}
--f /app/{{ .Values.appPath }}/sites/default/files/_installing
+-f /app/{{ $.Values.appPath }}/sites/default/files/_installing
 {{- end -}}
 
 
@@ -453,7 +453,7 @@ fi
 {{- end }}
 
 {{- define "drupal.backup-command.archive-store-backup" -}}
-  
+
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
@@ -482,12 +482,12 @@ fi
 
 
 {{- define "mariadb.db-validation" -}}
-  
+
   set -e
 
   echo "** DB validation"
 
-  export DB_USER=root 
+  export DB_USER=root
   export DB_PASS={{ .db_password }}
   export DB_HOST=127.0.0.1
   export DB_NAME=drupal

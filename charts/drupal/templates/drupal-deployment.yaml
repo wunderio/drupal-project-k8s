@@ -31,6 +31,9 @@ spec:
           tcpSocket:
             port: 9000
         readinessProbe:
+          tcpSocket:
+            port: 9000
+        startupProbe:
           exec:
             # Prevent coming in during the installation process.
             command: ['/bin/bash', '-c', 'if [ {{ include "drupal.installation-in-progress-test" . }} ]; then exit 1; fi']

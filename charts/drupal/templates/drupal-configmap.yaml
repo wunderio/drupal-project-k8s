@@ -621,6 +621,8 @@ data:
 {{- end }}
 
   php-fpm-probe.sh: |
+    #!/bin/bash
+    
     # Prevent requests during the site installation process.
     if [ {{ include "drupal.installation-in-progress-test" . }} ]; then 
         exit 1; 

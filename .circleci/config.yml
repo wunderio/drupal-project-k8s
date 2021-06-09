@@ -20,10 +20,10 @@ workflows:
     jobs:
       - silta/drupal-validate:
           name: validate
-          
+
           # Use custom executor.
           executor: cicd80
-          
+
           post-validation:
             - run:
                 name: Helm unit tests
@@ -38,6 +38,7 @@ workflows:
           # Use a local chart during development.
           chart_name: "./charts/drupal"
           chart_repository: ""
+          nginx_build_context: docroot
           silta_config: silta/silta.yml
           codebase-build:
             - silta/drupal-composer-install
@@ -71,7 +72,7 @@ workflows:
           context: silta_test
           filters:
             branches:
-              only: 
+              only:
                 - feature/test-cluster
                 - /feature\/test-cluster\/.*/
 
@@ -83,7 +84,7 @@ workflows:
           context: silta_aws
           filters:
             branches:
-              only: 
+              only:
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
 

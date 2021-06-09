@@ -5,20 +5,20 @@ parameters:
     succeeded: ~
   tasks:
     php_compatibility:
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
+      run_on: ['docroot/modules/custom', 'docroot/themes/custom', 'docroot/sites']
     check_file_permissions: ~
     php_check_syntax:
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
+      run_on: ['docroot/modules/custom', 'docroot/themes/custom', 'docroot/sites']
     phpcs:
       standard: ['phpcs.xml']
     phpstan_check_deprecation:
-      run_on: ['web/modules/custom', 'web/themes/custom']
+      run_on: ['docroot/modules/custom', 'docroot/themes/custom']
     ecs:
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
-    yaml_lint: 
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites', 'silta', '.circleci']
+      run_on: ['docroot/modules/custom', 'docroot/themes/custom', 'docroot/sites']
+    yaml_lint:
+      run_on: ['docroot/modules/custom', 'docroot/themes/custom', 'docroot/sites', 'silta', '.circleci']
     json_lint:
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
+      run_on: ['docroot/modules/custom', 'docroot/themes/custom', 'docroot/sites']
   extensions:
     - Wunderio\GrumPHP\Task\PhpCompatibility\PhpCompatibilityExtensionLoader
     - Wunderio\GrumPHP\Task\PhpCheckSyntax\PhpCheckSyntaxExtensionLoader

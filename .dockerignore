@@ -8,13 +8,13 @@ phpcs.xml
 **/*.sql
 **/*.gz
 **/*.zip
-web/core/**/tests
-web/modules/contrib/**/tests
+docroot/core/**/tests
+docroot/modules/contrib/**/tests
 vendor/**/Tests
 **/node_modules
 **/.git
-web/sites/**/files
-web/.dockerignore
+docroot/sites/**/files
+docroot/.dockerignore
 Dockerfile
 composer.lock
 silta/silta*.yml

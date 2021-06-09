@@ -4,6 +4,8 @@
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
 
+webRoot: /app/docroot
+
 varnish:
   enabled: false
 
@@ -16,6 +18,8 @@ memcached:
 mounts:
   private-files:
     enabled: true
+  public-files:
+    mountPath: /app/docroot/sites/default/files
 
 # Allow access from another namespace for testing purposes.
 silta-release:

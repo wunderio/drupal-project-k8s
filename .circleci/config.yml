@@ -24,6 +24,7 @@ workflows:
           # Use custom executor.
           executor: cicd80
 
+          web-root: docroot
           post-validation:
             - run:
                 name: Helm unit tests

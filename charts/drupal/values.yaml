@@ -26,19 +26,7 @@ app: drupal
 
 # Path to the web root folder.
 # If you change this, make sure to check for any other references to "/app/web" or "web/" in your project.
-# Some known references are:
-# - public-files mount in this file
-# - silta/nginx.Dockerfile
-# - composer.json & composer.lock
-# - .dockerignore
-# - .gitignore
-# - .lando.yml
-# - grumphp.yml
-# - phpcs.xml
-# In .circleci/config.yml you also need to add the following parameters and put
-# your webRoot directory name as the value, for example "web" or "docroot":
-# - To silta/drupal-validate job, add parameter web-root
-# - To silta/drupal-deploy-build job, add parameter nginx_build_context
+# See https://github.com/wunderio/silta/blob/master/docs/changing_the_webroot.md
 webRoot: /app/web
 
 # How many instances of the Drupal pod should be in our Kubernetes deployment.

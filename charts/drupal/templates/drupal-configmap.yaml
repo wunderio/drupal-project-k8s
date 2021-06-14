@@ -624,7 +624,7 @@ data:
     #!/bin/bash
     
     # Prevent requests during the site installation process.
-    if [ {{ include "drupal.installation-in-progress-test" . }} ]; then 
+    if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then 
         exit 1; 
     fi
 
@@ -634,3 +634,4 @@ data:
     REQUEST_METHOD=GET \
     cgi-fcgi -bind -connect localhost:9000 \
     > /dev/null
+

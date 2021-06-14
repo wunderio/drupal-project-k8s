@@ -42,8 +42,6 @@ spec:
           {{- range .Values.solr.commandArgs }}
           - {{ . | quote }}
           {{- end }}
-          - "-m"
-          - "{{ .Values.solr.javaProcessMemory }}"
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
@@ -53,7 +51,7 @@ spec:
           periodSeconds: 20
           httpGet:
             scheme: HTTP
-            path: /solr/admin/info/system
+            path: {{ .Values.solr.readinessProbeUrl }}
             port:  8983
         volumeMounts:
         - name: {{ .Release.Name }}-core-dir
@@ -82,7 +80,11 @@ spec:
       name: {{ .Release.Name }}-solr-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.solr.persistence.data.storageClassName }}
       storageClassName: {{ .Values.solr.persistence.data.storageClassName }}
+      {{- else if eq .Values.cluster.type "gke" }}
+      storageClassName: standard
+      {{- end }}
       {{- if .Values.solr.persistence.data.csiDriverName }}
       csiDriverName: {{ .Values.solr.persistence.data.csiDriverName }}
       {{- end }}

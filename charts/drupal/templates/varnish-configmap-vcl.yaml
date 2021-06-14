@@ -15,19 +15,7 @@ data:
     backend prod1_http1 {
       .host = "{{ .Release.Name }}-drupal";
       .port = "80";
-      .max_connections = 300;
-
-      .probe = {
-        .url       = "/robots.txt"; 
-        .interval  = 5s; # check the health of each backend every n seconds
-        .timeout   = 1s; # timing out after n seconds
-        .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is
-        .threshold = 3;  # considered healthy, otherwise it will be marked as sick
-      }
-
-      .first_byte_timeout     = 300s;    # How long to wait before we receive a first byte from our backend?
-      .connect_timeout        = 10s;     # How long to wait for a backend connection?
-      .between_bytes_timeout  = 10s;     # How long to wait between bytes received from our backend?
+      {{- .Values.varnish.backend_config | nindent 6 }}
     }
  
     # Define the internal network access.
@@ -163,6 +151,12 @@ data:
         set beresp.do_esi = true;
       }
 
+      # Pipe files larger than {{ int .Values.varnish.cache_skip_size }} megabytes
+      if (std.integer(beresp.http.Content-Length, 0) > {{ mul ( int .Values.varnish.cache_skip_size ) 1024 1024 }} ) {
+        set bereq.http.x-error-reason = "oversize";
+        return (error);
+      }
+
       # Store the request url in cached item
       # See "Smart banning" https://www.varnish-software.com/static/book/Cache_invalidation.html
       set beresp.http.x-url = bereq.url;
@@ -214,13 +208,6 @@ data:
         }
       }
 
-      // Making theme development a bit faster on local envs.
-      if (bereq.url ~ "\.(css|js)\??.*$" && bereq.http.host ~ "^local") {
-        set beresp.ttl = 0s;
-        set beresp.http.X-Noncached-Static = 1;
-        set beresp.http.Cache-control = "no-cache, max-age=0, must-revalidate";
-      }
-
       if(beresp.status >= 500){
         // Cache (public) internal errors, but for only 1s. Never cache client side.
         set beresp.ttl = 1s;
@@ -234,6 +221,10 @@ data:
     }
 
     sub vcl_backend_error {
+      if (bereq.http.x-error-reason == "oversize") {
+        set beresp.status = 599;
+        return (deliver);
+      }
       return(retry);
     }
 
@@ -291,8 +282,9 @@ data:
       # which backend to use.
       # also used to modify the request
 
-      if (req.url == "/monit-check-url-happy") {
-        return (synth(200, "Varnish up"));
+      # Pipe connections with x-pipe-request (used for larger file downloads)
+      if (req.http.x-pipe-request && req.restarts > 0) {
+          return(pipe);
       }
 
       # Only allow BAN requests from IP addresses in the 'purge' ACL.
@@ -495,6 +487,11 @@ data:
       unset resp.http.X-Powered-By;
       unset resp.http.x-do-esi;
       unset resp.http.X-Forced-Gzip;
+
+      if (resp.status == 599) {
+        set req.http.x-pipe-request = "1";
+        return (restart);
+      }
 
       # deliver can return synth, but we must avoid a potential loop.
       # This GET-param can be used to see the real backend error:

@@ -452,8 +452,11 @@ varnish:
   enabled: false
   resources:
     requests:
-      cpu: 25m
-      memory: 32Mi
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
   image: eu.gcr.io/silta-images/varnish
   imageTag: 6-v0.1
   # https://varnish-cache.org/docs/6.0/users-guide/storage-backends.html

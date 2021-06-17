@@ -12,7 +12,7 @@ release: {{ .Release.Name }}
 app.kubernetes.io/name: {{ .Values.app | quote }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-helm.sh/chart: {{ template "drupal.chart" . }}  
+helm.sh/chart: {{ template "drupal.chart" . }}
 {{- end }}
 
 {{- define "drupal.php-container" -}}
@@ -35,11 +35,11 @@ ports:
   readOnly: true
   subPath: php_ini
 - name: config
-  mountPath: /app/web/sites/default/settings.silta.php
+  mountPath: {{ .Values.webRoot }}/sites/default/settings.silta.php
   readOnly: true
   subPath: settings_silta_php
 - name: config
-  mountPath: /app/web/sites/default/silta.services.yml
+  mountPath: {{ .Values.webRoot }}/sites/default/silta.services.yml
   readOnly: true
   subPath: silta_services_yml
 - name: config
@@ -63,6 +63,7 @@ ports:
 - name: config
   configMap:
     name: {{ .Release.Name }}-drupal
+    defaultMode: 0755
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
@@ -251,7 +252,7 @@ done
 {{- end }}
 
 {{- define "drupal.installation-in-progress-test" -}}
--f /app/web/sites/default/files/_installing
+-f {{ $.Values.webRoot }}/sites/default/files/_installing
 {{- end -}}
 
 
@@ -265,7 +266,7 @@ done
   {{ include "drupal.wait-for-db-command" . }}
 
   {{ if .Release.IsInstall }}
-    touch /app/web/sites/default/files/_installing
+    touch {{ .Values.webRoot }}/sites/default/files/_installing
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
@@ -277,7 +278,7 @@ done
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm /app/web/sites/default/files/_installing
+    rm {{ .Values.webRoot }}/sites/default/files/_installing
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
@@ -305,7 +306,7 @@ done
   # Restore files from targeted backup
   {{ include "drupal.import-backup-files" . }}
 
-  touch /app/web/sites/default/files/_installing
+  touch {{ .Values.webRoot }}/sites/default/files/_installing
 
   # Restore db from targeted backup
   {{ include "drupal.import-backup-db" . }}
@@ -319,7 +320,7 @@ done
 
   # Running custom commands after restored backup
   {{ .Values.php.postRestoreCommand }}
-  rm /app/web/sites/default/files/_installing
+  rm {{ .Values.webRoot }}/sites/default/files/_installing
 
 {{- end }}
 
@@ -453,7 +454,7 @@ fi
 {{- end }}
 
 {{- define "drupal.backup-command.archive-store-backup" -}}
-  
+
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
@@ -463,12 +464,14 @@ fi
   mkdir -p $BACKUP_LOCATION
   cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
+  {{- if not .Values.backup.skipFiles }}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
   # File backup for {{ $index }} volume.
   echo "Starting {{ $index }} volume backup."
   tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
   {{- end -}}
+  {{- end }}
   {{- end }}
 
   # Delete old backups
@@ -480,12 +483,12 @@ fi
 
 
 {{- define "mariadb.db-validation" -}}
-  
+
   set -e
 
   echo "** DB validation"
 
-  export DB_USER=root 
+  export DB_USER=root
   export DB_PASS={{ .db_password }}
   export DB_HOST=127.0.0.1
   export DB_NAME=drupal

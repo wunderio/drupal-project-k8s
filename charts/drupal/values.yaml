@@ -24,6 +24,11 @@ imagePullSecrets: []
 # The app label added to our Kubernetes resources.
 app: drupal
 
+# Path to the web root folder.
+# If you change this, make sure to check for any other references to "/app/web" or "web/" in your project.
+# See https://github.com/wunderio/silta/blob/master/docs/changing_the_webroot.md
+webRoot: /app/web
+
 # How many instances of the Drupal pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.
 # Multiple pods make sense for high availability.
@@ -77,6 +82,9 @@ ingress:
     # The name of the reserved static IP address.
     # It is best to first reserve the IP address and then add it here.
     # staticIpAddressName: null
+    # Custom ingress annotations
+    # extraAnnotations:
+    #   networking.gke.io/suppress-firewall-xpn-error: "true"
 
 # Infrastructure related settings.
 cluster:
@@ -107,6 +115,9 @@ ssl:
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
+
+  # Possible Values: debug, info, notice, warn, error, crit, alert, or emerg.
+  loglevel: error
 
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
@@ -247,7 +258,6 @@ php:
 
   # PHP settings
   php_ini:
-    loglevel: notice  # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
@@ -302,6 +312,7 @@ mounts:
   public-files:
     enabled: true
     storage: 1G
+    # Assumes that webRoot is set to the default value "/app/web".
     mountPath: /app/web/sites/default/files
     storageClassName: silta-shared
     csiDriverName: csi-rclone
@@ -392,6 +403,9 @@ backup:
   # These tables will have their content ignored from the backups.
   ignoreTableContent: '(cache|cache_.*)'
 
+  #  Do not backup files
+  #skipFiles: true
+
   # Resources for the backup cron job.
   resources:
     requests:
@@ -402,7 +416,7 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
-# see: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
+# see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
 mariadb:
   enabled: true
   replication:
@@ -442,8 +456,10 @@ varnish:
       memory: 32Mi
   image: eu.gcr.io/silta-images/varnish
   imageTag: 6-v0.1
-  # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
+  # https://varnish-cache.org/docs/6.0/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
+  # https://varnish-cache.org/docs/6.0/reference/varnishd.html#list-of-parameters
+  extraParams: ""
   # Inject custom code into vcl_recv subroutine.
   vcl_recv_extra: ""
   # Html code for status 500 page.
@@ -452,6 +468,19 @@ varnish:
   vcl_extra_cookies: ""
   # Do not cache files larger than 3 megabytes (use integers).
   cache_skip_size: 3
+  # https://varnish-cache.org/docs/6.0/reference/vcl.html#backend-definition
+  backend_config: |
+    .max_connections = 300;
+    .probe = {
+      .url       = "/robots.txt";
+      .interval  = 5s;
+      .timeout   = 5s;
+      .window    = 5;
+      .threshold = 3;
+    }
+    .first_byte_timeout     = 300s;
+    .connect_timeout        = 10s;
+    .between_bytes_timeout  = 10s;
 
 elasticsearch:
   enabled: false
@@ -494,20 +523,22 @@ elasticsearch:
           - static-ip
 
 # Memcache service overrides
-# see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml
+# see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml
 memcached:
   enabled: false
   replicaCount: 1
-  pdbMinAvailable: 0
-  memcached:
-    # This should be less than the memory limit, or memcached will crash.
-    maxItemMemory: 118
   resources:
     requests:
       cpu: 10m
       memory: 128Mi
     limits:
       memory: 128Mi
+  arguments:
+    - /run.sh
+    # MaxMemoryLimit, this should be less than the resources.limits.memory, or memcached will crash.
+    - -m 118
+    # MaxItemSize
+    - -I 4M
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml

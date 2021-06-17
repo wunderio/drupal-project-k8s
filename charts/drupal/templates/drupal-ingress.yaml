@@ -9,13 +9,6 @@ metadata:
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
-    traefik.ingress.kubernetes.io/rate-limit: |
-      extractorfunc: client.ip
-      rateset:
-        default:
-          period: 7s
-          average: 32
-          burst: 32
     {{- end }}
     {{- else }}
     {{- if eq $ingress.type "traefik" }}

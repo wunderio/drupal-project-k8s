@@ -86,7 +86,7 @@ ingress:
         extractorfunc: client.ip
         rateset:
           default:
-            period: 1m
+            period: 1s
             average: 32
             burst: 90
   gce:

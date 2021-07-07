@@ -129,11 +129,11 @@ data:
         gzip_proxied                any;
         gzip_disable                msie6;
 
-        {{- if .Values.nginx.nginx_x_robots_tag_header_rules }}
-        map "$http_host:$request_uri" $x_robots_tag_header {
-        {{ .Values.nginx.nginx_x_robots_tag_header_rules }}
+        {{- if .Values.nginx.x_robots_tag_header_rules }}
+        map $http_host:$request_uri $x_robots_tag_header {
+        {{ .Values.nginx.x_robots_tag_header_rules }}
         }
-        add_header  X-Robots-Tag $x_robots_tag_header;
+        add_header                  X-Robots-Tag $x_robots_tag_header;
         {{- end }}
 
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.

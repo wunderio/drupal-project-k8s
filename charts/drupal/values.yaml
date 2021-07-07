@@ -167,6 +167,11 @@ nginx:
   #hsts_include_subdomains: " includeSubDomains;"
   #content_security_policy: "upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; base-uri 'self'; object-src 'self'; connect-src wss: https:"
 
+  # Handling web crawlers - per domain and path via X-Robots-Tag header
+  # This example will add X-Robots-Tag header to site paths that match the host:/path regex
+  # nginx_x_robots_tag_header_rules: "~*(dev|develop|stage|prod).mytestsitedomain.com:/.*$" "noindex, nofollow, nosnippet, noarchive"
+  # nginx_x_robots_tag_header_rules: ""
+
   # Gzip compression level
   comp_level: 6
 

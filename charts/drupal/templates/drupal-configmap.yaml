@@ -129,12 +129,16 @@ data:
         gzip_proxied                any;
         gzip_disable                msie6;
 
-        {{- if .Values.nginx.x_robots_tag_header_rules }}
-        map $http_host:$request_uri $x_robots_tag_header {
-        {{ .Values.nginx.x_robots_tag_header_rules }}
+
+        map $http_host $x_robots_tag_header {
+        "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+        {{- range $index, $prefix := .Values.domainPrefixes }}
+        "~{{$prefix}}.{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+        {{- end }}
+        "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+        default  '';
         }
         add_header                  X-Robots-Tag $x_robots_tag_header;
-        {{- end }}
 
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
         add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;

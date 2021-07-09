@@ -135,7 +135,6 @@ data:
         {{- range $index, $prefix := .Values.domainPrefixes }}
         "~{{$prefix}}.{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
         {{- end }}
-        "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
         default  '';
         }
         add_header                  X-Robots-Tag $x_robots_tag_header;

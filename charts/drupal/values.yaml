@@ -400,14 +400,6 @@ backup:
   # How many daily backups to preserve.
   retention: 14
 
-  # If specified, replace environment content with the given backup.
-  restoreId: ""
-
-  # Custom commands to be executed after backup db, files are imported
-  postRestoreCommand: |
-
-
-
   storage: 10G
   storageClassName: silta-shared
   csiDriverName: csi-rclone

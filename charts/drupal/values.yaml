@@ -173,6 +173,9 @@ nginx:
   # Gzip compression level
   comp_level: 6
 
+  # Retry file lookup in 5 seconds (filesystem sync workaround)
+  # retry404s: 5
+
   # Extra configuration block in server context.
   serverExtraConfig: |
 

@@ -1,5 +1,6 @@
-parameters:
+grumphp:
   stop_on_failure: true
+  process_timeout: 300
   ascii:
     failed: ~
     succeeded: ~
@@ -11,20 +12,26 @@ parameters:
       run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
     phpcs:
       standard: ['phpcs.xml']
-    phpstan_check_deprecation:
       run_on: ['web/modules/custom', 'web/themes/custom']
-    ecs:
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
-    yaml_lint: 
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites', 'silta', '.circleci']
+    php_stan:
+      run_on: ['web/modules/custom', 'web/themes/custom']
+    yaml_lint:
+      run_on: ['web/modules/custom', 'web/themes/custom']
     json_lint:
-      run_on: ['web/modules/custom', 'web/themes/custom', 'web/sites']
+      ignore_patterns:
+        - '/vendor/'
+        - '/node_modules/'
+        - '/core/'
+        - '/libraries/'
+        - '/contrib/'
+        - '/charts/'
   extensions:
     - Wunderio\GrumPHP\Task\PhpCompatibility\PhpCompatibilityExtensionLoader
     - Wunderio\GrumPHP\Task\PhpCheckSyntax\PhpCheckSyntaxExtensionLoader
     - Wunderio\GrumPHP\Task\CheckFilePermissions\CheckFilePermissionsExtensionLoader
-    - Wunderio\GrumPHP\Task\Ecs\EcsExtensionLoader
     - Wunderio\GrumPHP\Task\Phpcs\PhpcsExtensionLoader
-    - Wunderio\GrumPHP\Task\PhpstanCheckDeprecation\PhpstanCheckDeprecationExtensionLoader
+    - Wunderio\GrumPHP\Task\PhpStan\PhpStanExtensionLoader
     - Wunderio\GrumPHP\Task\YamlLint\YamlLintExtensionLoader
     - Wunderio\GrumPHP\Task\JsonLint\JsonLintExtensionLoader
+  git_hook_variables:
+    EXEC_GRUMPHP_COMMAND: lando php

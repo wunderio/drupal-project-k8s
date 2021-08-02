@@ -25,7 +25,7 @@ spec:
 {{- end }}
 ---
 {{- range $index, $prefix := .Values.domainPrefixes }}
-{{- include "cert-manager.api-version" . }}
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-p{{ $index }}
@@ -38,7 +38,7 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
-{{- if not ( .Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
+{{- if not ( $.Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
@@ -91,7 +91,7 @@ data:
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}
 {{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- include "cert-manager.api-version" . }}
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}
@@ -104,7 +104,7 @@ spec:
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
-{{- if not ( .Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
+{{- if not ( $.Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
@@ -115,7 +115,7 @@ spec:
 ---
 
 {{- else if eq $domain.ssl.issuer "selfsigned" }}
-{{- include "cert-manager.api-version" . }}
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}

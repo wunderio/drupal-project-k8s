@@ -63,6 +63,7 @@ workflows:
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
                 - feature/Traefik-ratelimiting
+                - feature/cert-manager-upgrade
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
@@ -76,6 +77,7 @@ workflows:
                 - feature/test-cluster
                 - /feature\/test-cluster\/.*/
                 - feature/Traefik-ratelimiting
+                - feature/cert-manager-upgrade
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.

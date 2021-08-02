@@ -457,7 +457,7 @@ fi
 {{- end }}
 
 {{- define "cert-manager.api-version" }}
-{{- if ( $.Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
+{{- if ( .Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
 apiVersion: cert-manager.io/v1
 {{- else -}}
 apiVersion: certmanager.k8s.io/v1alpha1

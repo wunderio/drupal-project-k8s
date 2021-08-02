@@ -2,7 +2,7 @@
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
 {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- include "cert-manager.api-version" . }}
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
@@ -15,7 +15,7 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
-{{- if not ( .Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
+{{- if not ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
@@ -38,7 +38,7 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
-{{- if not ( $.Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
+{{- if not ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
@@ -104,7 +104,7 @@ spec:
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
-{{- if not ( $.Capabilities.APIVersions.Has "certificates.cert-manager.io/v1" ) }}
+{{- if not ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:

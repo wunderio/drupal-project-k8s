@@ -4,9 +4,15 @@ orbs:
   silta: silta/silta@dev:master
 
 executors:
-  silta-latest:
+  cicd73:
     docker:
-      - image: wunderio/silta-circleci:latest
+      - image: eu.gcr.io/silta-images/cicd:circleci-php7.3-node12-composer1-v0.1
+  cicd74:
+    docker:
+      - image: eu.gcr.io/silta-images/cicd:circleci-php7.4-node14-composer1-v0.1
+  cicd80:
+    docker:
+      - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
 
 workflows:
   version: 2
@@ -14,6 +20,10 @@ workflows:
     jobs:
       - silta/drupal-validate:
           name: validate
+          
+          # Use custom executor.
+          executor: cicd80
+          
           post-validation:
             - run:
                 name: Helm unit tests
@@ -22,8 +32,8 @@ workflows:
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
 
-          # Use the latest orb version.
-          executor: silta-latest
+          # Use custom executor.
+          executor: cicd80
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"
@@ -32,6 +42,7 @@ workflows:
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build
+
           pre-release:
             - run:
                 name: Build local helm chart
@@ -41,11 +52,44 @@ workflows:
                   helm dependency build ./charts/drupal
             - run:
                 name: Dry-run helm install
-                command: helm install --dry-run --generate-name ./charts/drupal
+                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           context: silta_dev
           filters:
             branches:
-              ignore: production
+              ignore:
+                - production
+                - feature/test-cluster
+                - /feature\/test-cluster\/.*/
+                - feature/aws-cluster
+                - /feature\/aws-cluster\/.*/
+                - feature/Traefik-ratelimiting
+                - feature/cert-manager-upgrade
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-test cluster environment.
+          <<: *build-deploy
+          name: build-deploy-test
+          silta_config: silta/silta.yml,silta/silta-test.yml
+          context: silta_test
+          filters:
+            branches:
+              only: 
+                - feature/test-cluster
+                - /feature\/test-cluster\/.*/
+                - feature/Traefik-ratelimiting
+                - feature/cert-manager-upgrade
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-test cluster environment.
+          <<: *build-deploy
+          name: build-deploy-aws
+          silta_config: silta/silta.yml,silta/silta-aws.yml
+          context: silta_aws
+          filters:
+            branches:
+              only: 
+                - feature/aws-cluster
+                - /feature\/aws-cluster\/.*/
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

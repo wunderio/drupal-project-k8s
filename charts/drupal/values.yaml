@@ -24,6 +24,11 @@ imagePullSecrets: []
 # The app label added to our Kubernetes resources.
 app: drupal
 
+# Path to the web root folder.
+# If you change this, make sure to check for any other references to "/app/web" or "web/" in your project.
+# See https://github.com/wunderio/silta/blob/master/docs/changing_the_webroot.md
+webRoot: /app/web
+
 # How many instances of the Drupal pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.
 # Multiple pods make sense for high availability.
@@ -39,6 +44,10 @@ autoscaling:
     - type: Resource
       resource:
         name: cpu
+        targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
         targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
@@ -57,7 +66,7 @@ autoscaling:
 #     hostname: www.example.com
 #   example_no_https:
 #    hostname: insecure.example.com
-#      ssl: 
+#      ssl:
 #        enabled: false
 exposeDomains: {}
 
@@ -72,20 +81,32 @@ ingress:
     type: traefik
     tls: true
     redirect-https: true
+    extraAnnotations:
+      traefik.ingress.kubernetes.io/rate-limit: |
+        extractorfunc: client.ip
+        rateset:
+          default:
+            period: 1s
+            average: 32
+            burst: 90
   gce:
     type: gce
     # The name of the reserved static IP address.
     # It is best to first reserve the IP address and then add it here.
     # staticIpAddressName: null
+    # Custom ingress annotations
+    # extraAnnotations:
+    #   networking.gke.io/suppress-firewall-xpn-error: "true"
 
 # Infrastructure related settings.
-cluster: 
+cluster:
+  type: gke
   vpcNative: false
 
 # backendConfig customisations for Drupal service
 backendConfig:
- securityPolicy:
-   name: "silta-ingress"
+  securityPolicy:
+    name: "silta-ingress"
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
@@ -107,13 +128,16 @@ ssl:
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
+  # Possible Values: debug, info, notice, warn, error, crit, alert, or emerg.
+  loglevel: error
+
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
   resources:
     requests:
       cpu: 1m
       memory: 10M
-  
+
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
   basicauth:
@@ -124,7 +148,10 @@ nginx:
       username: silta
       password: demo
 
-  # Trust X-Forwarded-For from these hosts for getting external IP 
+  # Header containing real IP address
+  real_ip_header: X-Forwarded-For
+
+  # Trust X-Forwarded-For from these hosts for getting external IP
   realipfrom: 10.0.0.0/8
 
   # Define the internal network access.
@@ -146,10 +173,13 @@ nginx:
   # Gzip compression level
   comp_level: 6
 
-  # Extra configuration block in server context. 
+  # Retry file lookup in 5 seconds (filesystem sync workaround)
+  # retry404s: 5
+
+  # Extra configuration block in server context.
   serverExtraConfig: |
 
-  # Extra configuration block in location context. 
+  # Extra configuration block in location context.
   locationExtraConfig: |
 
   # Extra configuration to pass to nginx as a file
@@ -170,7 +200,7 @@ php:
       memory: 512M
 
   fpm:
-    # Custom php-fpm settings block. May override parameters previously defined. 
+    # Custom php-fpm settings block. May override parameters previously defined.
     # This will be put under [www] process pool.
     extraConfig: |
 
@@ -213,16 +243,25 @@ php:
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
+      # Cache rebuild needs to be done before anything else, since if for
+      # example service files have changed, Drupal might not be able to
+      # bootstrap, not even for the `drush status` command below.
+      if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
+        drush cache-clear all
+      else
+        drush cache-rebuild
+      fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        # This first cache rebuild is unfortunately needed for the common case where a Drupal or
-        # contrib module flaw requires a rebuild before running database updates.
-        drush cr
         drush updatedb -y
-        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
+        if [[ $DRUPAL_CORE_VERSION -gt 7 && -f $DRUPAL_CONFIG_PATH/core.extension.yml ]]; then
           drush config-import -y
-          drush cr
+          drush cache-rebuild
         fi
       fi
+    # Extra commands to run after previous 'command' block.
+    # This removes the user step of copying the whole 'command' block and adding their own custom logic.
+    afterCommand: |
+
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
@@ -237,17 +276,20 @@ php:
 
   # PHP settings
   php_ini:
-    loglevel: notice  # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
-    # Custom php settings block. May override parameters previously defined. 
+    # Custom php settings block. May override parameters previously defined.
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
 
   # Define the location of the Drupal config files relative to the composer root.
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
   drupalConfigPath: "config/sync"
+
+  # Define Drupal version to be able to use different settings.php and do other core specific tasks.
+  # This variable is exposed as $DRUPAL_CORE_VERSION in the container.
+  drupalCoreVersion: "8"
 
   # Set a restriction on where the php pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
@@ -288,6 +330,7 @@ mounts:
   public-files:
     enabled: true
     storage: 1G
+    # Assumes that webRoot is set to the default value "/app/web".
     mountPath: /app/web/sites/default/files
     storageClassName: silta-shared
     csiDriverName: csi-rclone
@@ -363,20 +406,15 @@ backup:
   # How many daily backups to preserve.
   retention: 14
 
-  # If specified, replace environment content with the given backup.
-  restoreId: ""
-
-  # Custom commands to be executed after backup db, files are imported
-  postRestoreCommand: |
-
-  
-
   storage: 10G
   storageClassName: silta-shared
   csiDriverName: csi-rclone
 
   # These tables will have their content ignored from the backups.
   ignoreTableContent: '(cache|cache_.*)'
+
+  #  Do not backup files
+  #skipFiles: true
 
   # Resources for the backup cron job.
   resources:
@@ -388,7 +426,7 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
-# see: https://github.com/helm/charts/blob/master/stable/mariadb/values.yaml
+# see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
 mariadb:
   enabled: true
   replication:
@@ -426,13 +464,33 @@ varnish:
     requests:
       cpu: 25m
       memory: 32Mi
-  # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
+  image: eu.gcr.io/silta-images/varnish
+  imageTag: 6-v0.1
+  # https://varnish-cache.org/docs/6.0/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
-  # Inject custom code into vcl_recv subroutine
-  vcl_recv_extra: |
-  
+  # https://varnish-cache.org/docs/6.0/reference/varnishd.html#list-of-parameters
+  extraParams: ""
+  # Inject custom code into vcl_recv subroutine.
+  vcl_recv_extra: ""
+  # Html code for status 500 page.
+  status_500_html: ""
   # Additional cookie based rules
-  vcl_extra_cookies: |
+  vcl_extra_cookies: ""
+  # Do not cache files larger than 3 megabytes (use integers).
+  cache_skip_size: 3
+  # https://varnish-cache.org/docs/6.0/reference/vcl.html#backend-definition
+  backend_config: |
+    .max_connections = 300;
+    .probe = {
+      .url       = "/robots.txt";
+      .interval  = 5s;
+      .timeout   = 5s;
+      .window    = 5;
+      .threshold = 3;
+    }
+    .first_byte_timeout     = 300s;
+    .connect_timeout        = 10s;
+    .between_bytes_timeout  = 10s;
 
 elasticsearch:
   enabled: false
@@ -475,25 +533,32 @@ elasticsearch:
           - static-ip
 
 # Memcache service overrides
-# see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml
+# see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml
 memcached:
   enabled: false
   replicaCount: 1
-  pdbMinAvailable: 0
-  memcached:
-    # This should be less than the memory limit, or memcached will crash.
-    maxItemMemory: 118
   resources:
     requests:
       cpu: 10m
       memory: 128Mi
     limits:
       memory: 128Mi
+  arguments:
+    - /run.sh
+    # MaxMemoryLimit, this should be less than the resources.limits.memory, or memcached will crash.
+    - -m 118
+    # MaxItemSize
+    - -I 4M
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
   enabled: false
+  image:
+    # Set image repository to "mailhog/mailhog" to reenable logging.
+    repository: eu.gcr.io/silta-images/silta-mailhog
+    # Set image tag to "" to reenable logging.
+    tag: silent
   resources:
     requests:
       cpu: 1m
@@ -507,3 +572,40 @@ smtp:
   # starttls: false
   # username: ""
   # password: ""
+
+# Solr.
+solr:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
+  image: geerlingguy/solr
+  imageTag: latest
+
+  # Solr 4.x and 5.x does not support "-force" argument (optional override)
+  command: ["/opt/solr/bin/solr"]
+  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m"]
+
+  # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
+  # Solr init container will contents of this folder to actual solr container.
+  # Note: Configuration folder is not synced with shell container, drupal image rebuild required to update!
+  confLocation: /app/silta/solr/conf
+  coreName: search
+
+  readinessProbeUrl: /solr/admin/info/system
+
+  # Kubernetes resource assignments.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512M
+    limits:
+      cpu: 500m
+      memory: 768M
+
+  persistence:
+    data:
+      size: 1Gi
+      # storageClassName: standard
+      # Provide driver name if using CSI driver backed storage class (optional).
+      # csiDriverName: csi-driver-name
+      accessModes:
+        - ReadWriteOnce

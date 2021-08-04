@@ -5,6 +5,8 @@
  * Automatically injected settings for the Silta environment.
  */
 
+use Drupal\Core\Installer\InstallerKernel;
+
 // Database settings.
 $databases['default']['default'] = [
   'database' => getenv('DB_NAME'),
@@ -48,6 +50,16 @@ if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
  */
 if (getenv('MEMCACHED_HOST')) {
   $settings['memcache']['servers'] = [getenv('MEMCACHED_HOST') . ':11211' => 'default'];
+
+  // Set the default cache backend to use memcache if memcache host is set
+  // and if one of the memcache libraries was found.
+  // Cache backends should not be set to memcache during installation.
+  // The existence of the memcache drupal module should also be checked
+  // but this is not possible until this issue has been fixed:
+  // https://www.drupal.org/project/drupal/issues/2766509
+  if (!InstallerKernel::installationAttempted() && (class_exists('Memcache', FALSE) || class_exists('Memcached', FALSE))) {
+    $settings['cache']['default'] = 'cache.backend.memcache';
+  }
 }
 
 /**

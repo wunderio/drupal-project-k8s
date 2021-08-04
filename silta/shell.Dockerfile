@@ -1,4 +1,6 @@
 # Dockerfile for the Drupal container.
-FROM wunderio/drupal-shell:latest
+#FROM eu.gcr.io/silta-images/shell:php7.3-v0.1
+#FROM eu.gcr.io/silta-images/shell:php7.4-v0.1
+FROM eu.gcr.io/silta-images/shell:php8.0-v0.1
 
 COPY --chown=www-data:www-data . /app

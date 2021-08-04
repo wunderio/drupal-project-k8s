@@ -19,16 +19,18 @@
         "php": ">=7.3",
         "composer/installers": "^1.8",
         "cweagans/composer-patches": "^1.6",
-        "drupal/core-composer-scaffold": "^9.0",
-        "drupal/core-recommended": "^9.0",
+        "drupal/core-composer-scaffold": "^9.1",
+        "drupal/core-dev": "^9.1",
+        "drupal/core-recommended": "^9.1",
+        "drupal/purge": "^3.0",
+        "drupal/purge_purger_http": "^1.0",
         "drupal/simplei": "^1.2",
         "drush/drush": "^10.0",
         "vlucas/phpdotenv": "^5.0",
         "webflo/drupal-finder": "^1.2"
     },
     "require-dev": {
-        "drupal/core-dev": "^9.0",
-        "wunderio/code-quality": "^1.0",
+        "wunderio/code-quality": "^2.0",
         "zaporylie/composer-drupal-optimizations": "^1.1"
     },
     "conflict": {
@@ -44,7 +46,9 @@
         "classmap": [
             "scripts/composer/ScriptHandler.php"
         ],
-        "files": ["load.environment.php"]
+        "files": [
+            "load.environment.php"
+        ]
     },
     "scripts": {
         "pre-install-cmd": [
@@ -67,15 +71,26 @@
             }
         },
         "installer-paths": {
-            "web/core": ["type:drupal-core"],
-            "web/libraries/{$name}": ["type:drupal-library"],
-            "web/modules/contrib/{$name}": ["type:drupal-module"],
-            "web/profiles/contrib/{$name}": ["type:drupal-profile"],
-            "web/themes/contrib/{$name}": ["type:drupal-theme"],
-            "drush/Commands/{$name}": ["type:drupal-drush"]
+            "web/core": [
+                "type:drupal-core"
+            ],
+            "web/libraries/{$name}": [
+                "type:drupal-library"
+            ],
+            "web/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "web/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "web/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/{$name}": [
+                "type:drupal-drush"
+            ]
         },
         "composer-exit-on-patch-failure": true,
-        "patches": {
-        }
+        "patches": []
     }
 }

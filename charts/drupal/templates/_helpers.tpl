@@ -12,7 +12,7 @@ release: {{ .Release.Name }}
 app.kubernetes.io/name: {{ .Values.app | quote }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-helm.sh/chart: {{ template "drupal.chart" . }}  
+helm.sh/chart: {{ template "drupal.chart" . }}
 {{- end }}
 
 {{- define "drupal.php-container" -}}
@@ -35,11 +35,11 @@ ports:
   readOnly: true
   subPath: php_ini
 - name: config
-  mountPath: /app/web/sites/default/settings.silta.php
+  mountPath: {{ .Values.webRoot }}/sites/default/settings.silta.php
   readOnly: true
   subPath: settings_silta_php
 - name: config
-  mountPath: /app/web/sites/default/silta.services.yml
+  mountPath: {{ .Values.webRoot }}/sites/default/silta.services.yml
   readOnly: true
   subPath: silta_services_yml
 - name: config
@@ -63,6 +63,7 @@ ports:
 - name: config
   configMap:
     name: {{ .Release.Name }}-drupal
+    defaultMode: 0755
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
@@ -117,6 +118,8 @@ imagePullSecrets:
   value: "{{ .Values.projectName | default .Release.Namespace }}"
 - name: ENVIRONMENT_NAME
   value: "{{ .Values.environmentName }}"
+- name: DRUSH_OPTIONS_URI
+  value: "http://{{- template "drupal.domain" . }}"
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
@@ -161,6 +164,13 @@ imagePullSecrets:
       key: hashsalt
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
+- name: DRUPAL_CORE_VERSION
+  value: {{ .Values.php.drupalCoreVersion | quote }}
+{{- if .Values.solr.enabled }}
+- name: SOLR_HOST
+  value: {{ .Release.Name }}-solr
+{{- end }}
+# Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -185,9 +195,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
@@ -244,7 +254,7 @@ done
 {{- end }}
 
 {{- define "drupal.installation-in-progress-test" -}}
--f /app/web/sites/default/files/_installing
+-f {{ $.Values.webRoot }}/sites/default/files/_installing
 {{- end -}}
 
 
@@ -258,7 +268,7 @@ done
   {{ include "drupal.wait-for-db-command" . }}
 
   {{ if .Release.IsInstall }}
-    touch /app/web/sites/default/files/_installing
+    touch {{ .Values.webRoot }}/sites/default/files/_installing
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
@@ -270,9 +280,12 @@ done
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm /app/web/sites/default/files/_installing
+    rm {{ .Values.webRoot }}/sites/default/files/_installing
   {{ end }}
-  {{ .Values.php.postupgrade.command}}
+  {{ .Values.php.postupgrade.command }}
+  {{- if .Values.php.postupgrade.afterCommand }}
+    {{ .Values.php.postupgrade.afterCommand }}
+  {{- end }}
 
   # Wait for background imports to complete.
   wait
@@ -283,36 +296,6 @@ done
     {{- end }}
   {{- end }}
 {{- end }}
-
-{{- define "drupal.restore-backup-command" -}}
-  set -e
-
-  {{ include "drupal.wait-for-db-command" . }}
-
-  # Make backup of current deployment
-  {{ include "drupal.backup-command" . }}
-
-  # Restore files from targeted backup
-  {{ include "drupal.import-backup-files" . }}
-
-  touch /app/web/sites/default/files/_installing
-
-  # Restore db from targeted backup
-  {{ include "drupal.import-backup-db" . }}
-
-  {{ if .Values.elasticsearch.enabled }}
-    {{ include "drupal.wait-for-elasticsearch-command" . }}
-  {{ end }}
-
-  # Run postupgrade commands from normal deployment
-  {{ .Values.php.postupgrade.command }}
-
-  # Running custom commands after restored backup
-  {{ .Values.php.postRestoreCommand }}
-  rm /app/web/sites/default/files/_installing
-
-{{- end }}
-
 
 {{- define "drupal.extract-reference-data" -}}
 set -e
@@ -365,23 +348,8 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   pv /tmp/reference-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drush cr
-else
-  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
-fi
-{{- end }}
-
-{{- define "drupal.import-backup-db" -}}
-if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
-  echo "Dropping old database"
-  drush sql-drop -y
-
-  echo "Importing backup database dump"
-  gunzip -c /backups/{{ $.Values.backup.restoreId }}/db.sql.gz > /tmp/backup-data-db.sql
-  pv /tmp/backup-data-db.sql | drush sql-cli
-
-  # Clear caches before doing anything else.
-  drush cr
+  if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;
+  else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
@@ -400,20 +368,13 @@ fi
   {{- end }}
 {{- end }}
 
-{{- define "drupal.import-backup-files" -}}
-  {{ range $index, $mount := .Values.mounts -}}
-  {{- if eq $mount.enabled true }}
-  echo "Deleting old files"
-  rm -rf {{ $mount.mountPath }}/*
-  rm -rf {{ $mount.mountPath }}/.*
-  echo "Restoring {{ $index }} volume backup."
-  tar -xvzf /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz -C /
-  {{- end -}}
-  {{- end }}
+{{- define "drupal.backup-command" -}}
+  {{ include "drupal.backup-command.dump-database" . }}
+  {{ include "drupal.backup-command.archive-store-backup" . }}
 {{- end }}
 
-{{- define "drupal.backup-command" -}}
-set -e
+{{- define "drupal.backup-command.dump-database" -}}
+  set -e
 
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
@@ -433,22 +394,27 @@ set -e
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
   echo "Database backup complete."
+{{- end }}
+
+{{- define "drupal.backup-command.archive-store-backup" -}}
 
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
-  gzip -9 /tmp/db.sql
+  gzip -k9 /tmp/db.sql
 
   # Create a folder for the backup
   mkdir -p $BACKUP_LOCATION
   cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
+  {{- if not .Values.backup.skipFiles }}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
   # File backup for {{ $index }} volume.
   echo "Starting {{ $index }} volume backup."
   tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
   {{- end -}}
+  {{- end }}
   {{- end }}
 
   # Delete old backups
@@ -457,3 +423,44 @@ set -e
   # List content of backup folder
   ls -lh /backups/*
 {{- end }}
+
+
+{{- define "mariadb.db-validation" -}}
+
+  set -e
+
+  echo "** DB validation"
+
+  export DB_USER=root
+  export DB_PASS={{ .db_password }}
+  export DB_HOST=127.0.0.1
+  export DB_NAME=drupal
+
+  TIME_WAITING=0
+  echo "Waiting for database.";
+
+  until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
+    echo -n "."
+    sleep 1s
+    TIME_WAITING=$((TIME_WAITING+1))
+
+    if [ $TIME_WAITING -gt 20 ]; then
+      echo "Database connection timeout"
+      exit 1
+    fi
+  done
+
+  echo "Importing database dump for validation"
+  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp < /tmp/db.sql
+  drush status --fields=bootstrap
+
+{{- end }}
+
+{{- define "cert-manager.api-version" }}
+{{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+apiVersion: cert-manager.io/v1
+{{- else }}
+apiVersion: certmanager.k8s.io/v1alpha1
+{{- end }}
+{{- end }}
+

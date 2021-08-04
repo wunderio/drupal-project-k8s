@@ -1,4 +1,6 @@
 {{- if .Values.backup.enabled }}
+{{- $db_password := randAlphaNum 20 }}
+{{- $params := dict "db_password" $db_password  -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -15,7 +17,14 @@ spec:
   suspend: false
   jobTemplate:
     spec:
+      # This is a fallback for sidecar termination failure.
+      # Two hours should be enough for backup/validation actions.
+      activeDeadlineSeconds: 7200
+      backoffLimit: 2
       template:
+        metadata:
+          annotations:
+            nrmitchi.com/sidecars: mariadb
         spec:
           enableServiceLinks: false
           containers:
@@ -28,7 +37,19 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
-                {{ include "drupal.backup-command" . | nindent 16 }}
+                {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
+                {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
+          - name: mariadb
+            image: docker.io/bitnami/mariadb:10.2
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: {{ $db_password }}
+            - name: MARIADB_DATABASE
+              value: drupal
+            ports:
+            - containerPort: 3306
+              name: mariadb
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
@@ -37,8 +58,7 @@ spec:
             - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
                 claimName: {{ .Release.Name }}-backup
-
-
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
+
 ---

@@ -46,14 +46,17 @@ spec:
           value: {{ .Values.shell.gitAuth.repositoryUrl }}
         - name: OUTSIDE_COLLABORATORS
           value: {{ .Values.shell.gitAuth.outsideCollaborators | default true | quote }}
-        - name: DRUSH_OPTIONS_URI
-          value: "http://{{- template "drupal.domain" . }}"
         ports:
           - containerPort: 22
         volumeMounts:
         {{- include "drupal.volumeMounts" . | nindent 8 }}
         - name: ssh-keys
           mountPath: /etc/ssh/keys
+        {{- if .Values.backup.enabled }}
+        - name: {{ .Release.Name }}-backup
+          mountPath: /backups
+          readOnly: true
+        {{- end }}
         resources:
           {{- merge .Values.shell.resources .Values.php.resources | toYaml | nindent 10 }}
       nodeSelector:
@@ -73,6 +76,11 @@ spec:
       - name: ssh-keys
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-ssh-keys
+      {{- if .Values.backup.enabled }}
+      - name: {{ .Release.Name }}-backup
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-backup
+      {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
 {{- end }}
 ---

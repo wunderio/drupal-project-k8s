@@ -9,8 +9,11 @@ data:
     [mysqldump]
     gdpr-replacements='{{ .Values.gdprDump | toJson }}'
 
+  {{- if eq .Values.php.drupalCoreVersion "7" }}
+  settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
+  {{- else }}
   settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}
-
+  {{- end }}
   silta_services_yml: |{{ .Files.Get "files/silta.services.yml" | nindent 4 }}
 
   php_ini: |
@@ -47,9 +50,6 @@ data:
     [Assertion]
     zend.assertions = -1
 
-    [mbstring]
-    mbstring.internal_encoding = UTF-8
-
     [opcache]
     opcache.enable = 1
     opcache.enable_cli = 0
@@ -67,25 +67,29 @@ data:
     ; Disable Twig instrumentation, it causes issues when used with Drupal.
     ; See https://docs.instana.io/ecosystem/php/#tracing
     instana.disabled_instrumentation=2097152
-    
+
     ; Custom configuration below
     {{ .Values.php.php_ini.extraConfig | nindent 4 }}
-    
+
   nginx_conf: |
+
+    include modules/*.conf;
+
     user                            nginx;
     worker_processes                auto;
+    worker_rlimit_nofile            10240;
 
     error_log                       /proc/self/fd/2 {{ .Values.nginx.loglevel }};
 
     events {
-        worker_connections          1024;
+        worker_connections          10240;
         multi_accept                on;
     }
 
     http {
 
         set_real_ip_from                {{ .Values.nginx.realipfrom }};
-        real_ip_header                  X-Forwarded-For;
+        real_ip_header                  {{ .Values.nginx.real_ip_header }};
 
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
@@ -93,7 +97,6 @@ data:
         log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
                                     '$status $body_bytes_sent "$http_referer" '
                                     '"$http_user_agent" "$http_x_forwarded_for"';
-
 
         access_log                  /proc/self/fd/1 main;
 
@@ -141,15 +144,12 @@ data:
 
         types_hash_max_size 8192;
         server_names_hash_bucket_size 64;
-        
+
         map_hash_bucket_size 128;
 
         map $uri $no_slash_uri {
             ~^/(?<no_slash>.*)$ $no_slash;
         }
-
-        # List health checks that need to return status 200 here
-        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; } 
 
         include conf.d/*.conf;
     }
@@ -193,11 +193,6 @@ data:
     pm.max_spare_servers = 2
     pm.process_idle_timeout = 60s
     pm.max_requests = 500
-    
-    access.log = /proc/self/fd/2
-    catch_workers_output = yes
-    
-    clear_env = no
 
     ; Custom configuration below
     {{ .Values.php.fpm.extraConfig | nindent 4 }}
@@ -257,12 +252,15 @@ data:
         {{- end }}
     }
     {{- end }}
+    
+    # List health checks that need to return status 200 here
+    map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
 
     server {
         server_name drupal;
         listen 80;
 
-        # Loadbalancer health checks need to be fed with http 200 
+        # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }
 
         {{- if .Values.nginx.redirects }}
@@ -275,7 +273,7 @@ data:
         }
         {{- end }}
 
-        root /app/web;
+        root {{ .Values.webRoot }};
         index index.php;
 
         include fastcgi.conf;
@@ -323,7 +321,7 @@ data:
 
             # Custom configuration gets included here
             {{ if .Values.nginx.locationExtraConfig }}
-            {{ .Values.nginx.locationExtraConfig | nindent 10 }} 
+            {{ .Values.nginx.locationExtraConfig | nindent 10 }}
             {{- end }}
 
             location ~* /system/files/ {
@@ -492,6 +490,22 @@ data:
             try_files $uri @drupal;
         }
 
+        {{- if .Values.nginx.retry404s }}
+        # Retry file lookup in 5 seconds (fs sync workaround)
+        location /sites/default/files/ {
+            try_files $uri $uri/ @files_delay;
+        }
+        location @files_delay {
+            internal;
+            echo_sleep {{ .Values.nginx.retry404s }}.0;
+            echo_exec @files_retry;
+        }
+        location @files_retry {
+            internal;
+            try_files $uri $uri/ =404;
+        }
+        {{- end }}
+
         location @drupal {
             include fastcgi.conf;
             fastcgi_param QUERY_STRING $query_string;
@@ -624,3 +638,19 @@ data:
     Host *
     ProxyCommand=nc -X connect -x {{ $proxy.url }}:{{ $proxy.port }} %h %p
 {{- end }}
+
+  php-fpm-probe.sh: |
+    #!/bin/bash
+    
+    # Prevent requests during the site installation process.
+    if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then 
+        exit 1; 
+    fi
+
+    # Ping php-fpm process
+    SCRIPT_NAME=/ping \
+    SCRIPT_FILENAME=/ping \
+    REQUEST_METHOD=GET \
+    cgi-fcgi -bind -connect localhost:9000 \
+    > /dev/null
+

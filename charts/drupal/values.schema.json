@@ -53,6 +53,7 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "app": { "type": "string" },
+    "webRoot": { "type": "string" },
 
     "replicas": { "type": "integer" },
     "autoscaling": {
@@ -144,6 +145,12 @@
     },
     "silta-release": {
       "type": "object"
+    },
+    "solr": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
     }
   }
 }

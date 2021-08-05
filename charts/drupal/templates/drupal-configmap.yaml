@@ -502,7 +502,9 @@ data:
         }
         location @files_retry {
             internal;
-            try_files $uri $uri/ =404;
+            # try_files $uri $uri/ =404;
+            # Pass file request to drupal as a final fallback. 
+            try_files $uri @drupal;
         }
         {{- end }}
 

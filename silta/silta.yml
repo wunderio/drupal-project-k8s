@@ -37,7 +37,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-nginx:
-  # Retry file lookup in 5 seconds (filesystem sync workaround)
-  retry404s: 5

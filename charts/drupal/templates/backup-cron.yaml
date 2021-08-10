@@ -52,7 +52,7 @@ spec:
               name: mariadb
             resources:
               requests:
-                {{- .Values.backup.resources.requests | default .Values.mariadb.master.resources.requests | toYaml | nindent 16 }}
+                {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

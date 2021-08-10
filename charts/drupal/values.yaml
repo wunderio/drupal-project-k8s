@@ -417,14 +417,10 @@ backup:
   #skipFiles: true
 
   # Resources for the backup cron job.
-  # Uses mariadb.master.resources by default, can be overriden here 
-  # if default db assignment is too generous.
-  # resources:
-  #   requests:
-  #     cpu: 1000m
-  #     memory: 512M
-  #   limits:
-  #     memory: 512M
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 512M
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.

@@ -40,7 +40,7 @@ spec:
                 {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
                 {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
           - name: mariadb
-            image: docker.io/bitnami/mariadb:10.2
+            image: docker.io/bitnami/mariadb:10.3.24-debian-10-r49
             imagePullPolicy: IfNotPresent
             env:
             - name: MARIADB_ROOT_PASSWORD
@@ -51,7 +51,8 @@ spec:
             - containerPort: 3306
               name: mariadb
             resources:
-              {{- .Values.backup.resources | toYaml | nindent 14 }}
+              requests:
+                {{- .Values.backup.resources.requests | default .Values.mariadb.master.resources.requests | toYaml | nindent 16 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

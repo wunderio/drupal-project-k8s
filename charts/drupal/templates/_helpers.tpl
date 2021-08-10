@@ -378,7 +378,7 @@ fi
 
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
-  BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
+  BACKUP_LOCATION="/backups/$BACKUP_ID"
 
   # Figure out which tables to skip.
   IGNORE_TABLES=""

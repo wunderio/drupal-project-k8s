@@ -17,13 +17,9 @@ class TestPageController extends ControllerBase {
    */
   public function testPage() {
     $element = [
+      '#attached' => ['http_header' => [['Custom-Header', 'TEST123']]],
       '#markup' => 'Host: ' . \Drupal::request()->getSchemeAndHttpHost(),
     ];
-
-    $element['#attached']['http_header'][] = [
-      'Custom-Header', 'THIS, IS, A, TAG, TEST'
-    ];
-
     return $element;
   }
 

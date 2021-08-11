@@ -220,6 +220,11 @@ data:
     ## Hide the PHP X-Powered-By header.
     fastcgi_hide_header 'X-Powered-By';
 
+    # Removing cache headers from backend response
+    fastcgi_hide_header 'Purge-Cache-Tags';
+    fastcgi_hide_header 'X-Drupal-Cache-Contexts';
+    fastcgi_hide_header 'X-Drupal-Cache-Tags';
+    
     # Mitigate HTTPoxy
     # https://httpoxy.org/
     fastcgi_param HTTP_PROXY "";

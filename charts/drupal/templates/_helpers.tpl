@@ -424,7 +424,6 @@ fi
   ls -lh /backups/*
 {{- end }}
 
-
 {{- define "mariadb.db-validation" -}}
 
   set -e
@@ -464,3 +463,10 @@ apiVersion: certmanager.k8s.io/v1alpha1
 {{- end }}
 {{- end }}
 
+{{- define "cron.entrypoints" -}}
+
+set -e
+# Trigger lagoon entrypoint scripts if present.
+if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
+
+{{- end }}

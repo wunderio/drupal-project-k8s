@@ -151,6 +151,9 @@ nginx:
   # Header containing real IP address
   real_ip_header: X-Forwarded-For
 
+  # Expose drupal cache tag headers
+  expose_cache_headers: false
+
   # Trust X-Forwarded-For from these hosts for getting external IP
   realipfrom: 10.0.0.0/8
 

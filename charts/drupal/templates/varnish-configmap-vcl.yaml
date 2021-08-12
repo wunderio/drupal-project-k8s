@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
-  default_vcl: |
+  default.vcl: |
     vcl 4.1;
 
     import std;
@@ -275,7 +275,7 @@ data:
       return (ok);
     }
 
-  vcl_recv_vcl: |
+  vcl_recv.vcl: |
     sub vcl_recv {
       # Called at the beginning of a request, after the complete request has been received and parsed.
       # Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable,
@@ -456,7 +456,7 @@ data:
       return (hash);
     }
     
-  vcl_deliver_vcl: |
+  vcl_deliver.vcl: |
 
     # The routine when we deliver the HTTP request to the user
     # Last chance to modify headers that are sent to the client

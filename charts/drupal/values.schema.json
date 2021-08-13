@@ -116,6 +116,12 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "db": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "varnish": {
       "type": "object",
       "properties": {

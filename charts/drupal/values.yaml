@@ -613,3 +613,8 @@ solr:
       # csiDriverName: csi-driver-name
       accessModes:
         - ReadWriteOnce
+
+db:
+  enabled: true
+  user: root
+  password: test123

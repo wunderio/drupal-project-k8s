@@ -122,16 +122,16 @@ imagePullSecrets:
   value: "http://{{- template "drupal.domain" . }}"
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
-  value: "{{ .Values.mariadb.db.user }}"
+  value: "{{ .Values.db.user }}"
 - name: DB_NAME
-  value: "{{ .Values.mariadb.db.name }}"
+  value: "{{ .Values.db.name }}"
 - name: DB_HOST
-  value: moco-{{ .Release.Name }}-db-primary
+  value: {{ .Release.Name }}-haproxy
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: moco-{{ .Release.Name }}-db
-      key: ADMIN_PASSWORD
+      name: {{ .Release.Name }}-pxc
+      key: root
 {{- end }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}

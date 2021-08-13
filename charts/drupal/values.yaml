@@ -616,5 +616,6 @@ solr:
 
 db:
   enabled: true
+  name: drupal
   user: root
   password: test123

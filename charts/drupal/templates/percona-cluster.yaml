@@ -1,7 +1,7 @@
 apiVersion: pxc.percona.com/v1-9-0
 kind: PerconaXtraDBCluster
 metadata:
-  name: {{ .Release.Name }}-pxc
+  name: pxc-{{ sha256sum .Release.Name | trunc 10 }}
 spec:
   crVersion: 1.9.0
   secretsName: {{ .Release.Name }}-pxc

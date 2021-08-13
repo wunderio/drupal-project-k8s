@@ -126,7 +126,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "{{ .Values.db.name }}"
 - name: DB_HOST
-  value: {{ .Release.Name }}-haproxy
+  value: pxc-{{ sha256sum .Release.Name | trunc 10 }}-pxc
 - name: DB_PASS
   valueFrom:
     secretKeyRef:

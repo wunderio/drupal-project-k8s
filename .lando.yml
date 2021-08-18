@@ -1,46 +1,59 @@
 name: Silta
-recipe: drupal8
-
-compose:
-  - docker-compose.yml
+recipe: drupal9
 
 config:
-  webroot: web
+  php: "7.4"
   via: nginx
-  php: '7.1'
-  database: mariadb:10.1
-  #xdebug: true
+  webroot: web
+  database: "mariadb:10.3"
+  xdebug: off
+  config:
+    php: .lando/php.ini
 
 tooling:
-  codeception:
-    service: appserver
-    description: Run codeception
+  grumphp:
+    description: "Runs grumphp commands"
     cmd:
-      - ./vendor/bin/codecept
-      - "--env=lando"
+      - appserver: ./vendor/bin/grumphp
+  npm:
+    description: "Runs npm commands"
+    service: node
+  xdebug:
+    description: "Loads Xdebug in the selected mode"
+    cmd:
+      - appserver: /app/.lando/xdebug.sh
+    user: root
 
-services:  
+services:
+  appserver:
+    build:
+      - "composer install"
+    overrides:
+      environment:
+        HASH_SALT: notsosecurehash
+        ENVIRONMENT_NAME: local
+        DB_NAME_DRUPAL: drupal9
+        DB_USER_DRUPAL: drupal9
+        DB_PASS_DRUPAL: drupal9
+        DB_HOST_DRUPAL: database
+        # Support debugging with XDEBUG 3.
+        XDEBUG_MODE:
+        PHP_IDE_CONFIG: serverName=appserver
   mailhog:
     type: mailhog
     hogfrom:
       - appserver
 
-  appserver:
-    overrides:
-      services:
-        environment:
-          HASH_SALT: notsosecurehash
-          DB_PASS: drupal8
-          DB_USER: drupal8
-          DB_HOST: database
-          DB_NAME: drupal8
-
 proxy:
   mailhog:
-    - mail.lndo.site
+    - mail-silta.lndo.site
 
 events:
-  # Clear caches after a database import
   post-db-import:
-    - appserver: cd $LANDO_WEBROOT && drush cr -y
+    - appserver: "cd $LANDO_WEBROOT && drush cache:rebuild -y && drush @local user:login"
 
+env_file:
+  - .lando/.env
+
+# Tested with Lando version
+version: v3.1.4

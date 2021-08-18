@@ -151,8 +151,14 @@ nginx:
   # Header containing real IP address
   real_ip_header: X-Forwarded-For
 
+  # Expose drupal cache tag headers
+  expose_cache_headers: false
+
   # Trust X-Forwarded-For from these hosts for getting external IP
-  realipfrom: 10.0.0.0/8
+  realipfrom: 
+    gke-internal: 10.0.0.0/8
+    gce-health-check-1: 130.211.0.0/22
+    gce-health-check-2: 35.191.0.0/16
 
   # Define the internal network access.
   # These are used below to allow internal access to certain files
@@ -420,8 +426,6 @@ backup:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
-    limits:
       memory: 512M
 
 # Override the default values of the MariaDB subchart.

@@ -87,9 +87,18 @@ data:
     }
 
     http {
+        
+        # List of upstream proxies we trust to set X-Forwarded-For correctly.
+        {{- if kindIs "string" .Values.nginx.realipfrom }}
+        set_real_ip_from            {{ .Values.nginx.realipfrom }};
+        {{- end }}
+        {{- if kindIs "map" .Values.nginx.realipfrom }}
+        {{- range .Values.nginx.realipfrom }}
+        set_real_ip_from            {{ . }};
+        {{- end }}
+        {{- end }}
 
-        set_real_ip_from                {{ .Values.nginx.realipfrom }};
-        real_ip_header                  {{ .Values.nginx.real_ip_header }};
+        real_ip_header              {{ .Values.nginx.real_ip_header }};
 
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
@@ -230,6 +239,13 @@ data:
     ## Hide the PHP X-Powered-By header.
     fastcgi_hide_header 'X-Powered-By';
 
+    {{- if and ( not .Values.nginx.expose_cache_headers ) ( not .Values.varnish.enabled ) }}
+    # Removing cache headers from backend response
+    fastcgi_hide_header 'Purge-Cache-Tags';
+    fastcgi_hide_header 'X-Drupal-Cache-Contexts';
+    fastcgi_hide_header 'X-Drupal-Cache-Tags';
+    {{- end }}
+    
     # Mitigate HTTPoxy
     # https://httpoxy.org/
     fastcgi_param HTTP_PROXY "";
@@ -290,8 +306,10 @@ data:
 
         {{ include "drupal.basicauth" . | indent 6}}
 
+        {{- if .Values.nginx.serverExtraConfig }}
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
+        {{- .Values.nginx.serverExtraConfig | nindent 8 }}
+        {{- end }}
 
         {{- if .Values.mailhog.enabled }}
         location /mailhog {
@@ -426,6 +444,13 @@ data:
                 try_files $uri @drupal;
             }
 
+            {{- if .Values.nginx.retry404s }}
+            # Retry file lookup in 5 seconds (fs sync workaround)
+            location ~* ^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$ {
+                try_files $uri $uri/ @files_delay;
+            }
+            {{- end }}
+            
             ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
             location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
                 tcp_nodelay     off;
@@ -501,10 +526,6 @@ data:
         }
 
         {{- if .Values.nginx.retry404s }}
-        # Retry file lookup in 5 seconds (fs sync workaround)
-        location /sites/default/files/ {
-            try_files $uri $uri/ @files_delay;
-        }
         location @files_delay {
             internal;
             echo_sleep {{ .Values.nginx.retry404s }}.0;
@@ -512,7 +533,8 @@ data:
         }
         location @files_retry {
             internal;
-            try_files $uri $uri/ =404;
+            # Pass file request to drupal as a final fallback. 
+            try_files $uri @drupal;
         }
         {{- end }}
 

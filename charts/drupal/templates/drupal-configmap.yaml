@@ -156,6 +156,16 @@ data:
 
         map_hash_bucket_size 128;
 
+        # Return noindex headers for built-in domains
+        map $http_host $x_robots_tag_header {
+            "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+            {{- range $index, $prefix := .Values.domainPrefixes }}
+            "~{{$prefix}}.{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+            {{- end }}
+            default  '';
+        }
+        add_header                  X-Robots-Tag $x_robots_tag_header;
+
         map $uri $no_slash_uri {
             ~^/(?<no_slash>.*)$ $no_slash;
         }

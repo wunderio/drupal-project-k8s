@@ -22,7 +22,7 @@
         "drupal/core-composer-scaffold": "^9.1",
         "drupal/core-dev": "^9.1",
         "drupal/core-recommended": "^9.1",
-        "drupal/memcache": "^2.3",
+        "drupal/memcache": "^2.0@alpha",
         "drupal/purge": "^3.0",
         "drupal/purge_purger_http": "^1.0",
         "drupal/simplei": "^1.2",

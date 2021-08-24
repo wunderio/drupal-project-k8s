@@ -126,7 +126,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "{{ .Values.db.name }}"
 - name: DB_HOST
-  value: pxc-{{ sha256sum .Release.Name | trunc 10 }}-pxc
+  value: {{ include "pxc-name" . }}-pxc
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
@@ -490,4 +490,9 @@ set -e
 # Trigger lagoon entrypoint scripts if present.
 if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
 
+{{- end }}
+
+{{- define "pxc-name" }}
+{{- $releaseNameHash := sha256sum .Release.Name | trunc 3 }}
+{{- (gt (len .Release.Name) 22) | ternary ( print (.Release.Name | trunc 18) print $releaseNameHash ) .Release.Name }}
 {{- end }}

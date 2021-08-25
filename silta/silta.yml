@@ -37,3 +37,11 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+mariadb:
+  enabled: true
+
+perconaXtraDB:
+  enabled: true
+  replicas: 2
+  persistence:

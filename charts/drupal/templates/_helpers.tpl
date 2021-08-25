@@ -122,11 +122,13 @@ imagePullSecrets:
   value: "http://{{- template "drupal.domain" . }}"
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
-  value: "{{ .Values.db.user }}"
+  value: "root"
 - name: DB_NAME
-  value: "{{ .Values.db.name }}"
+  value: "drupal"
 - name: DB_HOST
-  value: {{ include "pxc-name" . }}-pxc
+  value: {{ include "pxc-name" . }}-pxc 
+  # cluster1-haproxy
+  # -haproxy-replicas
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
@@ -239,7 +241,7 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-echo "Creating for database.";
+echo "Creating drupal database.";
 mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 

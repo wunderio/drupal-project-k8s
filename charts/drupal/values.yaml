@@ -615,7 +615,32 @@ solr:
         - ReadWriteOnce
 
 db:
-  enabled: true
-  name: drupal
-  user: root
-  password: test123
+  primary: mariadb
+
+perconaXtraDB:
+  enabled: false
+  secrets:
+    root: drupal
+    xtrabackup: backup_password
+    monitor: monitory
+    clustercheck: clustercheckpassword
+    proxyadmin: admin_password
+    pmmserver: supa|^|pazz
+    operator: operatoradmin
+    replication: repl_password
+  pxc:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 25m
+        memory: 384M
+      limits:
+        memory: 512M
+    persistence:
+      size: 1G
+    configuration: |
+      [mysqld]
+      # Required for db import / reference data / backups
+      # https://forums.percona.com/t/import-mysql-dump-to-pxc/6104
+      # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
+      pxc_strict_mode=PERMISSIVE

@@ -43,5 +43,12 @@ mariadb:
 
 perconaXtraDB:
   enabled: true
-  replicas: 2
-  persistence:
+  pxc:
+    replicas: 3
+
+db:
+  primary: perconaXtraDB
+
+php:
+  postupgrade:
+    command: ""

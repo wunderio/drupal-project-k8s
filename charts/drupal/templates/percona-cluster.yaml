@@ -27,9 +27,18 @@ spec:
             storage: {{ .Values.perconaXtraDB.pxc.persistence.size }}
   haproxy:
     enabled: true
-    size: 1
+    size: 2
     image: percona/percona-xtradb-cluster-operator:1.9.0-haproxy
+    resources:
+      requests:
+        memory: 128M
+        cpu: 25m
+      limits:
+        memory: 256M
+        cpu: 25m
+  proxysql:
+    enabled: false
   logcollector:
-    enabled: true
+    enabled: false
     image: percona/percona-xtradb-cluster-operator:1.9.0-logcollector
 {{- end }}

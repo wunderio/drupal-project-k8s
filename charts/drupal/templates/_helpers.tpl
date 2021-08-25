@@ -111,6 +111,61 @@ imagePullSecrets:
       key: password
 {{- end }}
 
+{{- define "drupal.db-env" }}
+{{- if .Values.mariadb.enabled }}
+- name: MARIADB_DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: MARIADB_DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: MARIADB_DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: MARIADB_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+{{- if .Values.perconaXtraDB.enabled }}
+- name: PERCONA_DB_USER
+  value: "root"
+- name: PERCONA_DB_NAME
+  value: "drupal"
+- name: PERCONA_DB_HOST
+  value: {{ include "pxc-name" . }}-haproxy-replicas
+- name: PERCONA_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-pxc
+      key: root
+{{- end }}
+{{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
+- name: DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+{{- if and .Values.perconaXtraDB.enabled ( eq .Values.db.primary "perconaXtraDB" ) }}
+- name: DB_USER
+  value: "root"
+- name: DB_NAME
+  value: "drupal"
+- name: DB_HOST
+  value: {{ include "pxc-name" . }}-haproxy-replicas
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-pxc
+      key: root
+{{- end }}
+{{- end }}
+
 {{- define "drupal.env" }}
 - name: SILTA_CLUSTER
   value: "1"
@@ -120,21 +175,7 @@ imagePullSecrets:
   value: "{{ .Values.environmentName }}"
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
-{{- if .Values.mariadb.enabled }}
-- name: DB_USER
-  value: "root"
-- name: DB_NAME
-  value: "drupal"
-- name: DB_HOST
-  value: {{ include "pxc-name" . }}-pxc 
-  # cluster1-haproxy
-  # -haproxy-replicas
-- name: DB_PASS
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-pxc
-      key: root
-{{- end }}
+{{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}

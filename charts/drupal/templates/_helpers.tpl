@@ -238,6 +238,11 @@ until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -
 done
 {{- end }}
 
+{{- define "drupal.create-db" }}
+echo "Creating for database.";
+mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+{{- end }}
+
 {{- define "drupal.wait-for-elasticsearch-command" }}
 TIME_WAITING=0
 echo -n "Waiting for Elasticsearch.";
@@ -269,6 +274,7 @@ done
 
   {{ if .Release.IsInstall }}
     touch {{ .Values.webRoot }}/sites/default/files/_installing
+    {{ include "drupal.create-db" . }}
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}

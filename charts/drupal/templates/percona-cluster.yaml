@@ -13,8 +13,6 @@ spec:
     apply: 8.0-recommended
     schedule: "0 4 * * *"
   pxc:
-    labels:
-      {{- include "drupal.release_labels" . | nindent 8 }}
     size: {{ .Values.perconaXtraDB.pxc.replicas }}
     image: percona/percona-xtradb-cluster:8.0.23-14.1
     autoRecovery: true

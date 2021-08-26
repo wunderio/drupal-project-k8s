@@ -5,8 +5,6 @@
  * Automatically injected settings for the Silta environment.
  */
 
-use Drupal\Core\Installer\InstallerKernel;
-
 // Database settings.
 $databases['default']['default'] = [
   'database' => getenv('DB_NAME'),
@@ -44,7 +42,6 @@ if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
     ],
   ];
 }
-
 
 /**
  * Generated twig files should not be on shared storage.

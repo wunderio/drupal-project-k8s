@@ -632,10 +632,11 @@ perconaXtraDB:
     replicas: 1
     resources:
       requests:
-        cpu: 25m
-        memory: 384M
-      limits:
+        cpu: 250m
         memory: 512M
+      limits:
+        cpu: 1000m
+        memory: 1024M
     persistence:
       size: 1G
     configuration: |
@@ -644,3 +645,11 @@ perconaXtraDB:
       # https://forums.percona.com/t/import-mysql-dump-to-pxc/6104
       # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
       pxc_strict_mode=PERMISSIVE
+  haproxy:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128M
+      limits:
+        cpu: 500m
+        memory: 256M

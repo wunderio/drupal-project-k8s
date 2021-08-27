@@ -44,7 +44,7 @@ mariadb:
 perconaXtraDB:
   enabled: true
   pxc:
-    replicas: 3
+    replicas: 2
 
 db:
   primary: perconaXtraDB

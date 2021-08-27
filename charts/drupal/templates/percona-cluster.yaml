@@ -27,7 +27,7 @@ spec:
             storage: {{ .Values.perconaXtraDB.pxc.persistence.size }}
   haproxy:
     enabled: true
-    size: 2
+    size: {{ .Values.perconaXtraDB.haproxy.replicas }}
     image: percona/percona-xtradb-cluster-operator:1.9.0-haproxy
     resources:
       {{- .Values.perconaXtraDB.haproxy.resources | toYaml | nindent 6 }}

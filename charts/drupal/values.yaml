@@ -647,3 +647,9 @@ perconaXtraDB:
       limits:
         cpu: 500m
         memory: 256M
+
+tidb:
+  enabled: false
+  secrets:
+    root: drupal
+    drupal: drupal

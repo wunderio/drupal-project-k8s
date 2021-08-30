@@ -138,6 +138,19 @@ imagePullSecrets:
       name: {{ .Release.Name }}-pxc
       key: root
 {{- end }}
+{{- if .Values.tidb.enabled }}
+- name: TIDB_DB_USER
+  value: "root"
+- name: TIDB_DB_NAME
+  value: "drupal"
+- name: TIDB_DB_HOST
+  value: {{ .Release.Name }}-tidb
+- name: TIDB_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-tidb
+      key: drupal
+{{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
@@ -163,6 +176,19 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-pxc
       key: root
+{{- end }}
+{{- if and .Values.tidb.enabled ( eq .Values.db.primary "tidb" ) }}
+- name: DB_USER
+  value: "drupal"
+- name: DB_NAME
+  value: "drupal"
+- name: DB_HOST
+  value: {{ .Release.Name }}-tidb
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-tidb
+      key: drupal
 {{- end }}
 {{- end }}
 

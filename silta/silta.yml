@@ -41,13 +41,16 @@ silta-release:
 mariadb:
   enabled: true
 
-perconaXtraDB:
+tidb:
   enabled: true
-  pxc:
-    replicas: 2
 
-db:
-  primary: perconaXtraDB
+# perconaXtraDB:
+#   enabled: true
+#   pxc:
+#     replicas: 2
+
+# db:
+#   primary: tidb
 
 php:
   postupgrade:

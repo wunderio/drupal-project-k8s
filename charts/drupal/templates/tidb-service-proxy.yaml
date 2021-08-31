@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-tiprxy
+  annotations:
+    auto-downscale/down: "false"
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ .Release.Name }}-tidb
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 4000
+  sessionAffinity: None

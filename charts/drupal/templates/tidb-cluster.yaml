@@ -25,20 +25,20 @@ spec:
     # if storageClassName is not set, the default Storage Class of the Kubernetes cluster will be used
     # storageClassName: local-storage
     requests:
-      storage: "1Gi"
-    annotations:
-      tidb.pingcap.com/sysctl-init: "true"
-      test: "123"
+      storage: "5Gi"
+    # annotations:
+    #   tidb.pingcap.com/sysctl-init: "true"
+    #   test: "123"
     config: {}
-    #   storage:
-    #     # In basic examples, we set this to avoid using too much storage.
-    #     reserve-space: "0MB"
-    #   rocksdb:
-    #     # In basic examples, we set this to avoid the following error in some Kubernetes clusters:
-    #     # "the maximum number of open file descriptors is too small, got 1024, expect greater or equal to 82920"
-    #     max-open-files: 256
-    #   raftdb:
-    #     max-open-files: 256
+      # storage:
+      #   # In basic examples, we set this to avoid using too much storage.
+      #   reserve-space: "0MB"
+      # rocksdb:
+      #   # In basic examples, we set this to avoid the following error in some Kubernetes clusters:
+      #   # "the maximum number of open file descriptors is too small, got 1024, expect greater or equal to 82920"
+      #   max-open-files: 256
+      # raftdb:
+      #   max-open-files: 256
   tidb:
     baseImage: pingcap/tidb
     replicas: 2
@@ -55,9 +55,9 @@ spec:
       # performance:
       #   max-procs: 0
       #   tcp-keep-alive: true
-    annotations:
-      tidb.pingcap.com/sysctl-init: "true"
-      test: "234"
-    separateSlowLog: true
+    # annotations:
+    #   tidb.pingcap.com/sysctl-init: "true"
+    #   test: "234"
+    # separateSlowLog: true
     passwordSecretName: {{ .Release.Name }}-tidb
 {{- end }}

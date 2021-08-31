@@ -144,7 +144,7 @@ imagePullSecrets:
 - name: TIDB_DB_NAME
   value: "drupal"
 - name: TIDB_DB_HOST
-  value: {{ .Release.Name }}-tidb
+  value: {{ .Release.Name }}-tiproxy
 - name: TIDB_DB_PASS
   valueFrom:
     secretKeyRef:
@@ -183,7 +183,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: {{ .Release.Name }}-tidb
+  value: {{ .Release.Name }}-tiproxy
 - name: DB_PASS
   valueFrom:
     secretKeyRef:

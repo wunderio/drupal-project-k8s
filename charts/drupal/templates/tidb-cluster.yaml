@@ -7,17 +7,18 @@ spec:
   # https://docs.pingcap.com/tidb-in-kubernetes/stable/tidb-cluster-chart-config#parameters
   version: v5.1.1
   timezone: UTC
-  configUpdateStrategy: RollingUpdate
-  pvReclaimPolicy: Retain
+  # Retain
+  pvReclaimPolicy: Delete
   enableDynamicConfiguration: true
-  schedulerName: tidb-scheduler
+  configUpdateStrategy: RollingUpdate
+  discovery: {}
   pd:
     baseImage: pingcap/pd
     replicas: 3
     # if storageClassName is not set, the default Storage Class of the Kubernetes cluster will be used
     # storageClassName: local-storage
     requests:
-      storage: "1Gi"
+      storage: "3Gi"
     config: {}
   tikv:
     baseImage: pingcap/tikv
@@ -26,38 +27,22 @@ spec:
     # storageClassName: local-storage
     requests:
       storage: "5Gi"
-    # annotations:
-    #   tidb.pingcap.com/sysctl-init: "true"
-    #   test: "123"
-    config: {}
-      # storage:
-      #   # In basic examples, we set this to avoid using too much storage.
-      #   reserve-space: "0MB"
-      # rocksdb:
-      #   # In basic examples, we set this to avoid the following error in some Kubernetes clusters:
-      #   # "the maximum number of open file descriptors is too small, got 1024, expect greater or equal to 82920"
-      #   max-open-files: 256
-      # raftdb:
-      #   max-open-files: 256
+    config:
+      storage:
+        # In basic examples, we set this to avoid using too much storage.
+        reserve-space: "0MB"
+      rocksdb:
+        # In basic examples, we set this to avoid the following error in some Kubernetes clusters:
+        # "the maximum number of open file descriptors is too small, got 1024, expect greater or equal to 82920"
+        max-open-files: 256
+      raftdb:
+        max-open-files: 256
   tidb:
     baseImage: pingcap/tidb
     replicas: 2
     service:
-      # annotations:
-      #   cloud.google.com/load-balancer-type: "Internal"
-      # exposeStatus: true
-      # externalTrafficPolicy: Local
-      # type: LoadBalancer
       type: ClusterIP
     config: {}
-      # log:
-      #   level: info
-      # performance:
-      #   max-procs: 0
-      #   tcp-keep-alive: true
-    # annotations:
-    #   tidb.pingcap.com/sysctl-init: "true"
-    #   test: "234"
-    # separateSlowLog: true
+    separateSlowLog: true
     passwordSecretName: {{ .Release.Name }}-tidb
 {{- end }}

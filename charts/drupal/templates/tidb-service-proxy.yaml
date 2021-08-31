@@ -1,3 +1,4 @@
+# TODO: This does not work
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,7 +9,7 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   type: ExternalName
-  externalName: {{ .Release.Name }}-tidb
+  externalName: {{ .Release.Name }}-tidb-tidb.drupal-project-k8s
   ports:
   - port: 3306
     protocol: TCP

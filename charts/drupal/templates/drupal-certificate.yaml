@@ -8,6 +8,7 @@ metadata:
   name: {{ .Release.Name }}-crt
   annotations:
     cert-manager.io/issue-temporary-certificate: "true" 
+    acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-drupal"
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
@@ -31,6 +32,9 @@ spec:
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-p{{ $index }}
+  annotations:
+    cert-manager.io/issue-temporary-certificate: "true" 
+    acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-drupal"
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
@@ -98,7 +102,8 @@ kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}
   annotations:
-    cert-manager.io/issue-temporary-certificate: "true" 
+    cert-manager.io/issue-temporary-certificate: "true"
+    acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-drupal-{{ $domain.ingress }}"
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:

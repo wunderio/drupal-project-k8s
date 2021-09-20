@@ -8,7 +8,7 @@ varnish:
   enabled: false
 
 elasticsearch:
-  enabled: false
+  enabled: true
 
 memcached:
   enabled: false
@@ -37,21 +37,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-exposeDomains:
-  # Uncomment production domains when going live
-  domain1:
-    hostname: domain-test-1.wdr.io
-    ssl:
-      enabled: true
-      issuer: letsencrypt-staging
-  domain2:
-    hostname: domain-test-2.wdr.io
-    ssl:
-      enabled: true
-      issuer: letsencrypt-staging
-  domain3:
-    hostname: domain-test-3.wdr.io
-    ssl:
-      enabled: true
-      issuer: letsencrypt

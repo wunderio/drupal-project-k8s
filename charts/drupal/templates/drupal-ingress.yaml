@@ -6,7 +6,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
     {{- else }}
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
@@ -103,7 +103,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    {{- if ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
     {{- else }}
     certmanager.k8s.io/acme-http01-edit-in-place: "true"

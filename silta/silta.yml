@@ -50,3 +50,8 @@ exposeDomains:
     ssl:
       enabled: true
       issuer: letsencrypt-staging
+  domain3:
+    hostname: domain-test-3.wdr.io
+    ssl:
+      enabled: true
+      issuer: letsencrypt

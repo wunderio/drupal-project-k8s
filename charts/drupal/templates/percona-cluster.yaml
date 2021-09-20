@@ -6,15 +6,18 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
+  # https://www.percona.com/doc/kubernetes-operator-for-pxc/operator.html
   crVersion: 1.9.0
   secretsName: {{ .Release.Name }}-pxc
-  allowUnsafeConfigurations: true
+  allowUnsafeConfigurations: {{ .Values.perconaXtraDB.allowUnsafeConfigurations }}
   upgradeOptions:
     apply: 8.0-recommended
     schedule: "0 4 * * *"
   pxc:
     size: {{ .Values.perconaXtraDB.pxc.replicas }}
     image: percona/percona-xtradb-cluster:8.0.23-14.1
+    expose: 
+      enabled: false
     autoRecovery: true
     configuration: |
       {{- .Values.perconaXtraDB.pxc.configuration | nindent 6 }}

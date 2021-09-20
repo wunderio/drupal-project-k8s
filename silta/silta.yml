@@ -44,7 +44,7 @@ mariadb:
 perconaXtraDB:
   enabled: true
   pxc:
-    replicas: 2
+    replicas: 3
   haproxy:
     replicas: 2
 

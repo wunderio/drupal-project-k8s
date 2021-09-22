@@ -2,7 +2,7 @@
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
 {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: {{ include "cert-manager.api-version" $ | trim }}
+apiVersion: {{ include "cert-manager.api-version" . | trim }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt

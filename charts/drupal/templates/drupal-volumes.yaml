@@ -7,7 +7,8 @@ kind: PersistentVolume
 metadata:
   name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
   labels:
-    name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
+    {{- $volumeNameLabel := printf "%s-%s-%s" $.Release.Name ($.Release.Namespace | sha256sum | trunc 7) $index }}
+    name: {{ substr 0 63 $volumeNameLabel }}
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
   accessModes:

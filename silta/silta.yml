@@ -38,8 +38,22 @@ silta-release:
             matchLabels:
               name: drupal-project
 
-# mariadb-galera:
-#   galera:
-#     bootstrap:
-#       bootstrapFromNode: 0
-#       forceSafeToBootstrap: true
+db:
+  primary: mariadb-galera
+
+mariadb:
+  enabled: true
+
+mariadb-galera:
+  enabled: true
+  # Boot failure recovery
+  # galera:
+  #   bootstrap:
+  #     bootstrapFromNode: 0
+  #     forceSafeToBootstrap: true
+
+replicas: 2
+
+silta-release:
+  downscaler:
+    enabled: false

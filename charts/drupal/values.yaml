@@ -428,6 +428,9 @@ backup:
       cpu: 1000m
       memory: 512M
 
+db:
+  primary: mariadb
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 # see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
@@ -462,7 +465,7 @@ mariadb:
 
 
 mariadb-galera:
-  enabled: true
+  enabled: false
   # galera:
   #   name: ""
   db:
@@ -484,7 +487,7 @@ mariadb-galera:
         memory: 512M
 
   podManagementPolicy: Parallel
-  replicaCount: 2
+  replicaCount: 3
 
   affinity:
     nodeAffinity:

@@ -110,6 +110,12 @@
     "gdprDump": { "type": "object" },
     "backup": { "type": "object" },
 
+    "db": {
+      "type": "object",
+      "properties": {
+        "primary": { "type": "string" }
+      }
+    },
     "mariadb": {
       "type": "object",
       "properties": {

@@ -111,16 +111,50 @@ imagePullSecrets:
       key: password
 {{- end }}
 
-{{- define "drupal.env" }}
-- name: SILTA_CLUSTER
-  value: "1"
-- name: PROJECT_NAME
-  value: "{{ .Values.projectName | default .Release.Namespace }}"
-- name: ENVIRONMENT_NAME
-  value: "{{ .Values.environmentName }}"
-- name: DRUSH_OPTIONS_URI
-  value: "http://{{- template "drupal.domain" . }}"
+{{- define "drupal.db-env" }}
 {{- if .Values.mariadb.enabled }}
+- name: MARIADB_DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: MARIADB_DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: MARIADB_DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: MARIADB_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+
+{{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
+- name: DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+
+{{- if (index (index .Values "mariadb-galera") "enabled") }}
+- name: MARIADB_GALERA_DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: MARIADB_GALERA_DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: MARIADB_GALERA_DB_HOST
+  value: {{ .Release.Name }}-mariadb-galera
+- name: MARIADB_GALERA_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-galera
+      key: mariadb-password
+{{- end }}
+
+{{- if and ((index (index .Values "mariadb-galera") "enabled")) ( eq .Values.db.primary "mariadb-galera" ) }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
 - name: DB_NAME
@@ -133,6 +167,18 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb-galera
       key: mariadb-password
 {{- end }}
+{{- end }}
+
+{{- define "drupal.env" }}
+- name: SILTA_CLUSTER
+  value: "1"
+- name: PROJECT_NAME
+  value: "{{ .Values.projectName | default .Release.Namespace }}"
+- name: ENVIRONMENT_NAME
+  value: "{{ .Values.environmentName }}"
+- name: DRUSH_OPTIONS_URI
+  value: "http://{{- template "drupal.domain" . }}"
+{{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}
@@ -238,6 +284,11 @@ until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -
 done
 {{- end }}
 
+{{- define "drupal.create-db" }}
+echo "Creating drupal database.";
+mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+{{- end }}
+
 {{- define "drupal.wait-for-elasticsearch-command" }}
 TIME_WAITING=0
 echo -n "Waiting for Elasticsearch.";
@@ -269,6 +320,7 @@ done
 
   {{ if .Release.IsInstall }}
     touch {{ .Values.webRoot }}/sites/default/files/_installing
+    {{- include "drupal.create-db" . }}
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}

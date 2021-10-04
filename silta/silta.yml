@@ -39,7 +39,7 @@ silta-release:
               name: drupal-project
 
 mariadb:
-  enabled: true
+  enabled: false
 
 perconaXtraDB:
   enabled: true
@@ -54,3 +54,9 @@ db:
 php:
   postupgrade:
     command: ""
+
+replicas: 2
+
+silta-release:
+  downscaler:
+    enabled: false

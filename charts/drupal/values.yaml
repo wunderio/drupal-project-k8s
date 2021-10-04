@@ -619,10 +619,12 @@ db:
 
 perconaXtraDB:
   enabled: false
+  allowUnsafeConfigurations: false
   secrets:
     root: drupal
   pxc:
-    replicas: 1
+    # See allowUnsafeConfigurations
+    replicas: 3
     resources:
       requests:
         cpu: 250m

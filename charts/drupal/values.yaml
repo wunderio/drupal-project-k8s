@@ -633,7 +633,7 @@ perconaXtraDB:
         cpu: 1000m
         memory: 1024M
     persistence:
-      size: 1G
+      size: 5G
     configuration: |
       [mysqld]
       # Required for db import / reference data / backups

@@ -61,6 +61,9 @@ workflows:
                 - feature/test-cluster
                 - /feature\/test-cluster\/.*/
                 - feature/aws-cluster
+                - feature/prod-cluster
+                - /feature\/prod-cluster\/.*/
+                - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
@@ -90,6 +93,18 @@ workflows:
               only: 
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-prod cluster environment.
+          <<: *build-deploy
+          name: build-deploy-prod
+          silta_config: silta/silta.yml
+          context: silta_finland
+          filters:
+            branches:
+              only: 
+                - feature/prod-cluster
+                - /feature\/prod-cluster\/.*/
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

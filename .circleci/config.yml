@@ -40,7 +40,9 @@ workflows:
           chart_repository: ""
           silta_config: silta/silta.yml
           codebase-build:
-            - silta/drupal-composer-install
+            - silta/drupal-composer-install:
+                install-dev-dependencies: true
+                cache-version: v4
             - silta/npm-install-build
 
           pre-release:

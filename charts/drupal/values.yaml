@@ -464,31 +464,30 @@ mariadb:
               - static-ip
 
 
+# Overrides for mariadb-galera 6.0.1
+# https://github.com/bitnami/charts/blob/09410ce4eeb30cad415845caf620025699f904e0/bitnami/mariadb-galera/values.yaml
 mariadb-galera:
   enabled: false
-  # galera:
-  #   name: ""
   db:
     name: drupal
     user: drupal
     password: drupal
   rootUser:
     password: drupal
-  
   persistence:
     # Database storage disk space allocation
     # Request assistance from ops team after changing this on existing deployment.
     size: 1G
-    resources:
-      requests:
-        cpu: 25m
-        memory: 384M
-      limits:
-        memory: 512M
-
+  resources:
+    requests:
+      cpu: 25m
+      memory: 384M
+    limits:
+      memory: 512M
   podManagementPolicy: Parallel
   replicaCount: 3
-
+  # Look up podAntiAffinity with topologyKey and custom labelSelector to
+  # keep replicas on separate nodes. This has to be a custom definition.
   affinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -499,16 +498,6 @@ mariadb-galera:
             operator: NotIn
             values:
             - static-ip
-
-  # initdbScripts:
-  #   my_init_script.sh: |
-  #     #!/bin/sh
-  #     if [[ $(hostname) == *-0  ]]; then
-  #       echo "First node"
-  #       mysql -P 3306 -uroot -prandompassword -e "create database new_database";
-  #     else
-  #       echo "No first node"
-  #     fi
 
 varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish

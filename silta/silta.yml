@@ -43,20 +43,6 @@ mariadb:
 
 perconaXtraDB:
   enabled: true
-  pxc:
-    replicas: 3
-  haproxy:
-    replicas: 2
 
 db:
   primary: perconaXtraDB
-
-php:
-  postupgrade:
-    command: ""
-
-replicas: 2
-
-silta-release:
-  downscaler:
-    enabled: false

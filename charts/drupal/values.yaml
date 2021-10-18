@@ -641,7 +641,7 @@ perconaXtraDB:
       # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
       pxc_strict_mode=PERMISSIVE
   haproxy:
-    replicas: 1
+    replicas: 2
     resources:
       requests:
         cpu: 100m

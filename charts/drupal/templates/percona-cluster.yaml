@@ -1,4 +1,7 @@
 {{- if .Values.perconaXtraDB.enabled }}
+{{- if not ( .Capabilities.APIVersions.Has "pxc.percona.com/v1-9-0" ) }}
+{{- fail "API pxc.percona.com/v1-9-0 unavailable, ask cluster administrator to enable Percona XtraDB Cluster support in Silta cluster first!" }}
+{{- end }}
 apiVersion: pxc.percona.com/v1-9-0
 kind: PerconaXtraDBCluster
 metadata:

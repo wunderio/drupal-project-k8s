@@ -125,12 +125,11 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
-{{- if index (index .Values "pxc-db") "enabled" }}
 - name: PXC_DB_USER
   value: "root"
 - name: PXC_DB_NAME
   value: "drupal"
-{{- end }}
+
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
@@ -144,11 +143,18 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
-{{- if and (index (index .Values "pxc-db") "enabled") ( eq .Values.db.primary "pxc-db" ) }}
+{{- if ( eq .Values.db.primary "pxc-db" ) }}
 - name: DB_USER
   value: "root"
 - name: DB_NAME
   value: "drupal"
+- name: DB_HOST
+  value: {{ include "pxc-name" . }}-haproxy-replicas
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-pxc
+      key: root
 {{- end }}
 {{- end }}
 

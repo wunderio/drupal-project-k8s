@@ -651,10 +651,9 @@ pxc-db:
   logcollector:
     enabled: false
   backup:
-    enabled: false
+    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
+    #enabled: false
+    schedule: []
   secrets:
     passwords:
       root: drupal
-  # finalizers:
-  #   - delete-proxysql-pvc
-  #   - delete-pxc-pvc

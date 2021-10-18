@@ -2,6 +2,9 @@ suite: drupal mariadb
 templates:
   - drupal-deployment.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: sets mariadb user
     template: drupal-deployment.yaml

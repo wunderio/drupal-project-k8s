@@ -38,11 +38,14 @@ silta-release:
             matchLabels:
               name: drupal-project
 
-mariadb:
-  enabled: false
+# mariadb:
+#   enabled: false
 
-perconaXtraDB:
+# perconaXtraDB:
+#   enabled: true
+
+pxc-db:
   enabled: true
 
-db:
-  primary: perconaXtraDB
+# db:
+#   primary: perconaXtraDB

@@ -7,6 +7,10 @@ dependencies:
   version: 7.5.x
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
+- name: pxc-db
+  version: 1.9.x
+  repository: https://percona.github.io/percona-helm-charts/
+  condition: pxc-db.enabled
 - name: memcached
   version: 4.2.x
   repository: https://charts.bitnami.com/bitnami

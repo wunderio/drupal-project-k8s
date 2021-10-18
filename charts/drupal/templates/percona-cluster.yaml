@@ -1,45 +1,5 @@
-{{- if .Values.perconaXtraDB.enabled }}
+{{- if index (index .Values "pxc-db") "enabled" }}
 {{- if not ( .Capabilities.APIVersions.Has "pxc.percona.com/v1" ) }}
 {{- fail "API pxc.percona.com/v1 unavailable, ask cluster administrator to enable Percona XtraDB Cluster support in Silta cluster first!" }}
 {{- end }}
-apiVersion: pxc.percona.com/v1-9-0
-kind: PerconaXtraDBCluster
-metadata:
-  name: {{ include "pxc-name" . }}
-  labels:
-    {{- include "drupal.release_labels" . | nindent 4 }}
-spec:
-  # https://www.percona.com/doc/kubernetes-operator-for-pxc/operator.html
-  crVersion: 1.9.0
-  secretsName: {{ .Release.Name }}-pxc
-  allowUnsafeConfigurations: {{ .Values.perconaXtraDB.allowUnsafeConfigurations }}
-  upgradeOptions:
-    apply: 8.0-recommended
-    schedule: "0 4 * * *"
-  pxc:
-    size: {{ .Values.perconaXtraDB.pxc.replicas }}
-    image: percona/percona-xtradb-cluster:8.0.23-14.1
-    expose: 
-      enabled: false
-    autoRecovery: true
-    configuration: |
-      {{- .Values.perconaXtraDB.pxc.configuration | nindent 6 }}
-    resources:
-      {{- .Values.perconaXtraDB.pxc.resources | toYaml | nindent 6 }}
-    volumeSpec:
-      persistentVolumeClaim:
-        resources:
-          requests:
-            storage: {{ .Values.perconaXtraDB.pxc.persistence.size }}
-  haproxy:
-    enabled: true
-    size: {{ .Values.perconaXtraDB.haproxy.replicas }}
-    image: percona/percona-xtradb-cluster-operator:1.9.0-haproxy
-    resources:
-      {{- .Values.perconaXtraDB.haproxy.resources | toYaml | nindent 6 }}
-  proxysql:
-    enabled: false
-  logcollector:
-    enabled: false
-    image: percona/percona-xtradb-cluster-operator:1.9.0-logcollector
 {{- end }}

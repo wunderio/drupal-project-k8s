@@ -116,7 +116,7 @@
         "enabled": { "type": "boolean" }
       }
     },
-    "perconaXtraDB": {
+    "pxc-db": {
       "type": "object",
       "properties": {
         "enabled": { "type": "boolean" }

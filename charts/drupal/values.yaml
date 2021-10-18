@@ -617,14 +617,13 @@ solr:
 db:
   primary: mariadb
 
-perconaXtraDB:
+pxc-db:
   enabled: false
   allowUnsafeConfigurations: false
-  secrets:
-    root: drupal
   pxc:
-    # See allowUnsafeConfigurations
-    replicas: 3
+    size: 3
+    expose:
+      enabled: false
     resources:
       requests:
         cpu: 250m
@@ -632,16 +631,16 @@ perconaXtraDB:
       limits:
         cpu: 1000m
         memory: 1024M
-    persistence:
-      size: 5G
+    # User defined MySQL options according to MySQL configuration file syntax
     configuration: |
       [mysqld]
       # Required for db import / reference data / backups
       # https://forums.percona.com/t/import-mysql-dump-to-pxc/6104
       # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
       pxc_strict_mode=PERMISSIVE
+    persistence:
+      size: 8Gi
   haproxy:
-    replicas: 2
     resources:
       requests:
         cpu: 100m
@@ -649,3 +648,13 @@ perconaXtraDB:
       limits:
         cpu: 500m
         memory: 256M
+  logcollector:
+    enabled: false
+  backup:
+    enabled: false
+  secrets:
+    passwords:
+      root: drupal
+  # finalizers:
+  #   - delete-proxysql-pvc
+  #   - delete-pxc-pvc

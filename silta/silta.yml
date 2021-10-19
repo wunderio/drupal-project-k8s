@@ -18,7 +18,7 @@ mounts:
     enabled: true
 
 mariadb:
-  fullnameOverride: overly-long-branchname-to-trigger-t-0081-longname
+  fullnameOverride: overly-long-branchname-to-trigger-t-0081-long
 
 # Allow access from another namespace for testing purposes.
 silta-release:

@@ -17,6 +17,9 @@ mounts:
   private-files:
     enabled: true
 
+mariadb:
+  fullnameOverride: overly-long-branchname-to-trigger-t-0081-longname
+
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:

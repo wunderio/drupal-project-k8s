@@ -238,9 +238,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
@@ -527,9 +527,17 @@ fi
 
 {{- define "cert-manager.api-version" }}
 {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
-apiVersion: cert-manager.io/v1
+cert-manager.io/v1
 {{- else }}
-apiVersion: certmanager.k8s.io/v1alpha1
+certmanager.k8s.io/v1alpha1
+{{- end }}
+{{- end }}
+
+{{- define "ingress.api-version" }}
+{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+networking.k8s.io/v1
+{{- else }}
+networking.k8s.io/v1beta1
 {{- end }}
 {{- end }}
 

@@ -59,8 +59,8 @@ tests:
   - it: does not set db environments when dbms are disabled
     template: drupal-deployment.yaml
     set:
-      mariadb.enabled: true
-      pxc-db.enabled: true
+      mariadb.enabled: false
+      pxc-db.enabled: false
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].env

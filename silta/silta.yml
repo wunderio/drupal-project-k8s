@@ -38,8 +38,8 @@ silta-release:
             matchLabels:
               name: drupal-project
 
-# mariadb:
-#   enabled: false
+mariadb:
+  enabled: false
 
 # perconaXtraDB:
 #   enabled: true
@@ -47,5 +47,5 @@ silta-release:
 pxc-db:
   enabled: true
 
-# db:
-#   primary: perconaXtraDB
+db:
+  primary: pxc-db

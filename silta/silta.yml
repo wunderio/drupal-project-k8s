@@ -17,8 +17,6 @@ mounts:
   private-files:
     enabled: true
 
-replicas: 2
-
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:

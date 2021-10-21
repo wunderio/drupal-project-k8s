@@ -1,5 +1,4 @@
 {{- range $index, $mount := .Values.mounts }}
-{{- $volumeNameLabel := printf "%s-%s-%s" $.Release.Name ($.Release.Namespace | sha256sum | trunc 7) $index }}
 #Trimmed release name to fit *it*, sha256sum(7 chars), $index and '-' separators together into a single 63 character string
 {{- $releaseNameTrimmed := substr 0 (int (sub 54 (len $index))) $.Release.Name }}
 {{- if eq $mount.enabled true }}

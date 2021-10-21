@@ -613,3 +613,47 @@ solr:
       # csiDriverName: csi-driver-name
       accessModes:
         - ReadWriteOnce
+
+db:
+  primary: mariadb
+
+pxc-db:
+  enabled: false
+  allowUnsafeConfigurations: false
+  pxc:
+    size: 3
+    expose:
+      enabled: false
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512M
+      limits:
+        cpu: 1000m
+        memory: 1024M
+    # User defined MySQL options according to MySQL configuration file syntax
+    configuration: |
+      [mysqld]
+      # Required for db import / reference data / backups
+      # https://forums.percona.com/t/import-mysql-dump-to-pxc/6104
+      # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
+      pxc_strict_mode=PERMISSIVE
+    persistence:
+      size: 8Gi
+  haproxy:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128M
+      limits:
+        cpu: 500m
+        memory: 256M
+  logcollector:
+    enabled: false
+  backup:
+    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
+    #enabled: false
+    schedule: []
+  secrets:
+    passwords:
+      root: drupal

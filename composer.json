@@ -27,7 +27,8 @@
         "drupal/simplei": "^1.2",
         "drush/drush": "^10.0",
         "vlucas/phpdotenv": "^5.0",
-        "webflo/drupal-finder": "^1.2"
+        "webflo/drupal-finder": "^1.2",
+        "wunderio/drupal-ping": "^1.0"
     },
     "require-dev": {
         "wunderio/code-quality": "^2.0",
@@ -69,6 +70,9 @@
             "locations": {
                 "web-root": "./web"
             }
+        },
+        "dropin-paths": {
+            "web/": ["type:web-dropin"]
         },
         "installer-paths": {
             "web/core": [

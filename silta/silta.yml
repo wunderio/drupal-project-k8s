@@ -47,3 +47,12 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+mariadb:
+  enabled: false
+
+pxc-db:
+  enabled: true
+
+db:
+  primary: pxc-db

@@ -96,4 +96,5 @@ tests:
           content:
             name: DB_HOST
             value: RELEASE-NAME-haproxy-replicas
+
   

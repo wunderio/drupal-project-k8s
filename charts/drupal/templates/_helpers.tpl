@@ -548,8 +548,3 @@ set -e
 if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
 
 {{- end }}
-
-{{- define "pxc-name" }}
-{{- $releaseNameHash := sha256sum .Release.Name | trunc 3 }}
-{{- (gt (len .Release.Name) 22) | ternary ( print (.Release.Name | trunc 18) print $releaseNameHash ) .Release.Name }}
-{{- end }}

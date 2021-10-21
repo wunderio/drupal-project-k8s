@@ -569,11 +569,10 @@ mailhog:
       memory: 10M
 
 # Email via SMTP. Configuration is passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
+# see: https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#sending-e-mail
 smtp:
   enabled: false
   # address: smtp.example.com:25
-  # tls: false
-  # starttls: false
   # username: ""
   # password: ""
 

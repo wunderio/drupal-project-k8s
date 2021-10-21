@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:release-name-shorten
+  silta: silta/silta@dev:master
 
 executors:
   cicd73:
@@ -42,7 +42,6 @@ workflows:
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build
-          release-suffix: very-long-suffix-name
 
           pre-release:
             - run:

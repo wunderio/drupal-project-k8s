@@ -56,3 +56,9 @@ pxc-db:
 
 db:
   primary: pxc-db
+
+replicas: 2
+
+silta-release:
+  downscaler:
+    enabled: false

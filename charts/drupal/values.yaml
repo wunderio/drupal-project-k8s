@@ -626,6 +626,7 @@ pxc-db:
     size: 3
     expose:
       enabled: false
+    disableTLS: true
     resources:
       requests:
         cpu: 250m

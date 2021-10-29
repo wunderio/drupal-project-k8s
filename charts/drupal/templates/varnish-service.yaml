@@ -11,6 +11,8 @@ metadata:
     cloud.google.com/neg: '{"ingress": true}'
     {{- end }}
     {{- end }}
+    traefik.ingress.kubernetes.io/affinity: "true"
+    traefik.ingress.kubernetes.io/session-cookie-name: "sticky-proxy"
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
     service: varnish

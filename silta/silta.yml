@@ -43,4 +43,9 @@ nginx:
     # Show server host name as header
     add_header X-Backend-Server $hostname;
 
-replicas: 2
+replicas: 5
+
+# backendConfig:
+#   sessionAffinity:
+#     affinityType: "GENERATED_COOKIE"
+#     affinityCookieTtlSec: 50

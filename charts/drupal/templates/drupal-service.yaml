@@ -12,10 +12,16 @@ metadata:
     cloud.google.com/neg: '{"ingress": true}'
     {{- end }}
     {{- end }}
+    traefik.ingress.kubernetes.io/affinity: "true"
+    traefik.ingress.kubernetes.io/session-cookie-name: "sticky-drupal"
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   type: NodePort
+  sessionAffinity: "ClientIP"
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10
   # We explicitly unset this, in case the application is currently downscaled.
   externalName: null
   ports:

@@ -413,14 +413,14 @@ data:
       }
 
       if (req.http.Cookie) {
-        if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
+        if (req.http.Cookie ~ "(SESS[a-z0-9]+|SSESS[a-z0-9]+)") {
+          # Authenticated users should not be cached
+          return (pass);
+        }
+        elseif (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
           # Static file request do not vary on cookies
           unset req.http.Cookie;
           return (hash);
-        }
-        elseif (req.http.Cookie ~ "(SESS[a-z0-9]+|SSESS[a-z0-9]+)") {
-          # Authenticated users should not be cached
-          return (pass);
         }
         # Include additional cookie rules before we unset all cookies
         {{- if .Values.varnish.vcl_extra_cookies }}

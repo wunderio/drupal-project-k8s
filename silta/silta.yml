@@ -37,10 +37,3 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
-
-nginx:
-  retry404s:
-    delay: 5
-    paths:
-      - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
-      - "^/sites/(.*)/files/(.*).(?:png|jpg)$"

@@ -56,7 +56,7 @@ ingress:
     type: gce
     staticIpAddressName: test-gcp-stickiness
 
-backendConfig:
-  sessionAffinity:
-    affinityType: "GENERATED_COOKIE"
-    affinityCookieTtlSec: 10
+# backendConfig:
+#   sessionAffinity:
+#     affinityType: "GENERATED_COOKIE"
+#     affinityCookieTtlSec: 10

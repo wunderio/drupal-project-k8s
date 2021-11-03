@@ -5,7 +5,7 @@
 # for all possible options.
 
 varnish:
-  enabled: false
+  enabled: true
 
 elasticsearch:
   enabled: true
@@ -59,4 +59,4 @@ ingress:
 backendConfig:
   sessionAffinity:
     affinityType: "GENERATED_COOKIE"
-    affinityCookieTtlSec: 10
+    affinityCookieTtlSec: 50

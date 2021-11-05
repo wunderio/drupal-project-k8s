@@ -37,3 +37,9 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+nginx:
+  extraConfig: |
+    # Show server host name as header
+    add_header X-Backend-Server $hostname;
+

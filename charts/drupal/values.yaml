@@ -182,6 +182,9 @@ nginx:
   # Retry file lookup in 5 seconds (filesystem sync workaround)
   # retry404s: 5
 
+  # Allow load-balancer to pod session affinity for consequitive requests. Does not work with varnish enabled.
+  sessionAffinity: false
+
   # Extra configuration block in server context.
   serverExtraConfig: |
 

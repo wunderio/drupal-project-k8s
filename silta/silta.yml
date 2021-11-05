@@ -43,20 +43,3 @@ nginx:
     # Show server host name as header
     add_header X-Backend-Server $hostname;
 
-replicas: 5
-
-exposeDomains:
-  sticky:
-    hostname: stickiness-test.silta.wdr.io
-    # Reference to a key under `ingress`
-    ingress: gce
-
-ingress:
-  gce:
-    type: gce
-    staticIpAddressName: test-gcp-stickiness
-
-backendConfig:
-  sessionAffinity:
-    affinityType: "GENERATED_COOKIE"
-    affinityCookieTtlSec: 50

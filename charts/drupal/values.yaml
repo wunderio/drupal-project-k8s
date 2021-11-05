@@ -185,7 +185,6 @@ nginx:
   #   paths:
   #     - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
 
-
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
   sessionAffinity: false
 

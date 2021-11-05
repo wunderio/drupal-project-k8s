@@ -180,7 +180,11 @@ nginx:
   comp_level: 6
 
   # Retry file lookup in 5 seconds (filesystem sync workaround)
-  # retry404s: 5
+  # retry404s:
+  #   delay: 5
+  #   paths:
+  #     - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
+
 
   # Allow load-balancer to pod session affinity for consequitive requests. Does not work with varnish enabled.
   sessionAffinity: false
@@ -629,6 +633,7 @@ pxc-db:
     size: 3
     expose:
       enabled: false
+    disableTLS: true
     resources:
       requests:
         cpu: 250m

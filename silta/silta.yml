@@ -45,3 +45,7 @@ nginx:
 
 domainPrefixes:
   - testing
+  - thismayfail
+
+ssl:
+  issuer: letsencrypt-staging

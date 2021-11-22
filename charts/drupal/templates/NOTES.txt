@@ -62,7 +62,11 @@ Importing data into server (use this with caution!)
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
   Uploading files to {{ $index }}:
-  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
+  1. rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:/app/files
+  2. ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }}
+  3. nohup cp --recursive /app/files/. {{ $mount.mountPath }}
+  4. rm -rf /app/files
+  (Note: Due to Google Filestore architecture, direct rsync or mv to {{ $mount.mountPath }} mount will fail.)
   {{ end }}
   {{ end -}}
   {{- end -}}

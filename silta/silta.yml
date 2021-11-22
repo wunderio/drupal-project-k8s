@@ -11,7 +11,7 @@ elasticsearch:
   enabled: true
 
 memcached:
-  enabled: false
+  enabled: true
 
 mounts:
   private-files:

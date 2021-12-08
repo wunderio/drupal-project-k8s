@@ -42,10 +42,3 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
-
-domainPrefixes:
-  - testing
-  - thismayfail
-
-ssl:
-  issuer: letsencrypt-staging

@@ -92,7 +92,10 @@
             }
           }
         },
-        "realipfrom": { "type": "string"},
+        "realipfrom": {
+          "type": ["string","object"],
+          "additionalProperties": { "type": "string"}
+        },
         "noauthips": {
           "type": "object",
           "additionalProperties": { "type": "string"}
@@ -108,6 +111,18 @@
     "backup": { "type": "object" },
 
     "mariadb": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "pxc-db": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "db": {
       "type": "object",
       "properties": {
         "enabled": { "type": "boolean" }

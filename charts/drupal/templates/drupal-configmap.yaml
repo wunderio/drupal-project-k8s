@@ -6,8 +6,8 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
   gdpr-dump: |
-    [mysqldump]
-    gdpr-replacements='{{ .Values.gdprDump | toJson }}'
+    # [mysqldump]
+    # gdpr-replacements='{{ .Values.gdprDump | toJson }}'
 
   {{- if eq .Values.php.drupalCoreVersion "7" }}
   settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
@@ -87,9 +87,18 @@ data:
     }
 
     http {
+        
+        # List of upstream proxies we trust to set X-Forwarded-For correctly.
+        {{- if kindIs "string" .Values.nginx.realipfrom }}
+        set_real_ip_from            {{ .Values.nginx.realipfrom }};
+        {{- end }}
+        {{- if kindIs "map" .Values.nginx.realipfrom }}
+        {{- range .Values.nginx.realipfrom }}
+        set_real_ip_from            {{ . }};
+        {{- end }}
+        {{- end }}
 
-        set_real_ip_from                {{ .Values.nginx.realipfrom }};
-        real_ip_header                  {{ .Values.nginx.real_ip_header }};
+        real_ip_header              {{ .Values.nginx.real_ip_header }};
 
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
@@ -146,6 +155,17 @@ data:
         server_names_hash_bucket_size 64;
 
         map_hash_bucket_size 128;
+
+        # Return noindex headers for built-in domains
+        map $http_host $x_robots_tag_header {
+            "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+            {{- range $index, $prefix := .Values.domainPrefixes }}
+            {{- $params := dict "prefix" $prefix  -}}
+            "~{{ template "drupal.domain" ( merge $params $ ) }}$" "noindex, nofollow, nosnippet, noarchive";
+            {{- end }}
+            default  '';
+        }
+        add_header                  X-Robots-Tag $x_robots_tag_header;
 
         map $uri $no_slash_uri {
             ~^/(?<no_slash>.*)$ $no_slash;
@@ -220,6 +240,13 @@ data:
     ## Hide the PHP X-Powered-By header.
     fastcgi_hide_header 'X-Powered-By';
 
+    {{- if and ( not .Values.nginx.expose_cache_headers ) ( not .Values.varnish.enabled ) }}
+    # Removing cache headers from backend response
+    fastcgi_hide_header 'Purge-Cache-Tags';
+    fastcgi_hide_header 'X-Drupal-Cache-Contexts';
+    fastcgi_hide_header 'X-Drupal-Cache-Tags';
+    {{- end }}
+    
     # Mitigate HTTPoxy
     # https://httpoxy.org/
     fastcgi_param HTTP_PROXY "";
@@ -280,8 +307,10 @@ data:
 
         {{ include "drupal.basicauth" . | indent 6}}
 
+        {{- if .Values.nginx.serverExtraConfig }}
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
+        {{- .Values.nginx.serverExtraConfig | nindent 8 }}
+        {{- end }}
 
         {{- if .Values.mailhog.enabled }}
         location /mailhog {
@@ -416,6 +445,18 @@ data:
                 try_files $uri @drupal;
             }
 
+            {{- if .Values.nginx.retry404s }}
+            {{- if kindIs "float64" .Values.nginx.retry404s }}
+            {{- fail ".Values.nginx.retry404s configuration schema has been changed. Please check chart values file for updates." }}
+            {{- end }}
+            # Retry file lookup in {{ .Values.nginx.retry404s.delay }} seconds (fs sync workaround)
+            {{- range .Values.nginx.retry404s.paths }}
+            location ~* {{ . }} {
+                try_files $uri $uri/ @files_delay;
+            }
+            {{- end }}
+            {{- end }}
+            
             ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
             location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
                 tcp_nodelay     off;
@@ -491,18 +532,15 @@ data:
         }
 
         {{- if .Values.nginx.retry404s }}
-        # Retry file lookup in 5 seconds (fs sync workaround)
-        location /sites/default/files/ {
-            try_files $uri $uri/ @files_delay;
-        }
         location @files_delay {
             internal;
-            echo_sleep {{ .Values.nginx.retry404s }}.0;
+            echo_sleep {{ .Values.nginx.retry404s.delay }}.0;
             echo_exec @files_retry;
         }
         location @files_retry {
             internal;
-            try_files $uri $uri/ =404;
+            # Pass file request to drupal as a final fallback. 
+            try_files $uri @drupal;
         }
         {{- end }}
 

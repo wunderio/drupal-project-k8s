@@ -111,16 +111,34 @@ imagePullSecrets:
       key: password
 {{- end }}
 
-{{- define "drupal.env" }}
-- name: SILTA_CLUSTER
-  value: "1"
-- name: PROJECT_NAME
-  value: "{{ .Values.projectName | default .Release.Namespace }}"
-- name: ENVIRONMENT_NAME
-  value: "{{ .Values.environmentName }}"
-- name: DRUSH_OPTIONS_URI
-  value: "http://{{- template "drupal.domain" . }}"
+{{- define "drupal.db-env" }}
 {{- if .Values.mariadb.enabled }}
+- name: MARIADB_DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: MARIADB_DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: MARIADB_DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: MARIADB_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+{{- if index ( index .Values "pxc-db" ) "enabled" }}
+- name: PXC_DB_USER
+  value: "root"
+- name: PXC_DB_NAME
+  value: "drupal"
+- name: PXC_DB_HOST
+  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+- name: PXC_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: internal-{{ include "pxc-database.fullname" . }}
+      key: root
+{{- end }}
+{{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
 - name: DB_NAME
@@ -133,6 +151,31 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+{{- if and ( index ( index .Values "pxc-db" ) "enabled" ) ( eq .Values.db.primary "pxc-db" ) }}
+- name: DB_USER
+  value: "root"
+- name: DB_NAME
+  value: "drupal"
+- name: DB_HOST
+  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: internal-{{ include "pxc-database.fullname" . }}
+      key: root
+{{- end }}
+{{- end }}
+
+{{- define "drupal.env" }}
+- name: SILTA_CLUSTER
+  value: "1"
+- name: PROJECT_NAME
+  value: "{{ .Values.projectName | default .Release.Namespace }}"
+- name: ENVIRONMENT_NAME
+  value: "{{ .Values.environmentName }}"
+- name: DRUSH_OPTIONS_URI
+  value: "http://{{- template "drupal.domain" . }}"
+{{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}
@@ -195,9 +238,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
@@ -231,11 +274,16 @@ until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
 
-  if [ $TIME_WAITING -gt 90 ]; then
+  if [ $TIME_WAITING -gt 300 ]; then
     echo "Database connection timeout"
     exit 1
   fi
 done
+{{- end }}
+
+{{- define "drupal.create-db" }}
+echo "Creating drupal database.";
+mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
 {{- define "drupal.wait-for-elasticsearch-command" }}
@@ -266,6 +314,7 @@ done
   {{- end }}
 
   {{ include "drupal.wait-for-db-command" . }}
+  {{ include "drupal.create-db" . }}
 
   {{ if .Release.IsInstall }}
     touch {{ .Values.webRoot }}/sites/default/files/_installing
@@ -315,7 +364,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
-  gzip -9 /tmp/db.sql
+  gzip -1 /tmp/db.sql
   cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
 
   {{ range $index, $mount := .Values.mounts -}}
@@ -378,7 +427,7 @@ fi
 
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
-  BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
+  BACKUP_LOCATION="/backups/$BACKUP_ID"
 
   # Figure out which tables to skip.
   IGNORE_TABLES=""
@@ -401,7 +450,7 @@ fi
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
-  gzip -k9 /tmp/db.sql
+  gzip -1 /tmp/db.sql
 
   # Create a folder for the backup
   mkdir -p $BACKUP_LOCATION
@@ -418,12 +467,32 @@ fi
   {{- end }}
 
   # Delete old backups
-  find /backups/ -mtime +{{ .Values.backup.retention }} -exec rm -r {} \;
+  echo "Removing backups older than {{ .Values.backup.retention }} days"
+  # Can't locate directories based on mtime due to storage backend limitations, 
+  # Using folder name for time selection. 
+  retention_time=$(date -d "{{ .Values.backup.retention }} days ago" +%s)
+                  
+  find /backups -type d -mindepth 1 -maxdepth 1 -print \
+  | grep -E '/[0-9-]+$' \
+  | while read -r dir
+  do
+    # convert dir name into timestamp
+    stamp="$(echo "$dir" | sed -re 's%.+/(.+)-(.+)-(.+)-(.+)-(.+)-(.+)$%\1-\2-\3 \4:\5:\6%')"
+    stamp="$(date -d "$stamp" '+%s')" || continue
+    
+    # jump out of the execution block if the directory more recent than retention time
+    if [[ "$stamp" -gt "$retention_time" ]]; then
+      continue
+    fi
+    # All checks have passed and we can remove the directory.
+    echo "Removing directory: $dir"
+    rm -rf "$dir"
+  done
 
   # List content of backup folder
+  echo "Current backups:"
   ls -lh /backups/*
 {{- end }}
-
 
 {{- define "mariadb.db-validation" -}}
 
@@ -444,7 +513,7 @@ fi
     sleep 1s
     TIME_WAITING=$((TIME_WAITING+1))
 
-    if [ $TIME_WAITING -gt 20 ]; then
+    if [ $TIME_WAITING -gt 60 ]; then
       echo "Database connection timeout"
       exit 1
     fi
@@ -458,9 +527,24 @@ fi
 
 {{- define "cert-manager.api-version" }}
 {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
-apiVersion: cert-manager.io/v1
+cert-manager.io/v1
 {{- else }}
-apiVersion: certmanager.k8s.io/v1alpha1
+certmanager.k8s.io/v1alpha1
 {{- end }}
 {{- end }}
 
+{{- define "ingress.api-version" }}
+{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+networking.k8s.io/v1
+{{- else }}
+networking.k8s.io/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "cron.entrypoints" -}}
+
+set -e
+# Trigger lagoon entrypoint scripts if present.
+if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
+
+{{- end }}

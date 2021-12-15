@@ -1,13 +1,16 @@
 {{- $ingress := .Values.ingress.default }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: {{ include "ingress.api-version" . | trim }}
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
+    {{- else }}
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -51,10 +54,17 @@ spec:
   tls:
   {{- if .Values.ssl.existingTLSSecret }}
   - secretName: {{ .Values.ssl.existingTLSSecret }}
+    hosts: 
+      - {{ include "drupal.domain" . | quote }}
   {{- else }}
   - secretName: {{ .Release.Name }}-tls
+    hosts: 
+      - {{ include "drupal.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
+  {{ $params := dict "prefix" $prefix -}}
   - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+    hosts: 
+      - '{{ template "drupal.domain" (merge $params $ ) }}'
   {{- end }}
   {{- end }}
   {{- end }}
@@ -64,16 +74,31 @@ spec:
       paths:
       - path: /
         backend:
+          {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ include "drupal.servicename" . }}
+            port: 
+              number: 80
+          {{- else }}
           serviceName: {{ include "drupal.servicename" . }}
           servicePort: 80
+          {{- end }}
 {{- range $index, $prefix := .Values.domainPrefixes }}
-  - host: '{{ $prefix }}.{{ template "drupal.domain" $ }}'
+{{- $params := dict "prefix" $prefix }}
+  - host: '{{ template "drupal.domain" (merge $params $ ) }}'
     http:
       paths:
       - path: /
         backend:
+          {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ include "drupal.servicename" $ }}
+            port: 
+              number: 80
+          {{- else }}
           serviceName: {{ include "drupal.servicename" $ }}
           servicePort: 80
+          {{- end }}
 {{- end }}
 ---
 
@@ -93,15 +118,18 @@ spec:
 {{- end }}
 
 {{- if $ingress_in_use }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: {{ include "ingress.api-version" $ | trim }}
 kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-drupal-{{ $ingress_index }}
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
+    {{- else }}
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -142,8 +170,12 @@ spec:
   {{- if $domain.ssl.enabled }}
   {{- if $domain.ssl.existingTLSSecret }}
   - secretName: {{ $domain.ssl.existingTLSSecret }}
+    hosts: 
+      - {{ $domain.hostname }}
   {{- else }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+    hosts: 
+      - {{ $domain.hostname }}
   {{- end }}
   {{- end }}
   {{- end }}
@@ -159,8 +191,15 @@ spec:
       paths:
       - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
         backend:
+          {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ include "drupal.servicename" $ }}
+            port: 
+              number: 80
+          {{- else }}
           serviceName: {{ include "drupal.servicename" $ }}
           servicePort: 80
+          {{- end }}
   {{- end }}
   {{- end }}
 ---

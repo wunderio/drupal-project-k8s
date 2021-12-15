@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=7.3",
-        "composer/installers": "^1.8",
+        "composer/installers": "^2.0",
         "cweagans/composer-patches": "^1.6",
         "drupal/core-composer-scaffold": "^9.1",
         "drupal/core-dev": "^9.1",
@@ -27,7 +27,8 @@
         "drupal/simplei": "^1.2",
         "drush/drush": "^10.0",
         "vlucas/phpdotenv": "^5.0",
-        "webflo/drupal-finder": "^1.2"
+        "webflo/drupal-finder": "^1.2",
+        "wunderio/drupal-ping": "^1.0"
     },
     "require-dev": {
         "wunderio/code-quality": "^2.0",
@@ -36,7 +37,7 @@
     "conflict": {
         "drupal/drupal": "*"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "sort-packages": true,
@@ -69,6 +70,9 @@
             "locations": {
                 "web-root": "./web"
             }
+        },
+        "dropin-paths": {
+            "web/": ["type:web-dropin"]
         },
         "installer-paths": {
             "web/core": [

@@ -151,8 +151,14 @@ nginx:
   # Header containing real IP address
   real_ip_header: X-Forwarded-For
 
+  # Expose drupal cache tag headers
+  expose_cache_headers: false
+
   # Trust X-Forwarded-For from these hosts for getting external IP
-  realipfrom: 10.0.0.0/8
+  realipfrom: 
+    gke-internal: 10.0.0.0/8
+    gce-health-check-1: 130.211.0.0/22
+    gce-health-check-2: 35.191.0.0/16
 
   # Define the internal network access.
   # These are used below to allow internal access to certain files
@@ -174,7 +180,13 @@ nginx:
   comp_level: 6
 
   # Retry file lookup in 5 seconds (filesystem sync workaround)
-  # retry404s: 5
+  # retry404s:
+  #   delay: 5
+  #   paths:
+  #     - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
+
+  # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
+  sessionAffinity: false
 
   # Extra configuration block in server context.
   serverExtraConfig: |
@@ -384,6 +396,7 @@ referenceData:
 
 # Parameters for sanitizing reference data with gdpr-dump.
 # Uses formatters from https://packagist.org/packages/fzaninotto/faker.
+# ! This functionality has been temporary disabled
 gdprDump:
   users_field_data:
     name:
@@ -420,8 +433,6 @@ backup:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
-    limits:
       memory: 512M
 
 # Override the default values of the MariaDB subchart.
@@ -465,10 +476,10 @@ varnish:
       cpu: 25m
       memory: 32Mi
   image: eu.gcr.io/silta-images/varnish
-  imageTag: 6-v0.1
-  # https://varnish-cache.org/docs/6.0/users-guide/storage-backends.html
+  imageTag: 6-v0.2
+  # https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
-  # https://varnish-cache.org/docs/6.0/reference/varnishd.html#list-of-parameters
+  # https://varnish-cache.org/docs/6.6/reference/varnishd.html#list-of-parameters
   extraParams: ""
   # Inject custom code into vcl_recv subroutine.
   vcl_recv_extra: ""
@@ -478,7 +489,7 @@ varnish:
   vcl_extra_cookies: ""
   # Do not cache files larger than 3 megabytes (use integers).
   cache_skip_size: 3
-  # https://varnish-cache.org/docs/6.0/reference/vcl.html#backend-definition
+  # https://varnish-cache.org/docs/6.6/reference/vcl.html#backends-and-health-probes
   backend_config: |
     .max_connections = 300;
     .probe = {
@@ -497,7 +508,7 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 6.8.3
+  imageTag: 6.8.21
 
   replicas: 1
   minimumMasterNodes: 1
@@ -565,11 +576,10 @@ mailhog:
       memory: 10M
 
 # Email via SMTP. Configuration is passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
+# see: https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#sending-e-mail
 smtp:
   enabled: false
   # address: smtp.example.com:25
-  # tls: false
-  # starttls: false
   # username: ""
   # password: ""
 
@@ -577,12 +587,12 @@ smtp:
 solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
-  image: geerlingguy/solr
-  imageTag: latest
+  image: eu.gcr.io/silta-images/solr
+  imageTag: 8
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
-  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m"]
+  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m", "-a", "-Dlog4j2.formatMsgNoLookups=true"]
 
   # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
   # Solr init container will contents of this folder to actual solr container.
@@ -609,3 +619,51 @@ solr:
       # csiDriverName: csi-driver-name
       accessModes:
         - ReadWriteOnce
+
+db:
+  # Available options: mariadb, pxc-db
+  primary: mariadb
+
+# Percona XtraDB Cluster
+# see: https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/values.yaml
+pxc-db:
+  enabled: false
+  allowUnsafeConfigurations: false
+  pxc:
+    size: 3
+    expose:
+      enabled: false
+    disableTLS: true
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512M
+      limits:
+        cpu: 1000m
+        memory: 1024M
+    # User defined MySQL options according to MySQL configuration file syntax
+    configuration: |
+      [mysqld]
+      # Required for db import / reference data / backups
+      # https://forums.percona.com/t/import-mysql-dump-to-pxc/6104
+      # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
+      pxc_strict_mode=PERMISSIVE
+    persistence:
+      size: 8Gi
+  haproxy:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128M
+      limits:
+        cpu: 500m
+        memory: 256M
+  logcollector:
+    enabled: false
+  backup:
+    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
+    #enabled: false
+    schedule: []
+  secrets:
+    passwords:
+      root: drupal

@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:aks
 
 executors:
   cicd73:
@@ -12,7 +12,8 @@ executors:
       - image: eu.gcr.io/silta-images/cicd:circleci-php7.4-node14-composer1-v0.1
   cicd80:
     docker:
-      - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
+      # - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
+      - image: eu.gcr.io/silta-images/cicd:aks
 
 workflows:
   version: 2
@@ -63,6 +64,8 @@ workflows:
                 - /feature\/test-cluster\/.*/
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
+                - feature/aks-cluster
+                - /feature\/aks-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
 
@@ -91,6 +94,18 @@ workflows:
               only: 
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-test cluster environment.
+          <<: *build-deploy
+          name: build-deploy-aks
+          silta_config: silta/silta.yml,silta/silta-aks.yml
+          context: silta_aks
+          filters:
+            branches:
+              only: 
+                - feature/aks-cluster
+                - /feature\/aks-cluster\/.*/
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

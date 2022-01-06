@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:aks
+  silta: silta/silta@dev:master
 
 executors:
   cicd73:
@@ -12,8 +12,7 @@ executors:
       - image: eu.gcr.io/silta-images/cicd:circleci-php7.4-node14-composer1-v0.1
   cicd80:
     docker:
-      # - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
-      - image: eu.gcr.io/silta-images/cicd:aks
+      - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
 
 workflows:
   version: 2

@@ -5,3 +5,8 @@ referenceData:
 # Should be overriden by CI
 cluster:
   type: aks
+
+# AKS does egress NAT by default
+silta-release:
+  proxy:
+    enabled: false

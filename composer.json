@@ -28,7 +28,8 @@
         "drush/drush": "^10.0",
         "vlucas/phpdotenv": "^5.0",
         "webflo/drupal-finder": "^1.2",
-        "wunderio/drupal-ping": "^1.0"
+        "wunderio/drupal-ping": "^1.0",
+        "drupal/devel": "^4.0"
     },
     "require-dev": {
         "wunderio/code-quality": "^2.0",
@@ -41,7 +42,17 @@
     "prefer-stable": true,
     "config": {
         "sort-packages": true,
-        "discard-changes": true
+        "discard-changes": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "cweagans/composer-patches": true,
+            "drupal/core-composer-scaffold": true,
+            "composer/package-versions-deprecated": true,
+            "koodimonni/composer-dropin-installer": true,
+            "zaporylie/composer-drupal-optimizations": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpro/grumphp": true
+        }
     },
     "autoload": {
         "classmap": [

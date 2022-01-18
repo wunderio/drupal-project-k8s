@@ -12,6 +12,10 @@ silta-release:
   proxy:
     enabled: false
 
+# Hosted DB credentials encrypted!
+mariadb:
+  enabled: false
+
 ### Azure Application Gateway Ingress
 # exposeDomains:
 #   example-aks-ingress:

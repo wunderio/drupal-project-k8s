@@ -1,6 +1,7 @@
 # Configure reference data that will be used when creating new environments.
 referenceData:
-  enabled: false
+  enabled: true
+  referenceEnvironment: 'feature/aks-cluster/reference'
 
 # Should be overriden by CI
 cluster:
@@ -10,3 +11,32 @@ cluster:
 silta-release:
   proxy:
     enabled: false
+
+### Azure Application Gateway Ingress
+# exposeDomains:
+#   example-aks-ingress:
+#     hostname: aks-ingress-test.silta-aks.wdr.io
+#     ingress: aks
+
+# ingress:
+#   aks:
+#     type: azure/application-gateway
+
+### CSI Storage overrides for AKS / Filestore
+
+# shell:
+#   mount:
+#     storageClassName: azurefile-csi
+#     storage: 50M
+
+# mounts:
+#   public-files:
+#     storageClassName: azurefile-csi
+#   private-files:
+#     storageClassName: azurefile-csi
+
+# referenceData:
+#   storageClassName: azurefile-csi
+
+# backup:
+#   storageClassName: azurefile-csi

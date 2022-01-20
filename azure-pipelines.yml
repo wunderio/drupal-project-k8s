@@ -1,26 +1,267 @@
-# PHP
-# Test and package your PHP project.
-# Add steps that run tests, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/php
+# Pipeline templates
 
 trigger:
-- master
+# - master
+  branches:
+    include:
+    # Trigger build on a specific branch
+    - feature/azure-pipelines
+    # Trigger on all branches
+    # - {{ branch }}
 
 pool:
   vmImage: ubuntu-latest
 
-variables:
-  phpVersion: 7.2
 
-steps:
-- script: |
-    sudo update-alternatives --set php /usr/bin/php$(phpVersion)
-    sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
-    sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
-    sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
-    sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
-    php -version
-  displayName: 'Use PHP version $(phpVersion)'
+stages:
+- stage: development
+  displayName: Feature build
+  condition: |
+    and (
+      not(eq(variables['build.sourceBranch'], 'refs/heads/master')),
+      not(eq(variables['build.sourceBranch'], 'refs/heads/main')),
+      not(eq(variables['build.sourceBranch'], 'refs/heads/production'))
+    )
+  jobs:
+    - job: BuildAndDeploy
+      displayName: Build and deploy
+      variables:
 
-- script: composer install --no-interaction --prefer-dist
-  displayName: 'composer install'
+      # TODO: Variable group based on branch name
+      # - ${{ if eq(variables['build.sourceBranch'], 'refs/heads/production') }}:
+      #   - group: production
+      # - ${{ if or eq(variables['build.sourceBranch'], 'refs/heads/master'), eq(variables['build.sourceBranch'], 'refs/heads/main') }}:
+      #   - group: staging
+      # - ${{ if and ( not(eq(variables['build.sourceBranch'], 'refs/heads/master')), not(eq(variables['build.sourceBranch'], 'refs/heads/main')), not(eq(variables['build.sourceBranch'], 'refs/heads/production'))) }}:
+      #   - group: development
+      
+        - group: 'silta_aks'
+        - name: phpVersion
+          # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md#php
+          value: 8.1
+        - name: nodeVersion
+          # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md#nodejs
+          value: '16.x'
+      
+      steps:
+      
+      ### Build tools setup
+
+      - script: |
+          sudo update-alternatives --set php /usr/bin/php$(phpVersion)
+          sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
+          sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
+          sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
+          sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
+          php -version
+        displayName: 'Use PHP version $(phpVersion)'
+
+      - task: NodeTool@0
+        inputs:
+          # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md#nodejs
+          versionSpec: $(nodeVersion)
+        displayName: 'Install Node.js $(nodeVersion)'
+    
+      - script: |
+          # Silta cli download
+          mkdir -p ~/.local/bin
+
+          # Latest tagged release
+          latest_release_url=$(curl -sL https://api.github.com/repos/wunderio/silta-cli/releases/latest | grep -o -E "https://(.*)silta-(.*)-linux-amd64.tar.gz" | head -1)
+          curl -sL $latest_release_url | tar xz -C ~/.local/bin
+
+          # Selected release
+          # curl -sL https://github.com/wunderio/silta-cli/releases/download/0.1.0/silta-0.1.0-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+
+          # Latest build from master branch
+          # curl -sL https://github.com/wunderio/silta-cli/releases/download/master/silta-master-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+
+          silta version
+        displayName: 'Download Silta CI.'
+
+      #### Code build
+
+      - script: composer install -n --prefer-dist --ignore-platform-reqs --optimize-autoloader
+        displayName: 'composer install'
+        
+      - script: |
+          npm --version
+
+          # cd themes/custom/xyz
+          # npm install
+          # npm run build
+          # cd -
+        displayName: 'npm install and build'
+      
+      #### Cloud login  
+      
+      - script: |
+          silta cloud login \
+            --cluster-name "$(CLUSTER_NAME)" \
+            --aks-resource-group "$(AKS_RESOURCE_GROUP)" \
+            --aks-tenant-id "$(AKS_TENANT_ID)" \
+            --aks-sp-app-id "$(AKS_SP_APP_ID)" \
+            --aks-sp-password "$(AKS_SP_PASSWORD)"
+        displayName: 'Cloud login'
+      
+      - script: |
+          silta ci image login \
+            --image-repo-host "$(DOCKER_REPO_HOST)" \
+            --aks-tenant-id "$(AKS_TENANT_ID)" \
+            --aks-sp-app-id "$(AKS_SP_APP_ID)" \
+            --aks-sp-password "$(AKS_SP_PASSWORD)"
+        displayName: 'Login to the docker container registry'
+
+      - script: |
+          export BRANCHNAME=${BUILD_SOURCEBRANCH#"refs/heads/"}
+          export RELEASE_NAME=$(silta ci release name --branchname "${BRANCHNAME}" )
+          echo "Release name: ${RELEASE_NAME}"
+          echo "##vso[task.setvariable variable=RELEASE_NAME]$RELEASE_NAME"
+        displayName: 'Set release name'
+
+      #### Image build
+
+      - script: |
+          export BRANCHNAME=${BUILD_SOURCEBRANCH#"refs/heads/"}
+          export REPOSITORY_URL=$(Build.Repository.Uri)
+          export NAMESPACE=$(basename $REPOSITORY_URL .git)
+         
+          # Build nginx image
+          
+          export NGINX_IMAGE_URL=$(silta ci image url \
+            --image-repo-host "$(DOCKER_REPO_HOST)" \
+            --image-repo-project "$(DOCKER_REPO_PROJ)" \
+            --namespace "${NAMESPACE}" \
+            --image-identifier "nginx" \
+            --build-path "web" \
+            --dockerfile "silta/nginx.Dockerfile" \
+          )
+          echo "Nginx image url: ${NGINX_IMAGE_URL}"
+
+          silta ci image build \
+            --image-repo-host "$(DOCKER_REPO_HOST)" \
+            --image-repo-project "$(DOCKER_REPO_PROJ)" \
+            --namespace "${NAMESPACE}" \
+            --branchname "${BRANCHNAME}" \
+            --image-identifier "nginx" \
+            --build-path "web" \
+            --dockerfile "silta/nginx.Dockerfile"
+
+          echo "##vso[task.setvariable variable=NGINX_IMAGE_URL]$NGINX_IMAGE_URL"
+        displayName: 'Build nginx container image'
+
+      - script: |
+          export BRANCHNAME=${BUILD_SOURCEBRANCH#"refs/heads/"}
+          export REPOSITORY_URL=$(Build.Repository.Uri)
+          export NAMESPACE=$(basename $REPOSITORY_URL .git)
+         
+          # Build php image
+
+          export PHP_IMAGE_URL=$(silta ci image url \
+            --image-repo-host "$(DOCKER_REPO_HOST)" \
+            --image-repo-project "$(DOCKER_REPO_PROJ)" \
+            --namespace "${NAMESPACE}" \
+            --image-identifier "php" \
+            --build-path "." \
+            --dockerfile "silta/php.Dockerfile" \
+          )
+          echo "PHP image url: ${PHP_IMAGE_URL}"
+
+          silta ci image build \
+            --image-repo-host "$(DOCKER_REPO_HOST)" \
+            --image-repo-project "$(DOCKER_REPO_PROJ)" \
+            --namespace "${NAMESPACE}" \
+            --branchname "${BRANCHNAME}" \
+            --image-identifier "php" \
+            --build-path "." \
+            --dockerfile "silta/php.Dockerfile"
+
+          echo "##vso[task.setvariable variable=PHP_IMAGE_URL]$PHP_IMAGE_URL"
+        displayName: 'Build php container image'
+
+      - script: |
+          export BRANCHNAME=${BUILD_SOURCEBRANCH#"refs/heads/"}
+          export REPOSITORY_URL=$(Build.Repository.Uri)
+          export NAMESPACE=$(basename $REPOSITORY_URL .git)
+         
+          # Build shell image
+          export SHELL_IMAGE_URL=$(silta ci image url \
+            --image-repo-host "$(DOCKER_REPO_HOST)" \
+            --image-repo-project "$(DOCKER_REPO_PROJ)" \
+            --namespace "${NAMESPACE}" \
+            --image-identifier "shell" \
+            --build-path "." \
+            --dockerfile "silta/shell.Dockerfile" \
+          )
+          echo "Shell image url: ${SHELL_IMAGE_URL}"
+
+          silta ci image build \
+            --image-repo-host "$(DOCKER_REPO_HOST)" \
+            --image-repo-project "$(DOCKER_REPO_PROJ)" \
+            --namespace "${NAMESPACE}" \
+            --branchname "${BRANCHNAME}" \
+            --image-identifier "shell" \
+            --build-path "." \
+            --dockerfile "silta/shell.Dockerfile"
+
+          echo "##vso[task.setvariable variable=SHELL_IMAGE_URL]$SHELL_IMAGE_URL"
+        displayName: 'Build shell container image'
+
+      #### Deployment
+
+      # - script: |
+      #     silta secrets decrypt \
+      #       --files silta/prod-secrets \ 
+      #       --secret-key $(SECRET_KEY)
+      #   displayName: 'Decrypt secrets'
+      
+      - script: |
+          export BRANCHNAME=${BUILD_SOURCEBRANCH#"refs/heads/"}
+          export REPOSITORY_URL=$(Build.Repository.Uri)
+          export NAMESPACE=$(basename $REPOSITORY_URL .git)
+          
+          silta ci release deploy \
+            --release-name $(RELEASE_NAME) \
+            --chart-name drupal \
+            --branchname ${BRANCHNAME} \
+            --php-image-url ${PHP_IMAGE_URL} \
+            --nginx-image-url ${NGINX_IMAGE_URL} \
+            --shell-image-url ${SHELL_IMAGE_URL} \
+            --repository-url ${REPOSITORY_URL} \
+            --gitauth-username $(GITAUTH_USERNAME) \
+            --gitauth-password $(GITAUTH_PASSWORD) \
+            --cluster-domain $(CLUSTER_DOMAIN) \
+            --vpn-ip $(VPN_IP) \
+            --vpc-native false \
+            --cluster-type $(CLUSTER_TYPE) \
+            --db-root-pass $(DB_ROOT_PASS) \
+            --db-user-pass $(DB_USER_PASS) \
+            --namespace ${NAMESPACE} \
+            --silta-config "silta/silta.yml,silta/silta-aks.yml"
+        displayName: 'Deploy release'
+
+      - script: |
+          export REPOSITORY_URL=$(Build.Repository.Uri)
+          export NAMESPACE=$(basename $REPOSITORY_URL .git)
+          
+          silta ci release info \
+            --release-name $(RELEASE_NAME) \
+            --namespace ${NAMESPACE}
+        displayName: 'Release notes'
+
+- stage: staging
+  displayName: master / main build
+  dependsOn: []
+  condition: |
+    or (
+      contains(variables['build.sourceBranch'], 'refs/heads/master'),
+      contains(variables['build.sourceBranch'], 'refs/heads/main')
+    )
+  jobs:
+    - job: ShowVariables
+      displayName: Show variables
+      steps:
+      - task: CmdLine@2
+        displayName: Show variables
+        inputs:
+          script: 'printenv'

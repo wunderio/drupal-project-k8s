@@ -1,0 +1,4 @@
+charts:
+- name: custom-chart
+  version: 0.0.1
+  repository: file://../custom-chart

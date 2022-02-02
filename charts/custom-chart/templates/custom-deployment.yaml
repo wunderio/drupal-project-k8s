@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: custom-chart
+  name: {{ .Release.Name }}-custom-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-chart
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: custom-chart
+    spec:
+      containers:
+      - image: {{ .Values.image.repository }}
+        name: nginx
+        resources: {}
+

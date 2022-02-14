@@ -42,14 +42,3 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
-
-# Configuration for everything that runs in shell container.
-shell:
-  gitAuth:
-    keyserver:
-      enabled: false
-  authorizedKeys:
-    # Jānis Test key 1
-    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC0xefNbO0YrvBZU01aI4T2OZl8yUrHfD7Fmg0/T7XenD5AMyci4c5vJaRa8J/udCrbXwhShEJ02bniIGUwi9xNB/IcqlLME4DpoKpAGMvZh8xpVg/zsl2n2QZYpzEVknL6/ammBC1aoBKq5tYhvt7Whq4zjd6eafVsmax+ynqlRfMqaZx5FnFiVprAB31+0zHEjmu1CvULNKuaENiwHHtM/TKlGopn9yll3d5Pp+3Cn2VGNj5drb8rQPW3yw6+G8cpsW5wlsYD0ieZWvWlsq9EICsJehenV18iBmjWNnfQdBdw2WZ4qAdzhF+JGpYiVmfbdipUAD6HH3AZ11NO1TGaYK1NSULyFcdI5B4CrNDfshy5lE6RkkYJAD/AUIndpXY7sEZWcZUhPTtzwYmKh4s81fZbMGp4JRemPY87oPTTNiojVmcbO4pphymMPaB7qA0mIOCof/K3sAG7EsINcxAjWse8DDJd33f3BvGY89ElMvqImWQS+1frr0b5NMCBS4c= jancis@test-3"
-    # Jānis Test key 2
-    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDGzrA3Ob8a9JbCzDfSNi4rqFBFqphVj+SI/BOb64+8ZEaBTIFeP1EqCkGBDfLFpreGBLD8D5wlNaeO+L8bJHYqbh1aPlIsw5Bj6eJgXKm3JL3q1zrOLAMnljcPQpoZD41Uv1YoQtBpIdGggTahQHkyPSt/Fwjytxaf3C8Dd+IjhLnb85m8p5FkFeMfXUHCzZq1pGqBlVF5qxlA740XdiNDoAUoRquF+MdEYSh1hZ97Th8i3SrW69HIxxfVIv1svEeWdO726Q6q4BeobfASqkdh+wVQOWrBxPyejFmYRh6F+d+PgFI1njwEsywhqeY9CSpcSzgoCho1G/CIKTiTHl4vPylx7KvRuPCESQFK2vyy3mMGcm768zBHgFk42fKJPSYJfenvjPoFAHUjk/EcfgOVWrhDM2Bs1W1+HnLrOSUUZzlR8ZqvSWfZjdVBFTdXbqU+ZcM8+fqY1b3iCvXAnjITNVpWfK2xnL5maAYPMOGHTXCINmFxWfnuD7NsJzWdids= jancis@test-2"

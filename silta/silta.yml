@@ -44,11 +44,13 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 exposeDomains:
-  - hostname: ing-test.drupal-project-k8s.dev.wdr.io
+  ing-test:
+    hostname: ing-test.drupal-project-k8s.dev.wdr.io
     ssl:
-      enabled: true
-      issuer: letsencrypt
-  - hostname: ing-test2.drupal-project-k8s.dev.wdr.io
+    enabled: true
+    issuer: letsencrypt
+  ing-test2:
+    hostname: ing-test2.drupal-project-k8s.dev.wdr.io
     ssl:
       enabled: true
       issuer: letsencrypt

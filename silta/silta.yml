@@ -42,15 +42,3 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
-
-exposeDomains:
-  ing-test:
-    hostname: ing-test.drupal-project-k8s.dev.wdr.io
-    ssl:
-      enabled: true
-      issuer: letsencrypt
-  ing-test2:
-    hostname: ing-test2.drupal-project-k8s.dev.wdr.io
-    ssl:
-      enabled: true
-      issuer: letsencrypt

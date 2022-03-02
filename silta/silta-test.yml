@@ -2,3 +2,17 @@
 referenceData:
   enabled: true
   referenceEnvironment: 'feature/test-cluster/reference'
+
+mounts:
+  public-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/web/sites/default/files
+    storageClassName: nfs
+    csiDriverName: ''
+  private-files:
+    enabled: false
+    storage: 1G
+    mountPath: /app/private
+    storageClassName: nfs
+    csiDriverName: ''

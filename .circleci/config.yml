@@ -61,14 +61,7 @@ workflows:
             branches:
               ignore:
                 - production
-                - feature/test-cluster
-                - /feature\/test-cluster\/.*/
-                - feature/aws-cluster
-                - /feature\/aws-cluster\/.*/
-                - feature/aks-cluster
-                - /feature\/aks-cluster\/.*/
-                - feature/Traefik-ratelimiting
-                - feature/cert-manager-upgrade
+                - feature/storage-nfs
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
@@ -83,6 +76,7 @@ workflows:
                 - /feature\/test-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
+                - feature/storage-nfs
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.

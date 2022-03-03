@@ -51,13 +51,20 @@ workflows:
                 command: |
                   # CLI setup
                   mkdir -p ~/.local/bin
-                  wget https://storage.googleapis.com/silta-cli-test/silta-deployment -O ~/.local/bin/silta-deployment
-                  chmod +x ~/.local/bin/silta-deployment
-
+                  wget https://storage.googleapis.com/silta-cli-test/silta -O ~/.local/bin/silta
+                  chmod +x ~/.local/bin/silta
+            - run:
+                name: "Use production drupal chart"
+                command: |
+                  # Delete development chart
+                  rm -rf ./charts/drupal
+                  # Pull the public chart, extract for use
+                  helm pull wunderio/drupal
+                  tar -xzvf drupal-*.tgz -C ./charts
             - run:
                 name: "Edit main chart"
                 command: |
-                  silta-deployment -d ./silta/deployment_options.yml -c ./charts/drupal/Chart.yaml
+                  silta -d ./silta/deployment_options.yml -c ./charts/drupal/Chart.yaml
                   rm -f ./charts/drupal/values.schema.json
             - run:
                 name: Build local helm chart

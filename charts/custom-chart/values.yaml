@@ -1,2 +1,3 @@
 image:
   repository: nginx
+replicas: 1

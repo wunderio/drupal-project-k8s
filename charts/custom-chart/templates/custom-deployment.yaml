@@ -6,7 +6,7 @@ metadata:
     app: custom-chart
   name: {{ .Release.Name }}-custom-deployment
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: custom-chart

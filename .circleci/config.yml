@@ -64,7 +64,7 @@ workflows:
             - run:
                 name: "Edit main chart"
                 command: |
-                  silta -d ./silta/deployment_options.yml -c ./charts/drupal/Chart.yaml
+                  silta chart extend --subchart-list-file ./silta/deployment_options.yml --chart-file ./charts/drupal/Chart.yaml
                   rm -f ./charts/drupal/values.schema.json
             - run:
                 name: Build local helm chart

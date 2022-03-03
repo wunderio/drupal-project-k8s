@@ -111,12 +111,6 @@ tests:
           path: apiVersion
           value: 'networking.k8s.io/v1'
 
-
-
-
-
-
-
   - it: shortens long project names
     template: drupal-ingress.yaml
     set:
@@ -247,22 +241,6 @@ tests:
       - documentIndex: 1
         equal:
           path: 'spec.rules[0].host'
-          value: 'bar.baz'
-
-  - it: exposeDomains as list, multiple hostnames can use the same ingress [list definition to be deprecated]
-    template: drupal-ingress.yaml
-    set:
-      exposeDomains:
-        - hostname: foo.baz
-        - hostname: bar.baz
-    asserts:
-      - documentIndex: 1
-        equal:
-          path: 'spec.rules[0].host'
-          value: 'foo.baz'
-      - documentIndex: 1
-        equal:
-          path: 'spec.rules[1].host'
           value: 'bar.baz'
 
   - it: exposeDomains - can supply staticIpAddressName for gce type ingress

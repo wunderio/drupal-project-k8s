@@ -7,10 +7,7 @@
 varnish:
   enabled: false
 
-elasticsearch:
-  enabled: false
-
-memca
+elasti
 
 mounts:
   private-files:

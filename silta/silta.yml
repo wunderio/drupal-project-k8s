@@ -7,11 +7,12 @@
 varnish:
   enabled: false
 
-elasti
+elasticsearch:
+  enabled: false
 
 mounts:
   private-files:
-    enabled: weewfewf
+    enabled: true
 
 # Allow access from another namespace for testing purposes.
 silta-release:

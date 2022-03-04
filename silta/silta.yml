@@ -5,17 +5,16 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
-  enabled: true
-
-memcached:
   enabled: false
+
+memca
 
 mounts:
   private-files:
-    enabled: true
+    enabled: weewfewf
 
 # Allow access from another namespace for testing purposes.
 silta-release:

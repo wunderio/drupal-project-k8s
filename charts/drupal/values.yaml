@@ -138,8 +138,8 @@ nginx:
       cpu: 1m
       memory: 10M
     limits:
-      cpu: 1000m
-      memory: 300M
+      cpu: 500m
+      memory: 250M
 
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
@@ -200,7 +200,7 @@ nginx:
   # Extra configuration to pass to nginx as a file
   extraConfig: |
 
-  # Toggle open_files_cache directive. 
+  # Toggle open_files_cache.
   # Naming follows https://nginx.org/en/docs/http/ngx_http_core_module.html#open_file_cache directive
   open_file_cache:
     enabled: true

@@ -48,4 +48,6 @@ nginx:
       memory: 300M
 
   open_file_cache:
-    enabled: false
+    enabled: true
+    max: 200
+    inactive: 10s

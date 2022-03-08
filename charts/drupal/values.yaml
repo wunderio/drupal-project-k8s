@@ -138,7 +138,7 @@ nginx:
       cpu: 1m
       memory: 10M
     limits:
-      cpu: 200m
+      cpu: 1000m
       memory: 300M
 
   # Set of values to enable and use http basic authentication

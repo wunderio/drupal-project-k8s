@@ -43,9 +43,9 @@ nginx:
     # Show server host name as header
     add_header X-Backend-Server $hostname;
   resources:
-  limits:
-    cpu: 40m
-    memory: 300M
+    limits:
+      cpu: 40m
+      memory: 300M
 
   open_file_cache:
     enabled: false

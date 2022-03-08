@@ -42,12 +42,3 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
-  resources:
-    limits:
-      cpu: 40m
-      memory: 300M
-
-  open_file_cache:
-    enabled: true
-    max: 200
-    inactive: 10s

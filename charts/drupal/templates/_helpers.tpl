@@ -548,3 +548,11 @@ set -e
 if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
 
 {{- end }}
+
+{{- define "cron.api-version" }}
+{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+batch/v1
+{{- else }}
+batch/v1beta1
+{{- end }}
+{{- end }}

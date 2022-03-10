@@ -42,3 +42,14 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+exposeDomains:
+  wildcard-nossl:
+    hostname: '*.no-ssl.test-wildcard-domains.drupal-project-k8s.dev.wdr.io'
+    ssl:
+      enabled: false
+    
+  # wildcard-ssl:
+  #   hostname: '*.ssl.test-wildcard-domains.drupal-project-k8s.dev.wdr.io'
+  #   ssl:
+  #     issuer: selfsigned

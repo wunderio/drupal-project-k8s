@@ -49,7 +49,7 @@ exposeDomains:
     ssl:
       enabled: false
     
-  # wildcard-ssl:
-  #   hostname: '*.ssl.test-wildcard-domains.drupal-project-k8s.dev.wdr.io'
-  #   ssl:
-  #     issuer: selfsigned
+  wildcard-ssl:
+    hostname: '*.ssl.test-wildcard-domains.drupal-project-k8s.dev.wdr.io'
+    ssl:
+      issuer: selfsigned

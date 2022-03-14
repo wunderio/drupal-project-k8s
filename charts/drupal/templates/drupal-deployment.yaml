@@ -148,7 +148,7 @@ spec:
                   - drupal
 ---
 {{- if .Values.autoscaling.enabled }}
-apiVersion: {{ include "autoscaling.api-version" . | trim }}
+apiVersion: {{ include "drupal.autoscaling.api-version" . | trim }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Release.Name }}-drupal

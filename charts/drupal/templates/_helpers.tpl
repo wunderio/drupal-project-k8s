@@ -550,7 +550,7 @@ if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
 {{- end }}
 
 
-{{- define "cron.api-version" }}
+{{- define "drupal.cron.api-version" }}
 {{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
 batch/v1
 {{- else }}
@@ -558,7 +558,7 @@ batch/v1beta1
 {{- end }}
 {{- end }}
 
-{{- define "autoscaling.api-version" }}
+{{- define "drupal.autoscaling.api-version" }}
 {{- if semverCompare ">=1.23" .Capabilities.KubeVersion.Version }}
 autoscaling/v2
 {{- else }}

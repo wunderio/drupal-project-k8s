@@ -51,3 +51,9 @@ mounts:
     storageClassName: nfs-shared
   private-files:
     enabled: false
+  public-files-legacy:
+    enabled: true
+    storage: 1G
+    mountPath: /app/web/sites/default/files-legacy
+    storageClassName: silta-shared
+    csiDriverName: csi-rclone

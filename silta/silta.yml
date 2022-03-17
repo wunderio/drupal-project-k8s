@@ -44,16 +44,16 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 mounts:
+  public-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/web/sites/default/files-old
+    storageClassName: nfs-shared
+  private-files:
+    enabled: false
   public-files-legacy:
     enabled: true
     storage: 1G
     mountPath: /app/web/sites/default/files
-    storageClassName: nfs-shared
-  private-files:
-    enabled: false
-  public-files:
-    enabled: true
-    storage: 1G
-    mountPath: /app/web/sites/default/files-legacy
     storageClassName: silta-shared
     csiDriverName: csi-rclone

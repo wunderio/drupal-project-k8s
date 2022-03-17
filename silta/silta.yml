@@ -42,3 +42,12 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+mounts:
+  public-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/web/sites/default/files
+    storageClassName: nfs-shared
+  private-files:
+    enabled: false

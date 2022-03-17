@@ -45,14 +45,14 @@ nginx:
 
 mounts:
   public-files:
-    enabled: true
+    enabled: false
     storage: 1G
     mountPath: /app/web/sites/default/files-old
     storageClassName: nfs-shared
   private-files:
     enabled: false
   public-files-legacy:
-    enabled: false
+    enabled: true
     storage: 1G
     mountPath: /app/web/sites/default/files
     storageClassName: silta-shared

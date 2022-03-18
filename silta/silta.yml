@@ -47,13 +47,13 @@ mounts:
   public-files-new:
     enabled: true
     storage: 1G
-    mountPath: /app/web/sites/default/files-new
+    mountPath: /app/web/sites/default/files
     storageClassName: nfs-shared
   private-files:
     enabled: false
   public-files:
-    enabled: true
+    enabled: false
     storage: 1G
-    mountPath: /app/web/sites/default/files
+    mountPath: /app/web/sites/default/files-old
     storageClassName: silta-shared
     csiDriverName: csi-rclone

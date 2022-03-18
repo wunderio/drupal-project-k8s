@@ -44,14 +44,14 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 mounts:
-  public-files:
-    enabled: false
+  public-files-new:
+    enabled: true
     storage: 1G
-    mountPath: /app/web/sites/default/files-old
+    mountPath: /app/web/sites/default/files-new
     storageClassName: nfs-shared
   private-files:
     enabled: false
-  public-files-legacy:
+  public-files:
     enabled: true
     storage: 1G
     mountPath: /app/web/sites/default/files

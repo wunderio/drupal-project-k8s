@@ -49,6 +49,10 @@ mounts:
     storage: 1G
     mountPath: /app/web/sites/default/files
     storageClassName: nfs-shared
+  testing-expansion:
+    enabled: true
+    mountPath: /app/web/sites/default/testing-expansion
+    storageClassName: nfs-shared
   private-files:
     enabled: false
   public-files:

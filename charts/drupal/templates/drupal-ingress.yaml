@@ -29,6 +29,9 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
     {{- end }}
 
     {{- if eq $ingress.type "gce" }}
@@ -37,7 +40,11 @@ metadata:
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
-
+    
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
@@ -61,9 +68,10 @@ spec:
     hosts: 
       - {{ include "drupal.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
+  {{ $params := dict "prefix" $prefix -}}
   - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
     hosts: 
-      - '{{ $prefix }}.{{ template "drupal.domain" $ }}'
+      - '{{ template "drupal.domain" (merge $params $ ) }}'
   {{- end }}
   {{- end }}
   {{- end }}
@@ -72,6 +80,9 @@ spec:
     http:
       paths:
       - path: /
+        {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
         backend:
           {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
@@ -83,10 +94,14 @@ spec:
           servicePort: 80
           {{- end }}
 {{- range $index, $prefix := .Values.domainPrefixes }}
-  - host: '{{ $prefix }}.{{ template "drupal.domain" $ }}'
+{{- $params := dict "prefix" $prefix }}
+  - host: '{{ template "drupal.domain" (merge $params $ ) }}'
     http:
       paths:
       - path: /
+        {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
         backend:
           {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
           service:
@@ -146,6 +161,9 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
     {{- end }}
 
     {{- if eq $ingress.type "gce" }}
@@ -153,6 +171,10 @@ metadata:
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
+    {{- end }}
+    
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
     
     {{- if $ingress.extraAnnotations }}
@@ -188,6 +210,9 @@ spec:
     http:
       paths:
       - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
+        {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
         backend:
           {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
           service:

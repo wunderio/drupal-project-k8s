@@ -27,7 +27,9 @@ workflows:
           post-validation:
             - run:
                 name: Helm unit tests
-                command: helm unittest ./charts/drupal --helm3
+                command: |
+                  helm unittest ./charts/silta-release --helm3
+                  helm unittest ./charts/drupal --helm3
 
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
@@ -63,6 +65,8 @@ workflows:
                 - /feature\/test-cluster\/.*/
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
+                - feature/aks-cluster
+                - /feature\/aks-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
 
@@ -91,6 +95,18 @@ workflows:
               only: 
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration for the silta-test cluster environment.
+          <<: *build-deploy
+          name: build-deploy-aks
+          silta_config: silta/silta.yml,silta/silta-aks.yml
+          context: silta_aks
+          filters:
+            branches:
+              only: 
+                - feature/aks-cluster
+                - /feature\/aks-cluster\/.*/
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the production environment.

@@ -47,5 +47,9 @@ mounts:
   public-files-filestore:
     enabled: true
     storage: 1G
-    mountPath: /app/web/sites/default/files-new
+    mountPath: /app/web/sites/default/files
     storageClassName: nfs-shared
+  public-files:
+    enabled: false
+    mountPath: /app/web/sites/default/files-old
+

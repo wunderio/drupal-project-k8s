@@ -44,7 +44,7 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 mounts:
-  public-files-filestore:
+  public-files-filestore2:
     enabled: true
     storage: 1G
     mountPath: /app/web/sites/default/files-new

@@ -450,7 +450,7 @@ fi
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
-  gzip -1 /tmp/db.sql
+  gzip -k1 /tmp/db.sql
 
   # Create a folder for the backup
   mkdir -p $BACKUP_LOCATION
@@ -547,4 +547,21 @@ set -e
 # Trigger lagoon entrypoint scripts if present.
 if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
 
+{{- end }}
+
+
+{{- define "drupal.cron.api-version" }}
+{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+batch/v1
+{{- else }}
+batch/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "drupal.autoscaling.api-version" }}
+{{- if semverCompare ">=1.23" .Capabilities.KubeVersion.Version }}
+autoscaling/v2
+{{- else }}
+autoscaling/v2beta1
+{{- end }}
 {{- end }}

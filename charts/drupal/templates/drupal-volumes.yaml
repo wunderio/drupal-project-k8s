@@ -80,7 +80,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
-    storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/reference-data
+    storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/reference-data
 spec:
   storageClassName: {{ .Values.referenceData.storageClassName }}
   accessModes:

@@ -29,7 +29,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
-    storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/ssh-keys    
+    storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/ssh-keys    
 spec:
   accessModes:
     - ReadWriteMany

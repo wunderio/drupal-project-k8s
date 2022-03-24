@@ -137,6 +137,9 @@ nginx:
     requests:
       cpu: 1m
       memory: 10M
+    limits:
+      cpu: 500m
+      memory: 250M
 
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
@@ -183,7 +186,7 @@ nginx:
   # retry404s:
   #   delay: 5
   #   paths:
-  #     - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
+  #     - "^/sites/[^/]+/files/(?:css|js)/"
 
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
   sessionAffinity: false
@@ -196,6 +199,13 @@ nginx:
 
   # Extra configuration to pass to nginx as a file
   extraConfig: |
+
+  # Toggle open_files_cache.
+  # Naming follows https://nginx.org/en/docs/http/ngx_http_core_module.html#open_file_cache directive
+  open_file_cache:
+    enabled: true
+    max: 6000
+    inactive: 120s
 
 # Configuration for everything that runs in php containers.
 php:
@@ -319,10 +329,14 @@ shell:
     repositoryUrl: 'you need to pass in a value for shell.gitAuth.repositoryUrl to your helm chart'
     outsideCollaborators: true
     keyserver:
+      enabled: true
       # Defaults to https://keys.[clusterDomain]/api/1/git-ssh-keys
       url: ''
       username: ''
       password: ''
+  # Static ssh keys 
+  # Note: cluster administrator support required for duplicating keys in jumphost.
+  authorizedKeys: []
 
   # Specifications for the volume where host keys are mounted.
   mount:

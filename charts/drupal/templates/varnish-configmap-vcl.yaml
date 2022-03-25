@@ -314,7 +314,7 @@ data:
         elseif (req.http.Cache-Tags) {
             ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
         }
-        else  if (req.method == "URIBAN") {
+        elseif (req.method == "URIBAN") {
           ban("req.http.host == " + req.http.host + " && req.url == " + req.url);
         }
         else {

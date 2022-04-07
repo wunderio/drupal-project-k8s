@@ -5,17 +5,25 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
-  enabled: true
+  enabled: false
 
 memcached:
   enabled: false
 
 mounts:
+  public-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/web/sites/default/files
+    storageClassName: nfs-shared
   private-files:
     enabled: true
+    storage: 1G
+    mountPath: /app/private
+    storageClassName: nfs-shared
 
 # Allow access from another namespace for testing purposes.
 silta-release:

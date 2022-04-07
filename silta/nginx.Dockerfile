@@ -3,4 +3,4 @@ FROM eu.gcr.io/silta-images/nginx:latest
 
 COPY . /app/web
 
-USER www-data
+RUN adduser nginx www-data

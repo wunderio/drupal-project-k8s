@@ -1,5 +1,5 @@
 # Dockerfile for building nginx.
-FROM eu.gcr.io/silta-images/nginx:1.21-test
-#11
+#FROM eu.gcr.io/silta-images/nginx:1.21-test
+FROM eu.gcr.io/silta-images/nginx:latest
 COPY . /app/web
 

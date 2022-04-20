@@ -75,7 +75,7 @@ data:
 
     include modules/*.conf;
 
-    user                            nginx;
+    # user                            nginx;
     worker_processes                auto;
     worker_rlimit_nofile            10240;
 

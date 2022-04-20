@@ -286,7 +286,7 @@ data:
 
     server {
         server_name drupal;
-        listen 80;
+        listen 8080;
 
         # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }

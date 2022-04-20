@@ -522,6 +522,7 @@ data:
 
             location = /robots.txt {
                 add_header  Content-Type  text/plain;
+                access_log  off;
                 try_files $uri @drupal;
             }
 

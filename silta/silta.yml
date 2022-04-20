@@ -42,3 +42,18 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+mounts:
+  public-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/web/sites/default/files
+    storageClassName: nfs-shared
+
+php:
+  cron:
+    file-creation:
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '* * * * *'
+      command: |
+        date > /app/web/sites/default/files/fs-check-$(date +%Y-%m-%d-%H-%M-%S)

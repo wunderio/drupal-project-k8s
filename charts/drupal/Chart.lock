@@ -13,9 +13,9 @@ dependencies:
   version: 3.1.3
 - name: elasticsearch
   repository: file://../elasticsearch
-  version: 7.8.1
+  version: 7.8.2
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:17055f326935954f815a6a337b556b0c487391d6ac4ea6533151af403a787e88
-generated: "2021-10-19T09:02:03.014121382+03:00"
+digest: sha256:3a967add92fb46ca05443e63a41c68f4496dd2e9b08a32d1fa99edba109f3e96
+generated: "2022-04-20T16:04:38.659005319+03:00"

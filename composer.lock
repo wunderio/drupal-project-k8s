@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "97a8ef98016d2364be66ca8b71d82568",
+    "content-hash": "aa9895320e0ae3707de86c3d13d29289",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3652,16 +3652,16 @@
         },
         {
             "name": "koodimonni/composer-dropin-installer",
-            "version": "1.3",
+            "version": "1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Koodimonni/Composer-Dropin-Installer.git",
-                "reference": "2ebddd0ead26f52962be385dcc85057be4c5a69e"
+                "reference": "9596ef8f50cbba2cdc707ca3b1f5e4a0e9fa7e7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Koodimonni/Composer-Dropin-Installer/zipball/2ebddd0ead26f52962be385dcc85057be4c5a69e",
-                "reference": "2ebddd0ead26f52962be385dcc85057be4c5a69e",
+                "url": "https://api.github.com/repos/Koodimonni/Composer-Dropin-Installer/zipball/9596ef8f50cbba2cdc707ca3b1f5e4a0e9fa7e7e",
+                "reference": "9596ef8f50cbba2cdc707ca3b1f5e4a0e9fa7e7e",
                 "shasum": ""
             },
             "require": {
@@ -3687,16 +3687,16 @@
             "authors": [
                 {
                     "name": "Onni Hakala",
-                    "email": "onni@koodimonni.fi",
+                    "email": "onni@keksi.io",
                     "role": "Developer"
                 }
             ],
             "description": "Install packages or a few files from packages into custom paths without overwriting existing stuff.",
             "support": {
                 "issues": "https://github.com/Koodimonni/Composer-Dropin-Installer/issues",
-                "source": "https://github.com/Koodimonni/Composer-Dropin-Installer/tree/master"
+                "source": "https://github.com/Koodimonni/Composer-Dropin-Installer/tree/1.4"
             },
-            "time": "2020-08-17T07:41:05+00:00"
+            "time": "2022-02-02T11:42:57+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",
@@ -10416,21 +10416,25 @@
         },
         {
             "name": "wunderio/drupal-ping",
-            "version": "1.0.2",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wunderio/drupal-ping.git",
-                "reference": "1ba81d31a1527b19cbb115b01388c428e96136c9"
+                "reference": "6a017dfd4c02de814ce81e050e057b23d5b494f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/1ba81d31a1527b19cbb115b01388c428e96136c9",
-                "reference": "1ba81d31a1527b19cbb115b01388c428e96136c9",
+                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/6a017dfd4c02de814ce81e050e057b23d5b494f5",
+                "reference": "6a017dfd4c02de814ce81e050e057b23d5b494f5",
                 "shasum": ""
             },
             "require": {
-                "drupal/core": "~8.0 || ~9.0",
+                "drupal/core": "^8 || ^9",
                 "koodimonni/composer-dropin-installer": ">=1.0.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9",
+                "wunderio/code-quality": "^2"
             },
             "type": "web-dropin",
             "notification-url": "https://packagist.org/downloads/",
@@ -10443,6 +10447,12 @@
                     "email": "janne.koponen@wunder.io",
                     "homepage": "https://github.com/tharna",
                     "role": "Developer"
+                },
+                {
+                    "name": "Ragnar Kurm",
+                    "email": "ragnar.kurm@wunder.io",
+                    "homepage": "https://github.com/ragnarkurmwunder",
+                    "role": "Developer"
                 }
             ],
             "description": "Drupal health check endpoint for load balancers",
@@ -10454,9 +10464,9 @@
             ],
             "support": {
                 "issues": "https://github.com/wunderio/drupal-ping/issues",
-                "source": "https://github.com/wunderio/drupal-ping/tree/1.0.2"
+                "source": "https://github.com/wunderio/drupal-ping/tree/2.2.1"
             },
-            "time": "2020-09-11T10:38:01+00:00"
+            "time": "2022-04-20T10:14:00+00:00"
         }
     ],
     "packages-dev": [
@@ -12668,16 +12678,16 @@
         },
         {
             "name": "symfony/cache-contracts",
-            "version": "v2.5.0",
+            "version": "v2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache-contracts.git",
-                "reference": "ac2e168102a2e06a2624f0379bde94cd5854ced2"
+                "reference": "64be4a7acb83b6f2bf6de9a02cee6dad41277ebc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/ac2e168102a2e06a2624f0379bde94cd5854ced2",
-                "reference": "ac2e168102a2e06a2624f0379bde94cd5854ced2",
+                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/64be4a7acb83b6f2bf6de9a02cee6dad41277ebc",
+                "reference": "64be4a7acb83b6f2bf6de9a02cee6dad41277ebc",
                 "shasum": ""
             },
             "require": {
@@ -12727,7 +12737,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache-contracts/tree/v2.5.0"
+                "source": "https://github.com/symfony/cache-contracts/tree/v2.5.1"
             },
             "funding": [
                 {
@@ -12743,7 +12753,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-17T14:20:01+00:00"
+            "time": "2022-01-02T09:53:40+00:00"
         },
         {
             "name": "symfony/config",
@@ -13914,5 +13924,5 @@
         "php": ">=7.3"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

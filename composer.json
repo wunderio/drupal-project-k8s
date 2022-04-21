@@ -72,7 +72,10 @@
             }
         },
         "dropin-paths": {
-            "web/": ["type:web-dropin"]
+            "web/": [
+                "type:web-dropin",
+                "package:wunderio/drupal-ping:_ping.php"
+            ]
         },
         "installer-paths": {
             "web/core": [

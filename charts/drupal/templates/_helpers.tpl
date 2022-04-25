@@ -179,10 +179,16 @@ imagePullSecrets:
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}
+{{- if contains "memcache" .Release.Name -}}
+{{- fail "Do not use 'memcache' in release name or deployment will fail" -}}
+{{- end }}
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
 {{- end }}
 {{- if .Values.redis.enabled }}
+{{- if contains "redis" .Release.Name -}}
+{{- fail "Do not use 'redis' in release name or deployment will fail" -}}
+{{- end }}
 {{- if eq .Values.redis.auth.password "" }}
 {{- fail ".Values.redis.auth.password value required." }}
 {{- end }}
@@ -199,6 +205,11 @@ imagePullSecrets:
   value: {{ .Release.Name }}-es
 {{- end }}
 {{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
+{{- if .Values.mailhog.enabled }}
+{{- if contains "mailhog" .Release.Name -}}
+{{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
+{{- end }}
+{{- end }}
 {{ include "smtp.env" . }}
 {{- end}}
 {{- if .Values.varnish.enabled }}

@@ -575,6 +575,22 @@ memcached:
     # MaxItemSize
     - -I 4M
 
+# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+redis:
+  architecture: standalone
+  auth:
+    # mandatory value
+    password: ""
+  replica:
+    # replicaCount: 1
+    resources:
+      limits: 
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi
+
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:

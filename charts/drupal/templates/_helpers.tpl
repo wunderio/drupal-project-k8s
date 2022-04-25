@@ -182,6 +182,18 @@ imagePullSecrets:
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
 {{- end }}
+{{- if .Values.redis.enabled }}
+{{- if eq .Values.redis.auth.password "" }}
+{{- fail ".Values.redis.auth.password value required." }}
+{{- end }}
+- name: REDIS_HOST
+  value: {{ .Release.Name }}-redis-master
+- name: REDIS_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-redis
+      key: redis-password
+{{- end }}
 {{- if .Values.elasticsearch.enabled }}
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-es
@@ -238,9 +250,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 

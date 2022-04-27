@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   silta: silta/silta@dev:master
+  sumologic: circleci/sumologic@1.3.0
 
 executors:
   cicd73:
@@ -18,6 +19,7 @@ workflows:
   version: 2
   commit:
     jobs:
+      - sumologic/workflow-collector
       - silta/drupal-validate:
           name: validate
           

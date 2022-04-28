@@ -477,6 +477,15 @@ mariadb:
         memory: 384M
       limits:
         memory: 512M
+    extraInitContainers: |
+      - name: dbinfo
+        image: busybox:stable
+        command: ["/bin/sh", "-c"]
+        args:
+          - df -h /bitnami/mariadb
+        volumeMounts:
+          - mountPath: /bitnami/mariadb
+            name: data
     affinity:
       nodeAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
@@ -581,6 +590,23 @@ memcached:
     - -m 118
     # MaxItemSize
     - -I 4M
+
+# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+redis:
+  enabled: false
+  architecture: standalone
+  auth:
+    # mandatory value
+    password: ""
+  replica:
+    # replicaCount: 1
+    resources:
+      limits: 
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml

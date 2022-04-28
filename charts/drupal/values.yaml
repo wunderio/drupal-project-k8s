@@ -475,7 +475,7 @@ mariadb:
         image: busybox:stable
         command: ["/bin/sh", "-c"]
         args:
-          - df -h /bitnami/mariadb;
+          - df -h /bitnami/mariadb
         volumeMounts:
           - mountPath: /bitnami/mariadb
             name: data

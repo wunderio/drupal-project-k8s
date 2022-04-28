@@ -577,6 +577,7 @@ memcached:
 
 # https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
 redis:
+  enabled: false
   architecture: standalone
   auth:
     # mandatory value

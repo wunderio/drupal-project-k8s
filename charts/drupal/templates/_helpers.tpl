@@ -43,7 +43,7 @@ ports:
   readOnly: true
   subPath: silta_services_yml
 - name: config
-  mountPath: /usr/local/etc/php-fpm.d/zz-custom.conf
+  mountPath: /tmp/zz-custom.conf
   readOnly: false
   subPath: php_fpm_d_custom
 - name: config
@@ -179,14 +179,37 @@ imagePullSecrets:
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}
+{{- if contains "memcache" .Release.Name -}}
+{{- fail "Do not use 'memcache' in release name or deployment will fail" -}}
+{{- end }}
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
+{{- end }}
+{{- if .Values.redis.enabled }}
+{{- if contains "redis" .Release.Name -}}
+{{- fail "Do not use 'redis' in release name or deployment will fail" -}}
+{{- end }}
+{{- if eq .Values.redis.auth.password "" }}
+{{- fail ".Values.redis.auth.password value required." }}
+{{- end }}
+- name: REDIS_HOST
+  value: {{ .Release.Name }}-redis-master
+- name: REDIS_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-redis
+      key: redis-password
 {{- end }}
 {{- if .Values.elasticsearch.enabled }}
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-es
 {{- end }}
 {{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
+{{- if .Values.mailhog.enabled }}
+{{- if contains "mailhog" .Release.Name -}}
+{{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
+{{- end }}
+{{- end }}
 {{ include "smtp.env" . }}
 {{- end}}
 {{- if .Values.varnish.enabled }}
@@ -238,9 +261,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
@@ -547,4 +570,21 @@ set -e
 # Trigger lagoon entrypoint scripts if present.
 if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
 
+{{- end }}
+
+
+{{- define "drupal.cron.api-version" }}
+{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+batch/v1
+{{- else }}
+batch/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "drupal.autoscaling.api-version" }}
+{{- if semverCompare ">=1.23" .Capabilities.KubeVersion.Version }}
+autoscaling/v2
+{{- else }}
+autoscaling/v2beta1
+{{- end }}
 {{- end }}

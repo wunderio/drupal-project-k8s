@@ -36,7 +36,9 @@ workflows:
 
           # Use custom executor.
           executor: cicd80
-
+          # Use a local chart during development.
+          chart_name: "./charts/drupal"
+          chart_repository: ""
           silta_config: silta/silta.yml
           codebase-build:
             - silta/drupal-composer-install

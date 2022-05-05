@@ -8,10 +8,10 @@ varnish:
   enabled: false
 
 elasticsearch:
-  enabled: false
+  enabled: true
 
 redis:
-  enabled: falsedd
+  enabled: false
   auth:
     password: "foo"
 

@@ -22,6 +22,9 @@ mounts:
   private-files:
     enabled: true
 
+php:
+  cron: []
+
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:

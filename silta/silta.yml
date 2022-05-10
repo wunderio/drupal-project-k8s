@@ -22,9 +22,6 @@ mounts:
   private-files:
     enabled: true
 
-php:
-  cron: []
-
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:
@@ -50,3 +47,10 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+exposeDomains:
+  example:
+    hostname: test.cert-dev.wdr.io
+    ssl:
+      enabled: true
+      issuer: letsencrypt-staging

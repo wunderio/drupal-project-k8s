@@ -13,6 +13,11 @@ elasticsearch:
 memcached:
   enabled: false
 
+redis:
+  enabled: false
+  auth:
+    password: "foo"
+
 mounts:
   private-files:
     enabled: true

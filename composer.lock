@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa9895320e0ae3707de86c3d13d29289",
+    "content-hash": "2c09425434ea4c52f0d29def905723a0",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -10302,16 +10302,16 @@
         },
         {
             "name": "wunderio/drupal-ping",
-            "version": "2.2.1",
+            "version": "2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wunderio/drupal-ping.git",
-                "reference": "6a017dfd4c02de814ce81e050e057b23d5b494f5"
+                "reference": "b186b4ac8726174bee2fcc9e90131e38472f5326"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/6a017dfd4c02de814ce81e050e057b23d5b494f5",
-                "reference": "6a017dfd4c02de814ce81e050e057b23d5b494f5",
+                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/b186b4ac8726174bee2fcc9e90131e38472f5326",
+                "reference": "b186b4ac8726174bee2fcc9e90131e38472f5326",
                 "shasum": ""
             },
             "require": {
@@ -10350,9 +10350,9 @@
             ],
             "support": {
                 "issues": "https://github.com/wunderio/drupal-ping/issues",
-                "source": "https://github.com/wunderio/drupal-ping/tree/2.2.1"
+                "source": "https://github.com/wunderio/drupal-ping/tree/2.3"
             },
-            "time": "2022-04-20T10:14:00+00:00"
+            "time": "2022-04-28T15:45:44+00:00"
         }
     ],
     "packages-dev": [

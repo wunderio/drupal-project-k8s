@@ -158,3 +158,74 @@ workflows:
           filters:
             branches:
               only: production
+  weekly-build:
+    triggers:
+      - schedule:
+          cron: "0 8 * * 5"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - silta/drupal-build-deploy: &build-deploy
+          name: build-deploy
+
+          # Use custom executor.
+          executor: cicd80
+
+          # Use a local chart during development.
+          chart_name: "./charts/drupal"
+          chart_repository: ""
+          silta_config: silta/silta.yml
+          codebase-build:
+            - silta/drupal-composer-install
+            - silta/npm-install-build
+
+          pre-release:
+            - run:
+                name: Build local helm chart
+                command: |
+                  helm repo add elastic https://helm.elastic.co
+                  helm repo add codecentric https://codecentric.github.io/helm-charts
+                  helm repo add percona https://percona.github.io/percona-helm-charts/
+                  helm dependency build ./charts/drupal
+            - run:
+                name: Dry-run helm install
+                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
+          context: silta_dev
+          filters:
+            branches:
+              ignore:
+                - production
+                - feature/test-cluster
+                - /feature\/test-cluster\/.*/
+                - feature/aws-cluster
+                - /feature\/aws-cluster\/.*/
+                - feature/aks-cluster
+                - /feature\/aks-cluster\/.*/
+                - feature/Traefik-ratelimiting
+                - feature/cert-manager-upgrade
+
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration testing master deployment to aks cluster.
+          <<: *build-deploy
+          name: "Deploy master to AKS cluster"
+          silta_config: silta/silta.yml,silta/silta-master-aks.yml
+          context: silta_aks
+          filters:
+            branches:
+              only: 
+                - master
+                - feature/chart-tests
+
+      - site-test:
+          name: "Site test"
+          requires:
+            - "build-deploy"
+            - "Deploy master to AKS cluster"
+          filters:
+            branches:
+              only: 
+                - master
+                - feature/chart-tests
+

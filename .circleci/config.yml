@@ -85,6 +85,17 @@ workflows:
                 - feature/cert-manager-upgrade
 
       - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration testing master deployment to aks cluster.
+          <<: *build-deploy
+          name: build-deploy-master-aks
+          silta_config: silta/silta.yml,silta/silta-master-aks.yml
+          context: silta_aks
+          filters:
+            branches:
+              only: 
+                - master
+
+      - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
           <<: *build-deploy
           name: build-deploy-aws

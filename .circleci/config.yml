@@ -21,6 +21,8 @@ jobs:
     steps:
       - site-query:
           site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php
+      - site-query:
+          site_url: https://master.drupal-project-k8s.silta-aks.wdr.io/_ping.php
 commands:
   site-query:
     parameters:

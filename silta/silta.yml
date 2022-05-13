@@ -8,7 +8,7 @@ varnish:
   enabled: false
 
 elasticsearch:
-  enabled: falsedd
+  enabled: false
 
 redis:
   enabled: false
@@ -16,7 +16,8 @@ redis:
     password: "foo"
 
 mounts:
-  priva
+  private-files:
+    enabled: true
 
 # Allow access from another namespace for testing purposes.
 silta-release:

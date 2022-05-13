@@ -10302,16 +10302,16 @@
         },
         {
             "name": "wunderio/drupal-ping",
-            "version": "2.2.2",
+            "version": "2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wunderio/drupal-ping.git",
-                "reference": "b8ea2d5a17cba7243d4513f76db09a26da1e1c27"
+                "reference": "b186b4ac8726174bee2fcc9e90131e38472f5326"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/b8ea2d5a17cba7243d4513f76db09a26da1e1c27",
-                "reference": "b8ea2d5a17cba7243d4513f76db09a26da1e1c27",
+                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/b186b4ac8726174bee2fcc9e90131e38472f5326",
+                "reference": "b186b4ac8726174bee2fcc9e90131e38472f5326",
                 "shasum": ""
             },
             "require": {
@@ -10350,9 +10350,9 @@
             ],
             "support": {
                 "issues": "https://github.com/wunderio/drupal-ping/issues",
-                "source": "https://github.com/wunderio/drupal-ping/tree/2.2.2"
+                "source": "https://github.com/wunderio/drupal-ping/tree/2.3"
             },
-            "time": "2022-04-27T07:59:24+00:00"
+            "time": "2022-04-28T15:45:44+00:00"
         }
     ],
     "packages-dev": [

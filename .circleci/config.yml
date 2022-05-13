@@ -14,6 +14,24 @@ executors:
     docker:
       - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
 
+jobs:
+  site-test:
+    docker:
+      - image: alpine/curl
+    steps:
+      - site-query:
+          site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php
+commands:
+  site-query:
+    parameters:
+      site_url:
+        type: string
+    steps:
+      - run:
+          name: Validate site url <<parameters.site_url>>
+          command: |            
+            curl -u $SITE_TEST_BAUTH <<parameters.site_url>>
+
 workflows:
   version: 2
   commit:
@@ -87,13 +105,25 @@ workflows:
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration testing master deployment to aks cluster.
           <<: *build-deploy
-          name: build-deploy-master-aks
+          name: "Deploy master to AKS cluster"
           silta_config: silta/silta.yml,silta/silta-master-aks.yml
           context: silta_aks
           filters:
             branches:
               only: 
                 - master
+                - feature/chart-tests
+
+      - site-test:
+          name: "Site test"
+          requires:
+            - "build-deploy"
+            - "Deploy master to AKS cluster"
+          filters:
+            branches:
+              only: 
+                - master
+                - feature/chart-tests
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.

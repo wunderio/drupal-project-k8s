@@ -53,7 +53,7 @@ if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
       'proto' => 'http',
       'host' => $elasticsearch_host,
       'port' => $elasticsearch_port,
-    ]
+    ],
   ];
 }
 

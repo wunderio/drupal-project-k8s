@@ -166,6 +166,19 @@ workflows:
               only:
                 - master
     jobs:
+      - silta/drupal-validate:
+          name: validate
+          
+          # Use custom executor.
+          executor: cicd80
+          
+          post-validation:
+            - run:
+                name: Helm unit tests
+                command: |
+                  helm unittest ./charts/silta-release --helm3
+                  helm unittest ./charts/drupal --helm3
+                  
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
 

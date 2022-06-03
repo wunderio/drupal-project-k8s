@@ -171,6 +171,8 @@ imagePullSecrets:
   value: "1"
 - name: PROJECT_NAME
   value: "{{ .Values.projectName | default .Release.Namespace }}"
+- name: RELEASE_NAME
+  value: {{ .Release.Name }}
 - name: ENVIRONMENT_NAME
   value: "{{ .Values.environmentName }}"
 - name: DRUSH_OPTIONS_URI

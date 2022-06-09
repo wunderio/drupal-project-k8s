@@ -43,6 +43,7 @@ metadata:
     
     {{- if eq $ingress.type "azure/application-gateway" }}
     cert-manager.io/cluster-issuer: letsencrypt
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
     
     {{- if $ingress.extraAnnotations }}
@@ -64,12 +65,12 @@ spec:
     hosts: 
       - {{ include "drupal.domain" . | quote }}
   {{- else }}
-  - secretName: {{ .Release.Name }}-tls
+  - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
     hosts: 
       - {{ include "drupal.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
   {{ $params := dict "prefix" $prefix -}}
-  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
     hosts: 
       - '{{ template "drupal.domain" (merge $params $ ) }}'
   {{- end }}
@@ -175,6 +176,7 @@ metadata:
     
     {{- if eq $ingress.type "azure/application-gateway" }}
     cert-manager.io/cluster-issuer: letsencrypt
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
     
     {{- if $ingress.extraAnnotations }}
@@ -191,11 +193,11 @@ spec:
   {{- if $domain.ssl.existingTLSSecret }}
   - secretName: {{ $domain.ssl.existingTLSSecret }}
     hosts: 
-      - {{ $domain.hostname }}
+      - {{ $domain.hostname | quote }}
   {{- else }}
-  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}{{- if eq $domain.ssl.issuer "custom" }}-custom{{- end }}
     hosts: 
-      - {{ $domain.hostname }}
+      - {{ $domain.hostname | quote }}
   {{- end }}
   {{- end }}
   {{- end }}
@@ -206,7 +208,7 @@ spec:
   {{- range $domain_index, $domain := $.Values.exposeDomains }}
   {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
   {{- if eq $domain.ingress $ingress_index }}
-  - host: {{ $domain.hostname }}
+  - host: {{ $domain.hostname | quote }}
     http:
       paths:
       - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}

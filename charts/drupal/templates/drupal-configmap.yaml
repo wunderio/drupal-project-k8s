@@ -75,7 +75,7 @@ data:
 
     include modules/*.conf;
 
-    user                            nginx;
+    # user                            nginx;
     worker_processes                auto;
     worker_rlimit_nofile            10240;
 
@@ -99,6 +99,7 @@ data:
         {{- end }}
 
         real_ip_header              {{ .Values.nginx.real_ip_header }};
+        real_ip_recursive           on;
 
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
@@ -141,13 +142,16 @@ data:
         gzip_disable                msie6;
 
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
+        {{- range $header, $value := .Values.nginx.security_headers }}
+        {{- if $value }}
+        add_header                  {{ $header }} {{ $value }};
+        {{- end }}
+        {{- end }}
         add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
         {{- if .Values.nginx.content_security_policy }}
         add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
         {{- end }}
-        add_header                  X-XSS-Protection "1; mode=block";
-        add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
-
+        
         port_in_redirect off;
         merge_slashes off;
 
@@ -285,7 +289,7 @@ data:
 
     server {
         server_name drupal;
-        listen 80;
+        listen 8080;
 
         # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }
@@ -521,6 +525,7 @@ data:
 
             location = /robots.txt {
                 add_header  Content-Type  text/plain;
+                access_log  off;
                 try_files $uri @drupal;
             }
 

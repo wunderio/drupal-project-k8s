@@ -22,7 +22,7 @@ dependencies:
   version: 3.1.x
   repository: https://codecentric.github.io/helm-charts
   condition: mailhog.enabled
-- name: elasticsearch
+- name: elasticsearch 
   version: 7.8.x
 #  repository: https://helm.elastic.co
   repository: file://../elasticsearch

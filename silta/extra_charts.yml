@@ -1,0 +1,4 @@
+charts:
+- name: test
+  version: 0.1.1
+  repository: https://demondevilhades.github.io/helm-charts/

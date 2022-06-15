@@ -4,5 +4,7 @@
 FROM eu.gcr.io/silta-images/php:8.0-fpm-v0.1
 
 COPY --chown=www-data:www-data . /app
+RUN touch /etc/ssmtp/ssmtp.conf
+RUN chmod 755 /etc/ssmtp/ssmtp.conf
 
 USER www-data

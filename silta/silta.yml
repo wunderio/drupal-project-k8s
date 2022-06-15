@@ -47,3 +47,10 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+# Use Office 365 SMTP server for email sending.
+smtp:
+  enabled: true
+  address: smtp.office365.com:587
+  tls: "YES"
+  starttls: "YES"

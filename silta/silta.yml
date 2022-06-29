@@ -5,7 +5,7 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   enabled: true
@@ -47,3 +47,12 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+ingress:
+  gce:
+    staticIpAddressName: drupal-project-k8s-gke-test
+
+exposeDomains:
+  test1:
+    hostname: exposed-ing.drupal-project-k8s.dev.wdr.io
+    ingress: gce

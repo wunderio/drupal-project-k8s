@@ -54,5 +54,5 @@ ingress:
 
 exposeDomains:
   test1:
-    hostname: exposed-ing.drupal-project-k8s.dev.wdr.io
+    hostname: exposed-ing-1.drupal-project-k8s.dev.wdr.io
     ingress: gce

@@ -13,6 +13,9 @@ executors:
   cicd80:
     docker:
       - image: eu.gcr.io/silta-images/cicd:circleci-php8.0-node14-composer2-v0.1
+  cicd80-alpine:
+    docker:
+      - image: eu.gcr.io/silta-images/cicd:test-8.0
 
 jobs:
   site-test:
@@ -42,7 +45,7 @@ workflows:
           name: validate
           
           # Use custom executor.
-          executor: cicd80
+          executor: cicd80-alpine
           
           post-validation:
             - run:
@@ -55,7 +58,7 @@ workflows:
           name: build-deploy
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd80-alpine
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"
@@ -170,7 +173,7 @@ workflows:
           name: validate
           
           # Use custom executor.
-          executor: cicd80
+          executor: cicd80-alpine
           
           post-validation:
             - run:
@@ -183,7 +186,7 @@ workflows:
           name: build-deploy
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd80-alpine
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"

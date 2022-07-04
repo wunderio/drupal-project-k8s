@@ -68,6 +68,39 @@ workflows:
             - silta/drupal-composer-install
             - silta/npm-install-build
             - run:
+                name: test cli download issue
+                command: |
+                  # CLI setup
+                  # Silta cli download
+                  mkdir -p ~/.local/bin
+
+                  # Latest tagged release
+                  echo "test1"
+                  test1=$(curl -sL https://api.github.com/repos/wunderio/silta-cli/releases/latest)
+                  
+                  echo "test2"
+                  test2=$(curl -sL https://api.github.com/repos/wunderio/silta-cli/releases/latest | grep -o -E "https://(.*)silta-(.*)-linux-amd64.tar.gz")
+                  
+                  echo "test3"
+                  latest_release_url=$(curl -s https://api.github.com/repos/wunderio/silta-cli/releases/latest | jq -r '.assets[] | .browser_download_url | select(endswith("linux-amd64.tar.gz"))')
+                  
+                  echo "test4"
+                  curl -sL $latest_release_url | tar xz -C ~/.local/bin
+
+                  # Selected release, i.e. 1.0.1
+                  # curl -sL https://github.com/wunderio/silta-cli/releases/download/0.1.0/silta-0.1.0-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+
+                  # Latest build from master branch
+                  # curl -sL https://github.com/wunderio/silta-cli/releases/download/master/silta-master-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+
+                  # Latest build from test release
+                  # curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+
+                  echo "test5"
+                  silta version
+
+                  echo "test6"
+            - run:
                 name: Add helm repositories and build local chart
                 command: |
                   helm repo add elastic https://helm.elastic.co

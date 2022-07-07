@@ -10302,16 +10302,16 @@
         },
         {
             "name": "wunderio/drupal-ping",
-            "version": "2.3",
+            "version": "2.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wunderio/drupal-ping.git",
-                "reference": "b186b4ac8726174bee2fcc9e90131e38472f5326"
+                "reference": "3e766369a8e983c05c14a09b13830978830d0b20"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/b186b4ac8726174bee2fcc9e90131e38472f5326",
-                "reference": "b186b4ac8726174bee2fcc9e90131e38472f5326",
+                "url": "https://api.github.com/repos/wunderio/drupal-ping/zipball/3e766369a8e983c05c14a09b13830978830d0b20",
+                "reference": "3e766369a8e983c05c14a09b13830978830d0b20",
                 "shasum": ""
             },
             "require": {
@@ -10350,9 +10350,9 @@
             ],
             "support": {
                 "issues": "https://github.com/wunderio/drupal-ping/issues",
-                "source": "https://github.com/wunderio/drupal-ping/tree/2.3"
+                "source": "https://github.com/wunderio/drupal-ping/tree/2.3.3"
             },
-            "time": "2022-04-28T15:45:44+00:00"
+            "time": "2022-07-05T14:09:54+00:00"
         }
     ],
     "packages-dev": [
@@ -12564,7 +12564,7 @@
         },
         {
             "name": "symfony/cache-contracts",
-            "version": "v2.5.1",
+            "version": "v2.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache-contracts.git",
@@ -12623,7 +12623,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache-contracts/tree/v2.5.1"
+                "source": "https://github.com/symfony/cache-contracts/tree/v2.5.2"
             },
             "funding": [
                 {
@@ -12928,16 +12928,16 @@
         },
         {
             "name": "symfony/polyfill-php81",
-            "version": "v1.25.0",
+            "version": "v1.26.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php81.git",
-                "reference": "5de4ba2d41b15f9bd0e19b2ab9674135813ec98f"
+                "reference": "13f6d1271c663dc5ae9fb843a8f16521db7687a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php81/zipball/5de4ba2d41b15f9bd0e19b2ab9674135813ec98f",
-                "reference": "5de4ba2d41b15f9bd0e19b2ab9674135813ec98f",
+                "url": "https://api.github.com/repos/symfony/polyfill-php81/zipball/13f6d1271c663dc5ae9fb843a8f16521db7687a1",
+                "reference": "13f6d1271c663dc5ae9fb843a8f16521db7687a1",
                 "shasum": ""
             },
             "require": {
@@ -12946,7 +12946,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.23-dev"
+                    "dev-main": "1.26-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -12987,7 +12987,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php81/tree/v1.25.0"
+                "source": "https://github.com/symfony/polyfill-php81/tree/v1.26.0"
             },
             "funding": [
                 {
@@ -13003,7 +13003,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-13T13:58:11+00:00"
+            "time": "2022-05-24T11:49:31+00:00"
         },
         {
             "name": "symfony/stopwatch",

@@ -22,8 +22,9 @@
           "resources": {
             "properties": {
               "requests": {
+                "$comment": "Raise php.resources.requests.cpu for production environment",
                 "properties": {
-                  "cpu": { "type": "string", "not": { "const": "3m"}}
+                  "cpu": { "type": "string", "not": { "const": "5m"}}
                 }
               }
             }
@@ -35,8 +36,9 @@
           "resources": {
             "properties": {
               "requests": {
+                "$comment": "Raise nginx.resources.requests.cpu for production environment",
                 "properties": {
-                  "cpu": { "type": "string", "not": { "const": "3m"}}
+                  "cpu": { "type": "string", "not": { "const": "1m"}}
                 }
               }
             }

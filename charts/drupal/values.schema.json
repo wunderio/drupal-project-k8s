@@ -1,52 +1,5 @@
 {
   "type": "object",
-  "if": {
-    "properties": {
-      "silta-release": {
-        "type": "object",
-        "properties": {
-          "branchName": { "const": "feature/autoscaling-requests"}
-        },
-        "required": ["branchName"]
-      }
-    }
-  },
-  "then": {
-    "properties": {
-      "mailhog": {
-        "$comment": "Mailhog should not be enabled in production",
-        "properties": { "enabled": { "const": false }}
-      },
-      "php": {
-        "properties": {
-          "resources": {
-            "properties": {
-              "requests": {
-                "$comment": "Raise php.resources.requests.cpu for production environment",
-                "properties": {
-                  "cpu": { "type": "string", "not": { "const": "5m"}}
-                }
-              }
-            }
-          }
-        }
-      },
-      "nginx": {
-        "properties": {
-          "resources": {
-            "properties": {
-              "requests": {
-                "$comment": "Raise nginx.resources.requests.cpu for production environment",
-                "properties": {
-                  "cpu": { "type": "string", "not": { "const": "1m"}}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
   "additionalProperties": false,
   "properties": {
     "clusterDomain": { "type": "string" },

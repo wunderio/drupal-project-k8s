@@ -5,7 +5,7 @@
       "silta-release": {
         "type": "object",
         "properties": {
-          "branchName": { "const": "production"}
+          "branchName": { "const": "feature/autoscaling-requests"}
         },
         "required": ["branchName"]
       }

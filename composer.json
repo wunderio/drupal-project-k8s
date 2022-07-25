@@ -41,7 +41,17 @@
     "prefer-stable": true,
     "config": {
         "sort-packages": true,
-        "discard-changes": true
+        "discard-changes": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "cweagans/composer-patches": true,
+            "drupal/core-composer-scaffold": true,
+            "composer/package-versions-deprecated": true,
+            "koodimonni/composer-dropin-installer": true,
+            "zaporylie/composer-drupal-optimizations": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpro/grumphp": true
+        }
     },
     "autoload": {
         "classmap": [

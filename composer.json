@@ -11,6 +11,10 @@
     ],
     "repositories": [
         {
+            "type": "vcs",
+            "url": "https://git.drupalcode.org/project/elasticsearch_helper_views.git"
+        },
+        {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
         }
@@ -22,10 +26,13 @@
         "drupal/core-composer-scaffold": "^9.1",
         "drupal/core-dev": "^9.1",
         "drupal/core-recommended": "^9.1",
+        "drupal/elasticsearch_helper": "7.x-dev#009007c2",
+        "drupal/elasticsearch_helper_views": "8.x-7.x-dev#be307cf3",
         "drupal/purge": "^3.0",
         "drupal/purge_purger_http": "^1.0",
         "drupal/simplei": "^1.2",
         "drush/drush": "^10.0",
+        "elasticsearch/elasticsearch": "~7.0",
         "vlucas/phpdotenv": "^5.0",
         "webflo/drupal-finder": "^1.2",
         "wunderio/drupal-ping": "^2"

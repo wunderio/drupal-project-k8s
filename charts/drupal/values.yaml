@@ -545,6 +545,9 @@ elasticsearch:
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
+  roles:
+    remote_cluster_client: "false"
+
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
 

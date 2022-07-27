@@ -23,9 +23,8 @@ dependencies:
   repository: https://codecentric.github.io/helm-charts
   condition: mailhog.enabled
 - name: elasticsearch
-  version: 7.8.x
-#  repository: https://helm.elastic.co
-  repository: file://../elasticsearch
+  version: 7.17.x
+  repository: https://helm.elastic.co
   condition: elasticsearch.enabled
 - name: silta-release
   version: 0.1.1

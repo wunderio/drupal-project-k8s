@@ -22,7 +22,7 @@
 {{- else -}}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}{{ include "drupal.domainSeperator" . }}{{ .Values.clusterDomain }}
+{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- end -}}
 {{- end -}}
 

@@ -5,8 +5,8 @@
 -
 {{- else -}}
 .
-{{- end }}
-{{- end }}
+{{- end -}}
+{{- end -}}
 
 {{- define "drupal.domain" -}}
 {{- $projectName := regexReplaceAll "[^[:alnum:]]" (.Values.projectName | default .Release.Namespace) "-"  | trimSuffix "-" | lower }}

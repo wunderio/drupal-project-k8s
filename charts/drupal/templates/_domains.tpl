@@ -18,11 +18,11 @@
 {{- if .prefix -}}
 {{- $maxEnvironmentNameLength := int (sub 61 (add (len .Values.clusterDomain) (len $projectName) (len .prefix))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{ .prefix }}{{drupal.domainSeperator}}{{ $environmentName }}{{drupal.domainSeperator}}{{ $projectName }}.{{ .Values.clusterDomain }}
+{{ .prefix }}{{ include "drupal.domainSeperator" . }}{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- else -}}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{ $environmentName }}{{drupal.domainSeperator}}{{ $projectName }}{{drupal.domainSeperator}}{{ .Values.clusterDomain }}
+{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}{{ include "drupal.domainSeperator" . }}{{ .Values.clusterDomain }}
 {{- end -}}
 {{- end -}}
 

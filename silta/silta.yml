@@ -49,3 +49,5 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 domainPrefixes: ['en', 'fi']
+
+singleDomain: true

@@ -416,7 +416,7 @@ if [ -f /app/reference-data/db.sql.gz ]; then
 
   echo "Importing reference database dump"
   gunzip -c /app/reference-data/db.sql.gz > /tmp/reference-data-db.sql
-  pv /tmp/reference-data-db.sql | drush sql-cli
+  pv -f /tmp/reference-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
   if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;

@@ -1,4 +1,4 @@
 # Dockerfile for building nginx.
-FROM wunderio/silta-nginx:latest
+FROM eu.gcr.io/silta-images/nginx:1.17-stopsignal
 
 COPY . /app/web

@@ -2,6 +2,6 @@
 #FROM eu.gcr.io/silta-images/shell:php7.3-v0.1
 #FROM eu.gcr.io/silta-images/shell:php7.4-v0.1
 # FROM eu.gcr.io/silta-images/shell:php8.0-v0.1
-FROM wunderio/silta-php-shell:test-8.1
+FROM wunderio/silta-php-shell:test-8.0
 
 COPY --chown=www-data:www-data . /app

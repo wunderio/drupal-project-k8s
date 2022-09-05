@@ -29,6 +29,18 @@ spec:
       containers:
       - name: shell
         image: {{ .Values.shell.image | quote }}
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -e
+            if [ -f /silta/shell-entrypoint.sh ]; 
+            then
+              # Use php container entrypoint if possible
+              /silta/shell-entrypoint.sh
+            else
+              # Fallback to legacy otherwise
+              /entrypoint.sh
+            fi
         env:
         {{- include "drupal.env" . | indent 8 }}
         {{- if .Values.shell.gitAuth.keyserver.enabled }}
@@ -50,11 +62,17 @@ spec:
           value: {{ .Values.shell.gitAuth.outsideCollaborators | default true | quote }}
         {{- end }}
         ports:
-          - containerPort: 22
+          - containerPort: 2222
         volumeMounts:
         {{- include "drupal.volumeMounts" . | nindent 8 }}
         - name: ssh-keys
+          mountPath: /silta/ssh/keys
+        - name: ssh-keys
           mountPath: /etc/ssh/keys
+        - name: shell-configmap
+          mountPath: /silta/ssh/authorized_keys
+          subPath: authorizedKeys
+          readOnly: true
         - name: shell-configmap
           mountPath: /etc/ssh/authorized_keys
           subPath: authorizedKeys

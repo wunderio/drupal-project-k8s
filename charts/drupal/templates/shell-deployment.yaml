@@ -62,7 +62,7 @@ spec:
           value: {{ .Values.shell.gitAuth.outsideCollaborators | default true | quote }}
         {{- end }}
         ports:
-          - containerPort: 2222
+          - containerPort: 22
         volumeMounts:
         {{- include "drupal.volumeMounts" . | nindent 8 }}
         - name: ssh-keys

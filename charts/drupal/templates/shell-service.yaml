@@ -9,8 +9,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 22
-      targetPort: 2222
+    - name: ssh
+      port: 22
   selector:
     {{- include "drupal.release_selector_labels" . | nindent 4 }}
     service: shell

@@ -50,8 +50,11 @@ data:
     [Assertion]
     zend.assertions = -1
 
+    [apcu]
+    apc.enabled = 0
+
     [opcache]
-    opcache.enable = 1
+    opcache.enable = 0
     opcache.enable_cli = 0
     ; This should adjust to amount of memory given to the container
     opcache.memory_consumption = 128

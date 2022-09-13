@@ -142,12 +142,6 @@ workflows:
                 - master
                 - feature/new-builder-images  
 
-      - artillery:
-          name: "run artillery tests"
-          filters:
-                branches:
-                  only: vilpo-dev
-                  
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
           <<: *build-deploy
@@ -261,3 +255,10 @@ workflows:
             branches:
               only: 
                 - master
+
+  load-tests:
+      jobs:
+        - artillery:
+          filters:
+            branches:
+              only: vilpo-dev

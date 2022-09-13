@@ -32,7 +32,7 @@ jobs:
 
       - run:
           name: Execute load tests
-          command: /home/node/artillery/bin/artillery --target vilpo-dev.drupal-project-k8s.dev.wdr.io run .charts/artillery/config.yml
+          command: artillery --target vilpo-dev.drupal-project-k8s.dev.wdr.io run .charts/artillery/config.yml
 
 commands:
   site-query:

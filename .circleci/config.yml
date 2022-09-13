@@ -141,7 +141,8 @@ workflows:
               only: 
                 - master
                 - feature/new-builder-images  
-      - load-tests:
+
+      - artillery:
           jobs:
             - artillery:
               filters:

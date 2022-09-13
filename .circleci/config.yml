@@ -143,9 +143,8 @@ workflows:
                 - feature/new-builder-images  
 
       - artillery:
-          jobs:
-            - artillery:
-              filters:
+          name: "run artillery tests"
+          filters:
                 branches:
                   only: vilpo-dev
                   

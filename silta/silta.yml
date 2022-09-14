@@ -47,3 +47,10 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+  # Retry file lookup in seconds (filesystem sync workaround)
+  retry404s:
+    delay: 2
+    paths:
+      - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
+      - "^/sites/(.*)/files/styles/media_preview/(.*)$"

@@ -177,9 +177,11 @@ workflows:
               only: production
 
       - artillery:
-        filters:
-          branches:
-            only: vilpo-dev
+          requires:
+            - "build-deploy"
+          filters:
+            branches:
+              only: vilpo-dev
 
   weekly-build:
     triggers:

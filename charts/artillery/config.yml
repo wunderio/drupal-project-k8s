@@ -1,5 +1,5 @@
 config:
-  target: "https://example.com/api"
+  target: "https://vilpo-dev.drupal-project-k8s.dev.wdr.io"
   phases:
     - duration: 60
       arrivalRate: 5

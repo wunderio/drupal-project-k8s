@@ -32,7 +32,7 @@ jobs:
 
       - run:
           name: Execute load tests
-          command: /home/node/artillery/bin/run --target vilpo-dev.drupal-project-k8s.dev.wdr.io run .charts/artillery/config.yml
+          command: /home/node/artillery/bin/run .charts/artillery/config.yml
 
 commands:
   site-query:
@@ -256,9 +256,7 @@ workflows:
               only: 
                 - master
 
-  load-tests:
-      jobs:
-        - artillery:
-          filters:
-            branches:
-              only: vilpo-dev
+      - artillery:
+        filters:
+          branches:
+            only: vilpo-dev

@@ -32,7 +32,7 @@ jobs:
 
       - run:
           name: Execute load tests
-          command: /home/node/artillery/bin/run .charts/artillery/config.yml
+          command: /home/node/artillery/bin/run charts/artillery/config.yml
 
 commands:
   site-query:

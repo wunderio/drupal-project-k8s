@@ -52,6 +52,10 @@ spec:
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
         env:
+        - name: RELEASE_NAME
+          value: "{{ .Release.Name }}"
+        - name: PROJECT_NAME
+          value: "{{ .Values.projectName | default .Release.Namespace }}"
         ports:
         - containerPort: 8080
           name: drupal
@@ -91,6 +95,10 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep", "5"]
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 

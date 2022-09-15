@@ -175,6 +175,12 @@ workflows:
           filters:
             branches:
               only: production
+
+      - artillery:
+        filters:
+          branches:
+            only: vilpo-dev
+
   weekly-build:
     triggers:
       - schedule:

@@ -264,7 +264,3 @@ workflows:
               only: 
                 - master
 
-      - artillery:
-        filters:
-          branches:
-            only: vilpo-dev

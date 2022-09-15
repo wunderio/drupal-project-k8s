@@ -8,3 +8,7 @@ config:
       arrivalRate: 5
       rampTo: 50
       name: Ramp up load
+scenarios:
+  - flow:
+      - get:
+          url: "/"

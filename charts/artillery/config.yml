@@ -12,3 +12,6 @@ scenarios:
   - flow:
       - get:
           url: "/"
+          auth:
+            user: silta
+            pass: demo

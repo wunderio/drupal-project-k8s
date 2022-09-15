@@ -31,8 +31,20 @@ jobs:
       - checkout
 
       - run:
+          name: Make reports directory
+          command: mkdir reports
+
+      - run:
           name: Execute load tests
-          command: /home/node/artillery/bin/run run ./charts/artillery/config.yml
+          command: /home/node/artillery/bin/run run --output reports/report.json ./charts/artillery/config.yml
+
+      - run:
+          name: Generate HTML report
+          command: /home/node/artillery/bin/run report --output reports/report reports/report.json    
+
+
+      - store_artifacts:    
+          path: reports
 
 commands:
   site-query:

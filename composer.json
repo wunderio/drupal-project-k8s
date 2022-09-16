@@ -26,7 +26,7 @@
         "drupal/purge": "^3.0",
         "drupal/purge_purger_http": "^1.0",
         "drupal/simplei": "^1.2",
-        "drush/drush": "^10.0",
+        "drush/drush": "^11.1",
         "vlucas/phpdotenv": "^5.0",
         "webflo/drupal-finder": "^1.2",
         "wunderio/drupal-ping": "^2"

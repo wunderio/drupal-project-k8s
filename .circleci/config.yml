@@ -46,6 +46,19 @@ jobs:
       - store_artifacts:    
           path: reports
 
+  lighthouse:
+    docker:
+      - image: justinribeiro/lighthouse:latest
+    steps:
+
+      - run: Make output directory
+        command: mkdir output
+
+      - run: lighthouse --chrome-flags="--headless --disable-gpu" https://vilpo-dev.drupal-project-k8s.dev.wdr.io --output-path=output/lighthouse-results.html
+
+      - store_artifacts:
+          path: reports
+        
 commands:
   site-query:
     parameters:
@@ -189,6 +202,13 @@ workflows:
               only: production
 
       - artillery:
+          requires:
+            - "build-deploy"
+          filters:
+            branches:
+              only: vilpo-dev
+
+      - lighthouse:
           requires:
             - "build-deploy"
           filters:

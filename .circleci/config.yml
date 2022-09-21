@@ -52,11 +52,13 @@ jobs:
     steps:
       - checkout
 
-      - run: Make output directory
-        command: mkdir output
+      - run: 
+          name: Make output directory
+          command: mkdir output
 
-      - run: Run the lighthouse tests
-        command: lighthouse --chrome-flags="--headless --disable-gpu" https://vilpo-dev.drupal-project-k8s.dev.wdr.io --output-path=output/lighthouse-results.html
+      - run: 
+          name: Run the lighthouse tests
+          command: lighthouse --chrome-flags="--headless --disable-gpu" https://vilpo-dev.drupal-project-k8s.dev.wdr.io --output-path=output/lighthouse-results.html
 
       - store_artifacts:
           path: output

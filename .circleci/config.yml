@@ -50,6 +50,7 @@ jobs:
     docker:
       - image: justinribeiro/lighthouse:latest
     steps:
+      - checkout
 
       - run: Make output directory
         command: mkdir output

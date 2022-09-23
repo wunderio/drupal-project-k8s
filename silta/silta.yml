@@ -18,9 +18,9 @@ redis:
   auth:
     password: "foo"
 
-mounts:
-  private-files:
-    enabled: true
+# mounts:
+#   private-files:
+#     enabled: true
 
 # Allow access from another namespace for testing purposes.
 silta-release:
@@ -47,3 +47,15 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+mounts:
+  public-files:
+    enabled: true
+    storage: 10G
+    mountPath: /app/web/sites/default/files
+    storageClassName: silta-nfs-shared
+  private-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/private
+    storageClassName: silta-nfs-shared

@@ -44,11 +44,24 @@ autoscaling:
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: 80
+        target:
+          type: Utilization
+          averageUtilization: 80
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: 80
+        target:
+          type: Utilization
+          averageUtilization: 80
+    # Error: unable to build kubernetes objects from release manifest: error validating "": error validating data: [ValidationError(HorizontalPodAutoscaler.spec.metrics[0].resource): unknown field "targetAverageUtilization" in io.k8s.api.autoscaling.v2.ResourceMetricSource, ValidationError(HorizontalPodAutoscaler.spec.metrics[0].resource): missing required field "target" in io.k8s.api.autoscaling.v2.ResourceMetricSource, ValidationError(HorizontalPodAutoscaler.spec.metrics[1].resource): unknown field "targetAverageUtilization" in io.k8s.api.autoscaling.v2.ResourceMetricSource, ValidationError(HorizontalPodAutoscaler.spec.metrics[1].resource): missing required field "target" in io.k8s.api.autoscaling.v2.ResourceMetricSource]
+    # - type: Resource
+    #   resource:
+    #     name: cpu
+    #     targetAverageUtilization: 80
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate.

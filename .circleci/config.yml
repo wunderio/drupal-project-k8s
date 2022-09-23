@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   silta: silta/silta@dev:master
+  snyk: snyk/snyk@1.2.3
 
 executors:
   cicd73:
@@ -42,6 +43,7 @@ jobs:
           name: Generate HTML report
           command: /home/node/artillery/bin/run report --output reports/report reports/report.json    
 
+      - snyc/scan    
 
       - store_artifacts:    
           path: reports
@@ -58,7 +60,7 @@ jobs:
 
       - run: 
           name: Run the lighthouse tests
-          command: lighthouse --chrome-flags="--headless --disable-gpu" https://vilpo-dev.drupal-project-k8s.dev.wdr.io --output-path=output/lighthouse-results.html
+          command: lighthouse --chrome-flags="--headless --disable-gpu" $(cat charts/siteurl.txt) --output-path=output/lighthouse-results.html
 
       - store_artifacts:
           path: output

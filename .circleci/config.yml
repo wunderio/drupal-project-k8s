@@ -43,7 +43,7 @@ jobs:
           name: Generate HTML report
           command: /home/node/artillery/bin/run report --output reports/report reports/report.json    
 
-      - snyc/scan    
+      - snyk/scan    
 
       - store_artifacts:    
           path: reports

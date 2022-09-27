@@ -48,7 +48,8 @@ jobs:
 
   lighthouse:
     docker:
-      - image: supermies/alpine-lighthouse:1.0 
+      #      - image: supermies/alpine-lighthouse:1.0 
+      - image: justinribeiro/lighthouse:latest
     steps:
       - checkout
 

@@ -43,14 +43,12 @@ jobs:
           name: Generate HTML report
           command: /home/node/artillery/bin/run report --output reports/report reports/report.json    
 
-      - snyk/scan    
-
       - store_artifacts:    
           path: reports
 
   lighthouse:
     docker:
-      - image: justinribeiro/lighthouse:latest
+      - image: supermies/alpine-lighthouse:1.0 
     steps:
       - checkout
 
@@ -60,7 +58,7 @@ jobs:
 
       - run: 
           name: Run the lighthouse tests
-          command: lighthouse --chrome-flags="--headless --disable-gpu" $(cat charts/siteurl.txt) --output-path=output/lighthouse-results.html
+          command: lighthouse --chrome-flags="--headless --disable-gpu --no-sandbox" $(cat charts/siteurl.txt) --output-path=output/lighthouse-results.html
 
       - store_artifacts:
           path: output

@@ -454,6 +454,12 @@ backup:
   #  Do not backup files
   #skipFiles: true
 
+  # Matching folders will not be included in backup
+  ignoreFolders:
+    - css
+    - js
+    - styles
+    
   # Resources for the backup cron job.
   resources:
     requests:

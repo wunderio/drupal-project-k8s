@@ -446,17 +446,24 @@ fi
 {{- end }}
 
 {{- define "drupal.backup-command" -}}
-  {{ include "drupal.backup-command.dump-database" . }}
-  {{ include "drupal.backup-command.archive-store-backup" . }}
-{{- end }}
-
-{{- define "drupal.backup-command.dump-database" -}}
   set -e
 
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
   BACKUP_LOCATION="/backups/$BACKUP_ID"
 
+  # Create a folder for the backup
+  mkdir -p $BACKUP_LOCATION
+  
+  echo ${BACKUP_ID} > "${BACKUP_LOCATION}/BACKUP_IN_PROGRESS"
+  
+  {{ include "drupal.backup-command.dump-database" . }}
+  {{ include "drupal.backup-command.archive-store-backup" . }}
+
+  rm "${BACKUP_LOCATION}/BACKUP_IN_PROGRESS"
+{{- end }}
+
+{{- define "drupal.backup-command.dump-database" -}}
   # Figure out which tables to skip.
   IGNORE_TABLES=""
   IGNORED_TABLES=""
@@ -480,18 +487,20 @@ fi
   echo "Compressing database backup."
   gzip -k1 /tmp/db.sql
 
-  # Create a folder for the backup
-  mkdir -p $BACKUP_LOCATION
   cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
   {{- if not .Values.backup.skipFiles }}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
   # File backup for {{ $index }} volume.
-  # If files get changed while the tar command is running, tar will exit with code 1. 
-  # We ignore this as we want the rest of the job to still get run.
   echo "Starting {{ $index }} volume backup."
-  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }} || ( export exitcode=$?; [[ $exitcode -eq 1 ]] || exit )
+  rsync -rvu "{{ $mount.mountPath }}/" \
+    --max-size="{{ $.Values.referenceData.maxFileSize }}" \
+    {{ range $folderIndex, $folderPattern := $.Values.backup.ignoreFolders -}}
+    --exclude="{{ $folderPattern }}" \
+    {{ end -}}
+    --delete \
+    $BACKUP_LOCATION/{{ $index }}
   {{- end -}}
   {{- end }}
   {{- end }}

@@ -4,6 +4,13 @@
 #FROM wunderio/silta-php-fpm:7.4-fpm-v0.1
 FROM wunderio/silta-php-fpm:8.0-fpm-v0.1
 
+# Old
+# FROM wunderio/silta-php-fpm:8.0-fpm-v0.1.8
+# New, faulty
+# FROM wunderio/silta-php-fpm:8.0-fpm-v0.1.11
+
+# RUN mkdir /silta/tmp && chown www-data:www-data /silta/tmp && chmod 777 /silta/tmp
+
 COPY --chown=www-data:www-data . /app
 
 USER www-data

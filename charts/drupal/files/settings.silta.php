@@ -102,3 +102,5 @@ if (getenv('VARNISH_ADMIN_HOST')) {
 if (PHP_SAPI !== 'cli') {
   $settings['container_yamls'][] = 'sites/default/silta.services.yml';
 }
+
+// $settings['file_temp_path'] = sys_get_temp_dir();

@@ -34,6 +34,9 @@ data:
     post_max_size = {{ .Values.php.php_ini.post_max_size }}
     upload_max_filesize = {{ .Values.php.php_ini.upload_max_filesize }}
 
+    ; upload_tmp_dir = "/silta/tmp"
+    ; sys_temp_dir = "/silta/tmp"
+
     [Date]
     date.timezone = Europe/Helsinki
 

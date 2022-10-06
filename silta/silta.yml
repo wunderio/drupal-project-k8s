@@ -49,143 +49,105 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 exposeDomains:
-  gcs-le-cert:
-    hostname: gcs-le-cert-test.dev.wdr.io
-    ingress: gce-le
-    ssl:
-      enabled: true
-      issuer: letsencrypt
-
-  gcs-custom-cert:
+  prod:
     hostname: gcs-custom-cert-test.dev.wdr.io
     ingress: gce
     ssl:
       enabled: true
       issuer: custom
+      # ca: |
+      #   aaaa
       key: |
         -----BEGIN PRIVATE KEY-----
-        MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDOVzv+RTM9Mur/
-        lB6d4WlUL3aYPKkxo1/+JTPYrRJEwq7M//LF8EKMFeAZoPs1dQUua8Nn/qbdNWtS
-        j16Kj0wCglINKr/SEUZcxHu0WKZBBmzOzypPN2p6djmomd3CTwE43LtLfRKDzBLL
-        eAnKSw4+uRoOKHZaEgr1tSjWJvoKSZa79OCfIV7qDtFKFDihpqDKmmA10EmiS4Ps
-        yBW/WyK15pxftdJ8Ac5tJkQeoSQwlIvuNtz1IIxmFi589nUm298T+MbvgzlwLpaz
-        ThDgcND7emtcrk7lhNjT4zowWliDo0uNzV6thj3LCs3P3gh7kGMbEPpAkjp8AUIa
-        NUq3kO93AgMBAAECggEBAMpu+wSyj1pzIeosPv1VsChPiGJC4Rs51WtYxEzHPy0G
-        csfcMynOVPtqWrnKHaqMa9DnGIZmZv6O8gPFdFMr0r6DbExOrHJDUGyit1pvvmv9
-        CbK7vB6Ll4MdiePHULDZIbHPnFCrHAcBp07HLZOxnwAaSV2qhLJJEUeNu8qd4qFD
-        XM6hY4wMwT7kTJVqkb2qK7HrbYUD+m9f20YCy+PVw7GKrwOb/NAywhCvMyDV739o
-        QK2Ifvwv60cQksDFv/3813scqnHZsLRODyVjEQP6udq/DmS7L1KK3Cxlj131sHyc
-        3tITb8OilV8Gym79Ug9zJLhRe12O+l+1yOgMmiOwlYECgYEA95bds/4a02SccoZX
-        hBDKRBHpZF9JZjRhY/GNxNv6YE6o7YM5Elt/nM+ffcxlGi3xLsExSu2TnwjsYYSK
-        A5H4fcjqjfXd6lzfo3/+d+IeONn0HoY9U8r+5uZ+h8DT+P0BkVytsHHWkPrEfl6p
-        kpkXE4TbhIWUN53jpnX7UGM1yYkCgYEA1VmnlfG1C3V/k0BArKI0dhd9CMS3HZQ5
-        ZU0g9CN9ptJWDFLnU/BJCoS1S9j3lhvl97O42ecAXQsglodgXlPjtWqSvUwQYy60
-        5Y3DhBHt0i01/rhFQ0pz6+j9o3uTsZnhnDDcJUUzaeqh0TgHxFnF9rQ4oWd/POBo
-        jgyNzi43sP8CgYAVkGJG5v7XIpAtuV2t9vhm7VhykYoHCNDir4s1diNcd/1mkmNK
-        IgX/VmYBwuebXB0BgXoVmJOe6lwMMksC/Jez/OfQ7XUikGw6BU/YiS0wrmsArZhx
-        z+Bbo/+pOzY7HW4hhvzpvUB+6BhtGTmTtxm3bX7hD/FU1r+ZI/V7juiEYQKBgAF1
-        W2/q9xHc+8JF7is/8JveDTzCG35YRQwsOs1wcKtzRKNQ7cPlIJqxzYt3MDoWdrv6
-        voi+y4HXUaG1yzLZ3/SdheNFYddLunDXRz7f4IBPTs8u80pCeAhkz1cOwTO1mZU3
-        wEmA75kJwZFskKEG/BNzp+9yhawk3JIcA9wk9LyBAoGBAKP786pbXbDf/3/d5dYa
-        woV1QBDoggXj1zq4ejmjzwEOATMv1dwie6nFQC1nRcE1dnHmH9bbtUTzIpY9rSIW
-        HiwZcvg8cWWdM1h7fjb0kqiQzKjTN3JSfUzCmCl60wskY3O08E3Sl+q6m0bTEws9
-        2ir2Ax7WUZDdTAwHE9hBKhcD
-        -----END PRIVATE KEY-----
-      crt: |
-        -----BEGIN CERTIFICATE-----
-        MIIDuTCCAqGgAwIBAgIUNnTaFHuAAOBqrBzad24uT6/5EEQwDQYJKoZIhvcNAQEL
-        BQAwbDELMAkGA1UEBhMCTFYxDzANBgNVBAgMBkxhdHZpYTERMA8GA1UEBwwIVmFs
-        bWllcmExDzANBgNVBAoMBld1bmRlcjEoMCYGA1UEAwwfZ2NzLWN1c3RvbS1jZXJ0
-        LXRlc3QuZGV2Lndkci5pbzAeFw0yMjEwMDYxMDA2MDlaFw0yMzEwMDYxMDA2MDla
-        MGwxCzAJBgNVBAYTAkxWMQ8wDQYDVQQIDAZMYXR2aWExETAPBgNVBAcMCFZhbG1p
-        ZXJhMQ8wDQYDVQQKDAZXdW5kZXIxKDAmBgNVBAMMH2djcy1jdXN0b20tY2VydC10
-        ZXN0LmRldi53ZHIuaW8wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDO
-        Vzv+RTM9Mur/lB6d4WlUL3aYPKkxo1/+JTPYrRJEwq7M//LF8EKMFeAZoPs1dQUu
-        a8Nn/qbdNWtSj16Kj0wCglINKr/SEUZcxHu0WKZBBmzOzypPN2p6djmomd3CTwE4
-        3LtLfRKDzBLLeAnKSw4+uRoOKHZaEgr1tSjWJvoKSZa79OCfIV7qDtFKFDihpqDK
-        mmA10EmiS4PsyBW/WyK15pxftdJ8Ac5tJkQeoSQwlIvuNtz1IIxmFi589nUm298T
-        +MbvgzlwLpazThDgcND7emtcrk7lhNjT4zowWliDo0uNzV6thj3LCs3P3gh7kGMb
-        EPpAkjp8AUIaNUq3kO93AgMBAAGjUzBRMB0GA1UdDgQWBBTlAxpIJFq7SA74+55J
-        Vrx7SBQbDjAfBgNVHSMEGDAWgBTlAxpIJFq7SA74+55JVrx7SBQbDjAPBgNVHRMB
-        Af8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBdYjU7WAk/f/dynlF2+HTCaWaD
-        P+m8x++qHD8PUCeGKiBpCHro6L6bD1NduB8PRbQOY9pUSCWB6yIeNHuLTqOMs2Ih
-        yxCPrlLpMKx2izMEJh0QDOFWKwHOb6vN50nJ7P3qhhjNCvxuR5GWNI3r9oUJ1IWp
-        sw4rmwwgzesX7Nv/xhkdrlV/F7MQQ0j1k/9cLoU6RaCLzV6IVoKbMRPVtTXVFcco
-        daJGUOZDncL5nsQjyImv7TbivjyM9rQCaQ/T12389jkPjyljnoMXmgvVYeNB6XLA
-        3xAhctqbGbAVelIIsw5MYlsQBxn4kIbkQzskI+RpBVShrv2QO9CdiFICOYx4
-        -----END CERTIFICATE-----
-
-  traefik-le-cert:
-    hostname: traefik-le-cert-test.dev.wdr.io
-    ssl:
-      enabled: true
-      issuer: letsencrypt
-
-  traefik-custom-cert:
-    hostname: traefik-custom-cert-test.dev.wdr.io
-    ssl:
-      enabled: true
-      issuer: custom
-      key: |
-        -----BEGIN PRIVATE KEY-----
-        MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQC0oJKgIQwk3eBz
-        WIuOhCsw+ZDLm7mj+Si+obckPb2tcsvJYMLqZlOj9X7n9nw9dv0zkkSKEmD1ZdPh
-        waBGR3BEQtbJ+c5aGbmjRe72GQAVVgjWiCvlir7cVAbdCmAmHSH7s4mHmaxXsQhN
-        8gxFYJiQMzySg0OLtZSLUntzXX6+YGM1kmxeaIxQS9GEajCEtjilpFF82qj2XX5b
-        OtydeUBydoYt5Ne5824J2W47UlkqLdlpwEzMsSBmiUzvZhlPxmVjloaCj2uagIYP
-        AOFZZZQfqhQel41OkPpGTJiNFGxiKbooP/jgY5fVKktc47+eOEQzVWUKtilKiJUa
-        Vlod8vyrAgMBAAECggEBAIbN3AA0Ccst6EhNigH39AAeEYlTlE2jM1xqdrNOfNQI
-        +7w0QeQMMFoKawcVdw2sUzX88LgXFVOwBlzTVBl/UXMwavrcO7wUvO300G3MpLpH
-        tlrdz90FGoJ3F5Q6HR302hrumDKiZvQfRHJftfbFK7da9dbmri+DefQsv8OOwHu1
-        VDeW6U+Bh82xJoYskPECe/5GJvTX3pjlUxe37UDQECPwgWEmNmac3tR8r+sakz6A
-        yqi6w9DA6jGU9ElrdxRiuveuZ/zJ4hv82/DKLUdkQwneIgGIkL8JL7YGNJN+c1LL
-        2zjTdccXqyZGXefMTzeHIwhjeB3JwuC9C9EvYot6MoECgYEA5nG5cXaAbDRxlqNb
-        gTlHLaQobU116u2CktY2p9wKn2mYgDiCRBQ8xfqH79OD2xX51NhM9JLnALMJX/w/
-        ItqTXCLu314QeDijTwuwHXHwcwIA/6T3+7+vUKEm5ATnUimiP/pwvV3v1mqgVNDp
-        yVYielrc6hLHzsQLUcC1T3P4v8ECgYEAyKiNNppIPFWm12vIsfSsPSYUTIOwHWOG
-        Knv+L+ew5ZxGMEhN3kDtHn+Bn5xujodp6qxAa5QOdDTo1M2tlsahgMYhXFpcERCg
-        nw0KJdb2XsQ0kQ/In2IZisoi6Y8jI0pAJfSDvUdE35R56imLdOM4CsKVrEV5Lo/5
-        RO34TePgl2sCgYEA4MleU0d8zg/6HS8MO2lb/TF8HeLJe3hjPkim1+bUlduzXp/A
-        shfrkFNp9o8kt7kgEndL2ebSXuRF6NNt4tnDlMSerlRbTGozIxALoy1Zl1YFE1og
-        a/n3UXdhMFt4KbVjB3WMM6xGH6my7Ak9g5/50dCAXfQj45VoVT7dnbtKkgECgYEA
-        n5jgaJOh7Ms7XpAOGuy+qgxFjO4Y/+cO6W+hpzyjCJ2ZfgGkXahKcT19PhRQIvE1
-        nz/OJUKnlGoY3lmRPiFSh3gPRMNiAvi0qIzYi2xEnO912AMz0QFXy3om9pmwmvsN
-        tqKavcuXzjTsGwFcOGYZRwWpwlGnpw9AdkDIhDtBgW0CgYEAsJEkV4TxBwW3DWU+
-        F03MOQe3MTeqJAX4ZKozNWmm7zpoWMNdIUdN6qrlEUuN7kHG4eY4OieN4y7ZLMgP
-        bmKwcxiBV96XZkwqxqzrDl9NJxhQbjJrXeqVmSaICyL3HSDMk3PYPGUs+rgYTah4
-        uBC98BaWpMkA9T4PKAGi4935qv8=
+        MIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQDlWPzFrswEO5j3
+        VUHoplgxJFI6bDSQjiagUxcWU7Gtbz6PbJwEcCLpGME2WjasSqOlkHvnD+tkUrt/
+        RLdZtkM6qIKlNKjFycdriJGyt7y067T9nUhb87Amg7DHKHz1hOhlObtD64Z9ZrRT
+        saI7gf5aEUYaTloZ606nPqOFq7QdF0xbmvFA71YCP7FIdD6xuStCBZPUtWiSfCmT
+        qx4W1qc/KmTkhKKlK1echQDohSCBkQ+HmsazZUjZ5ryLa23OtWdNM2ay/ifLojgz
+        uvmhRMmJKoveW3m9UVcZH5NdUvUZmW0uTxD/WABotf3NoVEYl30VnD8kJa8ViKZq
+        guSRNmSpH3ELRgfqm0ZnzyOz92f5cVxyouu8DxU9zJZO3lV5zYSsYEDHvFsCh6Gg
+        LcQIos5QjQTp3rM+G6Lf9GLkdytORMiV03BSAZvhRaoteb5hZL41nFRG9JO8hExE
+        SxKfRHdqeURPFsJVn6K030QS8fFdjaTOFmdTXprKUSK5kG4Jqy7JdyogVzfyyUK/
+        /4+xiPDyED1byMRLATxj5i/nlfGkq62TViIsmmnZQHIs9abvVKq169msOIv8srHu
+        +W/jQ3CxJMNAw3mD9ff06lPluAkslIix1DVcJkBxqcJ6qpNyHiVQY9jd5/2kTRmv
+        GgdtkxZlWaR2JCDN0XmP5j1aaWmrOQIDAQABAoICAQDZY8f0+QKY4ITVrBKVG1ds
+        /SiUCAyrGJK0VQ4FM7+uzUtXV3NrIX91wukhQ9Ge7gC/5nwLQKO2rFTdBZ1lg8Wl
+        zCRJw+hV0jUcUI8J/+727pTX8EWuIwZM+3aM0GvhrOE7UcWXU6BfLQKwcid8kHMv
+        nD/+n1X4S3p6PH1zLpXDHVpbWjpjenjkGMtKCiWDACloozDE5k8Ayn/+YKxcqYpN
+        7TlFAhPIy5R33/pEbCurpHw75RGC6fZr1LHS1Tl4Pap1Gsu1zgKammD7Z7dGjZUa
+        VyHM2phCQt90COH+C6wXX76FrpxF7Hw2xIqWZtofnTgLS9btxGp41tYnD3rnyc8O
+        U6VocWshL+a/ERlYE9X9b7RBe5YIE6YyIWZX2NhoBqmfr80nndmSl9LO6fgCPbDG
+        jrhaTDv9PrkSOeexWaLyfk+Fivm3pUFLy7tSf/JiZqIIbuIiA7SLG41HTvEkV5f+
+        5IjoimNBM1WlJVMZ0y/t74LrxMITzen6CBAfbMCb77D9EiCU4RaPlXuYOkjWzwAT
+        vz3EvPeHD6rLI6rqxotpsedzFYe3u1SH1ydCffDuilin4GvLaTBquu5QVjw8LJEh
+        OGuduH/dzTl/EWXvssIAT8ayUeb8AH1AvzH9w2aQ35fJh/ewsPkoNcefDKXb3LWk
+        wd/YhMjDvu1gv4Vc+NVAAQKCAQEA/5A2SClZYw8trg5v3JWpLv9m+IS3xKpYy0b6
+        7vDgtKvDKXeMCvYR04gkQxl7Nfz4k51LRepZJfCJaMwTJ1au4HWTaax1puvAOb8Y
+        IgHGZRBTnj3bp/mOmLe7g7XHZG6H+gX/RAmFmVmj4MzLrtMIoIx6OSjoG0H8lXoe
+        WSmy0/Dl6H3BO9oAND73+kpKnt/67c/0KifzUCrj9vfxjmOsl4F/2ugQdQv+3uF3
+        Ht9SfUSaVUDbLcnBZKO+sg1tKPPQ2u+dgvGz0T6iRvqaapuN2oUxYw+UAW20253m
+        t9iqq8UmXPGR4DNB57GCGX/JJ2WxCw3CbL9EAhEsJjUTOPngOQKCAQEA5b1O4YB2
+        7mZPbW+xklcSfGGGPjOz6BzeDOmuVoRotAXjApO6T/e2xa60VsYyFDgWu1RlDEfA
+        OMLq0zi+xzEMlAVzpkPmP7+4BXXJ9p/hWWasvqVM+id0PdW77auO8iZEEKKUtq7f
+        0n8qZoNqDQsB8mZAYZaKlUhaROW7X30CV2cc4GlqrASzAJPlVpmQ4kHhFNaOxlpj
+        mLrhS+8TALRgVgnVlD0OMBBUxxyfIqBDSRw/0O+bUN3otIRd9FF5AFrcn1wifkpV
+        etckPVLkzPnjXA7EryfmgowdL8i9iDlC69QkfUFUw6uN0egjr/e7nq+tHzGtRLYi
+        F7xlBAVkLQgjAQKCAQEAzZRFhjD0/dGk7mIgq/IcQXkkbP/eEC7z9Lmpe/J63/tX
+        qBDJr7uYRXA7s1pZGengUGZ0uc41XmarMokPU1LQpDEQny4jCl6UqB9Hm3uQC5Zh
+        nWanPu1qPwF1rxLYTbr4WTDf0exS8zP/twMnSf/q7bNzUm3MoLipJdkxdoorl4Au
+        gaI/ghTwmxaYRlfixQDqCsmA4TR37uJBtVZokyEtIkcDAaYyLuWyZbo7J7N/2NMJ
+        z1C3v5KPppRt/y77w7i2JpggPciO3OCki7Jl6yIsrz77pnNOnQOSPCQ+B2Acksaq
+        AJQ2w4KYHnhVbouz1aRhEcJEx1Posjz8JdQGHYwsSQKCAQBVnj+PerjYD/j55+5d
+        g2W4RQAqnkol7twyI8R9Kct7i9YWV8fPlZngAkPjMunm7yBJoCIoeXUBsmKhZTx0
+        L6toXr/C7vsYNvL11ff2mY76KnGmeyQ89gc0JDttT8puJCSprm2Nx45SfGHo4oDb
+        a4bGN6U2uUvcZqJ9msBBzezZdewlFiRTB01Ooc+OfpyoNbUUdwGumnETslHUYrzK
+        Pm7IodGe9UIcV3nA2sHTvbZVwNlnnGRdttXKsKnzK4nUwAgIu+V++2Tv6s3urL3o
+        RhidbkOOo2gcrusRq9Y2tmBiUyVmKLrWUVEBMWpbYg/iC8aRIYpZWSdLgUKERR4Y
+        SjgBAoIBAQC6MLlax983Uw8UtryXGnZ71Er9ygQt+YknRCdne5dyP33FHAZxJ+Ty
+        XAK4hQtoUJFCqkuUSN3fFsOxNoKdHVFJx4otNiKTn3hSAilXhaqHH7w8BmkNE+Ep
+        djJS4pf0jG89QFW6RtZjJFNHPv9UZX+ewu+qAtQSo5Tw9ZTY3oeQ8rw5BcLj+fWn
+        n0fhzZC6x4O3DuPSrmBN8oOjAggyOq/sf1mt/OUeO7UfNLNIZnbLQlsHnr2A3QP2
+        Bd/nuLNgcR1r5QuuMPvKv/M6VqGE/5rvpRCAFQqnVQC8t9L9qWWSTi0lIA3O9lz0
+        cmiMXPQ28+OctPA/lFX2yyS2Syv4Ylzh
         -----END PRIVATE KEY-----
 
       crt: |
         -----BEGIN CERTIFICATE-----
-        MIIDwTCCAqmgAwIBAgIUSiLb3H5RklASLiy6eOl82L884zAwDQYJKoZIhvcNAQEL
-        BQAwcDELMAkGA1UEBhMCTFYxDzANBgNVBAgMBkxhdHZpYTERMA8GA1UEBwwIVmFs
-        bWllcmExDzANBgNVBAoMBld1bmRlcjEsMCoGA1UEAwwjdHJhZWZpay1jdXN0b20t
-        Y2VydC10ZXN0LmRldi53ZHIuaW8wHhcNMjIxMDA2MTAxMTU2WhcNMjMxMDA2MTAx
-        MTU2WjBwMQswCQYDVQQGEwJMVjEPMA0GA1UECAwGTGF0dmlhMREwDwYDVQQHDAhW
-        YWxtaWVyYTEPMA0GA1UECgwGV3VuZGVyMSwwKgYDVQQDDCN0cmFlZmlrLWN1c3Rv
-        bS1jZXJ0LXRlc3QuZGV2Lndkci5pbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
-        AQoCggEBALSgkqAhDCTd4HNYi46EKzD5kMubuaP5KL6htyQ9va1yy8lgwupmU6P1
-        fuf2fD12/TOSRIoSYPVl0+HBoEZHcERC1sn5zloZuaNF7vYZABVWCNaIK+WKvtxU
-        Bt0KYCYdIfuziYeZrFexCE3yDEVgmJAzPJKDQ4u1lItSe3Ndfr5gYzWSbF5ojFBL
-        0YRqMIS2OKWkUXzaqPZdfls63J15QHJ2hi3k17nzbgnZbjtSWSot2WnATMyxIGaJ
-        TO9mGU/GZWOWhoKPa5qAhg8A4VlllB+qFB6XjU6Q+kZMmI0UbGIpuig/+OBjl9Uq
-        S1zjv544RDNVZQq2KUqIlRpWWh3y/KsCAwEAAaNTMFEwHQYDVR0OBBYEFPXmvP6J
-        dIY/KVeQvnCvH/yAlUkUMB8GA1UdIwQYMBaAFPXmvP6JdIY/KVeQvnCvH/yAlUkU
-        MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAGdsgYHH6nwK6VAj
-        MAMurMMwdG8fiwAHBAmbkL3w+U8rCSWT0a5vKqB3rr4mHlUmtRs6DZ6aOWAM2aJL
-        7yU7ivP+g12/6fqAJYP9mJgSxYxSdXOPiBm/zDU0wL74TPjCRfm8dbk8O5fFed2b
-        EsMJXum8lteyOps2KPNfzXYLgX4hKfaYEodNUK05Z3R2TmtUzMX2/Psq5CePbrg3
-        TdZ0nGWpSlrDRD1nZFYGFYQUMCll2mjJlapsO2xlWs6UmADChTRoOKwEzNT3GwBb
-        nNFpp67YUHtkwSm5q1EOmaecFjghHJ4wHbDeWMtrQs++FNEpybw9GJNjj0NkSCWV
-        uYWVOuo=
+        MIIFwzCCA6ugAwIBAgIUV476Qm6RtEalY+MFHT7ypgjaw1owDQYJKoZIhvcNAQEL
+        BQAwcTELMAkGA1UEBhMCTFYxDzANBgNVBAgMBkxhdHZpYTERMA8GA1UEBwwIVmFs
+        bWllcmExFDASBgNVBAoMC0NlcnQgMiB0ZXN0MSgwJgYDVQQDDB9nY3MtY3VzdG9t
+        LWNlcnQtdGVzdC5kZXYud2RyLmlvMB4XDTIyMTAwNjExMjM1NloXDTIzMTAwNjEx
+        MjM1NlowcTELMAkGA1UEBhMCTFYxDzANBgNVBAgMBkxhdHZpYTERMA8GA1UEBwwI
+        VmFsbWllcmExFDASBgNVBAoMC0NlcnQgMiB0ZXN0MSgwJgYDVQQDDB9nY3MtY3Vz
+        dG9tLWNlcnQtdGVzdC5kZXYud2RyLmlvMIICIjANBgkqhkiG9w0BAQEFAAOCAg8A
+        MIICCgKCAgEA5Vj8xa7MBDuY91VB6KZYMSRSOmw0kI4moFMXFlOxrW8+j2ycBHAi
+        6RjBNlo2rEqjpZB75w/rZFK7f0S3WbZDOqiCpTSoxcnHa4iRsre8tOu0/Z1IW/Ow
+        JoOwxyh89YToZTm7Q+uGfWa0U7GiO4H+WhFGGk5aGetOpz6jhau0HRdMW5rxQO9W
+        Aj+xSHQ+sbkrQgWT1LVoknwpk6seFtanPypk5ISipStXnIUA6IUggZEPh5rGs2VI
+        2ea8i2ttzrVnTTNmsv4ny6I4M7r5oUTJiSqL3lt5vVFXGR+TXVL1GZltLk8Q/1gA
+        aLX9zaFRGJd9FZw/JCWvFYimaoLkkTZkqR9xC0YH6ptGZ88js/dn+XFccqLrvA8V
+        PcyWTt5Vec2ErGBAx7xbAoehoC3ECKLOUI0E6d6zPhui3/Ri5HcrTkTIldNwUgGb
+        4UWqLXm+YWS+NZxURvSTvIRMREsSn0R3anlETxbCVZ+itN9EEvHxXY2kzhZnU16a
+        ylEiuZBuCasuyXcqIFc38slCv/+PsYjw8hA9W8jESwE8Y+Yv55XxpKutk1YiLJpp
+        2UByLPWm71SqtevZrDiL/LKx7vlv40NwsSTDQMN5g/X39OpT5bgJLJSIsdQ1XCZA
+        canCeqqTch4lUGPY3ef9pE0ZrxoHbZMWZVmkdiQgzdF5j+Y9WmlpqzkCAwEAAaNT
+        MFEwHQYDVR0OBBYEFLu/7Ky7AVOzCIjggsKK3uCMcPRAMB8GA1UdIwQYMBaAFLu/
+        7Ky7AVOzCIjggsKK3uCMcPRAMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL
+        BQADggIBAFeQKnujyVmfD4ukqUk392SEhWdqMjcWnZexJUAdwEqK51ZKFqy6w2SY
+        EcP9aGH6YOTEzJWrL1KNp0HxPgPHSTd9d07qmhcysCBY5M/IGisMVriJpNbcSoj9
+        VWa/hTjcnIKoXvryrExmKBxgcgffH28VHC9Tu+iVBGB9QsjML6RpmPOrEompgiOb
+        Krx1Nr5TCNtTYiVzyjsZ68LYr5zb9ZUvehkovaPYhhccUd1Zh62FEDuPE4K3N+Zh
+        3Gv5Bzp+1LU5Id//s/7I89A5DOQa+EDw2acqUX41aGYQj14FZ+5ckPDveyj3WSby
+        rgjvqayyHKzvfLoNkIbk2+srTzSCfUXI3pc18hTLo0ubL5LGDbz+l4yUraJ7DJwM
+        owKc6ynfG917sGpTlkoLafvVY5vmr1b+fLm+Xz7ExyxeB+uIkxsi8hrFEn1TTJWz
+        73hx+qKPO5HAYOyT/lrrvA8b/65VIiueByfaUKgJEmqA7MyGn2xm9EdTow4wYyOe
+        iiSC+0O+sgNrO+96oQx9xMFNsaSQ24+1TKnNuGwwTJJQOUBmQayuvR9p+dpAWVig
+        bhzDjT06hG3Pl1IjzHlRLOmZNdSiWxoS746dUqHCmkDQcXu7Bm6x5ArQL9vtk6QU
+        RYKuY/yzadhobgU3nQ2QJVnnqyQtNqvdOez80aoKStEzOk67fXRS
         -----END CERTIFICATE-----
 
 ingress:
   gce:
     # Request a global static ip from OPS team first
-    # gcloud compute addresses create gcs-custom-cert --region europe-north1
+    # gcloud compute addresses create gcs-custom-cert --global
     staticIpAddressName: gcs-custom-cert
-  gce-le:
-    staticIpAddressName: gcs-le-cert
-    type: gce

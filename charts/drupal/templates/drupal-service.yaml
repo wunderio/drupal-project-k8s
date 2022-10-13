@@ -6,7 +6,7 @@ metadata:
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
     {{- end }}
-    {{- if eq .Values.cluster.type "gke" }}
+    {{- if and (eq .Values.cluster.type "gke") (.Values.backendConfig) }}
     cloud.google.com/backend-config: '{"ports": {"8080":"{{ .Release.Name }}-drupal"}}'
     {{- end }}
     {{- if .Values.cluster }}

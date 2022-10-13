@@ -8,7 +8,7 @@ metadata:
     auto-downscale/down: "false"
     {{- end }}
     {{- if and (eq .Values.cluster.type "gke") (.Values.backendConfig) }}
-    cloud.google.com/backend-config: '{"ports": {"8080":"{{ .Release.Name }}-drupal"}}'
+    cloud.google.com/backend-config: '{"default":"{{ .Release.Name }}-drupal"}'
     {{- end }}
     {{- if .Values.cluster }}
     {{- if .Values.cluster.vpcNative }}
@@ -22,8 +22,10 @@ spec:
   type: NodePort
   ports:
   - name: web
+    protocol: TCP
     port: 80
   - name: admin
+    protocol: TCP
     port: 6082 
   selector:
     {{- include "drupal.release_selector_labels" . | nindent 4 }}

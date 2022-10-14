@@ -373,23 +373,21 @@ done
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-  # Figure out which tables to skip.
-  IGNORE_TABLES=""
-  IGNORED_TABLES=""
-  for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.referenceData.ignoreTableContent }}'` ;
+  echo "Dump reference database."
+  mkdir /tmp/reference-data/
+  for TABLE in `drush sql-query "show tables;"`;
   do
-    IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
-    IGNORED_TABLES="$IGNORED_TABLES $TABLE";
+    # Add --no-data parameter for tables that match .Values.referenceData.ignoreTableContent.
+    [[ "$TABLE" =~ {{ .Values.referenceData.ignoreTableContent }} ]] && NODATA='--no-data' || NODATA=''
+    echo "Dumping table: $TABLE"
+    mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST $NODATA $DB_NAME $TABLE > /tmp/reference-data/$TABLE.sql
   done
 
-  echo "Dump reference database."
-  mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
-
-  # Compress the database dump and copy it into the backup folder.
+  # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
-  gzip -1 /tmp/db.sql
-  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
+  cd /tmp/reference-data/
+  tar -cf /tmp/db.tar.gz -I 'gzip -1' *.sql
+  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
@@ -412,13 +410,23 @@ fi
 {{- end }}
 
 {{- define "drupal.import-reference-db" -}}
-if [ -f /app/reference-data/db.sql.gz ]; then
+if [ -f /app/reference-data/db.tar.gz ] || [ -f /app/reference-data/db.sql.gz ]; then
   echo "Dropping old database"
   drush sql-drop -y
 
   echo "Importing reference database dump"
-  gunzip -c /app/reference-data/db.sql.gz > /tmp/reference-data-db.sql
-  pv -f /tmp/reference-data-db.sql | drush sql-cli
+
+  # New way of importing.
+  if [ -f /app/reference-data/db.tar.gz ]; then
+    mkdir /tmp/reference-data
+    tar -xzf /app/reference-data/db.tar.gz -C /tmp/reference-data/
+    find /tmp/reference-data/ -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A -u $DB_USER --password=$DB_PASS --host=$DB_HOST $DB_NAME < {}'
+
+  # Backwards compalitity for old way of importing.
+  elif [ -f /app/reference-data/db.sql.gz ]; then
+    gunzip -c /app/reference-data/db.sql.gz > /tmp/reference-data-db.sql
+    pv -f /tmp/reference-data-db.sql | drush sql-cli
+  fi
 
   # Clear caches before doing anything else.
   if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;
@@ -488,7 +496,7 @@ fi
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
   # File backup for {{ $index }} volume.
-  # If files get changed while the tar command is running, tar will exit with code 1. 
+  # If files get changed while the tar command is running, tar will exit with code 1.
   # We ignore this as we want the rest of the job to still get run.
   echo "Starting {{ $index }} volume backup."
   tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }} || ( export exitcode=$?; [[ $exitcode -eq 1 ]] || exit )

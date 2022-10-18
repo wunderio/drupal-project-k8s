@@ -375,18 +375,18 @@ set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   echo "Dump reference database."
   mkdir /tmp/reference-data/
-  for TABLE in `drush sql-query "show tables;"`;
+  for table in $(drush sql-query 'show tables;');
   do
     # Add --no-data parameter for tables that match .Values.referenceData.ignoreTableContent.
-    [[ "$TABLE" =~ {{ .Values.referenceData.ignoreTableContent }} ]] && NODATA='--no-data' || NODATA=''
-    echo "Dumping table: $TABLE"
-    mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST $NODATA $DB_NAME $TABLE > /tmp/reference-data/$TABLE.sql
+    [[ "${table}" =~ {{ .Values.referenceData.ignoreTableContent }} ]] && nodata='--no-data' || nodata=''
+    echo "Dumping table: ${table}"
+    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${nodata}" "${DB_NAME}" "${table}" > /tmp/reference-data/"${table}".sql
   done
 
   # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
-  cd /tmp/reference-data/
-  tar -cf /tmp/db.tar.gz -I 'gzip -1' *.sql
+  cd /tmp/reference-data/ || exit
+  tar -cf /tmp/db.tar.gz -I 'gzip -1' ./*.sql
   cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
 
   {{ range $index, $mount := .Values.mounts -}}
@@ -410,26 +410,28 @@ fi
 {{- end }}
 
 {{- define "drupal.import-reference-db" -}}
-if [ -f /app/reference-data/db.tar.gz ] || [ -f /app/reference-data/db.sql.gz ]; then
+if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; then
   echo "Dropping old database"
   drush sql-drop -y
 
   echo "Importing reference database dump"
+  app_ref_data=/app/reference-data
+  tmp_ref_data=/tmp/reference-data
 
   # New way of importing.
-  if [ -f /app/reference-data/db.tar.gz ]; then
-    mkdir /tmp/reference-data
-    tar -xzf /app/reference-data/db.tar.gz -C /tmp/reference-data/
-    find /tmp/reference-data/ -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A -u $DB_USER --password=$DB_PASS --host=$DB_HOST $DB_NAME < {}'
+  if [[ -f "${app_ref_data}"/db.tar.gz ]]; then
+    mkdir "${tmp_ref_data}"
+    tar -xzf "${app_ref_data}"/db.tar.gz -C "${tmp_ref_data}"/
+    find "${tmp_ref_data}"/ -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
 
-  # Backwards compalitity for old way of importing.
-  elif [ -f /app/reference-data/db.sql.gz ]; then
-    gunzip -c /app/reference-data/db.sql.gz > /tmp/reference-data-db.sql
-    pv -f /tmp/reference-data-db.sql | drush sql-cli
+  # Backwards compatibility for old way of importing.
+  elif [[ -f "${app_ref_data}"/db.sql.gz ]]; then
+    gunzip -c "${app_ref_data}"/db.sql.gz > "${tmp_ref_data}"-db.sql
+    pv -f "${tmp_ref_data}"-db.sql | drush sql-cli
   fi
 
   # Clear caches before doing anything else.
-  if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;
+  if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then drush cache-clear all;
   else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"

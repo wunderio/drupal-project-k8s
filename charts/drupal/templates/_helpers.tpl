@@ -374,18 +374,19 @@ done
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   echo "Dump reference database."
-  mkdir /tmp/reference-data/
+  dump_dir=/tmp/reference-data-export/
+  mkdir "${dump_dir}"
   for table in $(drush sql-query 'show tables;');
   do
     # Add --no-data parameter for tables that match .Values.referenceData.ignoreTableContent.
     [[ "${table}" =~ {{ .Values.referenceData.ignoreTableContent }} ]] && nodata='--no-data' || nodata=''
     echo "Dumping table: ${table}"
-    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${nodata}" "${DB_NAME}" "${table}" > /tmp/reference-data/"${table}".sql
+    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${nodata}" "${DB_NAME}" "${table}" > "${dump_dir}${table}".sql
   done
 
   # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
-  cd /tmp/reference-data/ || exit
+  cd "${dump_dir}" || exit
   tar -cf /tmp/db.tar.gz -I 'gzip -1' ./*.sql
   cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
 

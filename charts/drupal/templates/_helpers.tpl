@@ -382,7 +382,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     [[ "${table}" =~ {{ .Values.referenceData.ignoreTableContent }} ]] && nodata='--no-data' || nodata=''
     echo "Dumping table: ${table}"
     # The ${nodata} variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
-    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${nodata} "${DB_NAME}" "${table}" > "${dump_dir}${table}".sql
+    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${nodata} "${DB_NAME}" "${table}" > "${dump_dir}${table}.sql"
   done
 
   # Compress the sql files into a single file and copy it into the backup folder.
@@ -421,15 +421,15 @@ if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; t
   tmp_ref_data=/tmp/reference-data
 
   # New way of importing.
-  if [[ -f "${app_ref_data}"/db.tar.gz ]]; then
+  if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
     mkdir "${tmp_ref_data}"
-    tar -xzf "${app_ref_data}"/db.tar.gz -C "${tmp_ref_data}"/
-    find "${tmp_ref_data}"/ -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+    tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
+    find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
 
   # Backwards compatibility for old way of importing.
-  elif [[ -f "${app_ref_data}"/db.sql.gz ]]; then
-    gunzip -c "${app_ref_data}"/db.sql.gz > "${tmp_ref_data}"-db.sql
-    pv -f "${tmp_ref_data}"-db.sql | drush sql-cli
+  elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
+    gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
+    pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
   fi
 
   # Clear caches before doing anything else.

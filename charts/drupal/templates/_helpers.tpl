@@ -381,7 +381,8 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     # Add --no-data parameter for tables that match .Values.referenceData.ignoreTableContent.
     [[ "${table}" =~ {{ .Values.referenceData.ignoreTableContent }} ]] && nodata='--no-data' || nodata=''
     echo "Dumping table: ${table}"
-    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${nodata}" "${DB_NAME}" "${table}" > "${dump_dir}${table}".sql
+    # The ${nodata} variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
+    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${nodata} "${DB_NAME}" "${table}" > "${dump_dir}${table}".sql
   done
 
   # Compress the sql files into a single file and copy it into the backup folder.

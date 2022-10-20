@@ -432,8 +432,11 @@ if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; t
   fi
 
   # Clear caches before doing anything else.
-  if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then drush cache-clear all;
-  else drush cache-rebuild; fi
+  if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then
+    drush cache-clear all;
+  else
+    drush cache-rebuild;
+  fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi

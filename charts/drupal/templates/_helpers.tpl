@@ -376,19 +376,45 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   echo "Dump reference database."
   dump_dir=/tmp/reference-data-export/
   mkdir "${dump_dir}"
-  for table in $(drush sql-query 'show tables;');
-  do
-    # Add --no-data parameter for tables that match .Values.referenceData.ignoreTableContent.
-    [[ "${table}" =~ {{ .Values.referenceData.ignoreTableContent }} ]] && nodata='--no-data' || nodata=''
-    echo "Dumping table: ${table}"
-    # The ${nodata} variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
-    mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${nodata} "${DB_NAME}" "${table}" > "${dump_dir}${table}.sql"
+
+  # Figure out which tables to skip the data for.
+  ignore_tables=''
+  for table in $(drush sql-query 'show tables;' | grep -E '{{ .Values.referenceData.ignoreTableContent }}'); do
+    ignore_tables="${ignore_tables} --ignore-table-data=${DB_NAME}.${table}";
   done
+
+  echo "Dump reference database."
+  # The $ignore_tables variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
+  mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${ignore_tables} "${DB_NAME}" > /tmp/db.sql
+
+  previous_wd=$(pwd)
+  cd "${dump_dir}" || exit
+
+  # Split the dump to one file per table
+  csplit --silent --prefix='table-' /tmp/db.sql '/-- Table structure for table/'-1 {*}
+  # First file is the mysqldump header, rename it to "header"
+  mv table-00 header
+  # Find last table file
+  last_table=$(find -type f -name 'table-*' | sort -n | tail -n1)
+  # Split last table file to extract mysqldump footer, which starts with a line including "@OLD_"
+  csplit --silent --prefix='last-' "${last_table}" '/@OLD_/'
+  # Replace $last_table with the version of it that has footer extracted from it
+  mv last-00 "${last_table}"
+  # Rename the extracted footer to "footer"
+  mv last-01 footer
+  # Prepend header and append footer to all table files, save them as .sql
+  for file in table-*; do
+    table_name=$(grep 'Table structure for table' ${file} | cut -d$'\x60' -f2)
+    cat header "${file}" footer > "${table_name}.sql"
+  done
+  # Remove all non .sql files
+  find . -type f ! -name '*.sql' -delete
+
+  cd "${previous_wd}"
 
   # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
-  cd "${dump_dir}" || exit
-  tar -cf /tmp/db.tar.gz -I 'gzip -1' ./*.sql
+  tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
   cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
 
   {{ range $index, $mount := .Values.mounts -}}

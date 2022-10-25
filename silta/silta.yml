@@ -47,5 +47,6 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
-    
-    broken_nginx_config
+
+mariadb:
+  enabled: false

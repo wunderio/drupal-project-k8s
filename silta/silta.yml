@@ -48,15 +48,37 @@ nginx:
     # Show server host name as header
     add_header X-Backend-Server $hostname;
 
-php:
-  nodeSelector:
-    cloud.google.com/gke-nodepool: nonexistent
+    # Fail 1
+    # broken_nginx_config
 
-mariadb:
-  master: 
-    nodeSelector:
-      cloud.google.com/gke-nodepool: nonexistent2
-    tolerations:
-      - key: cloud.google.com/gke-nodepool
-        operator: Equal
-        value: nonexistent2
+# Fail 2
+# mariadb:
+#   enabled: false
+
+# pxc-db:
+#   enabled: true
+
+# db:
+#   primary: pxc-db
+
+# Fail 3
+
+# php:
+#   nodeSelector:
+#     cloud.google.com/gke-nodepool: nonexistent
+
+# mariadb:
+#   master: 
+#     nodeSelector:
+#       cloud.google.com/gke-nodepool: nonexistent2
+#     tolerations:
+#       - key: cloud.google.com/gke-nodepool
+#         operator: Equal
+#         value: nonexistent2
+
+# Fail 4
+php:
+  postupgrade:
+    afterCommand: |
+      echo "Triggering post-upgrade failure"
+      exit 123

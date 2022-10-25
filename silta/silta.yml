@@ -49,7 +49,7 @@ nginx:
     add_header X-Backend-Server $hostname;
 
     # Fail 1
-    # broken_nginx_config
+    broken_nginx_config
 
 # Fail 2
 # mariadb:

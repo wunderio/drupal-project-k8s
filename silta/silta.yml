@@ -48,5 +48,15 @@ nginx:
     # Show server host name as header
     add_header X-Backend-Server $hostname;
 
+php:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: nonexistent
+
 mariadb:
-  enabled: false
+  master: 
+    nodeSelector:
+      cloud.google.com/gke-nodepool: nonexistent2
+    tolerations:
+      - key: cloud.google.com/gke-nodepool
+        operator: Equal
+        value: nonexistent2

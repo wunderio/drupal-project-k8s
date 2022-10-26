@@ -77,8 +77,8 @@ nginx:
 #         value: nonexistent2
 
 # Fail 4
-php:
-  postupgrade:
-    afterCommand: |
-      echo "Triggering post-upgrade failure"
-      exit 123
+# php:
+#   postupgrade:
+#     afterCommand: |
+#       echo "Triggering post-upgrade failure"
+#       exit 123

@@ -67,18 +67,18 @@ nginx:
 #   nodeSelector:
 #     cloud.google.com/gke-nodepool: nonexistent
 
-mariadb:
-  master: 
-    nodeSelector:
-      cloud.google.com/gke-nodepool: nonexistent2
-    tolerations:
-      - key: cloud.google.com/gke-nodepool
-        operator: Equal
-        value: nonexistent2
+# mariadb:
+#   master: 
+#     nodeSelector:
+#       cloud.google.com/gke-nodepool: nonexistent2
+#     tolerations:
+#       - key: cloud.google.com/gke-nodepool
+#         operator: Equal
+#         value: nonexistent2
 
 # Fail 4
-# php:
-#   postupgrade:
-#     afterCommand: |
-#       echo "Triggering post-upgrade failure"
-#       exit 123
+php:
+  postupgrade:
+    afterCommand: |
+      echo "Triggering post-upgrade failure"
+      exit 123

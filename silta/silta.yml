@@ -52,8 +52,8 @@ nginx:
     # broken_nginx_config
 
 # Fail 2
-# mariadb:
-#   enabled: false
+mariadb:
+  enabled: false
 
 # pxc-db:
 #   enabled: true

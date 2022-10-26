@@ -48,8 +48,8 @@ nginx:
     # Show server host name as header
     add_header X-Backend-Server $hostname;
 
-    # Fail 1
-    broken_nginx_config
+    # # Fail 1
+    # broken_nginx_config
 
 # Fail 2
 # mariadb:

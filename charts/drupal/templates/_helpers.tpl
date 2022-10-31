@@ -50,6 +50,10 @@ ports:
   mountPath: /app/.ssh/config
   readOnly: true
   subPath: ssh_config
+- name: config
+  mountPath: /app/gdpr-dump.yaml
+  readOnly: true
+  subPath: gdpr-dump
 {{- end }}
 
 {{- define "drupal.volumes" -}}
@@ -377,19 +381,8 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   dump_dir=/tmp/reference-data-export/
   mkdir "${dump_dir}"
 
-  # Figure out which tables to skip the data for.
-  ignore_tables=''
-  {{- if .Values.referenceData.ignoreTableContent }}
-    ignore_tables="$(
-      drush sql-query 'show tables;' \
-      | grep -E '{{ .Values.referenceData.ignoreTableContent }}' \
-      | sed -e "s/^/--ignore-table-data=${DB_NAME}./" \
-      | tr '\n' ' '
-    )"
-  {{- end }}
-
-  # The $ignore_tables variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
-  mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${ignore_tables} "${DB_NAME}" > /tmp/db.sql
+  echo "Dump reference database."
+  gdpr-dump /app/gdpr-dump.yaml > /tmp/db.sql
 
   previous_wd=$(pwd)
   cd "${dump_dir}" || exit
@@ -527,7 +520,7 @@ fi
     IGNORED_TABLES="$IGNORED_TABLES $TABLE";
   done
 
-  # Take a database dump. We use the full path to bypass gdpr-dump
+  # Take a database dump.
   echo "Starting database backup."
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql

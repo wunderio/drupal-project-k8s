@@ -50,7 +50,7 @@ spec:
                 set -x
                 {{ $job.command | nindent 16 }}
                 CMD
-                cmod 755 "${script}"
+                chmod 755 "${script}"
                 stats="/tmp/stats.$$"
                 # The execution.
                 /usr/bin/time -f '"time_s":%es,"peak_mem_kb":%Mkb' -o "${stats}" "${script}"

@@ -53,7 +53,7 @@ spec:
                 chmod 755 "${script}"
                 stats="/tmp/stats.$$"
                 # The execution.
-                /usr/bin/time -f '"time_s":%es,"peak_mem_kb":%Mkb' -o "${stats}" "${script}"
+                /usr/bin/time -f '"time_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}"
                 exit_code="$?"
                 cron_name="{{ $index }}"
                 # if the error code is non-zero, the output file contains a warning.
@@ -62,6 +62,8 @@ spec:
                 cat << JSON
                 {"cron_name":"${cron_name}",${stats},"exit_code":${exit_code}}
                 JSON
+                # Prevent loop when a job fails.
+                exit 0
             resources:
               {{ if $job.resources }}
               {{- $job.resources | toYaml | nindent 14 }}

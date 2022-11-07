@@ -48,7 +48,7 @@ spec:
                 cat << CMD > "${script}"
                 #!/bin/bash
                 set -x
-                {{ $job.command }}
+                {{ $job.command | nindent 16 }}
                 CMD
                 cmod 755 "${script}"
                 stats="/tmp/stats.$$"

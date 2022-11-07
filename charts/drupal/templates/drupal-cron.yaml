@@ -33,13 +33,35 @@ spec:
             args:
               - |
                 {{- include "cron.entrypoints" $ | nindent 16 }}
-                set -ex
-                if [ ! {{ include "drupal.installation-in-progress-test" $ }} ]
-                then
-                {{ $job.command | nindent 18 }}
-                else
+                set -x
+                if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
+                  # Retry util install finishes
                   exit 1
                 fi
+                # Disable debugging while setting up things
+                { set +x ; } 2>/dev/null
+                set +e
+                # We need to save the executable command(s) into a file,
+                # because 'time' can exeute only command-files,
+                # not shell constructs.
+                script="/tmp/cron.$$"
+                cat << CMD > "${script}"
+                #!/bin/bash
+                set -x
+                {{ $job.command }}
+                CMD
+                cmod 755 "${script}"
+                stats="/tmp/stats.$$"
+                # The execution.
+                /usr/bin/time -f '"time_s":%es,"peak_mem_kb":%Mkb' -o "${stats}" "${script}"
+                exit_code="$?"
+                cron_name="{{ $index }}"
+                # if the error code is non-zero, the output file contains a warning.
+                stats="$(grep -E '"time_s".*"peak_mem_kb"' ${stats})"
+                # Assemble the JSON output.
+                cat << JSON
+                {"cron_name":"${cron_name}",${stats},"exit_code":${exit_code}}
+                JSON
             resources:
               {{ if $job.resources }}
               {{- $job.resources | toYaml | nindent 14 }}

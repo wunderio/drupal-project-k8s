@@ -24,6 +24,8 @@ mounts:
 
 php:
   cron:
+      drupal:
+        schedule: '* * * * *'
       testing-0:
         schedule: '* * * * *'
         command: |

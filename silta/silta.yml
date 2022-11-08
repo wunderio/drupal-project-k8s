@@ -22,23 +22,6 @@ mounts:
   private-files:
     enabled: true
 
-php:
-  cron:
-      drupal:
-        schedule: '* * * * *'
-      testing-0:
-        schedule: '* * * * *'
-        command: |
-          echo "stdout"
-          echo "stderr" 1>&2
-          exit 0
-      testing-1:
-        schedule: '* * * * *'
-        command: |
-          echo "stdout"
-          echo "stderr" 1>&2
-          exit 1
-
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:

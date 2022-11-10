@@ -1,9 +1,19 @@
 parameters:
   monolog.channel_handlers:
-     # Log to the stdout by default.
-     default: ['stdout']
+    # Log to the stdout by default.
+    default:
+      handlers:
+        - name: 'stream'
+          formatter: 'drush'
+  monolog.processors:
+    - 'message_placeholder'
+    - 'current_user'
+    - 'request_uri'
+    - 'ip'
+    - 'referer'
+    - 'filter_backtrace'
 
 services:
-  monolog.handler.stdout:
+  monolog.handler.stream:
     class: Monolog\Handler\StreamHandler
-    arguments: ['php://stdout']
+    arguments: ['php://stdout', 200]

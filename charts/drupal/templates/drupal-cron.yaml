@@ -61,7 +61,7 @@ spec:
                 output_json="/tmp/output_json.$$"
 
                 # The execution of the actual cron command.
-                # For backward compatibility reasons sent the output to stdout as well (tee).
+                # For backward compatibility reasons send the output to stdout as well (tee).
                 /usr/bin/time -f '"elapsed_time_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}" 2>&1 \
                 | tee "${output}"
 

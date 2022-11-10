@@ -62,7 +62,7 @@ spec:
 
                 # The execution of the actual cron command.
                 # For backward compatibility reasons send the output to stdout as well (tee).
-                /usr/bin/time -f '"elapsed_time_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}" 2>&1 \
+                /usr/bin/time -f '"duration_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}" 2>&1 \
                 | tee "${output}"
 
                 # It's tricky to get the exit code of a random command from a pipeline.
@@ -76,7 +76,7 @@ spec:
                 # the output file contains also a warning,
                 # which is not JSON.
                 # Get rid of this.
-                stats="$(grep -E '"elapsed_time_s".*"peak_mem_kb"' ${stats})"
+                stats="$(grep -E '"duration_s".*"peak_mem_kb"' ${stats})"
 
                 cron_name="{{ $index }}"
 

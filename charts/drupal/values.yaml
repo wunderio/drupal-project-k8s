@@ -227,9 +227,9 @@ php:
   resources:
     requests:
       cpu: 5m
-      memory: 122M
+      memory: 122Mi
     limits:
-      memory: 488M
+      memory: 488Mi
 
   fpm:
     # Custom php-fpm settings block. May override parameters previously defined.

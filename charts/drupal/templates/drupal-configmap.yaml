@@ -136,9 +136,9 @@ data:
                                       ',"status":"$status"'
 
                                       # browser
-                                      ',"http_referer":"$http_referer"'
-                                      ',"http_user_agent":"$http_user_agent"'
-                                      ',"remote_user":"$remote_user"'
+                                      ',"referer":"$http_referer"'
+                                      ',"agent":"$http_user_agent"'
+                                      ',"basic_auth_user":"$remote_user"'
 
                                     '}';
 

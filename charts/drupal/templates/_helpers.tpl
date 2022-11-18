@@ -429,12 +429,12 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
-  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
+  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz && echo "Saved db.tar.gz"
 
   # For backwards compability, we keep this older method of saving reference data. This way it will be easier to roll back if needed.
   # This will be removed once the new method has successfully been rolled out.
   gzip -1 /tmp/db.sql
-  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
+  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz && echo "Saved db.sql.gz"
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}

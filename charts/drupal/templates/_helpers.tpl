@@ -432,6 +432,11 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
   cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
 
+  # For backwards compability, we keep this older method of saving reference data. This way it will be easier to roll back if needed.
+  # This will be removed once the new method has successfully been rolled out.
+  gzip -1 /tmp/db.sql
+  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
+
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   # File backup for {{ $index }} volume.

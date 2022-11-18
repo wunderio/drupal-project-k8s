@@ -388,7 +388,6 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     )"
   {{- end }}
 
-  echo "Dump reference database."
   # The $ignore_tables variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
   mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${ignore_tables} "${DB_NAME}" > /tmp/db.sql
 

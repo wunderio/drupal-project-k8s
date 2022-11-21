@@ -96,6 +96,7 @@ if (getenv('VARNISH_ADMIN_HOST')) {
  * Use our own services override.
  *
  * Add monolog config
- * We avoid monolog interfering with drush batch processing by logging to STDERR
+ * because the output from monolog to stdout interferes with drush batch
+ * processing we avoid it by logging to STDERR.
  */
 $settings['container_yamls'][] = 'sites/default/silta.services.yml';

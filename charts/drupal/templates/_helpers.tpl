@@ -388,7 +388,6 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     )"
   {{- end }}
 
-  echo "Dump reference database."
   # The $ignore_tables variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
   mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${ignore_tables} "${DB_NAME}" > /tmp/db.sql
 
@@ -430,12 +429,12 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
-  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
+  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz && echo "Saved db.tar.gz"
 
   # For backwards compability, we keep this older method of saving reference data. This way it will be easier to roll back if needed.
   # This will be removed once the new method has successfully been rolled out.
   gzip -1 /tmp/db.sql
-  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
+  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz && echo "Saved db.sql.gz"
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
@@ -462,18 +461,19 @@ if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; t
   echo "Dropping old database"
   drush sql-drop -y
 
-  echo "Importing reference database dump"
   app_ref_data=/app/reference-data
   tmp_ref_data=/tmp/reference-data
 
   # New way of importing.
   if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
+    echo "Importing reference database dump from db.tar.gz"
     mkdir "${tmp_ref_data}"
     tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
     find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
 
   # Backwards compatibility for old way of importing.
   elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
+    echo "Importing reference database dump from db.sql.gz"
     gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
     pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
   fi

@@ -421,9 +421,13 @@ referenceData:
 # Uses formatters from fakerphp.github.io/formatters 
 gdprDump:
   tables:
+    cache:
+      truncate: true
     cache_*:
       truncate: true
     sessions:
+      truncate: true
+    watchdog:
       truncate: true
     commerce_payment_method*:
       truncate: true

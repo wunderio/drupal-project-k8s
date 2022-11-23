@@ -391,9 +391,6 @@ referenceData:
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
-  # Deprecated. See `gdprDump.tables.[cache_*].truncate` key for data removal
-  # ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
-
   # Matching folders will not be included in reference data.
   ignoreFolders:
     - css

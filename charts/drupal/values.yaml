@@ -391,8 +391,6 @@ referenceData:
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
-  ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
-
   # Matching folders will not be included in reference data.
   ignoreFolders:
     - css
@@ -419,18 +417,49 @@ referenceData:
     limits:
       memory: 488Mi
 
-# Parameters for sanitizing reference data with gdpr-dump.
-# Uses formatters from https://packagist.org/packages/fzaninotto/faker.
+# Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
+# Uses formatters from fakerphp.github.io/formatters 
 gdprDump:
-  users_field_data:
-    name:
-      formatter: name
-    pass:
-      formatter: password
-    mail:
-      formatter: safeEmail
-    init:
-      formatter: clear
+  tables:
+    cache:
+      truncate: true
+    cache_*:
+      truncate: true
+    sessions:
+      truncate: true
+    watchdog:
+      truncate: true
+    commerce_payment_method*:
+      truncate: true
+    users_field_data:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
+        init:
+          converter: 'fromContext'
+          parameters:
+            key: 'processed_data.mail'
+        name:
+          converter: 'faker'
+          parameters:
+            formatter: 'name'
+        pass:
+          converter: 'randomizeText'
+    commerce_order:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
+        ip_address:
+          converter: 'faker'
+          parameters:
+            formatter: 'ipv4'
+    commerce_store_field_data:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
 
 backup:
   # Whether backups should be taken for the current environment.

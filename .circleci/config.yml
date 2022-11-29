@@ -80,7 +80,7 @@ workflows:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
             - run:
-                name: Image test 1
+                name: Image build test - php
                 command: |
                   NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"
                   BRANCHNAME="${CIRCLE_BRANCH}"
@@ -95,7 +95,7 @@ workflows:
                     --image-tag "php-test-1"
                   )
 
-                  echo "Test-1 image url: ${IMAGE_URL}"
+                  echo "Image url: ${IMAGE_URL}"
 
                   silta ci image build \
                     --image-repo-host "${DOCKER_REPO_HOST}" \
@@ -105,6 +105,33 @@ workflows:
                     --build-path "." \
                     --dockerfile "silta/php.Dockerfile" \
                     --image-tag "php-test-1" \
+                    --branchname "feature/php-shell-base"
+            - run:
+                name: Image build test - shell-base
+                command: |
+                  NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"
+                  BRANCHNAME="${CIRCLE_BRANCH}"
+
+                  IMAGE_URL=$(silta ci image url \
+                    --image-repo-host "${DOCKER_REPO_HOST}" \
+                    --image-repo-project "${DOCKER_REPO_PROJ}" \
+                    --namespace "${NAMESPACE}" \
+                    --image-identifier "shell" \
+                    --build-path "." \
+                    --dockerfile "silta/shell-base.Dockerfile" \
+                    --image-tag "shell-test-1"
+                  )
+
+                  echo "Image url: ${IMAGE_URL}"
+
+                  silta ci image build \
+                    --image-repo-host "${DOCKER_REPO_HOST}" \
+                    --image-repo-project "${DOCKER_REPO_PROJ}" \
+                    --namespace "${NAMESPACE}" \
+                    --image-identifier "shell" \
+                    --build-path "." \
+                    --dockerfile "silta/shell-base.Dockerfile" \
+                    --image-tag "shell-test-1" \
                     --branchname "feature/php-shell-base"
 
           context: silta_dev

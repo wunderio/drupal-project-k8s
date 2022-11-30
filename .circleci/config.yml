@@ -96,7 +96,7 @@ workflows:
                     --image-identifier "php" \
                     --build-path "." \
                     --dockerfile "silta/php.Dockerfile" \
-                    --image-tag "php-test-2-1"
+                    --image-tag "php-test-3-1"
                   )
 
                   echo "Image url: ${IMAGE_URL}"
@@ -108,7 +108,7 @@ workflows:
                     --image-identifier "php" \
                     --build-path "." \
                     --dockerfile "silta/php.Dockerfile" \
-                    --image-tag "php-test-2-1" \
+                    --image-tag "php-test-3-1" \
                     --branchname "feature/php-shell-base" \
                     --image-reuse false
             - run:
@@ -124,7 +124,7 @@ workflows:
                     --image-identifier "shell" \
                     --build-path "." \
                     --dockerfile "silta/shell.Dockerfile" \
-                    --image-tag "shell-test-2-1"
+                    --image-tag "shell-test-3-1"
                   )
 
                   echo "Image url: ${IMAGE_URL}"
@@ -136,7 +136,7 @@ workflows:
                     --image-identifier "shell" \
                     --build-path "." \
                     --dockerfile "silta/shell.Dockerfile" \
-                    --image-tag "shell-test-2-1" \
+                    --image-tag "shell-test-3-1" \
                     --branchname "feature/php-shell-base" \
                     --image-reuse false
 
@@ -153,7 +153,7 @@ workflows:
                     --image-identifier "shell" \
                     --build-path "." \
                     --dockerfile "silta/shell-base.Dockerfile" \
-                    --image-tag "shell-test-2-2"
+                    --image-tag "shell-test-3-2"
                   )
 
                   echo "Image url: ${IMAGE_URL}"
@@ -165,7 +165,7 @@ workflows:
                     --image-identifier "shell" \
                     --build-path "." \
                     --dockerfile "silta/shell-base.Dockerfile" \
-                    --image-tag "shell-test-2-2" \
+                    --image-tag "shell-test-3-2" \
                     --branchname "feature/php-shell-base" \
                     --image-reuse false
 

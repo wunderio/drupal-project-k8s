@@ -92,7 +92,7 @@ workflows:
                     --image-identifier "php" \
                     --build-path "." \
                     --dockerfile "silta/php.Dockerfile" \
-                    --image-tag "php-test-1"
+                    --image-tag "php-test-2-1"
                   )
 
                   echo "Image url: ${IMAGE_URL}"
@@ -104,10 +104,40 @@ workflows:
                     --image-identifier "php" \
                     --build-path "." \
                     --dockerfile "silta/php.Dockerfile" \
-                    --image-tag "php-test-1" \
-                    --branchname "feature/php-shell-base"
+                    --image-tag "php-test-2-1" \
+                    --branchname "feature/php-shell-base" \
+                    --image-reuse false
             - run:
-                name: Image build test - shell-base
+                name: Image build test - shell-base with COPY from local fs 
+                command: |
+                  NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"
+                  BRANCHNAME="${CIRCLE_BRANCH}"
+
+                  IMAGE_URL=$(silta ci image url \
+                    --image-repo-host "${DOCKER_REPO_HOST}" \
+                    --image-repo-project "${DOCKER_REPO_PROJ}" \
+                    --namespace "${NAMESPACE}" \
+                    --image-identifier "shell" \
+                    --build-path "." \
+                    --dockerfile "silta/shell.Dockerfile" \
+                    --image-tag "shell-test-2-1"
+                  )
+
+                  echo "Image url: ${IMAGE_URL}"
+
+                  silta ci image build \
+                    --image-repo-host "${DOCKER_REPO_HOST}" \
+                    --image-repo-project "${DOCKER_REPO_PROJ}" \
+                    --namespace "${NAMESPACE}" \
+                    --image-identifier "shell" \
+                    --build-path "." \
+                    --dockerfile "silta/shell.Dockerfile" \
+                    --image-tag "shell-test-2-1" \
+                    --branchname "feature/php-shell-base" \
+                    --image-reuse false
+
+            - run:
+                name: Image build test - shell-base with COPY from php image 
                 command: |
                   NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"
                   BRANCHNAME="${CIRCLE_BRANCH}"
@@ -119,7 +149,7 @@ workflows:
                     --image-identifier "shell" \
                     --build-path "." \
                     --dockerfile "silta/shell-base.Dockerfile" \
-                    --image-tag "shell-test-1"
+                    --image-tag "shell-test-2-2"
                   )
 
                   echo "Image url: ${IMAGE_URL}"
@@ -131,8 +161,9 @@ workflows:
                     --image-identifier "shell" \
                     --build-path "." \
                     --dockerfile "silta/shell-base.Dockerfile" \
-                    --image-tag "shell-test-1" \
-                    --branchname "feature/php-shell-base"
+                    --image-tag "shell-test-2-2" \
+                    --branchname "feature/php-shell-base" \
+                    --image-reuse false
 
           context: silta_dev
           filters:

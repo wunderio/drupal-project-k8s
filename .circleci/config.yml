@@ -80,6 +80,10 @@ workflows:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
             - run:
+                name: Image build test - web/ size
+                command: |
+                  du -sh web/
+            - run:
                 name: Image build test - php
                 command: |
                   NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"

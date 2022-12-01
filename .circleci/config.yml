@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:bin_check
 
 executors:
   cicd73:
@@ -65,13 +65,13 @@ workflows:
           chart_repository: ""
           silta_config: silta/silta.yml
           codebase-build:
-            - run:
-                 name: Install oauth2l, gke auth plugin
-                 command: |
-                   curl -sL https://storage.googleapis.com/oauth2l/latest/linux_amd64.tgz | tar xz -C ./ &&  mv linux_amd64/* ~/.local/bin
-                   echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-                   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
-                   sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin -y
+            # - run:
+            #      name: Install oauth2l, gke auth plugin
+            #      command: |
+            #        curl -sL https://storage.googleapis.com/oauth2l/latest/linux_amd64.tgz | tar xz -C ./ &&  mv linux_amd64/* ~/.local/bin
+            #        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            #        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+            #        sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin -y
             - run:
                  name: Download feature branch build of silta cli
                  command: |

@@ -118,6 +118,7 @@ workflows:
             branches:
               only: 
                 - master
+                - feature/new-builder-images
 
       - site-test:
           name: "Site test"

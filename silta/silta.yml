@@ -47,3 +47,29 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+nginx:
+  # Allow Application Gateway network to access liveness probes
+  noauthips:
+    custom-azure-appgw: 172.30.1.0/24
+  # Trust Application Gateway network to supply real ip via "x-forwarded-for" header. 
+  # Ommiting this will remove basic auth for all requests (see `nginx.noauthips`)
+  realipfrom: 
+    custom-azure-appgw: 172.30.1.0/24
+  
+# Add NetworkPolicy exception for Application Gateway or it will timeout
+silta-release:
+  ingressAccess:
+    CustomAzureAppGWAccess:
+      from:
+        - ipBlock:
+            cidr: 172.30.1.0/24
+
+ingress:
+  default:
+    # This is the actual ingressClass name
+    type: azure/application-gateway
+    # Can add custom annotations to ingress. 
+    # See: https://azure.github.io/application-gateway-kubernetes-ingress/annotations/
+    # extraAnnotations:
+      # appgw.ingress.kubernetes.io/ssl-redirect: true

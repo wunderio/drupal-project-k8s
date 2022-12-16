@@ -566,25 +566,60 @@ varnish:
     .connect_timeout        = 10s;
     .between_bytes_timeout  = 10s;
 
+# https://github.com/elastic/helm-charts/blob/0ae236bc033a05b9e43f1ae5c196186e0d1473ff/elasticsearch/values.yaml
 elasticsearch:
   enabled: false
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 6.8.22
+  imageTag: 7.10.1
 
   replicas: 1
   minimumMasterNodes: 1
-  maxUnavailable: 0
-  clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+  # maxUnavailable: 0
+  # clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+
+  # # Elasticsearch roles that will be applied to this nodeGroup
+  # # These will be set as environment variables. E.g. node.roles=master
+  # # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html#node-roles
+  # roles: []
+  #   # Does not work with ES6 images
+  #   # elasticsearch org.elasticsearch.bootstrap.StartupException: java.lang.IllegalArgumentException: 
+  #   # unknown setting [cluster.initial_master_nodes] please check that any required plugins are installed, 
+  #   # or check  the breaking changes documentation for removed settings                                                                                                                                                     
+  #   # - master
+
+  #   # - data
+  #   # - data_content
+  #   # - data_hot
+  #   # - data_warm
+  #   # - data_cold
+  #   # - ingest
+  #   # - ml
+  #   # - remote_cluster_client
+  #   # - transform
+
+  # # Compatibility with es 6.x images
+  # extraEnvs:
+  #   - name: node.data
+  #     value: "true"
+  #   - name: node.ingest
+  #     value: "true"
+  #   - name: node.master
+  #     value: "true"
+
+  # io.netty.handler.ssl.NotSslRecordException: not an SSL/TLS record
+  createCert: false
+
+
 
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
 
   # This value should be slightly less than 50% of the requested memory.
-  esJavaOpts: -Xmx220m -Xms220m
-  xpack:
-    enabled: false
+  # esJavaOpts: -Xmx220m -Xms220m
+  # xpack:
+  #   enabled: false
   volumeClaimTemplate:
     resources:
       requests:

@@ -6,13 +6,13 @@ orbs:
 executors:
   cicd73:
     docker:
-      - image: wunderio/silta-cicd:circleci-php7.3-node12-composer1-v0.1
+      - image: wunderio/silta-cicd:circleci-php7.3-node12-composer1-v0.2
   cicd74:
     docker:
-      - image: wunderio/silta-cicd:circleci-php7.4-node14-composer1-v0.1
+      - image: wunderio/silta-cicd:circleci-php7.4-node14-composer1-v0.2
   cicd80:
     docker:
-      - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.1
+      - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.2
 
 jobs:
   site-test:
@@ -106,6 +106,7 @@ workflows:
                 - /feature\/test-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
+                - feature/new-builder-images
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration testing master deployment to aks cluster.
@@ -117,6 +118,7 @@ workflows:
             branches:
               only: 
                 - master
+                - feature/new-builder-images
 
       - site-test:
           name: "Site test"
@@ -127,6 +129,7 @@ workflows:
             branches:
               only: 
                 - master
+                - feature/new-builder-images
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.

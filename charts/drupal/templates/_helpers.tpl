@@ -50,6 +50,10 @@ ports:
   mountPath: /app/.ssh/config
   readOnly: true
   subPath: ssh_config
+- name: config
+  mountPath: /app/gdpr-dump.yaml
+  readOnly: true
+  subPath: gdpr-dump
 {{- end }}
 
 {{- define "drupal.volumes" -}}
@@ -377,20 +381,8 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   dump_dir=/tmp/reference-data-export/
   mkdir "${dump_dir}"
 
-  # Figure out which tables to skip the data for.
-  ignore_tables=''
-  {{- if .Values.referenceData.ignoreTableContent }}
-    ignore_tables="$(
-      drush sql-query 'show tables;' \
-      | grep -E '{{ .Values.referenceData.ignoreTableContent }}' \
-      | sed -e "s/^/--ignore-table-data=${DB_NAME}./" \
-      | tr '\n' ' '
-    )"
-  {{- end }}
-
   echo "Dump reference database."
-  # The $ignore_tables variable cannot be quoted in the mysqldump command because if it's empty, the command will fail.
-  mysqldump --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" ${ignore_tables} "${DB_NAME}" > /tmp/db.sql
+  gdpr-dump /app/gdpr-dump.yaml > /tmp/db.sql
 
   previous_wd=$(pwd)
   cd "${dump_dir}" || exit
@@ -430,12 +422,12 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
-  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz
+  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz && echo "Saved db.tar.gz"
 
   # For backwards compability, we keep this older method of saving reference data. This way it will be easier to roll back if needed.
   # This will be removed once the new method has successfully been rolled out.
   gzip -1 /tmp/db.sql
-  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
+  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz && echo "Saved db.sql.gz"
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
@@ -462,18 +454,19 @@ if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; t
   echo "Dropping old database"
   drush sql-drop -y
 
-  echo "Importing reference database dump"
   app_ref_data=/app/reference-data
   tmp_ref_data=/tmp/reference-data
 
   # New way of importing.
   if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
+    echo "Importing reference database dump from db.tar.gz"
     mkdir "${tmp_ref_data}"
     tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
     find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
 
   # Backwards compatibility for old way of importing.
   elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
+    echo "Importing reference database dump from db.sql.gz"
     gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
     pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
   fi
@@ -527,7 +520,7 @@ fi
     IGNORED_TABLES="$IGNORED_TABLES $TABLE";
   done
 
-  # Take a database dump. We use the full path to bypass gdpr-dump
+  # Take a database dump.
   echo "Starting database backup."
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql

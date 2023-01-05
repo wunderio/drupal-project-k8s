@@ -13,6 +13,9 @@ executors:
   cicd80:
     docker:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.2
+  cicd80v1:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.1
 
 jobs:
   site-test:
@@ -159,6 +162,7 @@ workflows:
           # Extend the build-deploy configuration for the production environment.
           <<: *build-deploy
           name: build-deploy-prod
+          executor: cicd80v1
           silta_config: silta/silta.yml,silta/silta-prod.yml
           context: silta_finland
           filters:

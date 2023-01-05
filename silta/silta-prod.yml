@@ -54,9 +54,35 @@ php:
     requests:
       cpu: 200m
       memory: 256M
+    limits:
+      cpu: 500m
+      memory: 512M
 
   # Don't show errors in production.
   errorLevel: "hide"
+
+nginx:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50M
+    limits:
+      cpu: 100m
+      memory: 150M
+
+mariadb:
+  master:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 500M
+      limits:
+        cpu: 1000m
+        memory: 750M
+
+# Consider enabling memcached service
+# memcached:
+#   enabled: true
 
 # Connect to an externally hosted database.
 #  env:

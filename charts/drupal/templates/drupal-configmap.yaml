@@ -6,8 +6,12 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
   gdpr-dump: |
-    # [mysqldump]
-    # gdpr-replacements='{{ .Values.gdprDump | toJson }}'
+    database:
+      host: '%env(DB_HOST)%'
+      user: '%env(DB_USER)%'
+      password: '%env(DB_PASS)%'
+      name: '%env(DB_NAME)%'
+    {{ .Values.gdprDump | toYaml | nindent 4 }}
 
   {{- if eq .Values.php.drupalCoreVersion "7" }}
   settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
@@ -313,7 +317,7 @@ data:
 
         {{- if .Values.nginx.serverExtraConfig }}
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 }}
+        {{- tpl .Values.nginx.serverExtraConfig . | nindent 8 }}
         {{- end }}
 
         {{- if .Values.mailhog.enabled }}
@@ -354,7 +358,7 @@ data:
 
             # Custom configuration gets included here
             {{ if .Values.nginx.locationExtraConfig }}
-            {{ .Values.nginx.locationExtraConfig | nindent 10 }}
+            {{ tpl .Values.nginx.locationExtraConfig . | nindent 10 }}
             {{- end }}
 
             location ~* /system/files/ {
@@ -395,12 +399,6 @@ data:
             location ~* ^.+\.(?:pdf|pptx?)$ {
                 expires 30d;
                 tcp_nodelay off;
-            }
-
-            ## Handle D7 image styles
-            location ~* /files/styles/ {
-                expires 365d;
-                try_files $uri @drupal;
             }
 
             ## Advanced Help module makes each module provided README available.
@@ -460,7 +458,13 @@ data:
             }
             {{- end }}
             {{- end }}
-            
+
+            ## Handle D7 image styles
+            location ~* /files/styles/ {
+                expires 365d;
+                try_files $uri @drupal;
+            }
+
             ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
             location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
                 tcp_nodelay     off;
@@ -680,7 +684,7 @@ data:
 
 {{- if .Values.nginx.extraConfig }}
   extraConfig: |
-  {{ .Values.nginx.extraConfig | nindent 4 }}
+  {{ tpl .Values.nginx.extraConfig . | nindent 4 }}
 {{- end }}
 
 {{ $proxy := ( index .Values "silta-release" ).proxy }}

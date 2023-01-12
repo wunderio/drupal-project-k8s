@@ -23,6 +23,17 @@ jobs:
           site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php
       - site-query:
           site_url: https://master.drupal-project-k8s.silta-aks.wdr.io/_ping.php
+ 
+  artillery:
+    docker:
+      - image: artilleryio/artillery:latest
+    steps:
+      - checkout
+
+      - run:
+          name: Execute load tests
+          command: /home/node/artillery/bin/artillery --target <<parameters.site_url>> run .charts/artillery/config.yml:
+
 commands:
   site-query:
     parameters:
@@ -129,8 +140,14 @@ workflows:
             branches:
               only: 
                 - master
-                - feature/new-builder-images
-
+                - feature/new-builder-images  
+      - load-tests:
+          jobs:
+            - artillery:
+              filters:
+                branches:
+                  only: vilpo-dev
+                  
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
           <<: *build-deploy

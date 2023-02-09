@@ -19,7 +19,7 @@
         "php": ">=7.3",
         "composer/installers": "^2.0",
         "cweagans/composer-patches": "^1.6",
-        "drupal/core-composer-scaffold": "^9.1",
+        "drupal/core-composer-scaffold": "^10.0",
         "drupal/core-dev": "^9.1",
         "drupal/core-recommended": "^9.1",
         "drupal/monolog": "^2.0",

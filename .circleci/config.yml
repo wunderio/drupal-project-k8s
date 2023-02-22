@@ -79,7 +79,7 @@ workflows:
             - run:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
-          context: silta_dev
+          context: silta_test_sa_test_janis
           filters:
             branches:
               ignore:
@@ -210,7 +210,7 @@ workflows:
             - run:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
-          context: silta_dev
+          context: silta_test_sa_test_janis
           filters:
             branches:
               ignore:

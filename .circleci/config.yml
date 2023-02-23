@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:dash-sa
 
 executors:
   cicd73:
@@ -230,6 +230,7 @@ workflows:
           name: "Deploy master to AKS cluster"
           silta_config: silta/silta.yml,silta/silta-master-aks.yml
           context: silta_aks
+          executor: cicd80
           filters:
             branches:
               only: 

@@ -25,7 +25,7 @@
         "drupal/monolog": "^2.0",
         "drupal/purge": "^3.0",
         "drupal/purge_purger_http": "^1.0",
-        "drupal/simplei": "^1.2",
+        "drupal/simplei": "^2.1",
         "drush/drush": "^11.1",
         "vlucas/phpdotenv": "^5.0",
         "webflo/drupal-finder": "^1.2",

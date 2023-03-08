@@ -2,6 +2,9 @@ dependencies:
 - name: mariadb
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 7.5.2
+- name: pxc-db
+  repository: https://percona.github.io/percona-helm-charts/
+  version: 1.9.1
 - name: memcached
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 4.2.27
@@ -17,5 +20,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:1075df3552905eff664b1f24a6bb4ec8d7d4227de78716965fe26d21b9bb12a2
-generated: "2023-03-08T11:19:21.771853378+02:00"
+digest: sha256:c3512a904de793d2705c98da4735d5ea3d58243442111dfcdf7c7f18b640d7b6
+generated: "2023-01-26T16:58:38.528197461+02:00"

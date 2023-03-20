@@ -39,6 +39,9 @@ metadata:
     {{- if eq $ingress.type "azure/application-gateway" }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     {{- end }}
+    {{- if eq $ingress.type "nginx" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
     {{- end }}
 
     {{- if eq $ingress.type "gce" }}
@@ -190,6 +193,9 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     {{- if eq $ingress.type "azure/application-gateway" }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
+    {{- if eq $ingress.type "nginx" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     {{- end }}
     {{- end }}
 

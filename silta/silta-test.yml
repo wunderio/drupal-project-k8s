@@ -2,3 +2,65 @@
 referenceData:
   enabled: true
   referenceEnvironment: 'feature/test-cluster/reference'
+
+ingress:
+  nginx:
+    type: nginx
+  nginx-notls:
+    type: nginx
+    redirect-https: false
+    tls: false
+  nginx-rate1:
+    type: nginx
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/limit-connections: "2"      
+  nginx-rate2:
+    type: nginx
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/limit-rpm: "5"
+  nginx-modsecurity1:
+    type: nginx
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+  nginx-modsecurity2:
+    type: nginx
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+  nginx-modsecurity3:
+    type: nginx
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+      nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"    
+  nginx-modsecurity4:
+    type: nginx
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+      nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+      nginx.ingress.kubernetes.io/modsecurity-snippet: |
+        SecRuleEngine On
+
+exposeDomains:
+  test1:
+    hostname: test1.drupal-project-k8s.nginx-silta-test.wdr.io
+    ingress: nginx
+  notls:
+    hostname: notls.drupal-project-k8s.nginx-silta-test.wdr.io
+    ingress: nginx-notls
+  rate1:
+    ingress: nginx-rate1
+    hostname: r1.drupal-project-k8s.nginx-silta-test.wdr.io
+  rate2:
+    ingress: nginx-rate2
+    hostname: r2.drupal-project-k8s.nginx-silta-test.wdr.io
+  modsecurity1:
+    ingress: nginx-modsecurity1
+    hostname: s1.drupal-project-k8s.nginx-silta-test.wdr.io
+  modsecurity2:
+    ingress: nginx-modsecurity2
+    hostname: s2.drupal-project-k8s.nginx-silta-test.wdr.io
+  modsecurity3:
+    ingress: nginx-modsecurity3
+    hostname: s3.drupal-project-k8s.nginx-silta-test.wdr.io
+  modsecurity4:
+    ingress: nginx-modsecurity4
+    hostname: s4.drupal-project-k8s.nginx-silta-test.wdr.io

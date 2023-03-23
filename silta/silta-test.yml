@@ -17,6 +17,20 @@ ingress:
       nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
       nginx.ingress.kubernetes.io/modsecurity-snippet: |
         SecRuleEngine On
+  nginx2:
+    type: traefik
+  nginx-notls2:
+    type: traefik
+    redirect-https: false
+    tls: false
+  nginx-modsecurity2:
+    type: traefik
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+      nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+      nginx.ingress.kubernetes.io/modsecurity-snippet: |
+        SecRuleEngine On
+
 exposeDomains:
   test:
     hostname: test.drupal-project-k8s.nginx-silta-test.wdr.io
@@ -27,4 +41,14 @@ exposeDomains:
   modsecurity:
     hostname: sec.drupal-project-k8s.nginx-silta-test.wdr.io
     ingress: nginx-modsecurity
+    
+  test2:
+    hostname: test.drupal-project-k8s.silta-test.wdr.io
+    ingress: nginx2
+  notls2:
+    hostname: notls.drupal-project-k8s.silta-test.wdr.io
+    ingress: nginx-notls2
+  modsecurity2:
+    hostname: sec.drupal-project-k8s.silta-test.wdr.io
+    ingress: nginx-modsecurity2
     

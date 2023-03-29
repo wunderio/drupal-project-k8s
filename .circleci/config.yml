@@ -92,6 +92,7 @@ workflows:
                 - /feature\/aks-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
+                - health-check
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
@@ -119,6 +120,7 @@ workflows:
               only: 
                 - master
                 - feature/new-builder-images
+                - health-check
 
       - site-test:
           name: "Site test"
@@ -223,6 +225,7 @@ workflows:
                 - /feature\/aks-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
+                - health-check
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration testing master deployment to aks cluster.

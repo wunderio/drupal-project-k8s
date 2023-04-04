@@ -50,6 +50,8 @@ workflows:
                 command: |
                   helm unittest ./charts/silta-release --helm3
                   helm unittest ./charts/drupal --helm3
+                  helm unittest ./charts/memcached --helm3                  
+                  helm unittest ./charts/mariadb --helm3                  
 
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
@@ -75,6 +77,8 @@ workflows:
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
+                  helm dependency build ./charts/memcached
+                  helm dependency build ./charts/mariadb
           pre-release:
             - run:
                 name: Dry-run helm install

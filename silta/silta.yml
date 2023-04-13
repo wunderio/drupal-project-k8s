@@ -19,8 +19,9 @@ redis:
     password: "foo"
 
 mounts:
-  private-files:
+  public-files:
     enabled: true
+    storageClassName: nfs-shared
 
 # Allow access from another namespace for testing purposes.
 silta-release:

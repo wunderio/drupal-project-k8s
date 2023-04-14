@@ -6,8 +6,12 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
   gdpr-dump: |
-    # [mysqldump]
-    # gdpr-replacements='{{ .Values.gdprDump | toJson }}'
+    database:
+      host: '%env(DB_HOST)%'
+      user: '%env(DB_USER)%'
+      password: '%env(DB_PASS)%'
+      name: '%env(DB_NAME)%'
+    {{ .Values.gdprDump | toYaml | nindent 4 }}
 
   {{- if eq .Values.php.drupalCoreVersion "7" }}
   settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
@@ -75,7 +79,7 @@ data:
 
     include modules/*.conf;
 
-    user                            nginx;
+    # user                            nginx;
     worker_processes                auto;
     worker_rlimit_nofile            10240;
 
@@ -99,6 +103,7 @@ data:
         {{- end }}
 
         real_ip_header              {{ .Values.nginx.real_ip_header }};
+        real_ip_recursive           on;
 
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
@@ -141,13 +146,16 @@ data:
         gzip_disable                msie6;
 
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
+        {{- range $header, $value := .Values.nginx.security_headers }}
+        {{- if $value }}
+        add_header                  {{ $header }} {{ $value }};
+        {{- end }}
+        {{- end }}
         add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
         {{- if .Values.nginx.content_security_policy }}
         add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
         {{- end }}
-        add_header                  X-XSS-Protection "1; mode=block";
-        add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
-
+        
         port_in_redirect off;
         merge_slashes off;
 
@@ -285,7 +293,7 @@ data:
 
     server {
         server_name drupal;
-        listen 80;
+        listen 8080;
 
         # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }
@@ -309,7 +317,7 @@ data:
 
         {{- if .Values.nginx.serverExtraConfig }}
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 }}
+        {{- tpl .Values.nginx.serverExtraConfig . | nindent 8 }}
         {{- end }}
 
         {{- if .Values.mailhog.enabled }}
@@ -350,7 +358,7 @@ data:
 
             # Custom configuration gets included here
             {{ if .Values.nginx.locationExtraConfig }}
-            {{ .Values.nginx.locationExtraConfig | nindent 10 }}
+            {{ tpl .Values.nginx.locationExtraConfig . | nindent 10 }}
             {{- end }}
 
             location ~* /system/files/ {
@@ -391,12 +399,6 @@ data:
             location ~* ^.+\.(?:pdf|pptx?)$ {
                 expires 30d;
                 tcp_nodelay off;
-            }
-
-            ## Handle D7 image styles
-            location ~* /files/styles/ {
-                expires 365d;
-                try_files $uri @drupal;
             }
 
             ## Advanced Help module makes each module provided README available.
@@ -456,14 +458,24 @@ data:
             }
             {{- end }}
             {{- end }}
-            
+
+            ## Handle D7 image styles
+            location ~* /files/styles/ {
+                expires 365d;
+                try_files $uri @drupal;
+            }
+
             ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
             location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
                 tcp_nodelay     off;
                 expires         365d;
                 add_header Cache-Control "public";
                 ## Set the OS file cache.
-                open_file_cache max=10000 inactive=120s;
+                {{- if .Values.nginx.open_file_cache.enabled }}
+                open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
+                {{- else }}
+                open_file_cache off;
+                {{- end }}
                 open_file_cache_valid 45s;
                 open_file_cache_min_uses 2;
                 open_file_cache_errors off;
@@ -485,7 +497,11 @@ data:
                 expires 365d;
                 add_header Cache-Control "public";
                 ## Set the OS file cache.
-                open_file_cache max=10000 inactive=120s;
+                {{- if .Values.nginx.open_file_cache.enabled }}
+                open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
+                {{- else }}
+                open_file_cache off;
+                {{- end }}
                 open_file_cache_valid 45s;
                 open_file_cache_min_uses 2;
                 open_file_cache_errors off;
@@ -513,6 +529,7 @@ data:
 
             location = /robots.txt {
                 add_header  Content-Type  text/plain;
+                access_log  off;
                 try_files $uri @drupal;
             }
 
@@ -667,7 +684,7 @@ data:
 
 {{- if .Values.nginx.extraConfig }}
   extraConfig: |
-  {{ .Values.nginx.extraConfig | nindent 4 }}
+  {{ tpl .Values.nginx.extraConfig . | nindent 4 }}
 {{- end }}
 
 {{ $proxy := ( index .Values "silta-release" ).proxy }}

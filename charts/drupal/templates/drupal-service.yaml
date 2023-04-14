@@ -3,9 +3,11 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
+    {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
-    {{- if eq .Values.cluster.type "gke" }}
-    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
+    {{- end }}
+    {{- if and (eq .Values.cluster.type "gke") (.Values.backendConfig) }}
+    cloud.google.com/backend-config: '{"default":"{{ .Release.Name }}-drupal"}'
     {{- end }}
     {{- if .Values.cluster }}
     {{- if .Values.cluster.vpcNative }}
@@ -23,7 +25,9 @@ spec:
   # We explicitly unset this, in case the application is currently downscaled.
   externalName: null
   ports:
-    - port: 80
+    - name: web
+      port: 80
+      targetPort: 8080
   selector:
     {{- include "drupal.release_selector_labels" . | nindent 4 }}
     deployment: drupal

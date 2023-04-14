@@ -1,7 +1,7 @@
 {{- if .Values.backup.enabled }}
 {{- $db_password := randAlphaNum 20 }}
 {{- $params := dict "db_password" $db_password  -}}
-apiVersion: batch/v1beta1
+apiVersion: {{ include "drupal.cron.api-version" $ | trim }}
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}-backup
@@ -18,8 +18,8 @@ spec:
   jobTemplate:
     spec:
       # This is a fallback for sidecar termination failure.
-      # Two hours should be enough for backup/validation actions.
-      activeDeadlineSeconds: 7200
+      # Six hours should be enough for backup/validation actions.
+      activeDeadlineSeconds: 21600
       backoffLimit: 2
       template:
         metadata:

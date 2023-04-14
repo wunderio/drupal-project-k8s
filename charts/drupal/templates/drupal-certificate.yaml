@@ -7,7 +7,7 @@ kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
   annotations:
-    cert-manager.io/issue-temporary-certificate: "true" 
+    cert-manager.io/issue-temporary-certificate: "true"
     acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-drupal"
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
@@ -34,7 +34,7 @@ kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-p{{ $index }}
   annotations:
-    cert-manager.io/issue-temporary-certificate: "true" 
+    cert-manager.io/issue-temporary-certificate: "true"
     acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-drupal"
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
@@ -66,7 +66,7 @@ metadata:
 spec:
   secretName: {{ .Release.Name }}-tls
   duration: 2160h
-  renewBefore: 150h 
+  renewBefore: 150h
   commonName: {{ template "drupal.domain" . }}
   dnsNames:
   - {{ template "drupal.domain" . }}
@@ -74,13 +74,33 @@ spec:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+{{- $params := dict "prefix" $prefix  -}}
+apiVersion: {{ include "cert-manager.api-version" $ | trim }}
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  duration: 2160h
+  renewBefore: 150h
+  commonName: {{ include "drupal.domain" (merge $params $ ) }}
+  dnsNames:
+    - '{{ include "drupal.domain" (merge $params $ ) }}'
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+---
+{{- end }}
 
 {{- else if eq $context_ssl.issuer "custom" }}
 {{- if not $context_ssl.existingTLSSecret }}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-tls
+  name: {{ .Release.Name }}-tls-custom
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 type: kubernetes.io/tls
@@ -89,10 +109,25 @@ data:
   tls.crt: {{ $context_ssl.crt | b64enc }}
   tls.key: {{ $context_ssl.key | b64enc }}
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-tls-p{{ $index }}-custom
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+type: kubernetes.io/tls
+data:
+  tls.ca: {{ $context_ssl.ca | b64enc }}
+  tls.crt: {{ $context_ssl.crt | b64enc }}
+  tls.key: {{ $context_ssl.key | b64enc }}
+---
+{{- end }}
+
 {{- end }}
 {{- end }}
 
-# Certificates for exposeDomains 
+# Certificates for exposeDomains
 {{- range $index, $domain := .Values.exposeDomains }}
 {{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
 {{- if $domain.ssl }}
@@ -110,7 +145,7 @@ metadata:
 spec:
   secretName: {{ $.Release.Name }}-tls-{{ $index }}
   dnsNames:
-  - {{ $domain.hostname }}
+  - {{ $domain.hostname | quote }}
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
@@ -120,7 +155,7 @@ spec:
       - http01:
           ingress: {{ $.Release.Name }}-drupal-{{ $domain.ingress }}
         domains:
-          - {{ $domain.hostname }}
+          - {{ $domain.hostname | quote }}
 {{- end }}
 ---
 
@@ -134,10 +169,10 @@ metadata:
 spec:
   secretName: {{ $.Release.Name }}-tls-{{ $index }}
   duration: 2160h
-  renewBefore: 150h 
-  commonName: {{ $domain.hostname }}
+  renewBefore: 150h
+  commonName: {{ $domain.hostname | quote }}
   dnsNames:
-  - {{ $domain.hostname }}
+  - {{ $domain.hostname | quote }}
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
@@ -148,12 +183,14 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ $.Release.Name }}-tls-{{ $index }}
+  name: {{ $.Release.Name }}-tls-{{ $index }}-custom
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 type: kubernetes.io/tls
 data:
-  ca.crt: {{ $domain.ssl.ca | default "" | b64enc }}
+  {{- if $domain.ssl.ca }}
+  tls.ca: {{ $domain.ssl.ca | default "" | b64enc }}
+  {{- end }}
   tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
   tls.key: {{ $domain.ssl.key | default "" | b64enc }}
 ---

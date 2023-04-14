@@ -43,13 +43,17 @@ ports:
   readOnly: true
   subPath: silta_services_yml
 - name: config
-  mountPath: /usr/local/etc/php-fpm.d/zz-custom.conf
+  mountPath: /tmp/zz-custom.conf
   readOnly: false
   subPath: php_fpm_d_custom
 - name: config
   mountPath: /app/.ssh/config
   readOnly: true
   subPath: ssh_config
+- name: config
+  mountPath: /app/gdpr-dump.yaml
+  readOnly: true
+  subPath: gdpr-dump
 {{- end }}
 
 {{- define "drupal.volumes" -}}
@@ -173,20 +177,45 @@ imagePullSecrets:
   value: "{{ .Values.projectName | default .Release.Namespace }}"
 - name: ENVIRONMENT_NAME
   value: "{{ .Values.environmentName }}"
+- name: RELEASE_NAME
+  value: "{{ .Release.Name }}"
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
 {{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}
+{{- if contains "memcache" .Release.Name -}}
+{{- fail "Do not use 'memcache' in release name or deployment will fail" -}}
+{{- end }}
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
+{{- end }}
+{{- if .Values.redis.enabled }}
+{{- if contains "redis" .Release.Name -}}
+{{- fail "Do not use 'redis' in release name or deployment will fail" -}}
+{{- end }}
+{{- if eq .Values.redis.auth.password "" }}
+{{- fail ".Values.redis.auth.password value required." }}
+{{- end }}
+- name: REDIS_HOST
+  value: {{ .Release.Name }}-redis-master
+- name: REDIS_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-redis
+      key: redis-password
 {{- end }}
 {{- if .Values.elasticsearch.enabled }}
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-es
 {{- end }}
 {{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
+{{- if .Values.mailhog.enabled }}
+{{- if contains "mailhog" .Release.Name -}}
+{{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
+{{- end }}
+{{- end }}
 {{ include "smtp.env" . }}
 {{- end}}
 {{- if .Values.varnish.enabled }}
@@ -238,9 +267,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
@@ -282,7 +311,6 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-echo "Creating drupal database.";
 mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
@@ -349,23 +377,57 @@ done
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-  # Figure out which tables to skip.
-  IGNORE_TABLES=""
-  IGNORED_TABLES=""
-  for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.referenceData.ignoreTableContent }}'` ;
-  do
-    IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
-    IGNORED_TABLES="$IGNORED_TABLES $TABLE";
-  done
+  echo "Dump reference database."
+  dump_dir=/tmp/reference-data-export/
+  mkdir "${dump_dir}"
 
   echo "Dump reference database."
-  mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  gdpr-dump /app/gdpr-dump.yaml > /tmp/db.sql
 
-  # Compress the database dump and copy it into the backup folder.
+  previous_wd=$(pwd)
+  cd "${dump_dir}" || exit
+
+  # Split the dump to one file per table. Use 4 digit suffix so that we don't run into sorting issues when there are over 100 or 1000 tables.
+  csplit \
+    --silent \
+    --prefix='table-' \
+    --suffix-format='%04d' \
+    /tmp/db.sql \
+    '/-- Table structure for table/-1' \
+    '{*}'
+  # First file is the mysqldump header, rename it to "header"
+  mv table-0000 header
+  # Find last table file
+  last_table=$(find -type f -name 'table-*' | sort -n | tail -n1)
+  # Split last table file to extract mysqldump footer, which starts with a line including "@OLD_"
+  csplit \
+    --silent \
+    --prefix='last-' \
+    "${last_table}" \
+    '/@OLD_/'
+  # Replace $last_table with the version of it that has footer extracted from it
+  mv last-00 "${last_table}"
+  # Rename the extracted footer to "footer"
+  mv last-01 footer
+  # Prepend header and append footer to all table files, save them as <table_name>.sql
+  for file in table-*; do
+    table_name=$(grep 'Table structure for table' ${file} | cut -d$'\x60' -f2)
+    cat header "${file}" footer > "${table_name}.sql"
+  done
+  # Remove all non .sql files
+  find . -type f ! -name '*.sql' -delete
+
+  cd "${previous_wd}"
+
+  # Compress the sql files into a single file and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+  tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
+  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz && echo "Saved db.tar.gz"
+
+  # For backwards compability, we keep this older method of saving reference data. This way it will be easier to roll back if needed.
+  # This will be removed once the new method has successfully been rolled out.
   gzip -1 /tmp/db.sql
-  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
+  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz && echo "Saved db.sql.gz"
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
@@ -388,17 +450,33 @@ fi
 {{- end }}
 
 {{- define "drupal.import-reference-db" -}}
-if [ -f /app/reference-data/db.sql.gz ]; then
+if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; then
   echo "Dropping old database"
   drush sql-drop -y
 
-  echo "Importing reference database dump"
-  gunzip -c /app/reference-data/db.sql.gz > /tmp/reference-data-db.sql
-  pv /tmp/reference-data-db.sql | drush sql-cli
+  app_ref_data=/app/reference-data
+  tmp_ref_data=/tmp/reference-data
+
+  # New way of importing.
+  if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
+    echo "Importing reference database dump from db.tar.gz"
+    mkdir "${tmp_ref_data}"
+    tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
+    find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+
+  # Backwards compatibility for old way of importing.
+  elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
+    echo "Importing reference database dump from db.sql.gz"
+    gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
+    pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
+  fi
 
   # Clear caches before doing anything else.
-  if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;
-  else drush cache-rebuild; fi
+  if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then
+    drush cache-clear all;
+  else
+    drush cache-rebuild;
+  fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
@@ -409,8 +487,12 @@ fi
   {{- if eq $mount.enabled true -}}
   if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
     echo "Importing {{ $index }} files"
-    for f in /app/reference-data/{{ $index }}/*; do
-      rsync -r --temp-dir=/tmp/ $f "{{ $mount.mountPath }}" &
+    # skip subfolders
+    rsync -r --delete --temp-dir=/tmp/ --filter "- */" "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
+    # run rsync for each subfolder
+    for f in /app/reference-data/{{ $index }}/*/; do
+      subfolder="$(realpath -s $f)"
+      rsync -r --delete --temp-dir=/tmp/ "${subfolder}" "{{ $mount.mountPath }}" &
     done
   fi
   {{ end -}}
@@ -438,7 +520,7 @@ fi
     IGNORED_TABLES="$IGNORED_TABLES $TABLE";
   done
 
-  # Take a database dump. We use the full path to bypass gdpr-dump
+  # Take a database dump.
   echo "Starting database backup."
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
   /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
@@ -450,7 +532,7 @@ fi
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
-  gzip -1 /tmp/db.sql
+  gzip -k1 /tmp/db.sql
 
   # Create a folder for the backup
   mkdir -p $BACKUP_LOCATION
@@ -460,18 +542,20 @@ fi
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
   # File backup for {{ $index }} volume.
+  # If files get changed while the tar command is running, tar will exit with code 1.
+  # We ignore this as we want the rest of the job to still get run.
   echo "Starting {{ $index }} volume backup."
-  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }} || ( export exitcode=$?; [[ $exitcode -eq 1 ]] || exit )
   {{- end -}}
   {{- end }}
   {{- end }}
 
   # Delete old backups
   echo "Removing backups older than {{ .Values.backup.retention }} days"
-  # Can't locate directories based on mtime due to storage backend limitations, 
-  # Using folder name for time selection. 
+  # Can't locate directories based on mtime due to storage backend limitations,
+  # Using folder name for time selection.
   retention_time=$(date -d "{{ .Values.backup.retention }} days ago" +%s)
-                  
+
   find /backups -type d -mindepth 1 -maxdepth 1 -print \
   | grep -E '/[0-9-]+$' \
   | while read -r dir
@@ -479,7 +563,7 @@ fi
     # convert dir name into timestamp
     stamp="$(echo "$dir" | sed -re 's%.+/(.+)-(.+)-(.+)-(.+)-(.+)-(.+)$%\1-\2-\3 \4:\5:\6%')"
     stamp="$(date -d "$stamp" '+%s')" || continue
-    
+
     # jump out of the execution block if the directory more recent than retention time
     if [[ "$stamp" -gt "$retention_time" ]]; then
       continue
@@ -534,7 +618,7 @@ certmanager.k8s.io/v1alpha1
 {{- end }}
 
 {{- define "ingress.api-version" }}
-{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "18" ) }}
 networking.k8s.io/v1
 {{- else }}
 networking.k8s.io/v1beta1
@@ -546,5 +630,24 @@ networking.k8s.io/v1beta1
 set -e
 # Trigger lagoon entrypoint scripts if present.
 if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
+# Trigger silta entrypoint script if present.
+if [ -f /silta/entrypoint.sh ] ; then /silta/entrypoint.sh ; fi
 
+{{- end }}
+
+
+{{- define "drupal.cron.api-version" }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "21" ) }}
+batch/v1
+{{- else }}
+batch/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "drupal.autoscaling.api-version" }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "23" ) }}
+autoscaling/v2
+{{- else }}
+autoscaling/v2beta1
+{{- end }}
 {{- end }}

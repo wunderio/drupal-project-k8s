@@ -30,15 +30,29 @@ if (getenv('PRIVATE_FILES_PATH')) {
  * Set Elasticsearch Helper module configuration if needed.
  */
 if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
+
+  $elasticsearch_port = 9200;
+
   // Elasticsearch Helper 6.x compatible configuration override.
   $config['elasticsearch_helper.settings']['elasticsearch_helper']['host'] = $elasticsearch_host;
-  $config['elasticsearch_helper.settings']['elasticsearch_helper']['port'] = 9200;
+  $config['elasticsearch_helper.settings']['elasticsearch_helper']['port'] = $elasticsearch_port;
 
   // Elasticsearch Helper 7.x compatible configuration override.
   $config['elasticsearch_helper.settings']['hosts'] = [
     [
       'host' => $elasticsearch_host,
-      'port' => 9200,
+      'port' => $elasticsearch_port,
+    ],
+  ];
+
+  // Enable Drupal Ping to survey the Elasticsearch connection
+  // https://github.com/wunderio/drupal-ping#elasticsearch
+  $settings['ping_elasticsearch_connections'] = [
+    [
+      'severity' => 'warning',
+      'proto' => 'http',
+      'host' => $elasticsearch_host,
+      'port' => $elasticsearch_port,
     ],
   ];
 }
@@ -81,10 +95,8 @@ if (getenv('VARNISH_ADMIN_HOST')) {
 /**
  * Use our own services override.
  *
- * We don't include this when running on cli, for example when using drush,
+ * Add monolog config
  * because the output from monolog to stdout interferes with drush batch
- * processing, causing the process to die when drush tries to start a new batch.
+ * processing we avoid it by logging to STDERR.
  */
-if (PHP_SAPI !== 'cli') {
-  $settings['container_yamls'][] = 'sites/default/silta.services.yml';
-}
+$settings['container_yamls'][] = 'sites/default/silta.services.yml';

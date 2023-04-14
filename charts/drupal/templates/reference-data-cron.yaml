@@ -1,6 +1,6 @@
 {{- if .Values.referenceData.enabled }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
-apiVersion: batch/v1beta1
+apiVersion: {{ include "drupal.cron.api-version" . | trim }}
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}-refdata
@@ -24,10 +24,6 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: reference-data-volume
                 mountPath: /app/reference-data
-              - name: config
-                mountPath: /etc/my.cnf.d/gdpr-dump.cnf
-                readOnly: true
-                subPath: gdpr-dump
             command: ["/bin/bash", "-c"]
             args:
               - |

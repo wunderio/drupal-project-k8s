@@ -1,50 +1,5 @@
 {
   "type": "object",
-  "if": {
-    "properties": {
-      "silta-release": {
-        "type": "object",
-        "properties": {
-          "branchName": { "const": "production"}
-        },
-        "required": ["branchName"]
-      }
-    }
-  },
-  "then": {
-    "properties": {
-      "mailhog": {
-        "$comment": "Mailhog should not be enabled in production",
-        "properties": { "enabled": { "const": false }}
-      },
-      "php": {
-        "properties": {
-          "resources": {
-            "properties": {
-              "requests": {
-                "properties": {
-                  "cpu": { "type": "string", "not": { "const": "3m"}}
-                }
-              }
-            }
-          }
-        }
-      },
-      "nginx": {
-        "properties": {
-          "resources": {
-            "properties": {
-              "requests": {
-                "properties": {
-                  "cpu": { "type": "string", "not": { "const": "3m"}}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
   "additionalProperties": false,
   "properties": {
     "clusterDomain": { "type": "string" },
@@ -62,9 +17,10 @@
         "enabled": { "type": "boolean" }
       }
     },
-    "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
+    "exposeDomains": { "type": "object", "items": { "type": "object"}},
     "exposeDomainsDefaults": { "type": "object"},
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
+    "singleSubdomain": { "type": "boolean"},
     "ssl": { "type": "object" },
     "backendConfig": { "type": ["array","object"], "items": { "type": "object"}},
     "ingress": { "type": "object" },
@@ -141,6 +97,12 @@
       }
     },
     "memcached": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "redis": {
       "type": "object",
       "properties": {
         "enabled": { "type": "boolean" }

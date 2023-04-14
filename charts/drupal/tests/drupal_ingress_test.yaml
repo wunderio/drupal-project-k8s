@@ -1,6 +1,9 @@
 suite: drupal ingress
 templates:
   - drupal-ingress.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a ingress
     template: drupal-ingress.yaml
@@ -36,21 +39,89 @@ tests:
           path: spec.rules[0].host
           value: 'foo.namespace.baz'
 
-  - it: directs traefik requests to drupal service by default
+  - it: directs traefik requests to drupal service by default (cm 0.8)
     template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - certmanager.k8s.io/v1alpha1
+        - networking.k8s.io/v1beta1
     asserts:
       - equal:
           path: spec.rules[0].http.paths[0].backend.serviceName
           value: 'RELEASE-NAME-drupal'
 
-  - it: directs traefik requests to varnish service when varnish is enabled
+  - it: directs traefik requests to drupal service by default (cm 1.4+)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: 'RELEASE-NAME-drupal'
+  
+  - it: directs traefik requests to varnish service when varnish is enabled (cm 0.8)
     template: drupal-ingress.yaml
     set:
       varnish.enabled: true
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - certmanager.k8s.io/v1alpha1
+        - networking.k8s.io/v1beta1
     asserts:
       - equal:
           path: spec.rules[0].http.paths[0].backend.serviceName
           value: 'RELEASE-NAME-varnish'
+
+  - it: directs traefik requests to varnish service when varnish is enabled (cm 1.4+)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      varnish.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: 'RELEASE-NAME-varnish'
+
+  - it: uses correct ingress api version (cm legacy pre 1.4)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - certmanager.k8s.io/v1alpha1
+        - networking.k8s.io/v1beta1
+    asserts:
+      - equal:
+          path: apiVersion
+          value: 'networking.k8s.io/v1beta1'
+
+  - it: uses correct ingress api version when multiple api versions are available
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+      apiVersions:
+        - cert-manager.io/v1
+        - certmanager.k8s.io/v1alpha1
+        - networking.k8s.io/v1
+        - networking.k8s.io/v1beta1
+    asserts:
+      - equal:
+          path: apiVersion
+          value: 'networking.k8s.io/v1'
 
   - it: shortens long project names
     template: drupal-ingress.yaml
@@ -184,22 +255,6 @@ tests:
           path: 'spec.rules[0].host'
           value: 'bar.baz'
 
-  - it: exposeDomains as list, multiple hostnames can use the same ingress [list definition to be deprecated]
-    template: drupal-ingress.yaml
-    set:
-      exposeDomains:
-        - hostname: foo.baz
-        - hostname: bar.baz
-    asserts:
-      - documentIndex: 1
-        equal:
-          path: 'spec.rules[0].host'
-          value: 'foo.baz'
-      - documentIndex: 1
-        equal:
-          path: 'spec.rules[1].host'
-          value: 'bar.baz'
-
   - it: exposeDomains - can supply staticIpAddressName for gce type ingress
     template: drupal-ingress.yaml
     set:
@@ -215,3 +270,83 @@ tests:
         equal:
           path: 'metadata.annotations.kubernetes\.io\/ingress\.global-static-ip-name'
           value: 'baz'
+
+  - it: exposeDomains - non-gce ingress path wildcard for kubernetes <1.19
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/'
+
+  - it: exposeDomains - non-gce ingress path without wildcard for kubernetes 1.19+
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 19
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/'
+
+  - it: exposeDomains - gce ingress path wildcard for kubernetes <1.19
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+          ingress: gce
+      ingress:
+        gce:
+          staticIpAddressName: baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/*'
+
+  - it: exposeDomains - gce ingress path without wildcard for kubernetes 1.19+
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 19
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+          ingress: gce
+      ingress:
+        gce:
+          staticIpAddressName: baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/'

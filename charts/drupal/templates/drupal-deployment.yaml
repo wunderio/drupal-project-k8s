@@ -5,11 +5,18 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "drupal.release_selector_labels" . | nindent 6 }}
       deployment: drupal
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0%
+      maxSurge: 50%
   template:
     metadata:
       labels:
@@ -43,8 +50,12 @@ spec:
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
         env:
+        - name: RELEASE_NAME
+          value: "{{ .Release.Name }}"
+        - name: PROJECT_NAME
+          value: "{{ .Values.projectName | default .Release.Namespace }}"
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           name: drupal
         volumeMounts:
         {{- range $index, $mount := $.Values.mounts }}
@@ -81,7 +92,11 @@ spec:
         {{- end }}
         livenessProbe:
           tcpSocket:
-            port: 80
+            port: 8080
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep", "5"]
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
@@ -148,7 +163,7 @@ spec:
                   - drupal
 ---
 {{- if .Values.autoscaling.enabled }}
-apiVersion: autoscaling/v2beta1
+apiVersion: {{ include "drupal.autoscaling.api-version" . | trim }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Release.Name }}-drupal
@@ -161,6 +176,29 @@ spec:
     name: {{ .Release.Name }}-drupal
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  {{- if .Values.autoscaling.metrics }}
   metrics:
-    {{- toYaml .Values.autoscaling.metrics | nindent 4 }}
+  {{- if eq ( include "drupal.autoscaling.api-version" . | trim ) "autoscaling/v2beta1" }}
+  {{- range .Values.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      targetAverageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if eq ( include "drupal.autoscaling.api-version" . | trim ) "autoscaling/v2" }}
+  {{- range .Values.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      target:
+        type: Utilization
+        averageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}

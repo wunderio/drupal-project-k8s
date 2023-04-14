@@ -1,0 +1,4 @@
+# AKS does egress NAT by default
+silta-release:
+  proxy:
+    enabled: false

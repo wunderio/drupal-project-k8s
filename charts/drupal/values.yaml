@@ -41,14 +41,14 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 3
   metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        targetAverageUtilization: 80
-    - type: Resource
-      resource:
-        name: memory
-        targetAverageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate.
@@ -113,6 +113,10 @@ backendConfig:
 # domainPrefixes: ['en', 'fi']
 domainPrefixes: []
 
+# Domains by default are created following pattern branch.repository.cluster
+# By enabling single subdomain it will be converted to branch-repository.cluster
+singleSubdomain: false
+
 # Settings for default site provided by this deployment
 ssl:
   # Enable HTTPS for this deployment
@@ -136,7 +140,10 @@ nginx:
   resources:
     requests:
       cpu: 1m
-      memory: 10M
+      memory: 10Mi
+    limits:
+      cpu: 500m
+      memory: 244Mi
 
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
@@ -155,7 +162,7 @@ nginx:
   expose_cache_headers: false
 
   # Trust X-Forwarded-For from these hosts for getting external IP
-  realipfrom: 
+  realipfrom:
     gke-internal: 10.0.0.0/8
     gce-health-check-1: 130.211.0.0/22
     gce-health-check-2: 35.191.0.0/16
@@ -171,6 +178,12 @@ nginx:
     gce-health-check-2: 35.191.0.0/16
 
   # Security headers
+  security_headers:
+    # X-Frame-Options: 'SAMEORIGIN'
+    # X-Content-Type-Options: 'nosniff'
+    X-XSS-Protection: '"1; mode=block"'
+    Referrer-Policy: '"no-referrer, strict-origin-when-cross-origin" always'
+
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
   hsts_include_subdomains: ""
   #hsts_include_subdomains: " includeSubDomains;"
@@ -180,7 +193,13 @@ nginx:
   comp_level: 6
 
   # Retry file lookup in 5 seconds (filesystem sync workaround)
-  # retry404s: 5
+  # retry404s:
+  #   delay: 5
+  #   paths:
+  #     - "^/sites/[^/]+/files/(?:css|js)/"
+
+  # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
+  sessionAffinity: false
 
   # Extra configuration block in server context.
   serverExtraConfig: |
@@ -190,6 +209,13 @@ nginx:
 
   # Extra configuration to pass to nginx as a file
   extraConfig: |
+
+  # Toggle open_files_cache.
+  # Naming follows https://nginx.org/en/docs/http/ngx_http_core_module.html#open_file_cache directive
+  open_file_cache:
+    enabled: true
+    max: 6000
+    inactive: 120s
 
 # Configuration for everything that runs in php containers.
 php:
@@ -201,9 +227,9 @@ php:
   resources:
     requests:
       cpu: 5m
-      memory: 128M
+      memory: 122Mi
     limits:
-      memory: 512M
+      memory: 488Mi
 
   fpm:
     # Custom php-fpm settings block. May override parameters previously defined.
@@ -211,11 +237,11 @@ php:
     extraConfig: |
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
-  # When overriding this value, make sure to include the `drush cron` command.
   cron:
     drupal:
       # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
       schedule: '~ * * * *'
+      # When overriding this value, make sure to include the `drush cron` command.
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
@@ -224,13 +250,14 @@ php:
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
 
-      # Set resources specifically for cron jobs.
+      # Set resources specifically for cron jobs. If not set, they will be
+      # inherited from php.resources.
       resources:
         requests:
           cpu: 500m
-          memory: 512M
+          memory: 488Mi
         limits:
-          memory: 512M
+          memory: 488Mi
 
   # Post-installation hook.
   # This is run every time a new environment is created.
@@ -241,9 +268,9 @@ php:
     resources:
       requests:
         cpu: 500m
-        memory: 512M
+        memory: 488Mi
       limits:
-        memory: 512M
+        memory: 488Mi
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
@@ -253,9 +280,9 @@ php:
       # example service files have changed, Drupal might not be able to
       # bootstrap, not even for the `drush status` command below.
       if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
-        drush cache-clear all
+        drush cache-clear all || true
       else
-        drush cache-rebuild
+        drush cache-rebuild || true
       fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y
@@ -313,10 +340,14 @@ shell:
     repositoryUrl: 'you need to pass in a value for shell.gitAuth.repositoryUrl to your helm chart'
     outsideCollaborators: true
     keyserver:
+      enabled: true
       # Defaults to https://keys.[clusterDomain]/api/1/git-ssh-keys
       url: ''
       username: ''
       password: ''
+  # Static ssh keys
+  # Note: cluster administrator support required for duplicating keys in jumphost.
+  authorizedKeys: []
 
   # Specifications for the volume where host keys are mounted.
   mount:
@@ -325,7 +356,10 @@ shell:
     storage: 1M
 
   # Extend resources defined under php.resources.
-  resources: {}
+  resources:
+    requests:
+      cpu: 5m
+      memory: 64Mi
 
   # Set a restriction on where the shell pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
@@ -360,8 +394,6 @@ referenceData:
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
-  ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
-
   # Matching folders will not be included in reference data.
   ignoreFolders:
     - css
@@ -384,22 +416,53 @@ referenceData:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
+      memory: 488Mi
     limits:
-      memory: 512M
+      memory: 488Mi
 
-# Parameters for sanitizing reference data with gdpr-dump.
-# Uses formatters from https://packagist.org/packages/fzaninotto/faker.
+# Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
+# Uses formatters from fakerphp.github.io/formatters 
 gdprDump:
-  users_field_data:
-    name:
-      formatter: name
-    pass:
-      formatter: password
-    mail:
-      formatter: safeEmail
-    init:
-      formatter: clear
+  tables:
+    cache:
+      truncate: true
+    cache_*:
+      truncate: true
+    sessions:
+      truncate: true
+    watchdog:
+      truncate: true
+    commerce_payment_method*:
+      truncate: true
+    users_field_data:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
+        init:
+          converter: 'fromContext'
+          parameters:
+            key: 'processed_data.mail'
+        name:
+          converter: 'faker'
+          parameters:
+            formatter: 'name'
+        pass:
+          converter: 'randomizeText'
+    commerce_order:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
+        ip_address:
+          converter: 'faker'
+          parameters:
+            formatter: 'ipv4'
+    commerce_store_field_data:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
 
 backup:
   # Whether backups should be taken for the current environment.
@@ -426,7 +489,7 @@ backup:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
+      memory: 488Mi
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
@@ -446,9 +509,18 @@ mariadb:
     resources:
       requests:
         cpu: 25m
-        memory: 384M
+        memory: 366Mi
       limits:
-        memory: 512M
+        memory: 488Mi
+    extraInitContainers: |
+      - name: dbinfo
+        image: busybox:stable
+        command: ["/bin/sh", "-c"]
+        args:
+          - df -h /bitnami/mariadb
+        volumeMounts:
+          - mountPath: /bitnami/mariadb
+            name: data
     affinity:
       nodeAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
@@ -459,6 +531,7 @@ mariadb:
               operator: NotIn
               values:
               - static-ip
+  enableServiceLinks: false
 
 varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
@@ -468,11 +541,11 @@ varnish:
     requests:
       cpu: 25m
       memory: 32Mi
-  image: eu.gcr.io/silta-images/varnish
-  imageTag: 6-v0.1
-  # https://varnish-cache.org/docs/6.0/users-guide/storage-backends.html
+  image: wunderio/silta-varnish
+  imageTag: 6-v0.2
+  # https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
-  # https://varnish-cache.org/docs/6.0/reference/varnishd.html#list-of-parameters
+  # https://varnish-cache.org/docs/6.6/reference/varnishd.html#list-of-parameters
   extraParams: ""
   # Inject custom code into vcl_recv subroutine.
   vcl_recv_extra: ""
@@ -482,7 +555,7 @@ varnish:
   vcl_extra_cookies: ""
   # Do not cache files larger than 3 megabytes (use integers).
   cache_skip_size: 3
-  # https://varnish-cache.org/docs/6.0/reference/vcl.html#backend-definition
+  # https://varnish-cache.org/docs/6.6/reference/vcl.html#backends-and-health-probes
   backend_config: |
     .max_connections = 300;
     .probe = {
@@ -501,7 +574,7 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 6.8.3
+  imageTag: 6.8.22
 
   replicas: 1
   minimumMasterNodes: 1
@@ -554,13 +627,31 @@ memcached:
     # MaxItemSize
     - -I 4M
 
+# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+redis:
+  enabled: false
+  architecture: standalone
+  auth:
+    # mandatory value
+    password: ""
+  replica:
+    # replicaCount: 1
+  master:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi
+
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
   enabled: false
   image:
     # Set image repository to "mailhog/mailhog" to reenable logging.
-    repository: eu.gcr.io/silta-images/silta-mailhog
+    repository: wunderio/silta-mailhog
     # Set image tag to "" to reenable logging.
     tag: silent
   resources:
@@ -569,11 +660,10 @@ mailhog:
       memory: 10M
 
 # Email via SMTP. Configuration is passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
+# see: https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#sending-e-mail
 smtp:
   enabled: false
   # address: smtp.example.com:25
-  # tls: false
-  # starttls: false
   # username: ""
   # password: ""
 
@@ -581,12 +671,12 @@ smtp:
 solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
-  image: geerlingguy/solr
-  imageTag: latest
+  image: wunderio/silta-solr
+  imageTag: 8
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
-  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m"]
+  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m", "-a", "-Dlog4j2.formatMsgNoLookups=true"]
 
   # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
   # Solr init container will contents of this folder to actual solr container.
@@ -600,10 +690,10 @@ solr:
   resources:
     requests:
       cpu: 250m
-      memory: 512M
+      memory: 488Mi
     limits:
       cpu: 500m
-      memory: 768M
+      memory: 732Mi
 
   persistence:
     data:
@@ -613,3 +703,51 @@ solr:
       # csiDriverName: csi-driver-name
       accessModes:
         - ReadWriteOnce
+
+db:
+  # Available options: mariadb, pxc-db
+  primary: mariadb
+
+# Percona XtraDB Cluster
+# see: https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/values.yaml
+pxc-db:
+  enabled: false
+  allowUnsafeConfigurations: false
+  pxc:
+    size: 3
+    expose:
+      enabled: false
+    disableTLS: true
+    resources:
+      requests:
+        cpu: 250m
+        memory: 488Mi
+      limits:
+        cpu: 1000m
+        memory: 977Mi
+    # User defined MySQL options according to MySQL configuration file syntax
+    configuration: |
+      [mysqld]
+      # Required for db import / reference data / backups
+      # https://forums.percona.com/t/import-mysql-dump-to-pxc/6104
+      # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
+      pxc_strict_mode=PERMISSIVE
+    persistence:
+      size: 8Gi
+  haproxy:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 122Mi
+      limits:
+        cpu: 500m
+        memory: 244Mi
+  logcollector:
+    enabled: false
+  backup:
+    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
+    #enabled: false
+    schedule: []
+  secrets:
+    passwords:
+      root: drupal

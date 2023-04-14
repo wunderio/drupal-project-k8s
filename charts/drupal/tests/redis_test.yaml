@@ -1,4 +1,4 @@
-suite: drupal memcached
+suite: drupal redis
 templates:
   - drupal-deployment.yaml
   - drupal-configmap.yaml
@@ -6,24 +6,27 @@ capabilities:
   apiVersions:
     - pxc.percona.com/v1
 tests:
-  - it: sets memcached hostname in drupal environment if memcached is enabled
+  - it: sets redis hostname in drupal environment if redis is enabled
     template: drupal-deployment.yaml
     set:
-      memcached.enabled: true
+      redis:
+        enabled: true
+        auth:
+          password: "foo"
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: MEMCACHED_HOST
-            value: RELEASE-NAME-memcached
+            name: REDIS_HOST
+            value: RELEASE-NAME-redis-master
 
-  - it: sets no memcached hostname in drupal environment if memcached is disabled
+  - it: sets no redis hostname in drupal environment if redis is disabled
     template: drupal-deployment.yaml
     set:
-      memcached.enabled: false
+      redis.enabled: false
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].env
           content:
-            name: MEMCACHED_HOST
-            value: RELEASE-NAME-memcached
+            name: REDIS_HOST
+            value: RELEASE-NAME-redis-master

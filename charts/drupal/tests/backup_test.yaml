@@ -2,6 +2,9 @@ suite: reference data
 templates:
   - backup-cron.yaml
   - backup-volume.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: By default no backup cron job or volume is created
     template: backup-cron.yaml
@@ -25,16 +28,3 @@ tests:
     - hasDocuments:
         count: 2
       template: backup-volume.yaml
-
-  - it: has no gdpr-dump configuration
-    template: backup-cron.yaml
-    set:
-      backup.enabled: true
-    asserts:
-    - notContains:
-        path: spec.jobTemplate.spec.template.spec.containers[0].volumeMounts
-        content:
-          name: gdpr-dump
-          mountPath: /etc/my.cnf.d/gdpr-dump.cnf
-          readOnly: true
-          subPath: gdpr-dump

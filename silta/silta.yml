@@ -5,13 +5,18 @@
 # for all possible options.
 
 varnish:
-  enabled: false
+  enabled: true
 
 elasticsearch:
   enabled: true
 
 memcached:
   enabled: false
+
+redis:
+  enabled: false
+  auth:
+    password: "foo"
 
 mounts:
   private-files:
@@ -37,3 +42,8 @@ silta-release:
         - namespaceSelector:
             matchLabels:
               name: drupal-project
+
+nginx:
+  extraConfig: |
+    # Show server host name as header
+    add_header X-Backend-Server $hostname;

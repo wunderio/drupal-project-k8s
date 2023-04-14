@@ -1,18 +1,25 @@
-apiVersion: v1
-name: drupal
-version: 0.3.97
 apiVersion: v2
+name: drupal
+version: 0.3.143
 dependencies:
 - name: mariadb
   version: 7.5.x
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
+- name: pxc-db
+  version: 1.9.x
+  repository: https://percona.github.io/percona-helm-charts/
+  condition: pxc-db.enabled
 - name: memcached
   version: 4.2.x
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: memcached.enabled
+- name: redis
+  version: 16.13.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: redis.enabled
 - name: mailhog
-  version: 3.1.x
+  version: 5.1.x
   repository: https://codecentric.github.io/helm-charts
   condition: mailhog.enabled
 - name: elasticsearch

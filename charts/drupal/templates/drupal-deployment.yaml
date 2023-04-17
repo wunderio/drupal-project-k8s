@@ -12,6 +12,11 @@ spec:
     matchLabels:
       {{- include "drupal.release_selector_labels" . | nindent 6 }}
       deployment: drupal
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0%
+      maxSurge: 50%
   template:
     metadata:
       labels:
@@ -38,13 +43,6 @@ spec:
         readinessProbe:
           exec:
             command: ['/bin/bash', '-c', '/php-fpm-probe.sh']
-        lifecycle:
-          postStart:
-            exec:
-              command:
-              - bash
-              - -c
-              - cp /tmp/zz-custom.conf /usr/local/etc/php-fpm.d/zz-custom.conf
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 
@@ -52,6 +50,10 @@ spec:
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
         env:
+        - name: RELEASE_NAME
+          value: "{{ .Release.Name }}"
+        - name: PROJECT_NAME
+          value: "{{ .Values.projectName | default .Release.Namespace }}"
         ports:
         - containerPort: 8080
           name: drupal
@@ -91,6 +93,10 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep", "5"]
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
@@ -170,6 +176,29 @@ spec:
     name: {{ .Release.Name }}-drupal
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  {{- if .Values.autoscaling.metrics }}
   metrics:
-    {{- toYaml .Values.autoscaling.metrics | nindent 4 }}
+  {{- if eq ( include "drupal.autoscaling.api-version" . | trim ) "autoscaling/v2beta1" }}
+  {{- range .Values.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      targetAverageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if eq ( include "drupal.autoscaling.api-version" . | trim ) "autoscaling/v2" }}
+  {{- range .Values.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      target:
+        type: Utilization
+        averageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}

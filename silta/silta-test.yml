@@ -2,3 +2,8 @@
 referenceData:
   enabled: true
   referenceEnvironment: 'feature/test-cluster/reference'
+
+silta-release:
+  proxy:
+    # Redundant on test cluster due to nat gateway
+    enabled: false

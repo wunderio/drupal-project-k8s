@@ -13,6 +13,9 @@ executors:
   cicd80:
     docker:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.2
+  cicd80-no_az:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.2-no_az-agnis
 
 jobs:
   site-test:
@@ -62,10 +65,10 @@ workflows:
           chart_repository: ""
           silta_config: silta/silta.yml
           codebase-build:
-            # - run:
-            #     name: Download feature branch build of silta cli
-            #     command: |
-            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+            - run:
+                name: Download feature branch build of silta cli
+                command: |
+                  curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
             - run:
@@ -92,6 +95,7 @@ workflows:
                 - /feature\/aks-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
+                - feature/no-az_libs
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
@@ -112,6 +116,7 @@ workflows:
           # Extend the build-deploy configuration testing master deployment to aks cluster.
           <<: *build-deploy
           name: "Deploy master to AKS cluster"
+          executor: cicd80-no_az
           silta_config: silta/silta.yml,silta/silta-master-aks.yml
           context: silta_aks
           filters:
@@ -119,6 +124,7 @@ workflows:
               only: 
                 - master
                 - feature/new-builder-images
+                - feature/no-az_libs
 
       - site-test:
           name: "Site test"
@@ -130,6 +136,7 @@ workflows:
               only: 
                 - master
                 - feature/new-builder-images
+                - feature/no-az_libs
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.

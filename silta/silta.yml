@@ -47,3 +47,7 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+signalsciences:
+  enabled: true
+  # keys defined in in silta/sigsci.secret

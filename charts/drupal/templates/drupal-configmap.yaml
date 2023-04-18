@@ -78,6 +78,9 @@ data:
     ; Custom configuration below
     {{ .Values.php.php_ini.extraConfig | nindent 4 }}
 
+  nginx_signalsciences_conf: |
+    load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
+    load_module /etc/nginx/modules/ndk_http_module.so;
 
   nginx_conf: |
 

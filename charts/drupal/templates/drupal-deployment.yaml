@@ -86,6 +86,8 @@ spec:
           mountPath: /etc/nginx/modules/nginx_signalsciences.conf
           readOnly: true
           subPath: nginx_signalsciences_conf
+        - name: sigsci-tmp
+          mountPath: /sigsci/tmp
         {{- end }}  
         {{- if .Values.nginx.extraConfig }}
         - name: config
@@ -126,6 +128,8 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-secrets-drupal
               key: signalsciences_secretaccesskey
+        securityContext:
+          readOnlyRootFilesystem: true
         volumeMounts:
         - name: sigsci-tmp
           mountPath: /sigsci/tmp

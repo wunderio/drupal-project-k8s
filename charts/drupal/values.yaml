@@ -760,8 +760,8 @@ pxc-db:
 # https://docs.fastly.com/signalsciences/
 signalsciences:
   enabled: false
-  accessKeyID: ""
-  secretAccessKey: ""
+  accesskeyid: ""
+  secretaccesskey: ""
   image: signalsciences/sigsci-agent
   imageTag: 4.40.0
   # sidecar container resources

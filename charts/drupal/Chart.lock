@@ -15,10 +15,10 @@ dependencies:
   repository: https://codecentric.github.io/helm-charts
   version: 5.1.0
 - name: elasticsearch
-  repository: file://../elasticsearch
-  version: 7.8.1
+  repository: https://helm.elastic.co
+  version: 8.5.1
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:c3512a904de793d2705c98da4735d5ea3d58243442111dfcdf7c7f18b640d7b6
-generated: "2023-01-26T16:58:38.528197461+02:00"
+digest: sha256:a0edc4fc9a3e58ebefff4abdb70678ae8be1b757d2377dfb39f6273313e9d524
+generated: "2023-04-21T12:48:20.410293145+03:00"

@@ -12,6 +12,11 @@ spec:
     matchLabels:
       {{- include "drupal.release_selector_labels" . | nindent 6 }}
       deployment: drupal
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0%
+      maxSurge: 50%
   template:
     metadata:
       labels:
@@ -38,13 +43,6 @@ spec:
         readinessProbe:
           exec:
             command: ['/bin/bash', '-c', '/php-fpm-probe.sh']
-        lifecycle:
-          postStart:
-            exec:
-              command:
-              - bash
-              - -c
-              - cp /tmp/zz-custom.conf /usr/local/etc/php-fpm.d/zz-custom.conf
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 

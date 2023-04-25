@@ -39,7 +39,7 @@ spec:
                   exit 1
                 fi
 
-                # By default run a cron job in a vary simple manner.
+                # By default run a cron job in a very simple manner.
                 if [ "{{ $job.stats }}" != "true" ]; then
                   {{ $job.command | nindent 18 }}
                   exit

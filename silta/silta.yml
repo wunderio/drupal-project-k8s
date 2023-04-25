@@ -22,20 +22,6 @@ mounts:
   private-files:
     enabled: true
 
-php:
-  cron:
-    drupal:
-      schedule: '* * * * *'
-    t1:
-      schedule: '* * * * *'
-      stats: true
-      command: |
-        echo "stats"
-    t2:
-      schedule: '* * * * *'
-      command: |
-        echo "statless"
-
 # Allow access from another namespace for testing purposes.
 silta-release:
   proxy:

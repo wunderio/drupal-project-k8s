@@ -222,7 +222,9 @@ data:
     pm.process_idle_timeout = 60s
     pm.max_requests = 500
 
+    {{ if .Values.php.fpm.json_logs }}
     access.format = "{\"time_iso8601\":\"%{%Y-%m-%dT%H:%M:%S%z}t\",\"time_s\":\"%{%s}t\",\"client_ip\":\"%{REMOTE_ADDR}e\",\"script\":\"%f\",\"method\":\"%m\",\"request_uri\":\"%{REQUEST_URI}e\",\"query\":\"%q\",\"status\":\"%s\",\"cpu_%%\":\"%{total}C\",\"duration_ms\":\"%{miliseconds}d\",\"mem_mb\":\"%{megabytes}M\"}"
+    {{ end }}
 
     ; Custom configuration below
     {{ .Values.php.fpm.extraConfig | nindent 4 }}

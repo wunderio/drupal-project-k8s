@@ -44,7 +44,6 @@ silta-release:
               name: drupal-project
 
 nginx:
-  json_logs: true
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;

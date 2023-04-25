@@ -52,7 +52,7 @@ spec:
                 { set +x ; } 2>/dev/null
 
                 # We need to save the executable command(s) into a file,
-                # because the 'time' can exeute only command-files,
+                # because the 'time' can execute only command files,
                 # not the shell constructs.
                 script="/tmp/cron.$$"
                 cat << CMD > "${script}"
@@ -62,29 +62,29 @@ spec:
                 CMD
                 chmod 755 "${script}"
 
-                # Try to make the tmp files more unique.
-                # $$ = pid of current running shell.
+                # Try to make the temporary files more unique.
+                # $$ = PID of the current running shell.
                 stats="/tmp/stats.$$"
                 output="/tmp/output.$$"
                 output_json="/tmp/output_json.$$"
 
                 # The execution of the actual cron command.
-                # For backwards compatibility reasons sent the output to stdout as well (tee).
-                /usr/bin/time -f '"elapsed_time_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}" 2>&1 \
+                # For backward compatibility reasons send the output to stdout as well (tee).
+                /usr/bin/time -f '"duration_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}" 2>&1 \
                 | tee "${output}"
 
-                # It's tricky to get exit code of a random command from a pipeline.
+                # It's tricky to get the exit code of a random command from a pipeline.
                 # It is highly shell-dependent.
                 exit_code="${PIPESTATUS[0]}"
 
-                # Convert the command output to json.
+                # Convert the command output to JSON.
                 php -r 'print json_encode(file_get_contents("/dev/stdin"))."\n";' < "${output}" > "${output_json}"
 
                 # If the error code is non-zero,
                 # the output file contains also a warning,
-                # which is not json.
+                # which is not JSON.
                 # Get rid of this.
-                stats="$(grep -E '"elapsed_time_s".*"peak_mem_kb"' ${stats})"
+                stats="$(grep -E '"duration_s".*"peak_mem_kb"' ${stats})"
 
                 cron_name="{{ $index }}"
 

@@ -26,12 +26,12 @@ php:
   cron:
     drupal:
       schedule: '* * * * *'
-    testing-stat:
+    t1:
       schedule: '* * * * *'
-      stat: true
+      stats: true
       command: |
         echo "stats"
-    testing-statless:
+    t2:
       schedule: '* * * * *'
       command: |
         echo "statless"

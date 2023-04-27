@@ -425,7 +425,7 @@ referenceData:
       memory: 488Mi
 
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
-# Uses formatters from fakerphp.github.io/formatters 
+# Uses formatters from fakerphp.github.io/formatters
 gdprDump:
   tables:
     cache:

@@ -575,8 +575,8 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 6.8.22
-  # imageTag: 7.17.9
+  # imageTag: 6.8.22
+  imageTag: 7.17.9
   # imageTag: 8.7.0
 
   replicas: 1
@@ -585,23 +585,15 @@ elasticsearch:
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
   # Compatibility with es 6.x images
-  # Fixes following errors:
-  # 1. ERROR: Caused by: java.lang.IllegalArgumentException: unknown setting [node.roles] 
-  # please check that any required plugins are installed, or check the breaking changes 
-  # documentation for removed settings   
-  # 2. ERROR: elasticsearch org.elasticsearch.bootstrap.StartupException: java.lang.IllegalArgumentException: 
-  # unknown setting [cluster.initial_master_nodes] please check that any required plugins are installed, 
-  # or check  the breaking changes documentation for removed settings                                                                                                                                                     
   # Note: remove this when using 7.x+ images
-  roles: []
-  # Compatibility with es 6.x images
-  extraEnvs:
-    - name: node.data
-      value: "true"
-    - name: node.ingest
-      value: "true"
-    - name: node.master
-      value: "true"
+  # roles: []
+  # extraEnvs:
+  #   - name: node.data
+  #     value: "true"
+  #   - name: node.ingest
+  #     value: "true"
+  #   - name: node.master
+  #     value: "true"
 
   # 7.x images does not require any extra settings
 
@@ -619,8 +611,8 @@ elasticsearch:
   # Transport SSL must be enabled if security is enabled. Please set [xpack.security.transport.ssl.enabled] 
   # to [true] or disable security by setting [xpack.security.enabled] to [false]
   # extraEnvs:
-    # - name: xpack.security.enabled
-    #   value: "false"
+  #   - name: xpack.security.enabled
+  #     value: "false"
 
 
   # elasticsearch {"@timestamp":"2023-04-25T11:18:48.159Z", "log.level":"ERROR", "message":"fatal exception while booting Elasticsearch", "ecs.version": "1.2.0","service.name":"ES_ECS","event.dataset":"elastic
@@ -670,11 +662,8 @@ elasticsearch:
   # .elasticsearch.cluster.coordination.Coordinator","elasticsearch.cluster.uuid":"p7YbrK3pSE2ESOh5NMfpmQ","elasticsearch.node.id":"TPvovuV3R0ydJ72Ga983IQ","elasticsearch.node.name":"feature-elasticsearch-8-es-0","e
   # lasticsearch.cluster.name":"elasticsearch"}  
 
-  # TODO: Adapt post-install ES pinger to use SSL based on settings below
-  #       or lookup es certs from secrets and enable SSL in pinger accordingly.
-  #       that might help running 6.x images.
-  # TODO: Check if es ssl secret gets cleaned up when release is deleted.
-  # Fixes error: "io.netty.handler.ssl.NotSslRecordException: not an SSL/TLS record"
+  # TODO: Test with drupal integration module, if we still need to force non-ssl connection
+  # related param: elasticsearch.extraEnvs[xpack.security.enabled]
   # createCert: false
   # # Adjust to "createCert" setting
   # protocol: http

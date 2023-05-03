@@ -25,7 +25,6 @@ dependencies:
 - name: elasticsearch
   version: 8.5.x
   repository: https://helm.elastic.co
-  # repository: file://../elasticsearch
   condition: elasticsearch.enabled
 - name: silta-release
   version: 0.1.1

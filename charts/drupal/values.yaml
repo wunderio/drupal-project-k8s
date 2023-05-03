@@ -575,98 +575,24 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  # imageTag: 6.8.22
-  imageTag: 7.17.9
-  # imageTag: 8.7.0
+  imageTag: 6.8.22
 
   replicas: 1
   minimumMasterNodes: 1
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
-  # Compatibility with es 6.x images
-  # Note: remove this when using 7.x+ images
-  # roles: []
-  # extraEnvs:
-  #   - name: node.data
-  #     value: "true"
-  #   - name: node.ingest
-  #     value: "true"
-  #   - name: node.master
-  #     value: "true"
-
-  # 7.x images does not require any extra settings
-
-  # 8.x images have issue when a single node is bein used: https://github.com/elastic/helm-charts/issues/1785
-  # Error: This node is a fully-formed single-node cluster with cluster UUID [p7YbrK3pSE2ESOh5NMfpmQ], 
-  # but it is configured as if to discover other nodes and form a multi-node cluster via the 
-  # [discovery.seed_hosts=[feature-elasticsearch-8-es-headless]] setting. 
-  # Fully-formed clusters do not attempt to discover other nodes, and nodes with different cluster UUIDs 
-  # cannot belong to the same cluster. The cluster UUID persists across restarts and can only be changed 
-  # by deleting the contents of the node's data path(s). Remove the discovery configuration to suppress 
-  # this message.
-
+  # Compatibility with es 6.x images, re-override with original chart values when using 7.x+ images.
+  # see: https://github.com/elastic/helm-charts/blob/0ae236bc033a05b9e43f1ae5c196186e0d1473ff/elasticsearch/values.yaml#L11-L22
+  roles: []
   
-  # Fixes following error:
-  # Transport SSL must be enabled if security is enabled. Please set [xpack.security.transport.ssl.enabled] 
-  # to [true] or disable security by setting [xpack.security.enabled] to [false]
-  # extraEnvs:
-  #   - name: xpack.security.enabled
-  #     value: "false"
-
-
-  # elasticsearch {"@timestamp":"2023-04-25T11:18:48.159Z", "log.level":"ERROR", "message":"fatal exception while booting Elasticsearch", "ecs.version": "1.2.0","service.name":"ES_ECS","event.dataset":"elastic
-  # search.server","process.thread.name":"main","log.logger":"org.elasticsearch.bootstrap.Elasticsearch","elasticsearch.node.name":"feature-elasticsearch-8-es-0","elasticsearch.cluster.name":"elasticsearch","e
-  # rror.type":"java.lang.IllegalArgumentException","error.message":"setting [cluster.initial_master_nodes] is not allowed when [discovery.type] is set to [single-node]","error.stack_trace":"java.lang.IllegalA
-  # rgumentException: setting [cluster.initial_master_nodes] is not allowed when [discovery.type] is set to [single-node]\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.cluster.coordination.ClusterBoot
-  # strapService.<init>(ClusterBootstrapService.java:88)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.cluster.coordination.Coordinator.<init>(Coordinator.java:279)\n\tat org.elasticsearch.server@8.7.
-  # 0/org.elasticsearch.discovery.DiscoveryModule.<init>(DiscoveryModule.java:193)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.node.Node.<init>(Node.java:903)\n\tat org.elasticsearch.server@8.7.0/or
-  # g.elasticsearch.node.Node.<init>(Node.java:324)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.bootstrap.Elasticsearch$2.<init>(Elasticsearch.java:216)\n\tat org.elasticsearch.server@8.7.0/org.elas
-  # ticsearch.bootstrap.Elasticsearch.initPhase3(Elasticsearch.java:216)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.bootstrap.Elasticsearch.main(Elasticsearch.java:67)\n"}                          
-  # elasticsearch ERROR: Elasticsearch did not exit normally - check the logs at /usr/share/elasticsearch/logs/elasticsearch.log    
-  # esConfig:
-  #   elasticsearch.yml: |
-  #     discovery:
-  #       type: single-node
-  #       seed_hosts: ""
-  
-    # Disable node discovery for single node cluster
-    # - name: discovery.type
-    #   value: single-node
-    # - name: cluster.initial_master_nodes
-    #   value: null
-
-    #     elasticsearch {"@timestamp":"2023-04-25T11:04:44.031Z", "log.level":"ERROR", "message":"fatal exception while booting Elasticsearch", "ecs.version": "1.2.0","service.name":"ES_ECS","event.dataset":"elastic
-    # search.server","process.thread.name":"main","log.logger":"org.elasticsearch.bootstrap.Elasticsearch","elasticsearch.node.name":"feature-elasticsearch-8-es-0","elasticsearch.cluster.name":"elasticsearch","e
-    # rror.type":"java.lang.IllegalArgumentException","error.message":"setting [cluster.initial_master_nodes] is not allowed when [discovery.type] is set to [single-node]","error.stack_trace":"java.lang.IllegalA
-    # rgumentException: setting [cluster.initial_master_nodes] is not allowed when [discovery.type] is set to [single-node]\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.cluster.coordination.ClusterBoot
-    # strapService.<init>(ClusterBootstrapService.java:88)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.cluster.coordination.Coordinator.<init>(Coordinator.java:279)\n\tat org.elasticsearch.server@8.7.
-    # 0/org.elasticsearch.discovery.DiscoveryModule.<init>(DiscoveryModule.java:193)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.node.Node.<init>(Node.java:903)\n\tat org.elasticsearch.server@8.7.0/or
-    # g.elasticsearch.node.Node.<init>(Node.java:324)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.bootstrap.Elasticsearch$2.<init>(Elasticsearch.java:216)\n\tat org.elasticsearch.server@8.7.0/org.elas
-    # ticsearch.bootstrap.Elasticsearch.initPhase3(Elasticsearch.java:216)\n\tat org.elasticsearch.server@8.7.0/org.elasticsearch.bootstrap.Elasticsearch.main(Elasticsearch.java:67)\n"}                          
-    # elasticsearch ERROR: Elasticsearch did not exit normally - check the logs at /usr/share/elasticsearch/logs/elasticsearch.log 
-    # - name: node.roles
-    #   value: master,data,data_content,data_hot,data_warm,data_cold,ingest,ml,remote_cluster_client,transform
-
-  # esConfig:
-  #   elasticsearch.yml: |
-  #     discovery:
-  #       type: single-node
-  #       seed_hosts: ""
-
-
-  #   elasticsearch {"@timestamp":"2023-04-24T10:45:28.104Z", "log.level": "WARN", "message":"This node is a fully-formed single-node cluster with cluster UUID [p7YbrK3pSE2ESOh5NMfpmQ], but it is configured as if to d
-  # iscover other nodes and form a multi-node cluster via the [discovery.seed_hosts=[feature-elasticsearch-8-es-headless]] setting. Fully-formed clusters do not attempt to discover other nodes, and nodes with differ
-  # ent cluster UUIDs cannot belong to the same cluster. The cluster UUID persists across restarts and can only be changed by deleting the contents of the node's data path(s). Remove the discovery configuration to s
-  # uppress this message.", "ecs.version": "1.2.0","service.name":"ES_ECS","event.dataset":"elasticsearch.server","process.thread.name":"elasticsearch[feature-elasticsearch-8-es-0][scheduler][T#1]","log.logger":"org
-  # .elasticsearch.cluster.coordination.Coordinator","elasticsearch.cluster.uuid":"p7YbrK3pSE2ESOh5NMfpmQ","elasticsearch.node.id":"TPvovuV3R0ydJ72Ga983IQ","elasticsearch.node.name":"feature-elasticsearch-8-es-0","e
-  # lasticsearch.cluster.name":"elasticsearch"}  
-
-  # TODO: Test with drupal integration module, if we still need to force non-ssl connection
+  # Drupal integration module still requires non-ssl connection
   # related param: elasticsearch.extraEnvs[xpack.security.enabled]
-  # createCert: false
-  # # Adjust to "createCert" setting
-  # protocol: http
+  createCert: false
+  protocol: http
+  extraEnvs:
+    - name: xpack.security.enabled
+      value: "false"
 
   # Disable service links that cause a slow startup.
   enableServiceLinks: false

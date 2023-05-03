@@ -150,7 +150,33 @@ imagePullSecrets:
       name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
+{{- if index ( index .Values "mariadb-galera" ) "enabled" }}
+- name: MARIADB_GALERA_DB_USER
+  value: "root"
+- name: MARIADB_GALERA_DB_NAME
+  value: "drupal"
+- name: MARIADB_GALERA_DB_HOST
+  value: {{ .Release.Name }}-mariadb-galera
+- name: MARIADB_GALERA_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-galera
+      key: mariadb-password
+{{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
+- name: DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+{{- if and ( index ( index .Values "mariadb-galera" ) "enabled" ) ( eq .Values.db.primary "mariadb-galera" ) }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
 - name: DB_NAME

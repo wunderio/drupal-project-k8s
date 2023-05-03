@@ -5,10 +5,10 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
-  enabled: true
+  enabled: false
 
 memcached:
   enabled: false
@@ -57,7 +57,27 @@ php:
       schedule: '~ 0 31 2 *'
 
 # mariadb-galera:
+mariadb-galera:
+  enabled: true
 #   galera:
 #     bootstrap:
 #       bootstrapFromNode: 0
 #       forceSafeToBootstrap: true
+
+  # initdbScripts:
+  #   my_init_script.sh: |
+  #     #!/bin/sh
+  #     if [[ $(hostname) == *-0  ]]; then
+  #       echo "First node"
+  #       mysql -P 3306 -uroot -prandompassword -e "create database new_database";
+  #     else
+  #       echo "No first node"
+  #     fi
+
+mariadb:
+  enabled: true
+
+# TODO: test primary db switching
+db:
+  primary: mariadb-galera
+

@@ -563,7 +563,10 @@ mariadb:
 
 # https://github.com/bitnami/charts/blob/f086fb89596a23b98658bcc2262e983c13e0eba9/bitnami/mariadb-galera/values.yaml
 mariadb-galera:
-  enabled: true
+  enabled: false
+  replicaCount: 3
+  # podManagementPolicy: Parallel
+  podManagementPolicy: Parallel
   # galera:
   #   name: ""
   db:
@@ -572,21 +575,21 @@ mariadb-galera:
     password: drupal
   rootUser:
     password: drupal
-  
+  galera:
+    mariabackup:
+      password: drupal
   persistence:
-    # Database storage disk space allocation
-    # Request assistance from ops team after changing this on existing deployment.
-    size: 1G
     resources:
       requests:
         cpu: 25m
         memory: 384M
       limits:
         memory: 512M
-
-  podManagementPolicy: Parallel
-  replicaCount: 2
-
+    # Database storage disk space allocation
+    # Request assistance from ops team after changing this on existing deployment.
+    size: 1G
+    labels:
+      release: "{{ .Release.Name }}"
   affinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -597,16 +600,6 @@ mariadb-galera:
             operator: NotIn
             values:
             - static-ip
-
-  # initdbScripts:
-  #   my_init_script.sh: |
-  #     #!/bin/sh
-  #     if [[ $(hostname) == *-0  ]]; then
-  #       echo "First node"
-  #       mysql -P 3306 -uroot -prandompassword -e "create database new_database";
-  #     else
-  #       echo "No first node"
-  #     fi
 
 varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish

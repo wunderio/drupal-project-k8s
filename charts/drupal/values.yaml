@@ -561,7 +561,7 @@ mariadb:
               - static-ip
   enableServiceLinks: false
 
-
+# https://github.com/bitnami/charts/blob/f086fb89596a23b98658bcc2262e983c13e0eba9/bitnami/mariadb-galera/values.yaml
 mariadb-galera:
   enabled: true
   # galera:
@@ -793,7 +793,7 @@ solr:
         - ReadWriteOnce
 
 db:
-  # Available options: mariadb, pxc-db
+  # Available options: mariadb, mariadb-galera, pxc-db
   primary: mariadb
 
 # Percona XtraDB Cluster

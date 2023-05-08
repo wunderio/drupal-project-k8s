@@ -34,7 +34,7 @@ commands:
     steps:
       - run:
           name: Validate site url <<parameters.site_url>>
-          command: |            
+          command: |
             curl -u $SITE_TEST_BAUTH <<parameters.site_url>>
 
 workflows:
@@ -43,10 +43,10 @@ workflows:
     jobs:
       - silta/drupal-validate:
           name: validate
-          
+
           # Use custom executor.
           executor: cicd80
-          
+
           post-validation:
             - run:
                 name: Helm unit tests
@@ -104,7 +104,7 @@ workflows:
           context: silta_test
           filters:
             branches:
-              only: 
+              only:
                 - feature/test-cluster
                 - /feature\/test-cluster\/.*/
                 - feature/Traefik-ratelimiting
@@ -119,7 +119,7 @@ workflows:
           context: silta_aks
           filters:
             branches:
-              only: 
+              only:
                 - master
                 - feature/new-builder-images
 
@@ -130,7 +130,7 @@ workflows:
             - "Deploy master to AKS cluster"
           filters:
             branches:
-              only: 
+              only:
                 - master
                 - feature/new-builder-images
 
@@ -142,7 +142,7 @@ workflows:
           context: silta_aws
           filters:
             branches:
-              only: 
+              only:
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
 
@@ -154,7 +154,7 @@ workflows:
           context: silta_aks
           filters:
             branches:
-              only: 
+              only:
                 - feature/aks-cluster
                 - /feature\/aks-cluster\/.*/
 
@@ -164,7 +164,7 @@ workflows:
           name: build-deploy-prod
           executor: cicd80
           silta_config: silta/silta.yml,silta/silta-prod.yml
-          context: silta_finland
+          context: silta_backup
           filters:
             branches:
               only: production
@@ -179,17 +179,17 @@ workflows:
     jobs:
       - silta/drupal-validate:
           name: validate
-          
+
           # Use custom executor.
           executor: cicd80
-          
+
           post-validation:
             - run:
                 name: Helm unit tests
                 command: |
                   helm unittest ./charts/silta-release --helm3
                   helm unittest ./charts/drupal --helm3
-                  
+
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
 
@@ -236,7 +236,7 @@ workflows:
           context: silta_aks
           filters:
             branches:
-              only: 
+              only:
                 - master
 
       - site-test:
@@ -246,5 +246,5 @@ workflows:
             - "Deploy master to AKS cluster"
           filters:
             branches:
-              only: 
+              only:
                 - master

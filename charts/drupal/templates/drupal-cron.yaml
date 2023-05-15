@@ -40,9 +40,14 @@ spec:
                 fi
 
                 # By default run a cron job in a very simple manner.
-                if [ "{{ $job.stats }}" != "true" ]; then
+                if [ '{{ .Values.logging.format }}' == 'default' ]; then
                   {{ $job.command | nindent 18 }}
                   exit
+                fi
+
+                if [ '{{ .Values.logging.format }}' != 'json' ]; then
+                  echo 'Silta: yml: logging: format: Expecting "default" or "json", found "{{ .Values.logging.format }}".' 1>&2
+                  exit 1
                 fi
 
                 # Run the following code, if the silta.yml has "stat: true" in the cron command.

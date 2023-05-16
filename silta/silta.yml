@@ -47,13 +47,3 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
-
-php:
-  cron:
-    test:
-      schedule: '* * * * *'
-      command: |
-        echo "stats xxx"
-
-logging:
-  format: json

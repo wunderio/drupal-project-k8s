@@ -91,7 +91,7 @@ data:
     }
 
     http {
-        
+
         # List of upstream proxies we trust to set X-Forwarded-For correctly.
         {{- if kindIs "string" .Values.nginx.realipfrom }}
         set_real_ip_from            {{ .Values.nginx.realipfrom }};
@@ -108,7 +108,7 @@ data:
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
 
-        {{ if .Values.nginx.json_logs }}
+        {{ if eq .Values.logging.format "json" }}
         log_format main             escape=json '{'
 
                                       # time
@@ -146,11 +146,12 @@ data:
                                       ',"basic_auth_user":"$remote_user"'
 
                                     '}';
-        {{ else }}
+        {{ end }}
+
+        {{ if eq .Values.logging.format "json" }}
         log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
                                     '$status $body_bytes_sent "$http_referer" '
                                     '"$http_user_agent" "$http_x_forwarded_for"';
-
         {{ end }}
 
         access_log                  /proc/self/fd/1 main;
@@ -196,7 +197,7 @@ data:
         {{- if .Values.nginx.content_security_policy }}
         add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
         {{- end }}
-        
+
         port_in_redirect off;
         merge_slashes off;
 
@@ -295,7 +296,7 @@ data:
     fastcgi_hide_header 'X-Drupal-Cache-Contexts';
     fastcgi_hide_header 'X-Drupal-Cache-Tags';
     {{- end }}
-    
+
     # Mitigate HTTPoxy
     # https://httpoxy.org/
     fastcgi_param HTTP_PROXY "";
@@ -328,7 +329,7 @@ data:
         {{- end }}
     }
     {{- end }}
-    
+
     # List health checks that need to return status 200 here
     map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
 
@@ -597,7 +598,7 @@ data:
         }
         location @files_retry {
             internal;
-            # Pass file request to drupal as a final fallback. 
+            # Pass file request to drupal as a final fallback.
             try_files $uri @drupal;
         }
         {{- end }}
@@ -737,10 +738,10 @@ data:
 
   php-fpm-probe.sh: |
     #!/bin/bash
-    
+
     # Prevent requests during the site installation process.
-    if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then 
-        exit 1; 
+    if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
+        exit 1;
     fi
 
     # Ping php-fpm process

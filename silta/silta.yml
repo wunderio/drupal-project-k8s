@@ -53,4 +53,7 @@ php:
     test:
       schedule: '* * * * *'
       command: |
-        echo "stats"
+        echo "stats xxx"
+
+logging:
+  format: json

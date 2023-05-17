@@ -24,9 +24,9 @@ mounts:
 
 # Allow access from another namespace for testing purposes.
 silta-release:
-  proxy:
-    enabled: true
-    no_proxy: ".example.com"
+  # proxy:
+  #   enabled: true
+  #   no_proxy: ".example.com"
   ingressAccess:
     test:
       additionalPodSelector:

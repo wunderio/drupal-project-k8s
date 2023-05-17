@@ -49,4 +49,4 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 logging:
-  format: json
+  format: default

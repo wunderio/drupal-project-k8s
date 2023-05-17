@@ -142,7 +142,7 @@ data:
                                     ',"basic_auth_user":"$remote_user"'
                                   '}';
       {{ end }}
-      {{ if eq $.Values.logging.format "json" }}
+      {{ if eq $.Values.logging.format "default" }}
       log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
                                   '$status $body_bytes_sent "$http_referer" '
                                   '"$http_user_agent" "$http_x_forwarded_for"';

@@ -755,3 +755,13 @@ pxc-db:
   secrets:
     passwords:
       root: drupal
+
+logging:
+  # Currently supported formats are:
+  # - "default"
+  # - "json"
+  # It affecs the output of:
+  # - cron
+  # - nginx-access
+  # - php-fpm-access
+  format: default

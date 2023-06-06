@@ -35,7 +35,7 @@ webRoot: /app/web
 replicas: 1
 
 # Provide an override for the DRUSH_OPTIONS_URI The default is: http://{{- template "drupal.domain" . }}
-drushUri: ""
+drushUri: "http://test-drush-uri.dev.wdr.io"
 
 # Enable autoscaling using HorizontalPodAutoscaler
 # see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/

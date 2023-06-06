@@ -134,6 +134,7 @@
       "properties": {
         "format": { "type": "string" }
       }
-    }
+    },
+    "drushUri": { "type": "string" }
   }
 }

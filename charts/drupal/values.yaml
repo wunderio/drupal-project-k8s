@@ -34,6 +34,9 @@ webRoot: /app/web
 # Multiple pods make sense for high availability.
 replicas: 1
 
+# Provide an override for the DRUSH_OPTIONS_URI The default is: http://{{- template "drupal.domain" . }}
+drushUri: ""
+
 # Enable autoscaling using HorizontalPodAutoscaler
 # see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
 autoscaling:

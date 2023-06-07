@@ -74,8 +74,8 @@ metadata:
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
     auto-downscale/services: {{ include "drupal.servicename" . }}
-    {{- if and (index .Values "release").downscaler.releaseMinAge (ne (index .Values "release").downscaler.releaseMinAge "") }}
-    auto-downscale/min-age: {{(index .Values "release").downscaler.releaseMinAge}}
+    {{- if and (index .Values "silta-release").downscaler.releaseMinAge (ne (index .Values "silta-release").downscaler.releaseMinAge "") }}
+    auto-downscale/min-age: {{(index .Values "silta-release").downscaler.releaseMinAge}}
     {{- end }}
     {{- end }}
   labels:
@@ -237,8 +237,8 @@ metadata:
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ $.Release.Name }}"
     auto-downscale/services: {{ include "drupal.servicename" $ }}
-    {{- if and (index .Values "release").downscaler.releaseMinAge (ne (index .Values "release").downscaler.releaseMinAge "") }}
-    auto-downscale/min-age: {{(index .Values "release").downscaler.releaseMinAge}}
+    {{- if and (index .Values "silta-release").downscaler.releaseMinAge (ne (index .Values "silta-release").downscaler.releaseMinAge "") }}
+    auto-downscale/min-age: {{(index .Values "silta-release").downscaler.releaseMinAge}}
     {{- end }}
     {{- end }}
   labels:

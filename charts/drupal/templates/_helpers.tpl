@@ -139,7 +139,7 @@ imagePullSecrets:
 - name: PXC_DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
@@ -165,7 +165,7 @@ imagePullSecrets:
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- end }}

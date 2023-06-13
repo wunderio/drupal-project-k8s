@@ -83,7 +83,7 @@ data:
     load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
     load_module /etc/nginx/modules/ndk_http_module.so;
   {{- end }}
-    
+
   nginx_conf: |
 
     include modules/*.conf;
@@ -100,7 +100,7 @@ data:
     }
 
     http {
-        
+
         {{- if .Values.signalsciences.enabled }}
         # Signal sciences agent socket
         sigsci_agent_host unix:/sigsci/tmp/sigsci.sock;
@@ -473,10 +473,10 @@ data:
         {{- end }}
         {{- end }}
 
-        ## Handle D7 image styles
-        location ~* /files/styles/ {
+        # Passes image style and asset generation to PHP D10.1.
+          location ~ ^/sites/.*/files/(css|js|styles)/ {
           expires 365d;
-          try_files $uri @drupal;
+          try_files $uri @rewrite;
         }
 
         ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.

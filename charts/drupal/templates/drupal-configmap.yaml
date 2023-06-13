@@ -476,7 +476,7 @@ data:
         # Passes image style and asset generation to PHP D10.1.
           location ~ ^/sites/.*/files/(css|js|styles)/ {
           expires 365d;
-          try_files $uri @rewrite;
+          try_files $uri @drupal;
         }
 
         ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.

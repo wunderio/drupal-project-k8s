@@ -2,11 +2,11 @@ name: Silta
 recipe: drupal9
 
 config:
-  php: "7.4"
+  php: "8.1"
   via: nginx
   webroot: web
   database: "mariadb:10.3"
-  xdebug: off
+  xdebug: true
   config:
     php: .lando/php.ini
 

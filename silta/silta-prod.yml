@@ -10,10 +10,6 @@ exposeDomains:
 #   gce:
 #     staticIpAddressName: gke-ingress-test
 
-# TODO: Move this to orb
-# cluster:
-#   vpcNative: true
-
 # nginx:
 #   serverExtraConfig: |
 #     # Traefik IP for pre-generated hostname

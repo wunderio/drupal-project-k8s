@@ -89,6 +89,10 @@ ingress:
             period: 1s
             average: 32
             burst: 90
+      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rpm: "300"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+      nginx.ingress.kubernetes.io/limit-connections: "20"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -356,7 +360,10 @@ shell:
     storage: 1M
 
   # Extend resources defined under php.resources.
-  resources: {}
+  resources:
+    requests:
+      cpu: 5m
+      memory: 64Mi
 
   # Set a restriction on where the shell pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
@@ -418,7 +425,7 @@ referenceData:
       memory: 488Mi
 
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
-# Uses formatters from fakerphp.github.io/formatters 
+# Uses formatters from fakerphp.github.io/formatters
 gdprDump:
   tables:
     cache:
@@ -748,3 +755,26 @@ pxc-db:
   secrets:
     passwords:
       root: drupal
+
+# Fastly Signal Sciences support
+# https://docs.fastly.com/signalsciences/
+signalsciences:
+  enabled: false
+  accesskeyid: ""
+  secretaccesskey: ""
+  image: signalsciences/sigsci-agent
+  imageTag: 4.40.0
+  # sidecar container resources
+  resources:
+    requests:
+      cpu: 20m
+      memory: 40Mi
+    limits:
+      cpu: 40m
+      memory: 80Mi
+
+# Logging configurations for services that support them.
+# BETA feature, currently only supported by drupal-cron.
+logging:
+  # Currently supported formats are "default" and "json".
+  format: default

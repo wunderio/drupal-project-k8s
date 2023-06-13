@@ -565,8 +565,11 @@ mariadb:
 mariadb-galera:
   enabled: false
   replicaCount: 3
-  # podManagementPolicy: Parallel
+  # TODO: test crash recovery
+  # https://github.com/bitnami/charts/pull/12886
+  # https://github.com/bitnami/charts/pull/12886/commits/8480ab5cb6572ebafc4fbf43fea07f80c2d9bd0f
   podManagementPolicy: Parallel
+  # TODO: check if there's interference with multiple deployments in the same namespace
   # galera:
   #   name: ""
   db:

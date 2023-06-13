@@ -59,6 +59,12 @@ php:
 # mariadb-galera:
 mariadb-galera:
   enabled: true
+
+  # FOR FUTURE REFERENCE: Test recovery before merging. 
+  # Sequence to break cluster:
+  # - Kill 2nd replica (-1), then first (-0) and before first two are ready, 
+  # kill third (-2). Cluster should recover (but it does not).
+
 #   galera:
 #     bootstrap:
 #       bootstrapFromNode: 0
@@ -77,7 +83,6 @@ mariadb-galera:
 mariadb:
   enabled: true
 
-# TODO: test primary db switching
 db:
   primary: mariadb-galera
 

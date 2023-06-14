@@ -48,11 +48,11 @@ nginx:
     # Show server host name as header
     add_header X-Backend-Server $hostname;
 
-# php:
-#   env:
-#     TESTING: testval
-#     secret_TEST:
-#       valueFrom:
-#         secretKeyRef:
-#         name: secret-resource
-#         key: somefield
+php:
+  env:
+    #TESTING: testval
+    secret_TEST:
+      valueFrom:
+        secretKeyRef:
+          name: secret-resource
+          key: somefield

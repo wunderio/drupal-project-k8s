@@ -244,8 +244,10 @@ imagePullSecrets:
 {{- end }}
 # Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
+#- name: {{ $key }}
+#  value: {{ $val.valueFrom.secretKeyRef.name | quote }}
 - name: {{ $key }}
-  value: {{ $val | quote }}
+  {{ $val | toYaml | indent 4 | trim }}
 {{- end }}
 {{- range $index, $mount := $.Values.mounts }}
 {{- if eq $mount.enabled true }}

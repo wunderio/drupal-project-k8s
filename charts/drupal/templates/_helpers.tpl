@@ -135,7 +135,7 @@ imagePullSecrets:
 - name: PXC_DB_NAME
   value: "drupal"
 - name: PXC_DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: PXC_DB_PASS
   valueFrom:
     secretKeyRef:
@@ -161,7 +161,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: DB_PASS
   valueFrom:
     secretKeyRef:

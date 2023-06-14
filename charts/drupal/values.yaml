@@ -737,70 +737,29 @@ pxc-db:
       # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
       pxc_strict_mode=PERMISSIVE
     persistence:
+      enabled: true
       size: 8Gi
-
-  # proxysql:
+  proxysql:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128M
+      limits:
+        cpu: 500m
+        memory: 256M
+  # haproxy:
   #   enabled: true
   #   resources:
   #     requests:
   #       cpu: 100m
-  #       memory: 128M
+  #       memory: 122Mi
   #     limits:
   #       cpu: 500m
-  #       memory: 256M
-
-  haproxy:
-    enabled: true
-    configuration: |
-      global
-        maxconn 2048
-        external-check
-        insecure-fork-wanted
-        stats socket /var/run/haproxy.sock mode 600 expose-fd listeners level user
-        # log /dev/null  local0 
-
-      defaults
-        #log global
-        #no log
-        #mode http
-        #option httplog
-        #option dontlognull
-        option dontlog-normal
-        mode tcp
-        retries 10
-        timeout client 28800s
-        timeout connect 100500
-        timeout server 28800s
-
-      frontend galera-in
-        bind *:3309 accept-proxy
-        bind *:3306
-        mode tcp
-        option clitcpka
-        default_backend galera-nodes
-        # mode http
-        # http-request set-log-level err
-        # no log
-
-      frontend galera-replica-in
-        bind *:3307
-        mode tcp
-        option clitcpka
-        default_backend galera-replica-nodes
-        # mode http
-        # http-request set-log-level err
-        # no log
-    resources:
-      requests:
-        cpu: 100m
-        memory: 122Mi
-      limits:
-        cpu: 500m
-        memory: 244Mi
+  #       memory: 244Mi
   logcollector:
     enabled: false
   backup:
-    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
     enabled: false
     # schedule: []
   secrets:

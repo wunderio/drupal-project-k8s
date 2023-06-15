@@ -38,6 +38,12 @@ backup:
 #   basicauth:
 #     enabled: false
 
+nginx:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 30M
+
 php:
   # Reserve more resources for our PHP containerss.
   resources:

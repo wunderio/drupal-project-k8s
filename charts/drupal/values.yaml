@@ -744,19 +744,10 @@ pxc-db:
     resources:
       requests:
         cpu: 100m
-        memory: 128M
+        memory: 122Mi
       limits:
         cpu: 500m
-        memory: 256M
-  # haproxy:
-  #   enabled: true
-  #   resources:
-  #     requests:
-  #       cpu: 100m
-  #       memory: 122Mi
-  #     limits:
-  #       cpu: 500m
-  #       memory: 244Mi
+        memory: 244Mi
   logcollector:
     enabled: false
   backup:

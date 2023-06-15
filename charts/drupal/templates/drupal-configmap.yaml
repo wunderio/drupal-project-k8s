@@ -473,8 +473,8 @@ data:
         {{- end }}
         {{- end }}
 
-        ## Handle D7 image styles
-        location ~* /files/styles/ {
+        ## Passes image style and asset generation to PHP.
+        location ~ ^(/[a-z\-]+)?/sites/.*/files/(css|js|styles)/ {
           expires 365d;
           try_files $uri @drupal;
         }

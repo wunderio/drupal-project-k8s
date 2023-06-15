@@ -89,3 +89,7 @@ mariadb:
 # Disable the built-in database when using an external database.
 #mariadb:
 #  enabled: false
+
+# Fastly WAF.
+signalsciences:
+  enabled: true

@@ -163,7 +163,8 @@ workflows:
           <<: *build-deploy
           name: build-deploy-prod
           executor: cicd80
-          silta_config: silta/silta.yml,silta/silta-prod.yml
+          silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
+          decrypt_files: silta/secrets_prod_signalsciences
           context: silta_finland
           filters:
             branches:

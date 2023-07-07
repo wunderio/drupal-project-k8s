@@ -92,9 +92,14 @@ spec:
                     head --bytes=4096 < "$output"
                     echo -en "\n\n[---------- truncated ----------]\n\n"
                     tail --bytes=4096 < "$output"
-                    echo
                   } > "$output_truncated"
                   mv "$output_truncated" "$output"
+                fi
+
+                # Append newline at the end of the output
+                # because otherwise JSON would be on the same line.
+                if [[ $(tail -c1 "$output" | wc -l) -eq 0 ]]; then
+                  echo
                 fi
 
                 # Convert the command output to JSON.

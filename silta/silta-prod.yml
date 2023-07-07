@@ -38,6 +38,12 @@ backup:
 #   basicauth:
 #     enabled: false
 
+nginx:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 30M
+
 php:
   # Reserve more resources for our PHP containerss.
   resources:
@@ -83,3 +89,7 @@ mariadb:
 # Disable the built-in database when using an external database.
 #mariadb:
 #  enabled: false
+
+# Fastly WAF.
+signalsciences:
+  enabled: true

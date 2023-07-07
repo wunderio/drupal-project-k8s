@@ -35,7 +35,6 @@ spec:
                 {{- include "cron.entrypoints" $ | nindent 16 }}
                 set -x
                 if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
-                  # Retry util install finishes.
                   exit 1
                 fi
 
@@ -46,32 +45,30 @@ spec:
                 fi
 
                 if [ '{{ $.Values.logging.format }}' != 'json' ]; then
-                  echo 'Silta: yml: logging: format: Expecting "default" or "json", found "{{ $.Values.logging.format }}".' 1>&2
+                  echo 'Incorrect value in silta.yml: logging.format: Expecting "default" or "json", found "{{ $.Values.logging.format }}".' 1>&2
                   exit 1
                 fi
-
-                # Run the following code, if the silta.yml has "stat: true" in the cron command.
 
                 # Disable debugging while setting up things.
                 # Don't output the set command itself.
                 { set +x ; } 2>/dev/null
 
+                # Make temporary files names unique by using $$, which is
+                # the PID of the current running shell.
+                script="/tmp/cron.$$"
+                stats="/tmp/stats.$$"
+                output="/tmp/output.$$"
+                output_json="/tmp/output_json.$$"
+
                 # We need to save the executable command(s) into a file,
                 # because the 'time' can execute only command files,
                 # not the shell constructs.
-                script="/tmp/cron.$$"
                 cat << CMD > "${script}"
                 #!/bin/bash
                 set -x
                 {{ $job.command | nindent 16 }}
                 CMD
                 chmod 755 "${script}"
-
-                # Try to make the temporary files more unique.
-                # $$ = PID of the current running shell.
-                stats="/tmp/stats.$$"
-                output="/tmp/output.$$"
-                output_json="/tmp/output_json.$$"
 
                 # The execution of the actual cron command.
                 # For backward compatibility reasons send the output to stdout as well (tee).
@@ -82,14 +79,13 @@ spec:
                 # It is highly shell-dependent.
                 exit_code="${PIPESTATUS[0]}"
 
+                # If the exit code is non-zero,
+                # the output file contains also a warning, which is not JSON.
+                # Get rid of this by extracting only the stats.
+                stats="$(grep -E '"duration_s".*"peak_mem_kb"' ${stats})"
+
                 # Convert the command output to JSON.
                 php -r 'print json_encode(file_get_contents("/dev/stdin"))."\n";' < "${output}" > "${output_json}"
-
-                # If the error code is non-zero,
-                # the output file contains also a warning,
-                # which is not JSON.
-                # Get rid of this.
-                stats="$(grep -E '"duration_s".*"peak_mem_kb"' ${stats})"
 
                 cron_name="{{ $index }}"
 

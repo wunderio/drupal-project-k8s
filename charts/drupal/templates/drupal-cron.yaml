@@ -51,7 +51,7 @@ spec:
 
                 # Disable debugging while setting up things.
                 # Don't output the set command itself.
-                # { set +x ; } 2>/dev/null
+                { set +x ; } 2>/dev/null
 
                 # Make temporary files names unique by using $$, which is
                 # the PID of the current running shell.

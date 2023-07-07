@@ -92,6 +92,7 @@ spec:
                     head --bytes=4096 < "$output"
                     echo -en "\n\n[---------- truncated ----------]\n\n"
                     tail --bytes=4096 < "$output"
+                    echo
                   } > "$output_truncated"
                   mv "$output_truncated" "$output"
                 fi

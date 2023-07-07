@@ -781,5 +781,5 @@ logging:
   #   - output everything as it runs in real time.
   # - "json" (default)
   #   - output everything as it runs in real time.
-  #   - create additional overview-log-entry at the end including the logs.
+  #   - create additional overview-log-entry at the end including the cron job output.
   format: json

@@ -78,6 +78,12 @@ workflows:
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
+            - run:
+                name: Pre-pull base images
+                command: |
+                  docker pull wunderio/silta-nginx:latest
+                  docker pull wunderio/silta-php-fpm:8.0-fpm-v0.1
+                  docker pull wunderio/silta-php-shell:php8.0-v0.1
           pre-release:
             - run:
                 name: Dry-run helm install

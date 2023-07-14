@@ -64,6 +64,9 @@ workflows:
           chart_name: "./charts/drupal"
           chart_repository: ""
           silta_config: silta/silta.yml
+          image_build_background: true
+          # Let circleci build images while other steps are running
+          image_build_wait: false
           codebase-build:
             # - run:
             #     name: Download feature branch build of silta cli

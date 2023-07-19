@@ -334,6 +334,19 @@ data:
       {{- tpl .Values.nginx.serverExtraConfig . | nindent 6 }}
       {{- end }}
 
+      {{- if .Values.nginx.status.enabled }}
+      location /nginx_status {
+        stub_status on;
+        # Basic auth won't be sufficient here
+        satisfy all;
+        allow 127.0.0.1;
+        {{- range .Values.nginx.noauthips }}
+        allow {{ . }};
+        {{- end }}
+        deny all;
+      }
+      {{- end }}
+      
       {{- if .Values.mailhog.enabled }}
       location /mailhog {
 

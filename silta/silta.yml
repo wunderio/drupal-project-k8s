@@ -50,3 +50,4 @@ nginx:
 
 backup:
   enabled: true
+  storageClassName: nfs-shared

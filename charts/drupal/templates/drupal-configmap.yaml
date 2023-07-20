@@ -345,26 +345,43 @@ data:
 
       {{- if .Values.nginx.status.enabled }}
       location /nginx_status {
-        stub_status on;
-        
         satisfy all;
         allow 127.0.0.1;
         {{- range .Values.nginx.noauthips }}
         allow {{ . }};
         {{- end }}
         deny all;
+        
+        stub_status on;
       }
       location /nginx_vts {
-        vhost_traffic_status_display;
-        vhost_traffic_status_display_format html;
-        
         satisfy all;
         allow 127.0.0.1;
         {{- range .Values.nginx.noauthips }}
         allow {{ . }};
         {{- end }}
         deny all;
+
+        vhost_traffic_status_display;
+        vhost_traffic_status_display_format html;
       }
+      {{- end }}
+
+      {{- if .Values.php.fpm.status.enabled }}
+      location /php_status {
+        satisfy all;
+        allow 127.0.0.1;
+        {{- range .Values.nginx.noauthips }}
+        allow {{ . }};
+        {{- end }}
+        deny all;
+
+        include fastcgi.conf;
+        fastcgi_param SCRIPT_NAME /status;
+        fastcgi_param SCRIPT_FILENAME $document_root/status;
+        fastcgi_index index.php;
+        fastcgi_pass php;
+      }  
       {{- end }}
       
       {{- if .Values.mailhog.enabled }}

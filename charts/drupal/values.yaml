@@ -243,6 +243,9 @@ php:
     # This will be put under [www] process pool.
     extraConfig: |
 
+    status:
+      enabled: true
+
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   cron:
     drupal:

@@ -387,6 +387,10 @@ data:
       if (req.url ~ "^/nginx_vts") {
         return (pass);
       }
+      // TODO: convert to php_status
+      if (req.url ~ "^/php_status") {
+        return (pass);
+      }
       {{- end }}
 
       {{- if .Values.mailhog.enabled }}

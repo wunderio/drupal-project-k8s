@@ -105,7 +105,7 @@ data:
     }
 
     http {
-        
+
       {{- if .Values.signalsciences.enabled }}
       # Signal sciences agent socket
       sigsci_agent_host unix:/sigsci/tmp/sigsci.sock;
@@ -345,7 +345,7 @@ data:
 
       {{- if .Values.nginx.status.enabled }}
       location /nginx_status {
-        satisfy all;
+        satisfy any;
         allow 127.0.0.1;
         {{- range .Values.nginx.noauthips }}
         allow {{ . }};
@@ -355,7 +355,7 @@ data:
         stub_status on;
       }
       location /nginx_vts {
-        satisfy all;
+        satisfy any;
         allow 127.0.0.1;
         {{- range .Values.nginx.noauthips }}
         allow {{ . }};
@@ -369,7 +369,7 @@ data:
 
       {{- if .Values.php.fpm.status.enabled }}
       location /php_status {
-        satisfy all;
+        satisfy any;
         allow 127.0.0.1;
         {{- range .Values.nginx.noauthips }}
         allow {{ . }};

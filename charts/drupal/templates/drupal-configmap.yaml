@@ -546,7 +546,7 @@ data:
           access_log  off;
           try_files $uri @drupal;
         {{- if .Values.signalsciences.enabled }}
-        sigsci_enabled off;
+          sigsci_enabled off;
         {{- end }}
         }
 

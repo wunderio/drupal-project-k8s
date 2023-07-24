@@ -545,6 +545,7 @@ data:
           add_header  Content-Type  text/plain;
           access_log  off;
           try_files $uri @drupal;
+          sigsci_enabled off;
         }
 
         location = /radioactivity_node.php {
@@ -654,6 +655,7 @@ data:
         fastcgi_param  SCRIPT_FILENAME    $document_root/_ping.php;
         fastcgi_pass php;
         access_log off;
+        sigsci_enabled off;
       }
       # Following directive is commented out since it produces notes in logs
       # on every http request where parameter q= is not present

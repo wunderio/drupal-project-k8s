@@ -545,9 +545,9 @@ data:
           add_header  Content-Type  text/plain;
           access_log  off;
           try_files $uri @drupal;
-        {{- if .Values.signalsciences.enabled }}
+          {{- if .Values.signalsciences.enabled }}
           sigsci_enabled off;
-        {{- end }}
+          {{- end }}
         }
 
         location = /radioactivity_node.php {

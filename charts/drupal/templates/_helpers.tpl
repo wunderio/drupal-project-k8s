@@ -187,8 +187,10 @@ imagePullSecrets:
   value: "{{ .Values.environmentName }}"
 - name: RELEASE_NAME
   value: "{{ .Release.Name }}"
+{{- if not .Values.php.env.DRUSH_OPTIONS_URI }}
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
+{{- end }}
 {{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}

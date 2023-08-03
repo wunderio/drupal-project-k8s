@@ -57,11 +57,19 @@ ports:
 {{- end }}
 
 {{- define "drupal.volumes" -}}
-{{- range $index, $mount := $.Values.mounts }}
+{{- range $index, $mount := $.Values.mounts -}}
 {{- if eq $mount.enabled true }}
 - name: drupal-{{ $index }}
+{{- if hasKey $mount "secretName" }}
+  secret:
+    secretName: {{ $mount.secretName }}
+{{- else if hasKey $mount "configMapName" }}
+  configMap:
+    name: {{ $mount.configMapName }}
+{{- else }}
   persistentVolumeClaim:
     claimName: {{ $.Release.Name }}-{{ $index }}
+{{- end }}
 {{- end }}
 {{- end }}
 - name: config

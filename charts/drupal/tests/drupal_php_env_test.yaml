@@ -12,7 +12,7 @@ tests:
       projectName: "example"
     asserts:
       - contains:
-          path: template.spec.containers[0].env
+          path: spec.template.spec.containers[0].env
           content:
             name: DRUSH_OPTIONS_URI
             value: http://testing.example.silta.wdr.io
@@ -23,7 +23,7 @@ tests:
         DRUSH_OPTIONS_URI: http://some-custom.example.com
     asserts:
       - contains:
-          path: template.spec.containers[0].env
+          path: spec.template.spec.containers[0].env
           content:
             name: DRUSH_OPTIONS_URI
             value: http://some-custom.example.com

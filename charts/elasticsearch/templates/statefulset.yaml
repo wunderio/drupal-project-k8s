@@ -322,8 +322,10 @@ spec:
           - name: discovery.zen.ping.unicast.hosts
             value: "{{ template "elasticsearch.masterService" . }}-headless"
           {{- else }}
+          {{- if gt (int .Values.replicas) 1 }}
           - name: discovery.seed_hosts
             value: "{{ template "elasticsearch.masterService" . }}-headless"
+          {{- end }}
           {{- end }}
           - name: cluster.name
             value: "{{ .Values.clusterName }}"

@@ -582,10 +582,8 @@ elasticsearch:
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
-  # Compatibility with es 6.x images, re-override with original chart values when using 7.x+ images.
-  # see: https://github.com/elastic/helm-charts/blob/0ae236bc033a05b9e43f1ae5c196186e0d1473ff/elasticsearch/values.yaml#L11-L22
-  roles: []
-  
+  # Note: "roles" definition is ignored for 6.x images due to subchart compatability reasons.
+
   # Drupal integration module still requires non-ssl connection
   # related param: elasticsearch.extraEnvs[xpack.security.enabled]
   createCert: false

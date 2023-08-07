@@ -9,7 +9,6 @@ varnish:
 
 elasticsearch:
   enabled: true
-  imageTag: 8.8.1
 
 memcached:
   enabled: false

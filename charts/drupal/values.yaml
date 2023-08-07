@@ -569,7 +569,7 @@ varnish:
     .connect_timeout        = 10s;
     .between_bytes_timeout  = 10s;
 
-# https://github.com/elastic/helm-charts/blob/0ae236bc033a05b9e43f1ae5c196186e0d1473ff/elasticsearch/values.yaml
+# https://github.com/elastic/helm-charts/blob/2fd64d0af65f14df7aa01da591919460dabac4b3/elasticsearch/values.yaml
 elasticsearch:
   enabled: false
 

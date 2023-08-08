@@ -421,7 +421,7 @@ referenceData:
       memory: 488Mi
 
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
-# Uses formatters from fakerphp.github.io/formatters 
+# Uses formatters from fakerphp.github.io/formatters
 gdprDump:
   tables:
     cache:
@@ -575,7 +575,7 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 6.8.22
+  imageTag: 8.8.1
 
   replicas: 1
   minimumMasterNodes: 1

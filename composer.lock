@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33b6f185f32c18944398f9ef0c46aff8",
+    "content-hash": "21e3626beb23ce0649001247f03feea3",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2386,17 +2386,17 @@
         },
         {
             "name": "drupal/elasticsearch_helper",
-            "version": "8.0.0",
+            "version": "7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/elasticsearch_helper.git",
-                "reference": "8.0.0"
+                "reference": "8.x-7.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/elasticsearch_helper-8.0.0.zip",
-                "reference": "8.0.0",
-                "shasum": "9855039b267898943b24a27e847b4fd510989e77"
+                "url": "https://ftp.drupal.org/files/projects/elasticsearch_helper-8.x-7.0.zip",
+                "reference": "8.x-7.0",
+                "shasum": "6cfa9eab3c9f10b61535ec65e5967ad305082198"
             },
             "require": {
                 "drupal/core": "^9.4 || ^10"
@@ -2404,8 +2404,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.0.0",
-                    "datestamp": "1671613748",
+                    "version": "8.x-7.0",
+                    "datestamp": "1671613635",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"

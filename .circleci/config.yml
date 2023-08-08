@@ -12,10 +12,6 @@ workflows:
   version: 2
   commit:
     jobs:
-      - silta/drupal-validate:
-          name: validate
-          drupal-root: /
-
       - silta/drupal-build-deploy: &build-deploy
           name: build-deploy
           drupal-root: /

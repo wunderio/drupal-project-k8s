@@ -28,6 +28,7 @@
         "drupal/purge_purger_http": "^1.0",
         "drupal/simplei": "^1.2",
         "drush/drush": "^11.1",
+        "elasticsearch/elasticsearch": "^7.0",
         "vlucas/phpdotenv": "^5.0",
         "webflo/drupal-finder": "^1.2",
         "wunderio/drupal-ping": "^2"

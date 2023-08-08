@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8f1eb0458c13ef9d13b030f81b91f1ce",
+    "content-hash": "33b6f185f32c18944398f9ef0c46aff8",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2383,6 +2383,83 @@
                 "source": "https://github.com/drupal/core-recommended/tree/9.5.3"
             },
             "time": "2023-02-01T19:47:31+00:00"
+        },
+        {
+            "name": "drupal/elasticsearch_helper",
+            "version": "8.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/elasticsearch_helper.git",
+                "reference": "8.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/elasticsearch_helper-8.0.0.zip",
+                "reference": "8.0.0",
+                "shasum": "9855039b267898943b24a27e847b4fd510989e77"
+            },
+            "require": {
+                "drupal/core": "^9.4 || ^10"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "8.0.0",
+                    "datestamp": "1671613748",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                },
+                "drush": {
+                    "services": {
+                        "drush.services.yml": "^10 || ^11"
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "a.dmitriiev",
+                    "homepage": "https://www.drupal.org/user/3235287"
+                },
+                {
+                    "name": "badrange",
+                    "homepage": "https://www.drupal.org/user/119700"
+                },
+                {
+                    "name": "dreizwo",
+                    "homepage": "https://www.drupal.org/user/1048466"
+                },
+                {
+                    "name": "floretan",
+                    "homepage": "https://www.drupal.org/user/66163"
+                },
+                {
+                    "name": "jcnventura",
+                    "homepage": "https://www.drupal.org/user/122464"
+                },
+                {
+                    "name": "maijs",
+                    "homepage": "https://www.drupal.org/user/179101"
+                },
+                {
+                    "name": "martins.bertins",
+                    "homepage": "https://www.drupal.org/user/1181510"
+                },
+                {
+                    "name": "msgph",
+                    "homepage": "https://www.drupal.org/user/851746"
+                }
+            ],
+            "description": "Provide tools to integrate Elasticsearch with Drupal.",
+            "homepage": "https://www.drupal.org/project/elasticsearch_helper",
+            "support": {
+                "source": "https://git.drupalcode.org/project/elasticsearch_helper"
+            }
         },
         {
             "name": "drupal/monolog",

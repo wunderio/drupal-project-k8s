@@ -22,6 +22,7 @@
         "drupal/core-composer-scaffold": "^10.0",
         "drupal/core-dev": "^9.1",
         "drupal/core-recommended": "^9.1",
+        "drupal/elasticsearch_helper": "^8.0",
         "drupal/monolog": "^2.0",
         "drupal/purge": "^3.0",
         "drupal/purge_purger_http": "^1.0",

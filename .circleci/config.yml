@@ -16,6 +16,9 @@ executors:
   cicd80v1:
     docker:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.1
+  cicd81:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.2
 
 jobs:
   site-test:
@@ -45,7 +48,7 @@ workflows:
           name: validate
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd81
 
           post-validation:
             - run:
@@ -58,7 +61,7 @@ workflows:
           name: build-deploy
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd81
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"
@@ -162,7 +165,7 @@ workflows:
           # Extend the build-deploy configuration for the production environment.
           <<: *build-deploy
           name: build-deploy-prod
-          executor: cicd80
+          executor: cicd81
           silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
           decrypt_files: silta/secrets_prod_signalsciences
           context: silta_finland
@@ -182,7 +185,7 @@ workflows:
           name: validate
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd81
 
           post-validation:
             - run:
@@ -195,7 +198,7 @@ workflows:
           name: build-deploy
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd81
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"

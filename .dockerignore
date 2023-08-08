@@ -1,7 +1,8 @@
 # Ignore file for the Drupal container.
-**/*.md
+# https://github.com/drush-ops/drush/issues/5725
+#**/*.md
+#**/README*
 **/CHANGELOG*
-**/README*
 **/LICENSE*
 .circleci/*
 phpcs.xml

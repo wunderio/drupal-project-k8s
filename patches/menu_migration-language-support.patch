@@ -1,0 +1,129 @@
+diff --git a/src/Commands/MenuMigrationCommands.php b/src/Commands/MenuMigrationCommands.php
+index 7bc7696..4039c6b 100644
+--- a/src/Commands/MenuMigrationCommands.php
++++ b/src/Commands/MenuMigrationCommands.php
+@@ -32,6 +32,8 @@ class MenuMigrationCommands extends DrushCommands {
+    *
+    * @param string $menu_names
+    *   ID(s) of menu(s) to export. Delimit multiple using commas.
++   * @param string $langcode
++   *   The language code.
+    *
+    * @command menu_migration:export
+    *
+@@ -44,21 +46,23 @@ class MenuMigrationCommands extends DrushCommands {
+    *
+    * @aliases mme
+    */
+-  public function export(string $menu_names = '') {
++  public function export(string $menu_names = '', $langcode = '') {
+     $menus = explode(',', $menu_names);
+     if (empty($menus)) {
+       $this->output()->writeln('You must specify at least one menu to export.');
+     }
+     else {
+       $availableMenus = $this->menuMigration->getAvailableMenus();
++      if (empty($langcode)) {
++        $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
++      }
+       foreach ($menus as $menu) {
+         if (!isset($availableMenus[$menu])) {
+           // @todo We might wanna throw some errors, but we do that later.
+           $this->output()->writeln("The {$menu} menu does not exist. Skipping.");
+         }
+-        elseif ($this->menuMigration->exportMenu($menu)) {
+-          $this->output()->writeln("Successfully exported {$menu} menu");
+-
++        elseif ($this->menuMigration->exportMenu($menu, $langcode)) {
++          $this->output()->writeln("Successfully exported {$menu} menu in {$langcode} language");
+         }
+         else {
+           $this->output()->writeln("Could not export {$menu} menu");
+diff --git a/src/Service/MenuMigrationService.php b/src/Service/MenuMigrationService.php
+index f795422..04d3184 100644
+--- a/src/Service/MenuMigrationService.php
++++ b/src/Service/MenuMigrationService.php
+@@ -101,17 +101,22 @@ class MenuMigrationService {
+    *
+    * @param string $menuName
+    *   The menu machine name.
++   * @param string $langcode
++   *   The language code.
+    *
+    * @return bool
+    *   Returns TRUE if successful, FALSE otherwise.
+    */
+-  public function exportMenu(string $menuName) {
++  public function exportMenu(string $menuName, string $langcode = '') {
++    if (empty($langcode)) {
++      $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
++    }
+     $directory = $this->getTargetDirectory($menuName);
+     if (!$this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS)) {
+       return FALSE;
+     }
+ 
+-    $bytes = file_put_contents("{$directory}/{$menuName}.json", Json::encode($this->getMenuTree($menuName)));
++    $bytes = file_put_contents("{$directory}/{$menuName}.json", Json::encode($this->getMenuTree($menuName, $langcode)));
+     return !empty($bytes);
+   }
+ 
+@@ -190,11 +195,13 @@ class MenuMigrationService {
+    *
+    * @param string $menuName
+    *   The menu name.
++   * @param string $langcode
++   *   The language code.
+    *
+    * @return array
+    *   Returns an array with the menu hierarchical structure.
+    */
+-  protected function getMenuTree($menuName) {
++  protected function getMenuTree($menuName, $langcode = '') {
+     $parameters = new MenuTreeParameters();
+     $tree = $this->menuTree->load($menuName, $parameters);
+     $manipulators = [
+@@ -202,7 +209,7 @@ class MenuMigrationService {
+     ];
+     $tree = $this->menuTree->transform($tree, $manipulators);
+     $processedTree = [];
+-    $this->processTree($tree, $processedTree);
++    $this->processTree($tree, $processedTree, 0, $langcode);
+     return $processedTree;
+   }
+ 
+@@ -218,23 +225,30 @@ class MenuMigrationService {
+    *   The resulted array.
+    * @param int $delta
+    *   The delta used for building the hierarchy.
++   * @param string $langcode
++   *   The language code.
+    */
+-  protected function processTree(array &$tree, array &$processedTree, $delta = 0) {
++  protected function processTree(array &$tree, array &$processedTree, $delta = 0, $langcode = '') {
+     foreach ($tree as &$element) {
+       $definition = $element->link->getPluginDefinition();
+       if ($element->link instanceof MenuLinkContentPlugin) {
+         // Unfortunately, we don't have access to the menu link content which
+         // exists in the menu link content plugin, but it's protected.
++        /** @var MenuLinkContent $menuLinkContent */
+         $menuLinkContent = $this->entityTypeManager->getStorage('menu_link_content')->load($definition['metadata']['entity_id']);
++        if (!empty($langcode) && $menuLinkContent->hasTranslation($langcode)) {
++          $menuLinkContent = $menuLinkContent->getTranslation($langcode);
++        }
+         $processedTree[$delta] = [
+           'url' => $definition['url'],
+-          'title' => $definition['title'],
+-          'description' => $definition['description'],
++          'title' => $menuLinkContent->get('title')->getString(),
++          'description' => $menuLinkContent->get('description')->getString(),
+           'options' => $definition['options'],
+           'enabled' => $definition['enabled'],
+           'expanded' => $definition['expanded'],
+-          'weight' => $definition['weight'],
++          'weight' => $menuLinkContent->get('weight')->getString(),
+           'menu_name' => $definition['menu_name'],
++          'langcode' => $menuLinkContent->language()->getId(),
+           'link' => $menuLinkContent->get('link')->getValue()[0],
+         ];
+         if ($element->hasChildren) {

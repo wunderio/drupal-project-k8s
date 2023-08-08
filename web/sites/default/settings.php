@@ -1,50 +1,54 @@
 <?php
 
-// Location of the site configuration files.
-$settings['config_sync_directory'] = '../config/sync';
+/**
+ * @file
+ * General settings.
+ */
 
 /**
- * Load services definition file.
+ * Database settings, overridden per environment.
  */
-$settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
-
-/**
- * The default list of directories that will be ignored by Drupal's file API.
- *
- * By default ignore node_modules and bower_components folders to avoid issues
- * with common frontend tools and recursive scanning of directories looking for
- * extensions.
- *
- * @see file_scan_directory()
- * @see \Drupal\Core\Extension\ExtensionDiscovery::scanDirectory()
- */
-$settings['file_scan_ignore_directories'] = [
-  'node_modules',
-  'bower_components',
+$databases = [];
+$databases['default']['default'] = [
+  'database' => $_ENV['DB_NAME'],
+  'username' => $_ENV['DB_USER'],
+  'password' => $_ENV['DB_PASS'],
+  'host' => $_ENV['DB_HOST'],
+  'port' => '3306',
+  'driver' => 'mysql',
 ];
 
 /**
- * Load local development override configuration, if available.
- *
- * Use settings.local.php to override variables on secondary (staging,
- * development, etc) installations of this site. Typically used to disable
- * caching, JavaScript/CSS compression, re-routing of outgoing emails, and
- * other things that should not happen on development and testing sites.
+ * Environment-specific settings.
  */
-if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
-  include $app_root . '/' . $site_path . '/settings.local.php';
+$env = $_ENV['ENVIRONMENT_NAME'];
+switch ($env) {
+  case 'production':
+    break;
+
+  case 'master':
+    break;
+
+  case 'local':
+    // Salt for one-time login links etc.
+    $drupal_hash_salt = md5(getenv('LANDO_HOST_IP'));
+    break;
+
+  default:
+    break;
 }
 
 /**
- * Lando configuration overrides.
+ * The default list of directories that will be ignored by Drupal's file API.
  */
-if (getenv('LANDO_INFO') && file_exists($app_root . '/' . $site_path . '/settings.lando.php')) {
-  include $app_root . '/' . $site_path . '/settings.lando.php';
-}
+$conf['file_scan_ignore_directories'] = array(
+  'node_modules',
+  'bower_components',
+);
 
 /**
  * Silta cluster configuration overrides.
  */
-if (getenv('SILTA_CLUSTER') && file_exists($app_root . '/' . $site_path . '/settings.silta.php')) {
-  include $app_root . '/' . $site_path . '/settings.silta.php';
+if (getenv('SILTA_CLUSTER') && file_exists(__DIR__ . '/settings.silta.php')) {
+  include __DIR__ . '/settings.silta.php';
 }

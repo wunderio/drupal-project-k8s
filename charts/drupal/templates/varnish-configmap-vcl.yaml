@@ -379,7 +379,7 @@ data:
         return (pass);
       }
 
-      {{- if .Values.nginx.status.enabled }}
+      {{- if .Values.nginx.status_page.enabled }}
       // No varnish for nginx status page
       if (req.url ~ "^/nginx_status$") {
         return (pass);

@@ -206,7 +206,7 @@ nginx:
   #   paths:
   #     - "^/sites/[^/]+/files/(?:css|js)/"
 
-  status:
+  status_page:
     enabled: true
 
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
@@ -247,7 +247,7 @@ php:
     # This will be put under [www] process pool.
     extraConfig: |
 
-    status:
+    status_page:
       enabled: true
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.

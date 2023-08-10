@@ -84,7 +84,7 @@ data:
     load_module /etc/nginx/modules/ndk_http_module.so;
   {{- end }}
 
-  {{- if .Values.nginx.status.enabled }}
+  {{- if .Values.nginx.status_page.enabled }}
   nginx_status_conf: |
     load_module modules/ngx_http_vhost_traffic_status_module.so;
   {{- end }}
@@ -111,7 +111,7 @@ data:
       sigsci_agent_host unix:/sigsci/tmp/sigsci.sock;
       {{- end }}
 
-      {{- if .Values.nginx.status.enabled }}
+      {{- if .Values.nginx.status_page.enabled }}
       vhost_traffic_status_zone;
       {{- end }}
 
@@ -343,7 +343,7 @@ data:
       {{- tpl .Values.nginx.serverExtraConfig . | nindent 6 }}
       {{- end }}
 
-      {{- if .Values.nginx.status.enabled }}
+      {{- if .Values.nginx.status_page.enabled }}
       location /nginx_status {
         satisfy any;
         allow 127.0.0.1;
@@ -367,7 +367,7 @@ data:
       }
       {{- end }}
 
-      {{- if .Values.php.fpm.status.enabled }}
+      {{- if .Values.php.fpm.status_page.enabled }}
       location /php_status {
         satisfy any;
         allow 127.0.0.1;

@@ -33,11 +33,6 @@ autoscaling:
 backup:
   enabled: true
 
-# Uncomment these lines to disable basic auth protection.
-# nginx:
-#   basicauth:
-#     enabled: false
-
 php:
   # Reserve more resources for our PHP containerss.
   resources:
@@ -52,6 +47,9 @@ php:
   errorLevel: "hide"
 
 nginx:
+# Uncomment these lines to disable basic auth protection.
+#  basicauth:
+#    enabled: false
   resources:
     requests:
       cpu: 50m
@@ -83,3 +81,7 @@ mariadb:
 # Disable the built-in database when using an external database.
 #mariadb:
 #  enabled: false
+
+# Fastly WAF.
+signalsciences:
+  enabled: true

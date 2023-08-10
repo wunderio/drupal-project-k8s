@@ -16,9 +16,9 @@ dependencies:
   version: 5.1.0
 - name: elasticsearch
   repository: file://../elasticsearch
-  version: 7.8.1
+  version: 8.5.1
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:2dee782f40cc688d4deda93cc5c6f9c4dfeb7e98e9d3fa91936414d4180d72d7
-generated: "2023-06-13T12:16:34.013547178+03:00"
+digest: sha256:4f55be5e808ff9f3cd1ed3b64640173c9633b8fd6bda08c2494ecfb687b3f9b6
+generated: "2023-08-03T14:00:03.435795069+03:00"

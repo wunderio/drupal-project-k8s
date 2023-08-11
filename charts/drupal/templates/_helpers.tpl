@@ -57,11 +57,19 @@ ports:
 {{- end }}
 
 {{- define "drupal.volumes" -}}
-{{- range $index, $mount := $.Values.mounts }}
+{{- range $index, $mount := $.Values.mounts -}}
 {{- if eq $mount.enabled true }}
 - name: drupal-{{ $index }}
+{{- if hasKey $mount "secretName" }}
+  secret:
+    secretName: {{ $mount.secretName }}
+{{- else if hasKey $mount "configMapName" }}
+  configMap:
+    name: {{ $mount.configMapName }}
+{{- else }}
   persistentVolumeClaim:
     claimName: {{ $.Release.Name }}-{{ $index }}
+{{- end }}
 {{- end }}
 {{- end }}
 - name: config
@@ -179,8 +187,10 @@ imagePullSecrets:
   value: "{{ .Values.environmentName }}"
 - name: RELEASE_NAME
   value: "{{ .Release.Name }}"
+{{- if not .Values.php.env.DRUSH_OPTIONS_URI }}
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
+{{- end }}
 {{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
@@ -245,7 +255,11 @@ imagePullSecrets:
 # Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
+{{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) }}
   value: {{ $val | quote }}
+{{- else }}
+  {{ $val | toYaml | indent 4 | trim }}
+{{- end }}
 {{- end }}
 {{- range $index, $mount := $.Values.mounts }}
 {{- if eq $mount.enabled true }}
@@ -317,7 +331,7 @@ mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_N
 {{- define "drupal.wait-for-elasticsearch-command" }}
 TIME_WAITING=0
 echo -n "Waiting for Elasticsearch.";
-until curl --silent --connect-timeout 2 "$ELASTICSEARCH_HOST:9200" ; do
+until curl --silent --connect-timeout 2 "{{ .Values.elasticsearch.protocol }}://${ELASTICSEARCH_HOST}:9200" -k ; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))

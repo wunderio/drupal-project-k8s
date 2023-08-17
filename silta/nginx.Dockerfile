@@ -1,5 +1,4 @@
 # Dockerfile for building nginx.
-# cache 01
-FROM wunderio/silta-nginx:1.17-status-test
+FROM wunderio/silta-nginx:latest
 
 COPY . /app/web

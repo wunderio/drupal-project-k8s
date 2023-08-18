@@ -47,14 +47,3 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
-
-php:
-  cron:
-    test-small:
-      schedule: '* * * * *'
-      command: |
-        echo "stats xxx"
-    test-big:
-      schedule: '* * * * *'
-      command: |
-        ls -laR /usr/ 2>/dev/null | head --bytes=10000

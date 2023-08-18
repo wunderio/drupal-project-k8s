@@ -112,7 +112,7 @@ spec:
                 # Assemble the JSON output.
                 # Add special markers (==) which helps json extraction by a log consumer.
                 cat << JSON
-                =={"cron_name":"${cron_name}",${stats},"exit_code":${exit_code},"output_size":$output_size,"memory_request":"$memory_request","memory_limit":"$memory_limit","cpu_request":"$cpu_request","cpu_limit":"$cpu_limit","output":$(cat"${output_json}")}==
+                =={"cron_name":"${cron_name}",${stats},"exit_code":${exit_code},"output_size":$output_size,"memory_request":"$memory_request","memory_limit":"$memory_limit","cpu_request":"$cpu_request","cpu_limit":"$cpu_limit","output":$(cat "${output_json}")}==
                 JSON
 
                 # Use the exit code of the actual cron command.

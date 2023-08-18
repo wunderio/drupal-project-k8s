@@ -103,10 +103,10 @@ spec:
                 cpu_request='{{ dig "resources" "cpu" "request" 0 $job }}'
                 cpu_limit='{{ dig "resources" "cpu" "limit" 0 $job }}'
                 {{ else }}
-                memory_request='{{ dig "php" "resources" "memory" "request" 0 .Values }}'
-                memory_limit='{{ dig "php" "resources" "memory" "limit" 0 .Values }}'
-                cpu_request='{{ dig "php" "resources" "cpu" "request" 0 .Values }}'
-                cpu_limit='{{ dig "php" "resources" "cpu" "limit" 0 .Values }}'
+                memory_request='{{ dig "resources" "memory" "request" 0 $.Values.php }}'
+                memory_limit='{{ dig "resources" "memory" "limit" 0 $.Values.php }}'
+                cpu_request='{{ dig "resources" "cpu" "request" 0 $.Values.php }}'
+                cpu_limit='{{ dig "resources" "cpu" "limit" 0 $.Values.php }}'
                 {{ end }}
 
                 # Assemble the JSON output.

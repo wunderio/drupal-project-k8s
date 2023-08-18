@@ -98,15 +98,16 @@ spec:
                 cron_name="{{ $index }}"
 
                 {{ if $job.resources }}
-                {{- $resources = $job.resources }}
+                memory_request='{{ $job.resources.memory.request | default 0 }}'
+                memory_limit='{{ $job.resources.memory.limit | default 0 }}'
+                cpu_request='{{ $job.resources.cpu.request | default 0 }}'
+                cpu_limit='{{ $job.resources.cpu.limit | default 0 }}'
                 {{ else }}
-                {{- $resources = $.Values.php.resources }}
+                memory_request='{{ $.Values.php.resources.memory.request | default 0 }}'
+                memory_limit='{{ $.Values.php.resources.memory.limit | default 0 }}'
+                cpu_request='{{ $.Values.php.resources.cpu.request | default 0 }}'
+                cpu_limit='{{ $.Values.php.resources.cpu.limit | default 0 }}'
                 {{ end }}
-
-                memory_request='{{ $resources.memory.request | default 0 }}'
-                memory_limit='{{ $resources.memory.limit | default 0 }}'
-                cpu_request='{{ $resources.cpu.request | default 0 }}'
-                cpu_limit='{{ $resources.cpu.limit | default 0 }}'
 
                 # Assemble the JSON output.
                 # Add special markers (==) which helps json extraction by a log consumer.

@@ -73,4 +73,4 @@ php:
           cpu: 500m
           memory: 512M
       command: |
-        sleep 1
+        ls -laR /usr/ > /dev/null

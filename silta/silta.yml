@@ -50,7 +50,27 @@ nginx:
 
 php:
   cron:
-    test-mem-cpu:
+    test-mem-cpu-no-res:
       schedule: '* * * * *'
+      command: |
+        sleep 1
+    test-mem-cpu-some-res:
+      schedule: '* * * * *'
+      resources:
+        requests:
+          cpu: 300m
+        limits:
+          memory: 512M
+      command: |
+        sleep 1
+    test-mem-cpu-all-res:
+      schedule: '* * * * *'
+      resources:
+        requests:
+          cpu: 300m
+          memory: 256M
+        limits:
+          cpu: 500m
+          memory: 512M
       command: |
         sleep 1

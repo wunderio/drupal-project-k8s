@@ -98,15 +98,15 @@ spec:
                 cron_name="{{ $index }}"
 
                 {{ if $job.resources }}
-                memory_request='{{ $job.resources.memory.request | default 0 }}'
-                memory_limit='{{ $job.resources.memory.limit | default 0 }}'
-                cpu_request='{{ $job.resources.cpu.request | default 0 }}'
-                cpu_limit='{{ $job.resources.cpu.limit | default 0 }}'
+                memory_request='{{ dig "resources" "memory" "request" 0 $job }}'
+                memory_limit='{{ dig "resources" "memory" "limit" 0 $job }}'
+                cpu_request='{{ dig "resources" "cpu" "request" 0 $job }}'
+                cpu_limit='{{ dig "resources" "cpu" "limit" 0 $job }}'
                 {{ else }}
-                memory_request='{{ $.Values.php.resources.memory.request | default 0 }}'
-                memory_limit='{{ $.Values.php.resources.memory.limit | default 0 }}'
-                cpu_request='{{ $.Values.php.resources.cpu.request | default 0 }}'
-                cpu_limit='{{ $.Values.php.resources.cpu.limit | default 0 }}'
+                memory_request='{{ dig "php" "resources" "memory" "request" 0 $.Values }}'
+                memory_limit='{{ dig "php" "resources" "memory" "limit" 0 $.Values }}'
+                cpu_request='{{ dig "php" "resources" "cpu" "request" 0 $.Values }}'
+                cpu_limit='{{ dig "php" "resources" "cpu" "limit" 0 $.Values }}'
                 {{ end }}
 
                 # Assemble the JSON output.

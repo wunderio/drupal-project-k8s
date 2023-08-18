@@ -38,17 +38,6 @@ spec:
                   exit 1
                 fi
 
-                # By default run a cron job in a very simple manner.
-                if [[ '{{ $.Values.logging.format }}' == 'plain' ]]; then
-                  {{ $job.command | nindent 18 }}
-                  exit
-                fi
-
-                if [[ '{{ $.Values.logging.format }}' != 'json' ]]; then
-                  echo 'Incorrect value in silta.yml: logging.format: Expecting "plain" or "json", found "{{ $.Values.logging.format }}".' 1>&2
-                  exit 1
-                fi
-
                 # Disable debugging while setting up things.
                 # Don't output the set command itself.
                 { set +x ; } 2>/dev/null

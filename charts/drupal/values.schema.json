@@ -134,12 +134,6 @@
       "properties": {
         "enabled": { "type": "boolean" }
       }
-    },
-    "logging": {
-      "type": "object",
-      "properties": {
-        "format": { "type": "string" }
-      }
     }
   }
 }

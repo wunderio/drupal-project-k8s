@@ -97,13 +97,11 @@ spec:
 
                 cron_name="{{ $index }}"
 
-                resources=$(cat <<RESOURCES
                 {{ if $job.resources }}
                 {{- $resources = $job.resources }}
                 {{ else }}
                 {{- $resources = $.Values.php.resources }}
                 {{ end }}
-                RESOURCES
 
                 memory_request='{{ $resources.memory.request | default 0 }}'
                 memory_limit='{{ $resources.memory.limit | default 0 }}'

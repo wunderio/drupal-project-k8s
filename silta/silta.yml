@@ -47,3 +47,10 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+php:
+  cron:
+    test-mem-cpu:
+      schedule: '* * * * *'
+      command: |
+        sleep 1

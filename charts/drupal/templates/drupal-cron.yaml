@@ -62,7 +62,8 @@ spec:
 
                 # The execution of the actual cron command.
                 # For backward compatibility reasons send the output to stdout as well (tee).
-                /usr/bin/time -f '"duration_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}" 2>&1 \
+                # Ideally we need %S+%U as a sum, but for the scripts simplisity sake, keep them apart.
+                /usr/bin/time -f '"duration_s":%e,"peak_mem_kb":%M,"kernel_cpu_time_s":%S,"user_cpu_time_s":%U' -o "${stats}" "${script}" 2>&1 \
                 | tee "${output}"
 
                 # It's tricky to get the exit code of a random command from a pipeline.
@@ -72,9 +73,9 @@ spec:
                 # If the exit code is non-zero,
                 # the output file contains also a warning, which is not JSON.
                 # Get rid of this by extracting only the stats.
-                stats="$(grep -E '"duration_s".*"peak_mem_kb"' ${stats})"
+                stats="$(grep -E '"duration_s"' ${stats})"
 
-                # if the log entry is too big shorten it.
+                # If the log entry is too big shorten it.
                 output_size=$(stat --format=%s "$output")
                 if [[ "$output_size" -gt 8192 ]]; then
                   {
@@ -96,10 +97,23 @@ spec:
 
                 cron_name="{{ $index }}"
 
+                resources=$(cat <<RESOURCES
+                {{ if $job.resources }}
+                {{- $resources = $job.resources }}
+                {{ else }}
+                {{- $resources = $.Values.php.resources }}
+                {{ end }}
+                RESOURCES
+
+                memory_request='{{ $resources.memory.request | default 0 }}'
+                memory_limit='{{ $resources.memory.limit | default 0 }}'
+                cpu_request='{{ $resources.cpu.request | default 0 }}'
+                cpu_limit='{{ $resources.cpu.limit | default 0 }}'
+
                 # Assemble the JSON output.
                 # Add special markers (==) which helps json extraction by a log consumer.
                 cat << JSON
-                =={"cron_name":"${cron_name}",${stats},"exit_code":${exit_code},"output_size":$output_size,"output":$(cat "${output_json}")}==
+                =={"cron_name":"${cron_name}",${stats},"exit_code":${exit_code},"output_size":$output_size,"memory_request":"$memory_request","memory_limit":"$memory_limit","cpu_request":"$cpu_request","cpu_limit":"$cpu_limit","output":$(cat"${output_json}")}==
                 JSON
 
                 # Use the exit code of the actual cron command.

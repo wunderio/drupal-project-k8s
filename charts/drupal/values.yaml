@@ -3,6 +3,10 @@ silta-release:
   # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
   downscaler:
     enabled: true
+    # Allows to modify How long should This release be active until downscaled.
+    # value examples: 10y, 4w, 1h Defaults to values used in silta-downscaler chart.
+    # https://github.com/wunderio/charts/blob/master/silta-downscaler/values.yaml
+    releaseMinAge: ''
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
@@ -202,6 +206,11 @@ nginx:
   #   paths:
   #     - "^/sites/[^/]+/files/(?:css|js)/"
 
+  # Nginx status pages will be available at /nginx_status and /nginx_vts,
+  # accessible from nginx.noauthips and localhost.
+  status_page:
+    enabled: true
+
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
   sessionAffinity: false
 
@@ -239,6 +248,11 @@ php:
     # Custom php-fpm settings block. May override parameters previously defined.
     # This will be put under [www] process pool.
     extraConfig: |
+
+    # PHP-FPM status page will be available at /php_status, accessible
+    # from nginx.noauthips and localhost.
+    status_page:
+      enabled: true
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   cron:
@@ -286,7 +300,7 @@ php:
       if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
         drush cache-clear all || true
       else
-        drush cache-rebuild || true
+        drush eval "drupal_flush_all_caches();" || true
       fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y
@@ -573,6 +587,7 @@ varnish:
     .connect_timeout        = 10s;
     .between_bytes_timeout  = 10s;
 
+# https://github.com/elastic/helm-charts/blob/2fd64d0af65f14df7aa01da591919460dabac4b3/elasticsearch/values.yaml
 elasticsearch:
   enabled: false
 
@@ -584,6 +599,16 @@ elasticsearch:
   minimumMasterNodes: 1
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+
+  # Note: "roles" definition is ignored for 6.x images due to subchart compatability reasons.
+
+  # Drupal integration module still requires non-ssl connection
+  # related param: elasticsearch.extraEnvs[xpack.security.enabled]
+  createCert: false
+  protocol: http
+  extraEnvs:
+    - name: xpack.security.enabled
+      value: "false"
 
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
@@ -599,7 +624,7 @@ elasticsearch:
   resources:
     requests:
       cpu: 200m
-      memory: 512Mi
+      memory: 640Mi
     limits:
       memory: 1Gi
 

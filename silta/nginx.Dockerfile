@@ -1,5 +1,5 @@
 # Dockerfile for building nginx.
-# New line to trigger image rebuild.
+# Cache 17.8.2023.
 FROM wunderio/silta-nginx:latest
 
 COPY . /app/web

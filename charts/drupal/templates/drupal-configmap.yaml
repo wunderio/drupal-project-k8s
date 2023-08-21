@@ -83,6 +83,11 @@ data:
     load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
     load_module /etc/nginx/modules/ndk_http_module.so;
   {{- end }}
+
+  {{- if .Values.nginx.status_page.enabled }}
+  nginx_status_conf: |
+    load_module modules/ngx_http_vhost_traffic_status_module.so;
+  {{- end }}
     
   nginx_conf: |
 
@@ -100,21 +105,25 @@ data:
     }
 
     http {
-        
-        {{- if .Values.signalsciences.enabled }}
-        # Signal sciences agent socket
-        sigsci_agent_host unix:/sigsci/tmp/sigsci.sock;
-        {{- end }}
 
-        # List of upstream proxies we trust to set X-Forwarded-For correctly.
-        {{- if kindIs "string" .Values.nginx.realipfrom }}
-        set_real_ip_from            {{ .Values.nginx.realipfrom }};
-        {{- end }}
-        {{- if kindIs "map" .Values.nginx.realipfrom }}
-        {{- range .Values.nginx.realipfrom }}
-        set_real_ip_from            {{ . }};
-        {{- end }}
-        {{- end }}
+      {{- if .Values.signalsciences.enabled }}
+      # Signal sciences agent socket
+      sigsci_agent_host unix:/sigsci/tmp/sigsci.sock;
+      {{- end }}
+
+      {{- if .Values.nginx.status_page.enabled }}
+      vhost_traffic_status_zone;
+      {{- end }}
+
+      # List of upstream proxies we trust to set X-Forwarded-For correctly.
+      {{- if kindIs "string" .Values.nginx.realipfrom }}
+      set_real_ip_from            {{ .Values.nginx.realipfrom }};
+      {{- end }}
+      {{- if kindIs "map" .Values.nginx.realipfrom }}
+      {{- range .Values.nginx.realipfrom }}
+      set_real_ip_from            {{ . }};
+      {{- end }}
+      {{- end }}
 
       real_ip_header              {{ .Values.nginx.real_ip_header }};
       real_ip_recursive           on;
@@ -334,6 +343,47 @@ data:
       {{- tpl .Values.nginx.serverExtraConfig . | nindent 6 }}
       {{- end }}
 
+      {{- if .Values.nginx.status_page.enabled }}
+      location /nginx_status {
+        satisfy any;
+        allow 127.0.0.1;
+        {{- range .Values.nginx.noauthips }}
+        allow {{ . }};
+        {{- end }}
+        deny all;
+        
+        stub_status on;
+      }
+      location /nginx_vts {
+        satisfy any;
+        allow 127.0.0.1;
+        {{- range .Values.nginx.noauthips }}
+        allow {{ . }};
+        {{- end }}
+        deny all;
+
+        vhost_traffic_status_display;
+        vhost_traffic_status_display_format html;
+      }
+      {{- end }}
+
+      {{- if .Values.php.fpm.status_page.enabled }}
+      location /php_status {
+        satisfy any;
+        allow 127.0.0.1;
+        {{- range .Values.nginx.noauthips }}
+        allow {{ . }};
+        {{- end }}
+        deny all;
+
+        include fastcgi.conf;
+        fastcgi_param SCRIPT_NAME /status;
+        fastcgi_param SCRIPT_FILENAME $document_root/status;
+        fastcgi_index index.php;
+        fastcgi_pass php;
+      }  
+      {{- end }}
+      
       {{- if .Values.mailhog.enabled }}
       location /mailhog {
 
@@ -473,8 +523,8 @@ data:
         {{- end }}
         {{- end }}
 
-        ## Handle D7 image styles
-        location ~* /files/styles/ {
+        ## Passes image style and asset generation to PHP.
+        location ~ ^(/[a-z\-]+)?/sites/.*/files/(css|js|styles)/ {
           expires 365d;
           try_files $uri @drupal;
         }
@@ -545,6 +595,9 @@ data:
           add_header  Content-Type  text/plain;
           access_log  off;
           try_files $uri @drupal;
+          {{- if .Values.signalsciences.enabled }}
+          sigsci_enabled off;
+          {{- end }}
         }
 
         location = /radioactivity_node.php {
@@ -654,6 +707,9 @@ data:
         fastcgi_param  SCRIPT_FILENAME    $document_root/_ping.php;
         fastcgi_pass php;
         access_log off;
+        {{- if .Values.signalsciences.enabled }}
+        sigsci_enabled off;
+        {{- end }}
       }
       # Following directive is commented out since it produces notes in logs
       # on every http request where parameter q= is not present

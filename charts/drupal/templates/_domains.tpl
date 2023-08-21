@@ -8,12 +8,6 @@
 {{- end -}}
 {{- end -}}
 
-{{- define "masking.prefix-alert" -}}
-{{ if $.Values.domainPrefixes }}
-{{ fail "Cannot use domain prefixes together with domain masking"}}
-{{- end -}}
-{{- end -}}
-
 {{- define "drupal.domain" -}}
 {{- $projectName := regexReplaceAll "[^[:alnum:]]" (.Values.projectName | default .Release.Namespace) "-"  | trimSuffix "-" | lower }}
 {{- $projectNameHash := sha256sum $projectName | trunc 3 }}
@@ -28,7 +22,9 @@
 {{- else -}}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{- if eq $.Values.maskSubdomains "both" -}}
+{{- if not (hasKey $.Values "maskSubdomains") -}}
+{{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
+{{- else if eq $.Values.maskSubdomains "both" -}}
 {{- include "masking.prefix-alert" . -}}
 {{- $environmentNameString := sha256sum (print $environmentName (include "drupal.domainSeparator" $ ) $projectName) | trunc 25 }}
 {{- $environmentNameString -}}.{{ .Values.clusterDomain }}
@@ -36,8 +32,6 @@
 {{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ sha256sum $projectName | trunc 10 }}.{{ .Values.clusterDomain }}
 {{- else if eq $.Values.maskSubdomains "releaseName" -}}
 {{ sha256sum $environmentName | trunc 10 }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
-{{- else if not (hasKey $.Values "maskSubdomains") -}}
-{{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- end -}}
 {{- end -}}
 {{- end -}}

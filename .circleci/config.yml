@@ -206,6 +206,7 @@ jobs:
       - checkout:
           path: ~/project
       - silta/silta-cli-setup
+      - steps: <<parameters.codebase-build>>
       - unless:
           condition: <<parameters.skip-deployment>>
           steps:

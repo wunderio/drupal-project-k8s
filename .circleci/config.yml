@@ -332,6 +332,8 @@ workflows:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           context: silta_dev
+          requires:
+            - build
           filters:
             branches:
               ignore:

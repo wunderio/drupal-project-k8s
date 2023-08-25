@@ -112,15 +112,6 @@ jobs:
             - silta/docker-setup
             - silta/silta-setup:
                 release-suffix: '<<parameters.release-suffix>>'
-            - silta/extend-helm-chart:
-                source_chart: '<<parameters.source_chart>>'
-                extension_file: '<<parameters.extension_file>>'
-                chart_version: '<<parameters.chart_version>>'
-            - silta/drupal-values-validate:
-                chart_name: <<parameters.chart_name>>
-                chart_version: <<parameters.chart_version>>
-                chart_repository: <<parameters.chart_repository>>
-                silta_config: <<parameters.silta_config>>
             - silta/drupal-docker-build:
                 nginx_build_context: <<parameters.nginx_build_context>>
             - run:
@@ -137,6 +128,7 @@ jobs:
   drupal-deploy:
     description: "Deploy drupal chart release."
     executor: <<parameters.executor>>
+    resource_class: small
     parameters:
       executor:
         description: "The name of custom executor to use."
@@ -228,6 +220,15 @@ jobs:
                   echo "export php_IMAGE_URL='$php_IMAGE_URL'" >> "$BASH_ENV"
                   echo "export nginx_IMAGE_URL='$nginx_IMAGE_URL'" >> "$BASH_ENV"
                   echo "export shell_IMAGE_URL='$shell_IMAGE_URL'" >> "$BASH_ENV"
+            - silta/extend-helm-chart:
+                source_chart: '<<parameters.source_chart>>'
+                extension_file: '<<parameters.extension_file>>'
+                chart_version: '<<parameters.chart_version>>'
+            - silta/drupal-values-validate:
+                chart_name: <<parameters.chart_name>>
+                chart_version: <<parameters.chart_version>>
+                chart_repository: <<parameters.chart_repository>>
+                silta_config: <<parameters.silta_config>>
             - silta/drupal-helm-deploy:
                 chart_name: <<parameters.chart_name>>
                 chart_version: <<parameters.chart_version>>

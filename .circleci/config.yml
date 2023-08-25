@@ -199,7 +199,6 @@ jobs:
       - checkout:
           path: ~/project
       - silta/silta-cli-setup
-      - steps: <<parameters.codebase-build>>
       - unless:
           condition: <<parameters.skip-deployment>>
           steps:
@@ -281,17 +280,6 @@ workflows:
             #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
-            - run:
-                name: Add helm repositories and build local chart
-                command: |
-                  helm repo add elastic https://helm.elastic.co
-                  helm repo add codecentric https://codecentric.github.io/helm-charts
-                  helm repo add percona https://percona.github.io/percona-helm-charts/
-                  helm dependency build ./charts/drupal
-          pre-release:
-            - run:
-                name: Dry-run helm install
-                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           context: silta_dev
           filters:
             branches:
@@ -316,13 +304,7 @@ workflows:
           chart_name: "./charts/drupal"
           chart_repository: ""
           silta_config: silta/silta.yml
-          codebase-build:
-            # - run:
-            #     name: Download feature branch build of silta cli
-            #     command: |
-            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
-            - silta/drupal-composer-install
-            - silta/npm-install-build
+          pre-release:
             - run:
                 name: Add helm repositories and build local chart
                 command: |
@@ -330,7 +312,6 @@ workflows:
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
-          pre-release:
             - run:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml

@@ -26,6 +26,213 @@ jobs:
           site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php
       - site-query:
           site_url: https://master.drupal-project-k8s.silta-aks.wdr.io/_ping.php
+
+  drupal-build:
+    description: "Build Drupal chart release."
+    executor: <<parameters.executor>>
+    parameters:
+      executor:
+        description: "The name of custom executor to use."
+        type: executor
+        default: silta
+      drupal-root:
+        description: "Relative path to drupal root"
+        type: string
+        default: "."
+      codebase-build:
+        description: "Preparational build steps run after code checkout."
+        type: steps
+        default: []
+      pre-release:
+        description: "Steps to be executed before the Helm release is created."
+        type: steps
+        default: []
+      chart_name:
+        description: "Helm chart name."
+        type: string
+        default: drupal
+      chart_version:
+        description: "Deploy specific drupal helm chart version."
+        type: string
+        default: ""
+      chart_repository:
+        description: "Helm chart repository."
+        type: string
+        default: https://storage.googleapis.com/charts.wdr.io
+      decrypt_files:
+        description: "Encrypted value files. Can have multiple, comma separated values."
+        type: string
+        default: ""
+      silta_config:
+        description: "Chart values override file. Can have multiple, comma separated values."
+        type: string
+        default: "silta/silta.yml"
+      skip-deployment:
+        description: "Skip release deployment."
+        type: boolean
+        default: false
+      cluster_domain:
+        description: "Cluster domain value for helm chart. Will be used for default ingress hostnames."
+        type: env_var_name
+        default: CLUSTER_DOMAIN
+      release-suffix:
+        description: "Release name suffix."
+        type: string
+        default: ''
+      deployment_timeout:
+        description: "Helm release deployment timeout."
+        type: string
+        default: "15m"
+      nginx_build_context:
+        description: "Path to be used as build context for Nginx image build."
+        type: string
+        default: "web"
+      source_chart:
+        description: "Chart to extend"
+        type: string
+        default: ''
+      extension_file:
+        description: "Extension config for the source chart"
+        type: string
+        default: ''
+    working_directory: ~/project/<<parameters.drupal-root>>
+    steps:
+      - checkout:
+          path: ~/project
+      - silta-cli-setup
+      - steps: <<parameters.codebase-build>>
+      - unless:
+          condition: <<parameters.skip-deployment>>
+          steps:
+            - when:
+                condition: <<parameters.decrypt_files>>
+                steps:
+                  - decrypt-files:
+                      files: <<parameters.decrypt_files>>
+            - silta-setup:
+                release-suffix: '<<parameters.release-suffix>>'
+            - extend-helm-chart:
+                source_chart: '<<parameters.source_chart>>'
+                extension_file: '<<parameters.extension_file>>'
+                chart_version: '<<parameters.chart_version>>'
+            - drupal-values-validate:
+                chart_name: <<parameters.chart_name>>
+                chart_version: <<parameters.chart_version>>
+                chart_repository: <<parameters.chart_repository>>
+                silta_config: <<parameters.silta_config>>
+            - drupal-docker-build:
+                nginx_build_context: <<parameters.nginx_build_context>>
+            - run:
+                name: Store container image URLs to workspace
+                command: |
+                  echo "php_IMAGE_URL='$php_IMAGE_URL'" >> tags
+                  echo "nginx_IMAGE_URL='$nginx_IMAGE_URL'" >> tags
+                  echo "shell_IMAGE_URL='$shell_IMAGE_URL'" >> tags
+            - persist_to_workspace:
+                root: .
+                paths:
+                  - tags
+
+  drupal-deploy:
+    description: "Deploy drupal chart release."
+    executor: <<parameters.executor>>
+    parameters:
+      executor:
+        description: "The name of custom executor to use."
+        type: executor
+        default: silta
+      drupal-root:
+        description: "Relative path to drupal root"
+        type: string
+        default: "."
+      codebase-build:
+        description: "Preparational build steps run after code checkout."
+        type: steps
+        default: []
+      pre-release:
+        description: "Steps to be executed before the Helm release is created."
+        type: steps
+        default: []
+      chart_name:
+        description: "Helm chart name."
+        type: string
+        default: drupal
+      chart_version:
+        description: "Deploy specific drupal helm chart version."
+        type: string
+        default: ""
+      chart_repository:
+        description: "Helm chart repository."
+        type: string
+        default: https://storage.googleapis.com/charts.wdr.io
+      decrypt_files:
+        description: "Encrypted value files. Can have multiple, comma separated values."
+        type: string
+        default: ""
+      silta_config:
+        description: "Chart values override file. Can have multiple, comma separated values."
+        type: string
+        default: "silta/silta.yml"
+      skip-deployment:
+        description: "Skip release deployment."
+        type: boolean
+        default: false
+      cluster_domain:
+        description: "Cluster domain value for helm chart. Will be used for default ingress hostnames."
+        type: env_var_name
+        default: CLUSTER_DOMAIN
+      release-suffix:
+        description: "Release name suffix."
+        type: string
+        default: ''
+      deployment_timeout:
+        description: "Helm release deployment timeout."
+        type: string
+        default: "15m"
+      nginx_build_context:
+        description: "Path to be used as build context for Nginx image build."
+        type: string
+        default: "web"
+      source_chart:
+        description: "Chart to extend"
+        type: string
+        default: ''
+      extension_file:
+        description: "Extension config for the source chart"
+        type: string
+        default: ''
+    working_directory: ~/project/<<parameters.drupal-root>>
+    steps:
+      - checkout:
+          path: ~/project
+      - silta-cli-setup
+      - unless:
+          condition: <<parameters.skip-deployment>>
+          steps:
+            - when:
+                condition: <<parameters.decrypt_files>>
+                steps:
+                  - decrypt-files:
+                      files: <<parameters.decrypt_files>>
+            - silta-setup:
+                release-suffix: '<<parameters.release-suffix>>'
+            - steps: <<parameters.pre-release>>
+            - attach_workspace:
+                at: /tmp/workspace
+            - run:
+                name: Set tags from workspace
+                command: |
+                  source /tmp/workspace/tags
+                  echo "export php_IMAGE_URL='$php_IMAGE_URL'" >> "$BASH_ENV"
+                  echo "export nginx_IMAGE_URL='$nginx_IMAGE_URL'" >> "$BASH_ENV"
+                  echo "export shell_IMAGE_URL='$shell_IMAGE_URL'" >> "$BASH_ENV"
+            - drupal-helm-deploy:
+                chart_name: <<parameters.chart_name>>
+                chart_version: <<parameters.chart_version>>
+                chart_repository: <<parameters.chart_repository>>
+                silta_config: <<parameters.silta_config>>
+                cluster_domain: <<parameters.cluster_domain>>
+                deployment_timeout: <<parameters.deployment_timeout>>
 commands:
   site-query:
     parameters:
@@ -54,8 +261,50 @@ workflows:
                   helm unittest ./charts/silta-release --helm3
                   helm unittest ./charts/drupal --helm3
 
-      - silta/drupal-build-deploy: &build-deploy
-          name: build-deploy
+      - drupal-build: &build-deploy
+          name: build
+
+          # Use custom executor.
+          executor: cicd80
+
+          # Use a local chart during development.
+          chart_name: "./charts/drupal"
+          chart_repository: ""
+          silta_config: silta/silta.yml
+          codebase-build:
+            # - run:
+            #     name: Download feature branch build of silta cli
+            #     command: |
+            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+            - silta/drupal-composer-install
+            - silta/npm-install-build
+            - run:
+                name: Add helm repositories and build local chart
+                command: |
+                  helm repo add elastic https://helm.elastic.co
+                  helm repo add codecentric https://codecentric.github.io/helm-charts
+                  helm repo add percona https://percona.github.io/percona-helm-charts/
+                  helm dependency build ./charts/drupal
+          pre-release:
+            - run:
+                name: Dry-run helm install
+                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
+          context: silta_dev
+          filters:
+            branches:
+              ignore:
+                - production
+                - feature/test-cluster
+                - /feature\/test-cluster\/.*/
+                - feature/aws-cluster
+                - /feature\/aws-cluster\/.*/
+                - feature/aks-cluster
+                - /feature\/aks-cluster\/.*/
+                - feature/Traefik-ratelimiting
+                - feature/cert-manager-upgrade
+
+      - drupal-deploy:
+          name: deploy
 
           # Use custom executor.
           executor: cicd80

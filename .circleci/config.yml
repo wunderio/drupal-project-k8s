@@ -27,7 +27,7 @@ jobs:
       - site-query:
           site_url: https://master.drupal-project-k8s.silta-aks.wdr.io/_ping.php
 
-  drupal-build:
+  drupal-build-old:
     description: "Build Drupal chart release."
     executor: <<parameters.executor>>
     parameters:
@@ -125,7 +125,7 @@ jobs:
                 paths:
                   - tags
 
-  drupal-deploy:
+  drupal-deploy-old:
     description: "Deploy drupal chart release."
     executor: <<parameters.executor>>
     resource_class: small
@@ -263,7 +263,7 @@ workflows:
                   helm unittest ./charts/silta-release --helm3
                   helm unittest ./charts/drupal --helm3
 
-      - drupal-build: &build-deploy
+      - silta/drupal-build: &build-deploy
           name: build
 
           # Use custom executor.
@@ -294,7 +294,7 @@ workflows:
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
 
-      - drupal-deploy:
+      - silta/drupal-deploy:
           name: deploy
 
           # Use custom executor.

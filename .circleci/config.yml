@@ -375,7 +375,7 @@ workflows:
       - site-test:
           name: "Site test"
           requires:
-            - "build-deploy"
+            #- "build-deploy"
             - "Deploy master to AKS cluster"
           filters:
             branches:

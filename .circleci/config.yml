@@ -107,20 +107,20 @@ jobs:
             - when:
                 condition: <<parameters.decrypt_files>>
                 steps:
-                  - decrypt-files:
+                  - silta/decrypt-files:
                       files: <<parameters.decrypt_files>>
-            - silta-setup:
+            - silta/silta-setup:
                 release-suffix: '<<parameters.release-suffix>>'
-            - extend-helm-chart:
+            - silta/extend-helm-chart:
                 source_chart: '<<parameters.source_chart>>'
                 extension_file: '<<parameters.extension_file>>'
                 chart_version: '<<parameters.chart_version>>'
-            - drupal-values-validate:
+            - silta/drupal-values-validate:
                 chart_name: <<parameters.chart_name>>
                 chart_version: <<parameters.chart_version>>
                 chart_repository: <<parameters.chart_repository>>
                 silta_config: <<parameters.silta_config>>
-            - drupal-docker-build:
+            - silta/drupal-docker-build:
                 nginx_build_context: <<parameters.nginx_build_context>>
             - run:
                 name: Store container image URLs to workspace
@@ -212,9 +212,9 @@ jobs:
             - when:
                 condition: <<parameters.decrypt_files>>
                 steps:
-                  - decrypt-files:
+                  - silta/decrypt-files:
                       files: <<parameters.decrypt_files>>
-            - silta-setup:
+            - silta/silta-setup:
                 release-suffix: '<<parameters.release-suffix>>'
             - steps: <<parameters.pre-release>>
             - attach_workspace:
@@ -226,7 +226,7 @@ jobs:
                   echo "export php_IMAGE_URL='$php_IMAGE_URL'" >> "$BASH_ENV"
                   echo "export nginx_IMAGE_URL='$nginx_IMAGE_URL'" >> "$BASH_ENV"
                   echo "export shell_IMAGE_URL='$shell_IMAGE_URL'" >> "$BASH_ENV"
-            - drupal-helm-deploy:
+            - silta/drupal-helm-deploy:
                 chart_name: <<parameters.chart_name>>
                 chart_version: <<parameters.chart_version>>
                 chart_repository: <<parameters.chart_repository>>

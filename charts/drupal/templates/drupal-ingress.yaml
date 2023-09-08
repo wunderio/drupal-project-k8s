@@ -11,7 +11,9 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
+    {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1beta1" }}
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
+    {{- end }}
     {{- if $ingress.tls }}
     {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
@@ -81,6 +83,9 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
+  {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
+  ingressClassName: {{ $ingress.type | quote }}
+  {{- end }}
   {{- if $ingress.tls }}
   tls:
   {{- if .Values.ssl.existingTLSSecret }}
@@ -174,7 +179,9 @@ kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-drupal-{{ $ingress_index }}
   annotations:
+    {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1beta1" }}
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
+    {{- end }}
     {{- if $ingress.tls }}
     {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
@@ -244,6 +251,9 @@ metadata:
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
+  {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+  ingressClassName: {{ $ingress.type | quote }}
+  {{- end }}
   {{- if $ingress.tls }}
   tls:
   {{- range $domain_index, $domain := $.Values.exposeDomains }}

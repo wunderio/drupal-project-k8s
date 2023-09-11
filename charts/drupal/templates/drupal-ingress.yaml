@@ -11,7 +11,7 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
-    {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1beta1" }}
+    {{- if or (eq $ingress.type "gce") (eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1beta1") }}
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- end }}
     {{- if $ingress.tls }}
@@ -83,7 +83,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
-  {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
+  {{- if and (ne $ingress.type "gce" ) (eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1") }}
   ingressClassName: {{ regexReplaceAll "[^[:alnum:]]" $ingress.type "-" | quote }}
   {{- end }}
   {{- if $ingress.tls }}
@@ -179,7 +179,7 @@ kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-drupal-{{ $ingress_index }}
   annotations:
-    {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1beta1" }}
+    {{- if or (eq $ingress.type "gce") (eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1beta1") }}
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- end }}
     {{- if $ingress.tls }}
@@ -251,7 +251,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
-  {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+  {{- if and (ne $ingress.type "gce" ) (eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1") }}
   ingressClassName: {{ regexReplaceAll "[^[:alnum:]]" $ingress.type "-" | quote }}
   {{- end }}
   {{- if $ingress.tls }}

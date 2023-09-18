@@ -15,7 +15,7 @@ executors:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.2
   cicd80v1:
     docker:
-      - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v0.1
+      - image: wunderio/silta-cicd:circleci-php8.0-node16-composer2-test
 
 jobs:
   site-test:
@@ -95,6 +95,7 @@ workflows:
                 - /feature\/aks-cluster\/.*/
                 - feature/Traefik-ratelimiting
                 - feature/cert-manager-upgrade
+                - feature/aws-test
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
@@ -137,14 +138,28 @@ workflows:
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.
           <<: *build-deploy
-          name: build-deploy-aws
+          name: 'Build & deploy to EKS'
           silta_config: silta/silta.yml,silta/silta-aws.yml
-          context: silta_aws
+          executor: cicd80v1
+          codebase-build:
+            - run:
+                name: Download feature branch build of silta cli
+                command: |
+                  curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+            - run:
+                name: install kubectl
+                command: |
+                  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+                  && sudo apt-get install apt-transport-https ca-certificates \
+                  && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
+                  && sudo apt-get update && sudo apt-get install kubectl
+          context: silta_aws_poc
           filters:
             branches:
               only:
                 - feature/aws-cluster
                 - /feature\/aws-cluster\/.*/
+                - feature/aws-test
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.

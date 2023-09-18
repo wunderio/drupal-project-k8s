@@ -153,6 +153,19 @@ workflows:
                   && sudo apt-get install apt-transport-https ca-certificates \
                   && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
                   && sudo apt-get update && sudo apt-get install kubectl
+            - silta/drupal-composer-install
+            - silta/npm-install-build
+            - run:
+                name: Add helm repositories and build local chart
+                command: |
+                  helm repo add elastic https://helm.elastic.co
+                  helm repo add codecentric https://codecentric.github.io/helm-charts
+                  helm repo add percona https://percona.github.io/percona-helm-charts/
+                  helm dependency build ./charts/drupal
+          pre-release:
+            - run:
+                name: Dry-run helm install
+                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           context: silta_aws_poc
           filters:
             branches:

@@ -49,5 +49,8 @@ nginx:
     add_header X-Backend-Server $hostname;
   realipfrom:
     eks-internal: 10.100.0.0/16
+    eks-pod-internal: 172.31.0.0/16
   noauthips:
-    aws-internal: 10.100.0.0/16
+    eks-internal: 10.100.0.0/16
+    eks-pod-internal: 172.31.0.0/16
+

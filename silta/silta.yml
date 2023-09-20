@@ -5,7 +5,7 @@
 # for all possible options.
 
 varnish:
-  enabled: false
+  enabled: true
 
 elasticsearch:
   enabled: true
@@ -47,3 +47,7 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+  realipfrom:
+    eks-internal: 10.100.0.0/16
+  noauthips:
+    aws-internal: 10.100.0.0/16

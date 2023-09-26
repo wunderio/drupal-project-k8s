@@ -143,11 +143,11 @@ imagePullSecrets:
 - name: PXC_DB_NAME
   value: "drupal"
 - name: PXC_DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: PXC_DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
@@ -169,11 +169,11 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- end }}
@@ -255,7 +255,7 @@ imagePullSecrets:
 # Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
-{{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) }}
+{{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) (kindIs "invalid" $val) }}
   value: {{ $val | quote }}
 {{- else }}
   {{ $val | toYaml | indent 4 | trim }}
@@ -331,7 +331,7 @@ mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_N
 {{- define "drupal.wait-for-elasticsearch-command" }}
 TIME_WAITING=0
 echo -n "Waiting for Elasticsearch.";
-until curl --silent --connect-timeout 2 "$ELASTICSEARCH_HOST:9200" ; do
+until curl --silent --connect-timeout 2 "{{ .Values.elasticsearch.protocol }}://${ELASTICSEARCH_HOST}:9200" -k ; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))

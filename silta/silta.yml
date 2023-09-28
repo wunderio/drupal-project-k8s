@@ -53,4 +53,5 @@ nginx:
     eks-pod-internal: 172.31.0.0/16
 
 referenceData:
+  enabled: true
   referenceEnvironment: 'feature/aws-test'

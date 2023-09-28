@@ -52,3 +52,5 @@ nginx:
   noauthips:
     eks-pod-internal: 172.31.0.0/16
 
+referenceData:
+  referenceEnvironment: 'feature-aws-test'

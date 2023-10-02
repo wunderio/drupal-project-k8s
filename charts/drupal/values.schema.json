@@ -309,7 +309,7 @@
         },
         "env": {
           "type": "object",
-          "additionalProperties": { "type": ["string", "boolean", "integer", "null"] }
+          "additionalProperties": { "type": ["string", "boolean", "integer", "object", "number", "null"] }
         },
         "hashsalt": { "type": "string" },
         "errorLevel": { "type": "string" },

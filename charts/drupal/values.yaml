@@ -248,6 +248,9 @@ php:
     # Custom php-fpm settings block. May override parameters previously defined.
     # This will be put under [www] process pool.
     extraConfig: |
+      env[SKIP_LOG] = $request_uri;
+      access.log = /dev/null if-not-env=SKIP_LOG="/index\.php|/status|/ping"
+      
 
     # PHP-FPM status page will be available at /php_status, accessible
     # from nginx.noauthips and localhost.

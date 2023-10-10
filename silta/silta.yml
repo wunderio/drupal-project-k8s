@@ -5,7 +5,7 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   enabled: true
@@ -19,8 +19,16 @@ redis:
     password: "foo"
 
 mounts:
+  public-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/web/sites/default/files
+    storageClassName: nfs-sc
   private-files:
     enabled: true
+    storage: 1G
+    mountPath: /app/private
+    storageClassName: nfs-sc
 
 # Allow access from another namespace for testing purposes.
 silta-release:

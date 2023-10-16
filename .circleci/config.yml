@@ -123,6 +123,16 @@ workflows:
                 - master
                 - feature/new-builder-images
 
+      - silta/drupal-build-deploy:
+          # Extend the build-deploy configuration testing upcloud poc.
+          <<: *build-deploy
+          name: "Deploy UKS cluster"
+          context: silta_uks
+          filters:
+            branches:
+              only:
+                - feature/upcloud
+
       - site-test:
           name: "Site test"
           requires:

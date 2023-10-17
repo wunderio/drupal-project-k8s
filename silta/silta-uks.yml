@@ -1,0 +1,5 @@
+mariadb:
+  master:
+    persistence:
+      size: 1Gi
+

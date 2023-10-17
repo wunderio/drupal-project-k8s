@@ -128,6 +128,7 @@ workflows:
           # Extend the build-deploy configuration testing upcloud poc.
           <<: *build-deploy
           name: "Deploy UKS cluster"
+          silta_config: silta/silta.yml,silta/silta-uks.yml
           context: silta_uks_poc
           filters:
             branches:

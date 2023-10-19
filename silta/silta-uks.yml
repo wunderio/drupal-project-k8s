@@ -2,6 +2,8 @@ mariadb:
   master:
     persistence:
       size: 1Gi
+  enabled: false
+
 nginx:
   realipfrom:
     upcloud-pod-internal: 192.168.0.0/16

@@ -47,3 +47,7 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+  realipfrom:
+    upcloud-pod-internal: 192.168.0.0/16
+  noauthips:
+    upcloud-pod-internal: 192.168.0.0/16

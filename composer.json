@@ -51,7 +51,8 @@
             "koodimonni/composer-dropin-installer": true,
             "zaporylie/composer-drupal-optimizations": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "phpro/grumphp": true
+            "phpro/grumphp": true,
+            "phpstan/extension-installer": true
         }
     },
     "autoload": {

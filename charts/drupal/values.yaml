@@ -3,6 +3,10 @@ silta-release:
   # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
   downscaler:
     enabled: true
+    # Allows to modify How long should This release be active until downscaled.
+    # value examples: 10y, 4w, 1h Defaults to values used in silta-downscaler chart.
+    # https://github.com/wunderio/charts/blob/master/silta-downscaler/values.yaml
+    releaseMinAge: ''
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
@@ -89,6 +93,10 @@ ingress:
             period: 1s
             average: 32
             burst: 90
+      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rpm: "300"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+      nginx.ingress.kubernetes.io/limit-connections: "20"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -198,6 +206,11 @@ nginx:
   #   paths:
   #     - "^/sites/[^/]+/files/(?:css|js)/"
 
+  # Nginx status pages will be available at /nginx_status and /nginx_vts,
+  # accessible from nginx.noauthips and localhost.
+  status_page:
+    enabled: true
+
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
   sessionAffinity: false
 
@@ -235,6 +248,11 @@ php:
     # Custom php-fpm settings block. May override parameters previously defined.
     # This will be put under [www] process pool.
     extraConfig: |
+
+    # PHP-FPM status page will be available at /php_status, accessible
+    # from nginx.noauthips and localhost.
+    status_page:
+      enabled: true
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   cron:
@@ -282,7 +300,7 @@ php:
       if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
         drush cache-clear all || true
       else
-        drush cache-rebuild || true
+        drush eval "drupal_flush_all_caches();" || true
       fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y
@@ -421,7 +439,7 @@ referenceData:
       memory: 488Mi
 
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
-# Uses formatters from fakerphp.github.io/formatters 
+# Uses formatters from fakerphp.github.io/formatters
 gdprDump:
   tables:
     cache:
@@ -496,6 +514,9 @@ backup:
 # see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
 mariadb:
   enabled: true
+  image:
+    # https://hub.docker.com/r/bitnami/mariadb/tags
+    tag: 10.6.15-debian-11-r24
   replication:
     enabled: false
   db:
@@ -542,7 +563,7 @@ varnish:
       cpu: 25m
       memory: 32Mi
   image: wunderio/silta-varnish
-  imageTag: 6-v0.2
+  imageTag: 6-v1
   # https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
   # https://varnish-cache.org/docs/6.6/reference/varnishd.html#list-of-parameters
@@ -569,6 +590,7 @@ varnish:
     .connect_timeout        = 10s;
     .between_bytes_timeout  = 10s;
 
+# https://github.com/elastic/helm-charts/blob/2fd64d0af65f14df7aa01da591919460dabac4b3/elasticsearch/values.yaml
 elasticsearch:
   enabled: false
 
@@ -580,6 +602,16 @@ elasticsearch:
   minimumMasterNodes: 1
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+
+  # Note: "roles" definition is ignored for 6.x images due to subchart compatability reasons.
+
+  # Drupal integration module still requires non-ssl connection
+  # related param: elasticsearch.extraEnvs[xpack.security.enabled]
+  createCert: false
+  protocol: http
+  extraEnvs:
+    - name: xpack.security.enabled
+      value: "false"
 
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
@@ -595,7 +627,7 @@ elasticsearch:
   resources:
     requests:
       cpu: 200m
-      memory: 512Mi
+      memory: 640Mi
     limits:
       memory: 1Gi
 
@@ -653,7 +685,7 @@ mailhog:
     # Set image repository to "mailhog/mailhog" to reenable logging.
     repository: wunderio/silta-mailhog
     # Set image tag to "" to reenable logging.
-    tag: silent
+    tag: v1
   resources:
     requests:
       cpu: 1m
@@ -672,7 +704,7 @@ solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
   image: wunderio/silta-solr
-  imageTag: 8
+  imageTag: 8-v1
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
@@ -709,7 +741,7 @@ db:
   primary: mariadb
 
 # Percona XtraDB Cluster
-# see: https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/values.yaml
+# see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml
 pxc-db:
   enabled: false
   allowUnsafeConfigurations: false
@@ -733,8 +765,10 @@ pxc-db:
       # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
       pxc_strict_mode=PERMISSIVE
     persistence:
+      enabled: true
       size: 8Gi
-  haproxy:
+  proxysql:
+    enabled: true
     resources:
       requests:
         cpu: 100m
@@ -745,9 +779,47 @@ pxc-db:
   logcollector:
     enabled: false
   backup:
-    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
-    #enabled: false
-    schedule: []
+    enabled: false
+    # schedule: []
   secrets:
     passwords:
       root: drupal
+      pmmserver: drupal
+      root: drupal
+      xtrabackup: drupal
+      monitor: drupal
+      clustercheck: drupal
+      proxyadmin: drupal
+      pmmserver: drupal
+      operator: drupal
+      replication: drupal
+
+# Fastly Signal Sciences support
+# https://docs.fastly.com/signalsciences/
+signalsciences:
+  enabled: false
+  accesskeyid: ""
+  secretaccesskey: ""
+  image: signalsciences/sigsci-agent
+  imageTag: 4.40.0
+  # sidecar container resources
+  resources:
+    requests:
+      cpu: 20m
+      memory: 40Mi
+    limits:
+      cpu: 40m
+      memory: 300Mi
+
+# Logging configurations for services that support them.
+# BETA feature, currently only supported by drupal-cron.
+logging:
+  # Currently supported formats are "default" and "json".
+  format: default
+
+# Obfuscate parts of the full domain name.
+# Available values for maskSubdomains are:
+# - releaseName (scrambles release name subdomain, e.g., xxx.project.silta.tld)
+# - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
+# - both (obfuscates both, e.g., zzz.silta.tld)
+# maskSubdomains: both

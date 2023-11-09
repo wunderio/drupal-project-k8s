@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8f1eb0458c13ef9d13b030f81b91f1ce",
+    "content-hash": "0f2c5777e0c72f81f903a60d5d60cf61",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2655,26 +2655,26 @@
         },
         {
             "name": "drupal/simplei",
-            "version": "1.2.0",
+            "version": "2.1.4",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/simplei.git",
-                "reference": "8.x-1.2"
+                "reference": "2.1.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/simplei-8.x-1.2.zip",
-                "reference": "8.x-1.2",
-                "shasum": "6f4af74a3215a0f7c989eb24f1620c5ea3ba79e4"
+                "url": "https://ftp.drupal.org/files/projects/simplei-2.1.4.zip",
+                "reference": "2.1.4",
+                "shasum": "1ed4dad4e1b3190645e20e768453f588db544e58"
             },
             "require": {
-                "drupal/core": "^8 || ^9"
+                "drupal/core": "^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.2",
-                    "datestamp": "1581970320",
+                    "version": "2.1.4",
+                    "datestamp": "1677733354",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"

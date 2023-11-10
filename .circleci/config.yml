@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:cachepaths
 
 executors:
   cicd73:
@@ -70,6 +70,8 @@ workflows:
             #     command: |
             #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
+            - silta/npm-install-build:
+                additional-cache-path: "vendor"
             - silta/npm-install-build
             - run:
                 name: Add helm repositories and build local chart

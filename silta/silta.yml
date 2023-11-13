@@ -47,3 +47,66 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+
+mariadb:
+  master:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 500M
+      limits:
+        cpu: 2000m
+        memory: 8096M
+    config: |-
+        [mysqld]
+        skip-name-resolve
+        explicit_defaults_for_timestamp
+        basedir=/opt/bitnami/mariadb
+        plugin_dir=/opt/bitnami/mariadb/plugin
+        port=3306
+        socket=/opt/bitnami/mariadb/tmp/mysql.sock
+        tmpdir=/opt/bitnami/mariadb/tmp
+        max_allowed_packet=2048M
+        bind-address=0.0.0.0
+        pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+        log-error=/opt/bitnami/mariadb/logs/mysqld.log
+        character-set-server=UTF8
+        collation-server=utf8_unicode_ci
+        transaction-isolation=READ-COMMITTED
+        #Mariadb default is 150, be aware that each active connection consumes ~19-20M of memory, so add some extra memory buffer to prod request/limit.
+        max_connections=200
+        #set innodb_buffer_pool_size to 70/80% of the memory request
+        innodb_buffer_pool_size=2048M
+        #set this to 1 per gigabyte of memory allocated in innodb_buffer_pool_size
+        innodb_buffer_pool_instances=2
+        innodb_log_buffer_size=8M
+        #normally should be 25% of innodb buffer size with 2 files of 12.5% each.
+        #here 48M is 12.5% OF 384M
+        innodb_log_file_size=256M
+        innodb_lock_wait_timeout=120
+        innodb_open_files=49152
+        innodb_flush_log_at_trx_commit=2
+        innodb_thread_concurrency=16
+        innodb_flush_method=O_DIRECT
+        table_open_cache=4000
+        table_definition_cache=1000
+        back_log=2048
+        tmp_table_size=64M
+        max_heap_table_size=32M
+        join_buffer_size=2M
+        #query_cache_size=0
+        performance_schema=1
+        innodb_write_io_threads=16
+        #Silta seems to require this variable set to 0
+        #https://mariadb.com/kb/en/innodb-system-variables/#innodb_use_native_aio
+        innodb_use_native_aio=0
+        [client]
+        port=3306
+        socket=/opt/bitnami/mariadb/tmp/mysql.sock
+        default-character-set=UTF8
+        plugin_dir=/opt/bitnami/mariadb/plugin
+        [manager]
+        port=3306
+        socket=/opt/bitnami/mariadb/tmp/mysql.sock
+        pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid

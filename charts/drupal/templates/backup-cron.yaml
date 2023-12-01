@@ -58,7 +58,11 @@ spec:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: {{ .Release.Name }}-backups
               persistentVolumeClaim:
+                {{- if and (eq .Values.backup.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  2) }}
+                claimName: {{ .Release.Name }}-v2-backups
+                {{- else }}
                 claimName: {{ .Release.Name }}-backups
+                {{- end }}
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 

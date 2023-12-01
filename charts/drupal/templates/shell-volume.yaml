@@ -1,6 +1,6 @@
 {{- if .Values.shell.enabled }}
 {{- $releaseNameTrimmed := substr 0 (int (sub 54 (len "ssh-keys"))) $.Release.Name }}
-{{- if eq .Values.shell.mount.storageClassName "silta-shared" }}
+{{- if and (eq .Values.shell.mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  1) }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -28,7 +28,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {{- if and (eq .Values.shell.mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 2) }}
+  name: {{ .Release.Name }}-v2-ssh-keys
+  {{- else }}
   name: {{ .Release.Name }}-ssh-keys
+  {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
@@ -36,13 +40,18 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
+  {{- if and (eq .Values.shell.mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 2) }}
+  storageClassName: silta-shared-nfs
+  {{- else }}
   storageClassName: {{ .Values.shell.mount.storageClassName }}
+  {{- end }}}
   resources:
     requests:
       storage: {{ .Values.shell.mount.storage }}
-{{- if eq .Values.shell.mount.storageClassName "silta-shared" }}
+  {{- if and (eq .Values.shell.mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 1) }}
   selector:
     matchLabels:
       name: {{ $releaseNameTrimmed }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-ssh-keys
+  {{- end}}
 {{- end }}
 {{- end }}

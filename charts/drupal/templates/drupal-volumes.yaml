@@ -50,11 +50,11 @@ spec:
   resources:
     requests:
       storage: {{ $mount.storage }}
-{{- if and (eq $mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 1) }}
+  {{- if and (eq $mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 1) }}
   selector:
     matchLabels:
       name: {{ $releaseNameTrimmed }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
-{{- end }}
+  {{- end }}
 ---
 {{- end -}}
 {{- end }}

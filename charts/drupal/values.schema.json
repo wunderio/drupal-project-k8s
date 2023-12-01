@@ -103,7 +103,8 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string" },
-        "vpcNative": { "type": "boolean" }
+        "vpcNative": { "type": "boolean" },
+        "siltaSharedStorageVersion": { "type": "integer" }
       }
     },
     "nginx": {

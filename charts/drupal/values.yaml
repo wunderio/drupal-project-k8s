@@ -109,6 +109,7 @@ ingress:
 cluster:
   type: gke
   vpcNative: false
+  siltaSharedStorageVersion: 1
 
 # backendConfig customisations for Drupal service
 backendConfig:
@@ -386,16 +387,16 @@ shell:
 mounts:
   public-files:
     enabled: true
-    storage: 10G
+    storage: 1G
     # Assumes that webRoot is set to the default value "/app/web".
     mountPath: /app/web/sites/default/files
-    storageClassName: silta-shared-nfs
+    storageClassName: silta-shared
     csiDriverName: csi-rclone
   private-files:
     enabled: false
-    storage: 10G
+    storage: 1G
     mountPath: /app/private
-    storageClassName: silta-shared-nfs
+    storageClassName: silta-shared
     csiDriverName: csi-rclone
 
 # Configure reference data that will be used when creating new environments.

@@ -68,7 +68,11 @@ ports:
     name: {{ $mount.configMapName }}
 {{- else }}
   persistentVolumeClaim:
+    {{- if and (eq $mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 2) }}
+    claimName: {{ $.Release.Name }}-v2-{{ $index }}
+    {{- else }}
     claimName: {{ $.Release.Name }}-{{ $index }}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -30,13 +30,21 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {{- if and (eq $mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 2) }}
+  name: {{ $.Release.Name }}-v2-{{ $index }}
+  {{- else }} 
   name: {{ $.Release.Name }}-{{ $index }}
+  {{- end }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
   annotations:
     storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/{{ $index }}
 spec:
+  {{- if and (eq $mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 2) }}
+  storageClassName: silta-shared-nfs
+  {{- else }}
   storageClassName: {{ $mount.storageClassName }}
+  {{- end }}
   accessModes:
     - ReadWriteMany
   resources:
@@ -80,13 +88,21 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {{- if and (eq .Values.referenceData.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  2) }}
+  name: {{ include "drupal.referenceEnvironment" . }}-v2-reference-data
+  {{- else }}
   name: {{ include "drupal.referenceEnvironment" . }}-reference-data
+  {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
     storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/reference-data
 spec:
+  {{- if and (eq .Values.referenceData.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int) 2) }}
+  storageClassName: silta-shared-nfs
+  {{- else }}
   storageClassName: {{ .Values.referenceData.storageClassName }}
+  {{- end }}
   accessModes:
     - ReadWriteMany
   resources:

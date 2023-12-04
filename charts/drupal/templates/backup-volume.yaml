@@ -51,4 +51,3 @@ spec:
       name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
   {{- end }}
 {{- end }}
-{{- end }}

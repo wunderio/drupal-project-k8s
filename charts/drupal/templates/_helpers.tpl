@@ -392,6 +392,18 @@ done
   {{- end }}
 {{- end }}
 
+{{- define "drupal.reference-data-pvc-name" }}
+{{- if .Values.referenceData.persistentVolumeClaim }}
+{{- .Values.referenceData.persistentVolumeClaim }}
+{{- else }}
+{{- if and (eq .Values.referenceData.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  2) }}
+{{- include "drupal.referenceEnvironment" . }}-v2-reference-data
+{{- else }}
+{{- include "drupal.referenceEnvironment" . }}-reference-data
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then

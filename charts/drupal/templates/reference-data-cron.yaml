@@ -36,12 +36,7 @@ spec:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: reference-data-volume
               persistentVolumeClaim:
-                {{- if and (eq .Values.referenceData.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  2) }}
-                claimName: {{ include "drupal.referenceEnvironment" . }}-v2-reference-data
-                {{- else }}
-                claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
-                {{- end }}
-
+                claimName: {{ include "drupal.reference-data-pvc-name" . }}
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 {{- end }}

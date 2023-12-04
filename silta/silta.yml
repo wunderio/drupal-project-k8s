@@ -50,3 +50,7 @@ nginx:
 
 cluster:
   siltaSharedStorageVersion: 2
+
+# TODO: remove me when cli override if fixed
+referenceData:
+  persistentVolumeClaim: feature-test-cluster-reference-reference-data

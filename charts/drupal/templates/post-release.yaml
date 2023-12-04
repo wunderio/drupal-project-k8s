@@ -47,10 +47,6 @@ spec:
         {{- if or (eq .Values.referenceData.referenceEnvironment .Values.environmentName) (not .Values.referenceData.skipMount) }}
         - name: reference-data-volume
           persistentVolumeClaim:
-            {{- if and (eq .Values.referenceData.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  2) }}
-            claimName: {{ include "drupal.referenceEnvironment" . }}-v2-reference-data
-            {{- else }}
-            claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
-            {{- end }}
+            claimName: {{ include "drupal.reference-data-pvc-name" . }}
         {{- end -}}
         {{- end }}

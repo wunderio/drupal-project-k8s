@@ -430,6 +430,9 @@ referenceData:
   # Skips mounting the volume outside of the reference environment, only used programmatically.
   skipMount: false
 
+  # The name of the persistent volume claim for the reference data, only used programmatically.
+  persistentVolumeClaim: ""
+
   # Resources for the reference data cron job.
   resources:
     requests:

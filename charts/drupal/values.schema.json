@@ -413,6 +413,7 @@
         "storage": { "type": "string" },
         "storageClassName": { "type": "string" },
         "csiDriverName": { "type": "string" },
+        "persistentVolumeClaim": { "type": "string" },
         "skipMount": { "type": "boolean" },
         "resources": {
           "type": "object",

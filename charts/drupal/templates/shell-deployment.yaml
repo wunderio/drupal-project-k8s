@@ -83,11 +83,12 @@ spec:
       {{- include "drupal.volumes" . | nindent 6 }}
       - name: ssh-keys
         persistentVolumeClaim:
-          {{- if and (eq .Values.shell.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  2) }}
-          claimName: {{ .Release.Name }}-v2-ssh-keys
-          {{- else }}
+          # TODO: restore when fs mount umask is fixed
+          # {- if and (eq .Values.shell.mount.storageClassName "silta-shared") ( eq ($.Values.cluster.siltaSharedStorageVersion | int)  2) }}
+          # claimName: {{ .Release.Name }}-v2-ssh-keys
+          # {- else }}
           claimName: {{ .Release.Name }}-ssh-keys
-          {{- end }}
+          # {- end }}
       - name: shell-configmap
         configMap:
           name: {{ .Release.Name }}-shell

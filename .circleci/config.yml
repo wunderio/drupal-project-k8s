@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:remove_remote
+  silta: silta/silta@dev:feature/slt-913-split-jobs
 
 executors:
   cicd73:

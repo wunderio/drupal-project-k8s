@@ -47,3 +47,92 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+
+# Configuration for everything that runs in php containers.
+php:
+  # Cron tasks, each of which will be run into a dedicated temporary pod.
+  cron:
+    drupal-1:
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
+      # When overriding this value, make sure to include the `drush cron` command.
+      command: |
+        if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+          drush cron;
+        fi
+
+      # Set a nodeSelector specifically for cron jobs.
+      nodeSelector: {}
+
+      # Set resources specifically for cron jobs. If not set, they will be
+      # inherited from php.resources.
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 488Mi
+    drupal-2:
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
+      # When overriding this value, make sure to include the `drush cron` command.
+      command: |
+        if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+          drush cron;
+        fi
+
+      # Set a nodeSelector specifically for cron jobs.
+      nodeSelector: {}
+
+      # Set resources specifically for cron jobs. If not set, they will be
+      # inherited from php.resources.
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 488Mi
+    drupal-3:
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
+      # When overriding this value, make sure to include the `drush cron` command.
+      command: |
+        if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+          drush cron;
+        fi
+
+      # Set a nodeSelector specifically for cron jobs.
+      nodeSelector: {}
+
+      # Set resources specifically for cron jobs. If not set, they will be
+      # inherited from php.resources.
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 488Mi
+    drupal-4:
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
+      # When overriding this value, make sure to include the `drush cron` command.
+      command: |
+        if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+          drush cron;
+        fi
+
+      # Set a nodeSelector specifically for cron jobs.
+      nodeSelector: {}
+
+      # Set resources specifically for cron jobs. If not set, they will be
+      # inherited from php.resources.
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 488Mi                              

@@ -161,6 +161,7 @@ workflows:
               only:
                 - master
                 - feature/new-builder-images
+                - feature/slt-913-split-jobs
 
       - silta/drupal-build-deploy:
           # Extend the build-deploy configuration for the silta-test cluster environment.

@@ -245,6 +245,7 @@ workflows:
             branches:
               only: production
 
+      # Test site availability by requesting _ping.php.
       - site-test: &site-test
           name: "Site test"
           requires:

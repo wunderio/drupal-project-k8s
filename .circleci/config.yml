@@ -21,6 +21,7 @@ jobs:
   site-test:
     docker:
       - image: alpine/curl
+    resource_class: small
     steps:
       - site-query:
           site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php

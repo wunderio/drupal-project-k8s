@@ -62,3 +62,14 @@ php:
     # backup: true
     command: "echo 'Pre-upgrade command'"
 
+
+mariadb:
+  enabled: false
+
+php:
+  env:
+    DB_HOST: mariadb.default
+    DB_USER: root
+    # default pass in mariadb-operator templates. This is used for testing, don't judge me, i'm too lazy to encrypt it.
+    DB_PASS: "MariaDB11!"
+    DB_NAME: drupal

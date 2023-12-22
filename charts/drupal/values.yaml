@@ -769,8 +769,28 @@ solr:
         - ReadWriteOnce
 
 db:
-  # Available options: mariadb, pxc-db
+  # Available options: mariadb, mariadb-ha, pxc-db
   primary: mariadb
+
+# provider: mariadb-operator
+mariadb-ha:
+  enabled: false
+  
+  image: "mariadb:11.0.3"
+  imagePullPolicy: IfNotPresent
+  password: drupal
+  replicas: 3
+  persistence:
+    size: 5Gi 
+  # TODO: tune defaults
+  # resources:
+  #   requests:
+  #     cpu: 250m
+  #     memory: 488Mi
+  #   limits:
+  #     cpu: 500m
+  #     memory: 977Mi
+
 
 # Percona XtraDB Cluster
 # see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml

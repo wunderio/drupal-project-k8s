@@ -150,6 +150,19 @@ imagePullSecrets:
       name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
+{{- if index ( index .Values "mariadb-ha" ) "enabled" }}
+- name: MARIADB_HA_DB_USER
+  value: "root"
+- name: MARIADB_HA_DB_NAME
+  value: "drupal"
+- name: MARIADB_HA_DB_HOST
+  value: {{ .Release.Name }}-mariadb-ha
+- name: MARIADB_HA_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-ha
+      key: password      
+{{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
@@ -175,6 +188,19 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ include "pxc-database.fullname" . }}
       key: root
+{{- end }}
+{{- if and ( index ( index .Values "mariadb-ha" ) "enabled" ) ( eq .Values.db.primary "mariadb-ha" ) }}
+- name: DB_USER
+  value: "root"
+- name: DB_NAME
+  value: "drupal"
+- name: DB_HOST
+  value: {{ .Release.Name }}-mariadb-ha
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-ha
+      key: password
 {{- end }}
 {{- end }}
 

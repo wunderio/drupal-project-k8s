@@ -13,7 +13,7 @@ spec:
   port: 3306
   replicas: {{ $mariadbha.replicas }}
   # TODO: test 1 replica, check data migration to 3 and then back to 1
-  {{- if gt $mariadbha.replicas 1 }}
+  {{- if gt (int $mariadbha.replicas) 1 }}
   galera:
     enabled: true
   {{- end }}

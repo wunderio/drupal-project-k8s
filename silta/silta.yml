@@ -60,10 +60,20 @@ php:
 mariadb:
   enabled: false
 
-php:
-  env:
-    DB_HOST: mariadb.default
-    DB_USER: root
-    # default pass in mariadb-operator templates. This is used for testing, don't judge me, i'm too lazy to encrypt it.
-    DB_PASS: "MariaDB11!"
-    DB_NAME: drupal
+mariadb-ha:
+  enabled: true
+
+db:
+  primary: mariadb-ha
+
+# TODO: check helm unittest
+# ### Error:  apiVersion 'v2' is not valid. The value must be "v1"
+
+# TODO: REMOVE ME
+# php:
+#   env:
+#     DB_HOST: mariadb.default
+#     DB_USER: root
+#     # default pass in mariadb-operator templates. This is used for testing, don't judge me, i'm too lazy to encrypt it.
+#     DB_PASS: "MariaDB11!"
+#     DB_NAME: drupal

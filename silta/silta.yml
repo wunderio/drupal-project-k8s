@@ -55,3 +55,15 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+
+
+mariadb:
+  enabled: false
+
+php:
+  env:
+    DB_HOST: mariadb.default
+    DB_USER: root
+    # default pass in mariadb-operator templates. This is used for testing, don't judge me, i'm too lazy to encrypt it.
+    DB_PASS: "MariaDB11!"
+    DB_NAME: drupal

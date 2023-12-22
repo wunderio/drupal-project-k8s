@@ -19,6 +19,7 @@ spec:
     volumeHandle: {{ .Release.Namespace }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/backups
+      vfs-cache-mode: "off"
   {{- end }}
 ---
 {{- end }}

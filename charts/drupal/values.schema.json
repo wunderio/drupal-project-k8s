@@ -565,7 +565,7 @@
       "properties": {
         "primary": {
           "type": "string",
-          "enum": [ "", "mariadb", "pxc-db" ]
+          "enum": [ "", "mariadb", "mariadb-ha", "pxc-db" ]
         }
       }
     },

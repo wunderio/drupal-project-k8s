@@ -66,14 +66,20 @@ mariadb-ha:
 db:
   primary: mariadb-ha
 
-# TODO: check helm unittest
-# ### Error:  apiVersion 'v2' is not valid. The value must be "v1"
+# TODO: downscaling for mariadb-ha, does not scale to 0 currently
 
-# TODO: REMOVE ME
-# php:
-#   env:
-#     DB_HOST: mariadb.default
-#     DB_USER: root
-#     # default pass in mariadb-operator templates. This is used for testing, don't judge me, i'm too lazy to encrypt it.
-#     DB_PASS: "MariaDB11!"
-#     DB_NAME: drupal
+# TODO: mariadb-ha affinity rules
+
+# TODO: Chart tests (helm unittest)
+# TODO: test 1 replica, check data migration to 3 and then back to 1
+# TODO: mariadb-operator in silta-cluster
+
+# TODO: test HPA
+# https://github.com/mariadb-operator/mariadb-operator/pull/307
+
+# TODO: check full release, it's still in alpha
+# https://github.com/mariadb-operator/mariadb-operator/issues/257
+
+# TODO: add doc
+# https://github.com/mariadb-operator/mariadb-operator
+# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/GALERA.md

@@ -16,6 +16,9 @@ executors:
   cicd80v1:
     docker:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v1
+  cicd82:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.2-node20-composer2-v1
 
 jobs:
   site-test:
@@ -45,7 +48,7 @@ workflows:
           name: validate
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd82
 
           post-validation:
             - run:
@@ -60,7 +63,7 @@ workflows:
           name: build-deploy
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd82
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"

@@ -54,8 +54,3 @@ php:
       # In feature environments, run cron jobs very seldom. Adjust as needed.
       # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
       schedule: '~ 0 1 2 *'
-
-backup:
-  enabled: true
-  schedule: '0 * * * *'
-  retention: 2

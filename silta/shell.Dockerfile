@@ -3,4 +3,6 @@
 #FROM wunderio/silta-php-shell:php7.4-v1
 FROM wunderio/silta-php-shell:php8.0-v1
 
+RUN apk add tzdata
+
 COPY --chown=www-data:www-data . /app

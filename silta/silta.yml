@@ -56,5 +56,5 @@ php:
       schedule: '~ 0 1 2 *'
 
   env:
-    TZ: Europe/Riga
+    TZ: Europe/Helsinki
 

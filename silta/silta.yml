@@ -4,11 +4,15 @@
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
 
-varnish:
+# Enable daily backups.
+backup:
   enabled: true
 
+varnish:
+  enabled: false
+
 elasticsearch:
-  enabled: true
+  enabled: false
 
 memcached:
   enabled: false

@@ -6,6 +6,7 @@ FROM wunderio/silta-php-fpm:8.0-fpm-v1
 COPY --chown=www-data:www-data . /app
 
 # Set timezone.
+RUN apk add tzdata
 ENV TZ=Europe/Riga
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 

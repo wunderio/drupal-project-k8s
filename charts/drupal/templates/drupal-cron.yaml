@@ -17,6 +17,7 @@ spec:
   suspend: false
   jobTemplate:
     spec:
+      backoffLimit: {{ $job.backoffLimit | default 1 }}
       template:
         metadata:
           labels:

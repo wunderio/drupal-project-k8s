@@ -16,16 +16,21 @@ executors:
   cicd80v1:
     docker:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v1
+  cicd82:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.2-node20-composer2-v1
 
 jobs:
   site-test:
     docker:
       - image: alpine/curl
+    resource_class: small
     steps:
       - site-query:
           site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php
       - site-query:
           site_url: https://master.drupal-project-k8s.silta-aks.wdr.io/_ping.php
+
 commands:
   site-query:
     parameters:
@@ -41,11 +46,11 @@ workflows:
   version: 2
   commit:
     jobs:
-      - silta/drupal-validate:
+      - silta/drupal-validate: &drupal-validate
           name: validate
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd82
 
           post-validation:
             - run:
@@ -54,16 +59,14 @@ workflows:
                   helm unittest ./charts/silta-release --helm3
                   helm unittest ./charts/drupal --helm3
 
-      - silta/drupal-build-deploy: &build-deploy
-          name: build-deploy
+      # Build job for feature environments.
+      # Other jobs defined below extend this job.
+      - silta/drupal-build: &build
+          name: build
 
           # Use custom executor.
-          executor: cicd80
+          executor: cicd82
 
-          # Use a local chart during development.
-          chart_name: "./charts/drupal"
-          chart_repository: ""
-          silta_config: silta/silta.yml
           codebase-build:
             # - run:
             #     name: Download feature branch build of silta cli
@@ -71,6 +74,27 @@ workflows:
             #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
+          context: silta_dev
+          filters:
+            branches:
+              ignore:
+                - production
+                - /feature\/test-cluster(\/.*)?/
+                - /feature\/aws-cluster(\/.*)?/
+                - /feature\/aks-cluster(\/.*)?/
+
+      # Deploy job for feature environments.
+      # Other jobs defined below extend this job.
+      - silta/drupal-deploy: &deploy
+          name: deploy
+
+          # Use custom executor.
+          executor: cicd82
+
+          # Use a local chart during development.
+          chart_name: "./charts/drupal"
+          chart_repository: ""
+          pre-release:
             - run:
                 name: Add helm repositories and build local chart
                 command: |
@@ -78,97 +102,165 @@ workflows:
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
-          pre-release:
             - run:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
+          silta_config: silta/silta.yml
           context: silta_dev
+          requires:
+            - build
           filters:
             branches:
               ignore:
                 - production
-                - feature/test-cluster
-                - /feature\/test-cluster\/.*/
-                - feature/aws-cluster
-                - /feature\/aws-cluster\/.*/
-                - feature/aks-cluster
-                - /feature\/aks-cluster\/.*/
-                - feature/Traefik-ratelimiting
-                - feature/cert-manager-upgrade
+                - master
+                - /feature\/test-cluster(\/.*)?/
+                - /feature\/aws-cluster(\/.*)?/
+                - /feature\/aks-cluster(\/.*)?/
 
-      - silta/drupal-build-deploy:
-          # Extend the build-deploy configuration for the silta-test cluster environment.
-          <<: *build-deploy
-          name: build-deploy-test
-          silta_config: silta/silta.yml,silta/silta-test.yml
+      # Build job for test cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build:
+          <<: *build
+          name: build-test
           context: silta_test
           filters:
             branches:
               only:
-                - feature/test-cluster
-                - /feature\/test-cluster\/.*/
-                - feature/Traefik-ratelimiting
-                - feature/cert-manager-upgrade
-                - feature/new-builder-images
+                - /feature\/test-cluster(\/.*)?/
 
-      - silta/drupal-build-deploy:
-          # Extend the build-deploy configuration testing master deployment to aks cluster.
-          <<: *build-deploy
-          name: "Deploy master to AKS cluster"
-          silta_config: silta/silta.yml,silta/silta-master-aks.yml
+      # Deploy job for test cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy
+          name: deploy-test
+          silta_config: silta/silta.yml,silta/silta-test.yml
+          context: silta_test
+          requires:
+            - build-test
+          filters:
+            branches:
+              only:
+                - /feature\/test-cluster(\/.*)?/
+
+      # Deploy job for master environment.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy: &deploy-master
+          <<: *deploy
+          name: deploy-master
+          silta_config: silta/silta.yml,silta/silta-master.yml
+          filters:
+            branches:
+              only:
+                - master
+
+      # Build job for master environment in AKS cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build: &build-master-aks
+          <<: *build
+          name: build-aks-master
           context: silta_aks
           filters:
             branches:
               only:
                 - master
-                - feature/new-builder-images
 
-      - site-test:
+      # Deploy job for master environment in AKS cluster.
+      # Extends the job defined for master environments.
+      - silta/drupal-deploy: &deploy-master-aks
+          <<: *deploy-master
+          name: "Deploy master to AKS cluster"
+          silta_config: silta/silta.yml,silta/silta-master-aks.yml
+          context: silta_aks
+          requires:
+            - build-aks-master
+
+      # Build job for AKS cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build:
+          <<: *build
+          name: build-aks
+          context: silta_aks
+          filters:
+            branches:
+              only:
+                - /feature\/aks-cluster(\/.*)?/
+
+      # Deploy job for AKS cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy
+          name: deploy-aks
+          silta_config: silta/silta.yml,silta/silta-aks.yml
+          context: silta_aks
+          requires:
+            - build-aks
+          filters:
+            branches:
+              only:
+                - /feature\/aks-cluster(\/.*)?/
+
+      # Build job for AWS cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build:
+          <<: *build
+          name: build-aws
+          context: silta_aws
+          filters:
+            branches:
+              only:
+                - /feature\/aws-cluster(\/.*)?/
+
+      # Deploy job for AWS cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy
+          name: deploy-aws
+          silta_config: silta/silta.yml,silta/silta-aws.yml
+          context: silta_aws
+          requires:
+            - build-aws
+          filters:
+            branches:
+              only:
+                - /feature\/aws-cluster(\/.*)?/
+
+      # Build job for production environment.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build:
+          <<: *build
+          name: build-deploy-prod
+          context: silta_finland
+          filters:
+            branches:
+              only: production
+
+      # Deploy job for production environment.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy
+          name: build-deploy-prod
+          silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
+          decrypt_files: silta/secrets_prod_signalsciences
+          context: silta_finland
+          requires:
+            - build-deploy-prod
+          filters:
+            branches:
+              only: production
+
+      # Test site availability by requesting _ping.php.
+      - site-test: &site-test
           name: "Site test"
           requires:
-            - "build-deploy"
+            - "deploy-master"
             - "Deploy master to AKS cluster"
           filters:
             branches:
               only:
                 - master
-                - feature/new-builder-images
 
-      - silta/drupal-build-deploy:
-          # Extend the build-deploy configuration for the silta-test cluster environment.
-          <<: *build-deploy
-          name: build-deploy-aws
-          silta_config: silta/silta.yml,silta/silta-aws.yml
-          context: silta_aws
-          filters:
-            branches:
-              only:
-                - feature/aws-cluster
-                - /feature\/aws-cluster\/.*/
-
-      - silta/drupal-build-deploy:
-          # Extend the build-deploy configuration for the silta-test cluster environment.
-          <<: *build-deploy
-          name: build-deploy-aks
-          silta_config: silta/silta.yml,silta/silta-aks.yml
-          context: silta_aks
-          filters:
-            branches:
-              only:
-                - feature/aks-cluster
-                - /feature\/aks-cluster\/.*/
-
-      - silta/drupal-build-deploy:
-          # Extend the build-deploy configuration for the production environment.
-          <<: *build-deploy
-          name: build-deploy-prod
-          executor: cicd80
-          silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
-          decrypt_files: silta/secrets_prod_signalsciences
-          context: silta_finland
-          filters:
-            branches:
-              only: production
+  # Weekly build and deploy master and master-aks environments.
   weekly-build:
     triggers:
       - schedule:
@@ -179,73 +271,19 @@ workflows:
                 - master
     jobs:
       - silta/drupal-validate:
-          name: validate
+          <<: *drupal-validate
 
-          # Use custom executor.
-          executor: cicd80
+      - silta/drupal-build:
+          <<: *build
 
-          post-validation:
-            - run:
-                name: Helm unit tests
-                command: |
-                  helm unittest ./charts/silta-release --helm3
-                  helm unittest ./charts/drupal --helm3
+      - silta/drupal-deploy:
+          <<: *deploy-master
 
-      - silta/drupal-build-deploy: &build-deploy
-          name: build-deploy
+      - silta/drupal-build:
+          <<: *build-master-aks
 
-          # Use custom executor.
-          executor: cicd80
-
-          # Use a local chart during development.
-          chart_name: "./charts/drupal"
-          chart_repository: ""
-          silta_config: silta/silta.yml
-          codebase-build:
-            - silta/drupal-composer-install
-            - silta/npm-install-build
-            - run:
-                name: Build local helm chart
-                command: |
-                  helm repo add elastic https://helm.elastic.co
-                  helm repo add codecentric https://codecentric.github.io/helm-charts
-                  helm repo add percona https://percona.github.io/percona-helm-charts/
-                  helm dependency build ./charts/drupal
-          pre-release:
-            - run:
-                name: Dry-run helm install
-                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
-          context: silta_dev
-          filters:
-            branches:
-              ignore:
-                - production
-                - feature/test-cluster
-                - /feature\/test-cluster\/.*/
-                - feature/aws-cluster
-                - /feature\/aws-cluster\/.*/
-                - feature/aks-cluster
-                - /feature\/aks-cluster\/.*/
-                - feature/Traefik-ratelimiting
-                - feature/cert-manager-upgrade
-
-      - silta/drupal-build-deploy:
-          # Extend the build-deploy configuration testing master deployment to aks cluster.
-          <<: *build-deploy
-          name: "Deploy master to AKS cluster"
-          silta_config: silta/silta.yml,silta/silta-master-aks.yml
-          context: silta_aks
-          filters:
-            branches:
-              only:
-                - master
+      - silta/drupal-deploy:
+          <<: *deploy-master-aks
 
       - site-test:
-          name: "Site test"
-          requires:
-            - "build-deploy"
-            - "Deploy master to AKS cluster"
-          filters:
-            branches:
-              only:
-                - master
+          <<: *site-test

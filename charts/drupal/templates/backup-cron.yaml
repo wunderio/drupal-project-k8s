@@ -9,6 +9,11 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
     cronjob-type: backup
 spec:
+  {{- if .Values.timezone }}
+  {{- if eq ( include "drupal.cron.timezone-support" . ) "true" }}
+  timeZone: {{ .Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
   schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600

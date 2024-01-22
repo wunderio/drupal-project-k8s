@@ -85,8 +85,8 @@ workflows:
 
       # Deploy job for feature environments.
       # Other jobs defined below extend this job.
-      - silta/drupal-deploy: &deploy
-          name: deploy
+      - silta/drupal-deploy: &deploy-master
+          name: deploy-master
 
           # Use custom executor.
           executor: cicd82
@@ -105,18 +105,14 @@ workflows:
             - run:
                 name: Dry-run helm install
                 command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
-          silta_config: silta/silta.yml
+          silta_config: silta/silta.yml,silta/silta-master.yml
           context: silta_dev
           requires:
             - build
           filters:
             branches:
-              ignore:
-                - production
+              only:
                 - master
-                - /feature\/test-cluster(\/.*)?/
-                - /feature\/aws-cluster(\/.*)?/
-                - /feature\/aks-cluster(\/.*)?/
 
       # Build job for test cluster.
       # Extends the job defined for feature environments.
@@ -132,7 +128,7 @@ workflows:
       # Deploy job for test cluster.
       # Extends the job defined for feature environments.
       - silta/drupal-deploy:
-          <<: *deploy
+          <<: *deploy-master
           name: deploy-test
           silta_config: silta/silta.yml,silta/silta-test.yml
           context: silta_test
@@ -143,16 +139,36 @@ workflows:
               only:
                 - /feature\/test-cluster(\/.*)?/
 
-      # Deploy job for master environment.
-      # Extends the job defined for feature environments.
-      - silta/drupal-deploy: &deploy-master
-          <<: *deploy
-          name: deploy-master
-          silta_config: silta/silta.yml,silta/silta-master.yml
+      - approval:
+          type: approval
+          name: "Deployment approval"
           filters:
             branches:
-              only:
+              ignore:
+                - production
                 - master
+                - /feature\/test-cluster(\/.*)?/
+                - /feature\/aws-cluster(\/.*)?/
+                - /feature\/aks-cluster(\/.*)?/
+
+
+      # Deploy job for master environment.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy: &deploy-feature
+          <<: *deploy-master
+          name: deploy-feature
+          requires:
+            - build
+            - "Deployment approval"
+          silta_config: silta/silta.yml
+          filters:
+            branches:
+              ignore:
+                - production
+                - master
+                - /feature\/test-cluster(\/.*)?/
+                - /feature\/aws-cluster(\/.*)?/
+                - /feature\/aks-cluster(\/.*)?/
 
       # Build job for master environment in AKS cluster.
       # Extends the job defined for feature environments.
@@ -189,7 +205,7 @@ workflows:
       # Deploy job for AKS cluster.
       # Extends the job defined for feature environments.
       - silta/drupal-deploy:
-          <<: *deploy
+          <<: *deploy-master
           name: deploy-aks
           silta_config: silta/silta.yml,silta/silta-aks.yml
           context: silta_aks
@@ -214,7 +230,7 @@ workflows:
       # Deploy job for AWS cluster.
       # Extends the job defined for feature environments.
       - silta/drupal-deploy:
-          <<: *deploy
+          <<: *deploy-master
           name: deploy-aws
           silta_config: silta/silta.yml,silta/silta-aws.yml
           context: silta_aws
@@ -238,7 +254,7 @@ workflows:
       # Deploy job for production environment.
       # Extends the job defined for feature environments.
       - silta/drupal-deploy:
-          <<: *deploy
+          <<: *deploy-master
           name: build-deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
           decrypt_files: silta/secrets_prod_signalsciences

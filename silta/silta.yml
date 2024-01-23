@@ -18,9 +18,9 @@ redis:
   auth:
     password: "foo"
 
-mounts:
-  private-files:
-    enabled: true
+# mounts:
+#   private-files:
+#     enabled: true
 
 # Allow access from another namespace for testing purposes.
 silta-release:
@@ -55,3 +55,15 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+
+mounts:
+  public-files:
+    enabled: true
+    storage: 10G
+    mountPath: /app/web/sites/default/files
+    storageClassName: silta-nfs-shared
+  private-files:
+    enabled: true
+    storage: 1G
+    mountPath: /app/private
+    storageClassName: silta-nfs-shared

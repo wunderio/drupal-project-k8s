@@ -62,24 +62,19 @@ mariadb:
 
 mariadb-ha:
   enabled: true
+  replicas: 2
 
 db:
   primary: mariadb-ha
 
-# TODO: downscaling for mariadb-ha, does not scale to 0 currently
+# TODO: test nodeselectors, tolerations and affinity (+unittests)
 
-# TODO: mariadb-ha affinity rules
+# TODO: resource requests and limits
 
 # TODO: Chart tests (helm unittest)
-# TODO: test 1 replica, check data migration to 3 and then back to 1
-# TODO: mariadb-operator in silta-cluster
-
-# TODO: test HPA
-# https://github.com/mariadb-operator/mariadb-operator/pull/307
-
-# TODO: check full release, it's still in alpha
-# https://github.com/mariadb-operator/mariadb-operator/issues/257
 
 # TODO: add doc
+# 1. mariadb-operator subchart values & crd setup
+# 2. CRD API for drupal template
 # https://github.com/mariadb-operator/mariadb-operator
 # https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/GALERA.md

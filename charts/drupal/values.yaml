@@ -789,13 +789,22 @@ db:
 # provider: mariadb-operator
 mariadb-ha:
   enabled: false
-  
   image: "mariadb:11.0.3"
   imagePullPolicy: IfNotPresent
   password: drupal
-  replicas: 3
+  # At least 2 replicas required 
+  replicas: 2
   persistence:
+    # Test / doc resizing
     size: 5Gi 
+  # myCnf: |
+  #   [mariadb]
+  #   bind-address=*
+  #   default_storage_engine=InnoDB
+  #   binlog_format=row
+  #   innodb_autoinc_lock_mode=2
+  #   max_allowed_packet=256M
+
   # TODO: tune defaults
   # resources:
   #   requests:

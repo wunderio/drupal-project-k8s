@@ -1,4 +1,4 @@
 # Configure reference data that will be used when creating new environments.
 referenceData:
-  enabled: true
-  referenceEnvironment: 'feature/test-cluster/reference'
+  enabled: false
+  # referenceEnvironment: 'feature/test-cluster/reference'

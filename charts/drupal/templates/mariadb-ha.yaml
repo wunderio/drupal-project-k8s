@@ -3,58 +3,70 @@
 {{- if not ( .Capabilities.APIVersions.Has "mariadb.mmontes.io/v1alpha1" ) }}
 {{- fail "API mariadb.mmontes.io/v1alpha1 unavailable, ask cluster administrator to enable mariadb-operator support in Silta cluster first!" }}
 {{- end }}
+{{- if lt (int $mariadbha.replicas) 2 }}
+{{- fail "mariadb-ha.replicas must be at least 2" }}
+{{- end }}
 apiVersion: mariadb.mmontes.io/v1alpha1
 kind: MariaDB
 metadata:
   name: {{ .Release.Name }}-mariadb-ha
+  labels:
+    app: mariadb
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "drupal.chart" . }}
 spec:
+  port: 3306
   image: {{ $mariadbha.image | quote }}
   imagePullPolicy: {{ $mariadbha.imagePullPolicy | quote }}
-  port: 3306
+  inheritMetadata:
+    labels:
+      app: mariadb
+      release: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      helm.sh/chart: {{ include "drupal.chart" . }}
+    annotations:
+      app: mariadb
   replicas: {{ $mariadbha.replicas }}
-  # TODO: test 1 replica, check data migration to 3 and then back to 1
-  {{- if gt (int $mariadbha.replicas) 1 }}
   galera:
     enabled: true
-  {{- end }}
+    primary:
+      automaticFailover: true
   rootPasswordSecretKeyRef:
     name: {{ .Release.Name }}-mariadb-ha
     key: password
-
-  # TODO: expose this?  
-  # replication:
-  #   enabled: true
-  #   primary:
-  #     podIndex: 0
-  #     automaticFailover: true
-  #   replica:
-  #     waitPoint: AfterSync
-  #     gtid: CurrentPos
-  #     replPasswordSecretKeyRef:
-  #       name: mariadb
-  #       key: password
-  #     connectionTimeout: 10s
-  #     connectionRetries: 10
-  #     syncTimeout: 10s
-  #   syncBinlog: true
-  
+  {{- if $mariadbha.myCnf }}
+  myCnf: |
+    {{ $mariadbha.myCnf | nindent 4 }}
+  {{- end }}
+  {{- if $mariadbha.nodeSelector }}
+  nodeSelector:
+    {{- $mariadbha.nodeSelector | toYaml | nindent 4 }}
+  {{- end }}
+  {{ if $mariadbha.tolerations }}
+  tolerations:
+    {{- $mariadbha.tolerations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if $mariadbha.affinity }}
+  affinity:
+    {{- $mariadbha.affinity | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if $mariadbha.resources }}
+  resources:
+    {{ $mariadbha.resources | toYaml | nindent 4 }}
+  {{- end }}
   volumeClaimTemplate:
     resources:
       requests:
         storage: {{ $mariadbha.persistence.size | quote}}
     accessModes:
       - ReadWriteOnce
-
-  {{- if $mariadbha.resources }}
-  resources:
-    {{ $mariadbha.resources | toYaml | nindent 4 }}
-  {{- end }}
-
   # Error writing Galera config: open /etc/mysql/mariadb.conf.d/0-galera.cnf: permission denied
   # https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/GALERA.md#permission-denied-writing-galera-configuration
   podSecurityContext:
     runAsUser: 0
-
 ---
 apiVersion: v1
 kind: Secret

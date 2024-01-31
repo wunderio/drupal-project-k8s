@@ -7,7 +7,7 @@ dependencies:
   version: 1.12.3
 - name: mariadb-galera
   repository: https://charts.bitnami.com/bitnami
-  version: 8.1.1
+  version: 11.2.2
 - name: memcached
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 4.2.27
@@ -23,5 +23,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.0
-digest: sha256:74ab4b2e06e75563a3838c0a20311d052e2d7aeb6e00b4602fae6e9a2fd77fa0
-generated: "2023-10-03T12:07:07.444943085+03:00"
+digest: sha256:7634fc2e776f3e5d7fad67180bd9545dd5f71986ef299cd43f1b587882a8e839
+generated: "2024-01-31T10:56:46.583759743+02:00"

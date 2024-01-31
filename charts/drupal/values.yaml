@@ -561,7 +561,7 @@ mariadb:
               - static-ip
   enableServiceLinks: false
 
-# https://github.com/bitnami/charts/blob/f086fb89596a23b98658bcc2262e983c13e0eba9/bitnami/mariadb-galera/values.yaml
+# see: https://github.com/bitnami/charts/blob/903a6e8245b861f1b7a7597f4adecfa4f0484bfd/bitnami/mariadb-galera/values.yaml
 mariadb-galera:
   enabled: false
   replicaCount: 3
@@ -579,6 +579,8 @@ mariadb-galera:
   rootUser:
     password: drupal
   galera:
+    bootstrap:
+      forceSafeToBootstrap: true
     mariabackup:
       password: drupal
   persistence:

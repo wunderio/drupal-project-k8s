@@ -81,7 +81,7 @@ mariadb-galera:
   #     fi
 
 mariadb:
-  enabled: true
+  enabled: false
 
 db:
   primary: mariadb-galera

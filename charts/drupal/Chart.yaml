@@ -11,7 +11,7 @@ dependencies:
   repository: https://percona.github.io/percona-helm-charts/
   condition: pxc-db.enabled
 - name: mariadb-galera
-  version: 11.2.x
+  version: 11.1.x
   # repository: oci://registry-1.docker.io/bitnamicharts/mariadb-galera
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb-galera.enabled,drupal.mariadb-galera.enabled,global.mariadb-galera.enabled

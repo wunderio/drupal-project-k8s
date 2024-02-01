@@ -46,6 +46,18 @@ workflows:
   version: 2
   commit:
     jobs:
+      - approval:
+          type: approval
+          name: approve-deployment
+          filters:
+            branches:
+              ignore:
+                - production
+                - master
+                - /feature\/test-cluster(\/.*)?/
+                - /feature\/aws-cluster(\/.*)?/
+                - /feature\/aks-cluster(\/.*)?/
+
       - silta/drupal-validate: &drupal-validate
           name: validate
 
@@ -75,10 +87,13 @@ workflows:
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev
+          requires:
+            - approve-deployment
           filters:
             branches:
               ignore:
                 - production
+                - master
                 - /feature\/test-cluster(\/.*)?/
                 - /feature\/aws-cluster(\/.*)?/
                 - /feature\/aks-cluster(\/.*)?/
@@ -124,6 +139,7 @@ workflows:
           <<: *build
           name: build-test
           context: silta_test
+          requires: [ ]
           filters:
             branches:
               only:
@@ -143,27 +159,36 @@ workflows:
               only:
                 - /feature\/test-cluster(\/.*)?/
 
+      # Build job for master environment.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build: &build-master
+          <<: *build
+          name: build-master
+          requires: [ ]
+          filters:
+            branches:
+              only:
+                - master
+
       # Deploy job for master environment.
       # Extends the job defined for feature environments.
       - silta/drupal-deploy: &deploy-master
           <<: *deploy
           name: deploy-master
           silta_config: silta/silta.yml,silta/silta-master.yml
+          requires:
+            - build-master
           filters:
             branches:
               only:
                 - master
 
       # Build job for master environment in AKS cluster.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build: &build-master-aks
-          <<: *build
+          <<: *build-master
           name: build-aks-master
           context: silta_aks
-          filters:
-            branches:
-              only:
-                - master
 
       # Deploy job for master environment in AKS cluster.
       # Extends the job defined for master environments.
@@ -176,9 +201,9 @@ workflows:
             - build-aks-master
 
       # Build job for AKS cluster.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
           name: build-aks
           context: silta_aks
           filters:
@@ -201,9 +226,9 @@ workflows:
                 - /feature\/aks-cluster(\/.*)?/
 
       # Build job for AWS cluster.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
           name: build-aws
           context: silta_aws
           filters:
@@ -226,9 +251,9 @@ workflows:
                 - /feature\/aws-cluster(\/.*)?/
 
       # Build job for production environment.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
           name: build-deploy-prod
           context: silta_finland
           filters:
@@ -274,7 +299,7 @@ workflows:
           <<: *drupal-validate
 
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
 
       - silta/drupal-deploy:
           <<: *deploy-master

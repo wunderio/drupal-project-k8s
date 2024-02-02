@@ -1,0 +1,46 @@
+{{- if .Values.moco.enabled -}}
+apiVersion: moco.cybozu.com/v1beta2
+kind: MySQLCluster
+metadata:
+  name: {{ .Release.Name }}-db
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.moco.replicas }}
+  podTemplate:
+    spec:
+      # securityContext:
+      #   fsGroup: 10000    # to make the data directory writable for `mysqld` container.
+      #   fsGroupChangePolicy: "OnRootMismatch"  # available since k8s 1.20
+      containers:
+      - name: mysqld
+        image: ghcr.io/cybozu-go/moco/mysql:8.0.35
+        # TODO
+        # resources:
+        #   limits:
+        #     cpu: "10"
+        #     memory: "10Gi"
+  mysqlConfigMapName: {{ .Release.Name }}-moco-cnf
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-moco-cnf
+data:
+  # key-value in data field will become server system variable names and values.
+  # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html
+  # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html
+  long_query_time: "5"
+  # innodb_buffer_pool_size: "70G"
+  # default_authentication_plugin: "mysql_native_password"
+  
+  
+{{- end }}

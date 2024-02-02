@@ -483,6 +483,12 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "moco": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "pxc-db": {
       "type": "object",
       "properties": {
@@ -494,7 +500,7 @@
       "properties": {
         "primary": {
           "type": "string",
-          "enum": [ "", "mariadb", "pxc-db" ]
+          "enum": [ "", "mariadb", "pxc-db", "moco" ]
         }
       }
     },

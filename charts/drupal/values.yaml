@@ -749,6 +749,11 @@ db:
   # Available options: mariadb, pxc-db
   primary: mariadb
 
+# MySQL cluster using MOCO: https://github.com/cybozu-go/moco
+moco:
+  enabled: true
+  replicas: 3
+
 # Percona XtraDB Cluster
 # see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml
 pxc-db:

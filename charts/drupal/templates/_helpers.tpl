@@ -137,6 +137,19 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+{{- if .Values.moco.enabled }}
+- name: MOCO_DB_USER
+  value: "moco-admin"
+- name: MOCO_DB_NAME
+  value: "drupal"
+- name: MOCO_DB_HOST
+  value: moco-{{ .Release.Name }}-db-primary
+- name: MOCO_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: moco-{{ .Release.Name }}-db
+      key: ADMIN_PASSWORD
+{{- end }}
 {{- if index ( index .Values "pxc-db" ) "enabled" }}
 - name: PXC_DB_USER
   value: "root"
@@ -162,6 +175,19 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
+{{- end }}
+{{- if and .Values.moco.enabled ( eq .Values.db.primary "moco" ) }}
+- name: DB_USER
+  value: "moco-admin"
+- name: DB_NAME
+  value: "drupal"
+- name: DB_HOST
+  value: moco-{{ .Release.Name }}-db-primary
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: moco-{{ .Release.Name }}-db
+      key: ADMIN_PASSWORD
 {{- end }}
 {{- if and ( index ( index .Values "pxc-db" ) "enabled" ) ( eq .Values.db.primary "pxc-db" ) }}
 - name: DB_USER

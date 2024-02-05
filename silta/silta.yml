@@ -55,3 +55,18 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+
+db:
+  primary: mysql
+
+mysql:
+  enabled: true
+
+mariadb:
+  enabled: false
+
+# TODO: drupal user and password
+# TODO: delete mysql pvc on removal
+# TODO: resources
+# TODO: datadirVolumeClaimTemplate
+# TODO: podSpec

@@ -1,0 +1,52 @@
+{{- if .Values.mysql.enabled }}
+{{- if not ( .Capabilities.APIVersions.Has "mysql.oracle.com/v2" ) }}
+{{- fail "API mysql.oracle.com/v2 unavailable, ask cluster administrator to enable Mysql InnoDBCluster support in Silta cluster first!" }}
+{{- end }}
+apiVersion: mysql.oracle.com/v2
+kind: InnoDBCluster
+metadata:
+  name: {{ .Release.Name }}-mysql
+spec:
+  secretName: {{ .Release.Name }}-mysql
+  instances: {{ .Values.mysql.replicas }}
+  router:
+    instances: {{ .Values.mysql.routerReplicas }}
+  tlsUseSelfSigned: true
+
+  # datadirVolumeClaimTemplate:
+  #   accessModes: [ "ReadWriteOnce" ]
+  #   resources:
+  #     requests:
+  #       storage: 300Gi
+
+  # podSpec:
+  #   nodeSelector:
+  #     failure-domain.beta.kubernetes.io/zone: US-ASHBURN-AD-1
+  #   containers:
+  #   - name: mysql
+  #     resources:
+  #       requests:
+  #         memory: "2048Mi"
+  #         cpu: "1800m"
+  #       limits:
+  #         memory: "8192Mi"
+  #         cpu: "3600m"
+
+  # mycnf: |
+  #   [mysqld]
+  #   innodb_buffer_pool_size=200M
+  #   innodb_log_file_size=2G
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-mysql
+type: Opaque
+data:
+  rootUser: {{ print "root" | b64enc | quote }}
+  rootPassword: {{ .Values.mysql.secrets.root | b64enc | quote }}
+  rootHost: {{ print "%" | b64enc | quote }}
+
+{{- end }}

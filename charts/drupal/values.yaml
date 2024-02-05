@@ -749,6 +749,15 @@ db:
   # Available options: mariadb, pxc-db
   primary: mariadb
 
+# Mysql InnoDBCluster
+# see: https://github.com/mysql/mysql-operator
+mysql:
+  enabled: false
+  replicas: 3
+  routerReplicas: 2
+  secrets:
+    root: drupal
+
 # Percona XtraDB Cluster
 # see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml
 pxc-db:

@@ -5,13 +5,21 @@
 apiVersion: mysql.oracle.com/v2
 kind: InnoDBCluster
 metadata:
-  name: {{ .Release.Name }}-mysql
+  # ERR1
+  # * InnoDBCluster.mysql.oracle.com "feature-test-cluster-mysql-operator-mysql" is invalid: 
+  #   metadata.name: Too long: may not be longer than 40
+  # ERR2
+  # Handler 'on_innodbcluster_create' failed temporarily: Error in InnoDBCluster spec: 
+  # Cluster name feature-test-cluster-mysql-operator-db is too long. Must be < 28
+  name: {{ include "silta.mysql-cluster.name" . }}
 spec:
   secretName: {{ .Release.Name }}-mysql
   instances: {{ .Values.mysql.replicas }}
   router:
     instances: {{ .Values.mysql.routerReplicas }}
   tlsUseSelfSigned: true
+
+  # See: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-title-spec-innodbcluster
 
   # datadirVolumeClaimTemplate:
   #   accessModes: [ "ReadWriteOnce" ]

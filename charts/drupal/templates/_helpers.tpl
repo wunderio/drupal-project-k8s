@@ -143,7 +143,7 @@ imagePullSecrets:
 - name: MYSQL_DB_NAME
   value: "drupal"
 - name: MYSQL_DB_HOST
-  value: "{{ .Release.Name }}-mysql"
+  value: "{{ include "silta.mysql-cluster.name" . }}"
 - name: MYSQL_DB_PASS
   valueFrom:
     secretKeyRef:
@@ -182,7 +182,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: "{{ .Release.Name }}-mysql"
+  value: "{{ include "silta.mysql-cluster.name" . }}"
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
@@ -707,3 +707,8 @@ autoscaling/v2beta1
 {{ fail "Cannot use domain prefixes together with domain masking"}}
 {{- end -}}
 {{- end -}}
+
+{{- define "silta.mysql-cluster.name" }}
+{{- $releaseNameHash := sha256sum .Release.Name | trunc 3 }}
+{{- (gt (len .Release.Name) 21) | ternary ( print (.Release.Name | trunc 18) print $releaseNameHash ) .Release.Name }}-mysql
+{{- end }}

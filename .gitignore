@@ -30,3 +30,4 @@ node_modules
 charts/*/charts
 /.editorconfig
 /.gitattributes
+helm-output.log

@@ -2,6 +2,12 @@
 {{- if not ( .Capabilities.APIVersions.Has "mysql.oracle.com/v2" ) }}
 {{- fail "API mysql.oracle.com/v2 unavailable, ask cluster administrator to enable Mysql InnoDBCluster support in Silta cluster first!" }}
 {{- end }}
+{{- if or (gt (.Values.mysql.replicas | toString | atoi) 9) (lt (.Values.mysql.replicas | toString | atoi) 1) }}
+{{- fail "Invalid mysql.replicas value, must be between 1 and 9" }}
+{{- end }}
+{{- if or (gt (.Values.mysql.routerReplicas | toString | atoi) 9) (lt (.Values.mysql.routerReplicas | toString | atoi) 1) }}
+{{- fail "Invalid mysql.routerReplicas value, must be between 1 and 9" }}
+{{- end }}
 apiVersion: mysql.oracle.com/v2
 kind: InnoDBCluster
 metadata:
@@ -13,11 +19,24 @@ metadata:
   # Cluster name feature-test-cluster-mysql-operator-db is too long. Must be < 28
   name: {{ include "silta.mysql-cluster.name" . }}
 spec:
-  secretName: {{ .Release.Name }}-mysql
+  # TODO: find available versions, pin to the latest stable
+  # version: 
   instances: {{ .Values.mysql.replicas }}
   router:
     instances: {{ .Values.mysql.routerReplicas }}
+    podAnnotations:
+      test333: "router-annotation"
+    podLabels:
+      test444: "router-label"
+    # podSpec:
+  secretName: {{ .Release.Name }}-mysql
   tlsUseSelfSigned: true
+
+  podAnnotations:
+    test111: "pod-annotation"
+
+  podLabels:
+    test222: "pod-label"
 
   # See: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-title-spec-innodbcluster
 
@@ -39,11 +58,15 @@ spec:
   #       limits:
   #         memory: "8192Mi"
   #         cpu: "3600m"
-
-  # mycnf: |
-  #   [mysqld]
-  #   innodb_buffer_pool_size=200M
-  #   innodb_log_file_size=2G
+  
+  {{- if .Values.mysql.logs }}
+  logs:
+    {{ .Values.mysql.logs | toYaml | nindent 4 }}
+  {{- end }}      
+  {{- if .Values.mysql.mycnf }}
+  mycnf: 
+    {{ .Values.mysql.mycnf | toYaml | nindent 4 }}
+  {{- end }}
 
 ---
 

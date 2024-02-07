@@ -757,6 +757,16 @@ mysql:
   routerReplicas: 2
   secrets:
     root: drupal
+  # see: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-spec-innodbclusterspeclogs
+  # logs:
+  #   slowQuery:
+  #     enabled: true
+  #     collect: true
+  #     longQueryTime: 10
+  # mycnf: |
+  #   [mysqld]
+  #   innodb_buffer_pool_size=200M
+  #   innodb_log_file_size=2G
 
 # Percona XtraDB Cluster
 # see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml

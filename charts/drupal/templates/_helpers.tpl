@@ -143,7 +143,7 @@ imagePullSecrets:
 - name: MYSQL_DB_NAME
   value: "drupal"
 - name: MYSQL_DB_HOST
-  value: "{{ include "silta.mysql-cluster.name" . }}"
+  value: "{{ include "silta.mysql-cluster.name" . }}.{{ .Release.Namespace }}.svc.cluster.local"
 - name: MYSQL_DB_PASS
   valueFrom:
     secretKeyRef:
@@ -182,7 +182,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: "{{ include "silta.mysql-cluster.name" . }}"
+  value: "{{ include "silta.mysql-cluster.name" . }}.{{ .Release.Namespace }}.svc.cluster.local"
 - name: DB_PASS
   valueFrom:
     secretKeyRef:

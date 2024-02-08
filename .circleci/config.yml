@@ -133,6 +133,20 @@ workflows:
           chart_repository: ""
           pre-release:
             - run:
+                name: Update Helm
+                command: |
+                  echo "Default helm version" && helm version
+
+                  HELM_VERSION="v3.14.0"
+                  FILENAME="helm-${HELM_VERSION}-linux-amd64.tar.gz"
+                  HELM_URL="https://get.helm.sh/${FILENAME}"
+                  
+                  curl -o /tmp/$FILENAME ${HELM_URL} \
+                  && tar -zxvf /tmp/${FILENAME} -C /tmp \
+                  && rm /tmp/${FILENAME} \
+                  && sudo mv /tmp/linux-amd64/helm /bin/helm
+                  echo "New helm version" && helm version
+            - run:
                 name: Add helm repositories and build local chart
                 command: |
                   helm repo add elastic https://helm.elastic.co

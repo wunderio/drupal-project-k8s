@@ -40,3 +40,10 @@ mounts:
 
 cluster:
   type: ""
+
+php:
+  cron:
+    drupal:
+      php_ini: |
+        [PHP]
+        max_input_time = 60

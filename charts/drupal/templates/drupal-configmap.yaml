@@ -779,3 +779,9 @@ data:
     cgi-fcgi -bind -connect localhost:9000 \
     > /dev/null
 
+{{- range $index, $job := .Values.php.cron -}}
+{{ if $job.php_ini }}
+  php_ini_{{ $index }}: |
+    {{- tpl $job.php_ini . | nindent 4 }}  
+{{- end }}
+{{- end }}

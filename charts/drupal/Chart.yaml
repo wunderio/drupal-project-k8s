@@ -4,7 +4,7 @@ version: 1.4.0
 dependencies:
 - name: mariadb
   version: 7.5.x
-  repository: https://storage.googleapis.com/charts.wdr.io
+  repository: file://../mariadb
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: pxc-db
   version: 1.12.x

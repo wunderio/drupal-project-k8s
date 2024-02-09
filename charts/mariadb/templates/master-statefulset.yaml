@@ -104,6 +104,10 @@ spec:
           image: {{ template "mariadb.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name        
             {{- if .Values.image.debug}}
             - name: BITNAMI_DEBUG
               value: "true"

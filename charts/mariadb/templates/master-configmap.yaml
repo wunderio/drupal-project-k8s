@@ -2,7 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "master.fullname" . }}
+  name: {{ template "mariadb.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
   labels:
     app: "{{ template "mariadb.name" . }}"
     component: "master"

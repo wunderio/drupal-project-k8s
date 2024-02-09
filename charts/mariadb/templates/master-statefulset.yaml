@@ -17,7 +17,7 @@ spec:
       release: {{ .Release.Name }}
       component: master
   serviceName: {{ template "master.fullname" . }}
-  replicas: 1
+  replicas: {{ .Values.replication.replicas }}
   updateStrategy:
     type: {{ .Values.master.updateStrategy.type }}
     {{- if (eq "Recreate" .Values.master.updateStrategy.type) }}
@@ -105,6 +105,10 @@ spec:
           image: {{ template "mariadb.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name        
             {{- if .Values.image.debug}}
             - name: BITNAMI_DEBUG
               value: "true"

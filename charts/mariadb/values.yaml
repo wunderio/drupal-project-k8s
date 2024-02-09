@@ -172,10 +172,16 @@ db:
 ## Replication configuration
 ##
 replication:
+  reportHostBase: "mariadb-master-replica"
+
   ## Enable replication. This enables the creation of replicas of MariaDB. If false, only a
   ## master deployment would be created
   ##
   enabled: true
+  type: "master-master"
+  ## Number of replicas to deploy
+  ##
+  replicas: 3
   ## MariaDB replication user
   ## ref: https://github.com/bitnami/bitnami-docker-mariadb#setting-up-a-replication-cluster
   ##
@@ -319,6 +325,24 @@ master:
     log-error=/opt/bitnami/mariadb/logs/mysqld.log
     character-set-server=UTF8
     collation-server=utf8_general_ci
+
+    report-host = "{{ .Values.mariadb.replication.reportHostBase }}-{{ .Environment.MY_POD_NAME }}"
+    log_bin=mysql-bin
+    binlog_format=row
+    log_slave_updates=1
+    gtid_mode=ON
+    enforce_gtid_consistency=ON
+
+    {{- $fullName := include "mariadb.fullname" . }}
+    {{- range $i, $e := until (.Values.mariadb.replicas | int) }}
+    [mysqld{{ $i }}]
+    server-id = {{ $i }}
+    log-bin = mysql-bin
+    relay-log = relay-log
+    auto_increment_increment = {{ .Values.replication.replicas }}
+    auto_increment_offset = {{ $i }}
+    {{- end }}
+
 
     [client]
     port=3306

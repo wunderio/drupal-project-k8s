@@ -139,12 +139,10 @@ workflows:
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
-                  helm dependency build ./charts/mariadb 
             - run:
                 name: Dry-run helm install
                 command: |
                   helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
-                  helm install --dry-run --generate-name ./charts/mariadb --values charts/mariadb/values.yaml
           silta_config: silta/silta.yml
           context: silta_dev
           requires:

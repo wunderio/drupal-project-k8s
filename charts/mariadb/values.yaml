@@ -19,7 +19,7 @@
 image:
   registry: docker.io
   repository: bitnami/mariadb
-  tag: 10.3.24-debian-10-r49
+  tag: 10.3.23-debian-10-r38
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -48,7 +48,7 @@ image:
 ## Additional pod labels
 ##
 # podLabels:
-# extraLabel: extraValue
+  # extraLabel: extraValue
 
 ## Init containers parameters:
 ## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
@@ -96,9 +96,6 @@ serviceAccount:
   ## The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the mariadb.fullname template
   # name:
-  ## Annotations to add to the service account (evaluated as a template)
-  ##
-  annotations: {}
 
 ## Role Based Access
 ## Ref: https://kubernetes.io/docs/admin/authorization/rbac/
@@ -118,16 +115,6 @@ securityContext:
 ##
 # existingSecret:
 
-## Allow customization of the secret resource
-##
-secret:
-  ## Add custom annotations to the secret (evaluated as a template)
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-  annotations: {}
-  ## Require all passwords at the secret resource
-  ##
-  requirePasswords: true
-
 ## MariaDB admin credentials
 ##
 rootUser:
@@ -142,9 +129,6 @@ rootUser:
   ## Mount admin password as a file instead of using an environment variable
   ##
   injectSecretsAsVolume: false
-  ## Specify custom secrets file location if injectSecretsAsVolume is true,
-  ## defaults to /opt/bitnami/mariadb/secrets/mariadb-root-password
-  # injectSecretsFile: "/vault/secrets/root-password"
 
 ## Custom user/db credentials
 ##
@@ -165,23 +149,14 @@ db:
   ## Mount user password as a file instead of using an environment variable
   ##
   injectSecretsAsVolume: false
-  ## Specify custom secrets file location if injectSecretsAsVolume is true,
-  ## defaults to /opt/bitnami/mariadb/secrets/mariadb-password
-  # injectSecretsFile: "/vault/secrets/user-password"
 
 ## Replication configuration
 ##
 replication:
-  reportHostBase: "mariadb-master-replica"
-
   ## Enable replication. This enables the creation of replicas of MariaDB. If false, only a
   ## master deployment would be created
   ##
   enabled: true
-  type: "master-master"
-  ## Number of replicas to deploy
-  ##
-  replicas: 3
   ## MariaDB replication user
   ## ref: https://github.com/bitnami/bitnami-docker-mariadb#setting-up-a-replication-cluster
   ##
@@ -197,9 +172,6 @@ replication:
   ## Mount replication user password as a file instead of using an environment variable
   ##
   injectSecretsAsVolume: false
-  ## Specify custom secrets file location if injectSecretsAsVolume is true,
-  ## defaults to //opt/bitnami/mariadb/secrets/mariadb-replication-password
-  # injectSecretsFile: "/vault/secrets/replication-password"
 
 ## initdb scripts
 ## Specify dictionary of scripts to be run at first boot
@@ -281,11 +253,6 @@ master:
     ## Persistent Volume size
     ##
     size: 8Gi
-    ## selector can be used to match an existing PersistentVolume
-    ## selector:
-    ##   matchLabels:
-    ##     app: my-app
-    selector: {}
 
   ## Add extra init Containers (evaluated as a templ
   ##
@@ -325,24 +292,6 @@ master:
     log-error=/opt/bitnami/mariadb/logs/mysqld.log
     character-set-server=UTF8
     collation-server=utf8_general_ci
-
-    report-host = "{{ .Values.mariadb.replication.reportHostBase }}-{{ .Environment.MY_POD_NAME }}"
-    log_bin=mysql-bin
-    binlog_format=row
-    log_slave_updates=1
-    gtid_mode=ON
-    enforce_gtid_consistency=ON
-
-    {{- $fullName := include "mariadb.fullname" . }}
-    {{- range $i, $e := until (.Values.mariadb.replicas | int) }}
-    [mysqld{{ $i }}]
-    server-id = {{ $i }}
-    log-bin = mysql-bin
-    relay-log = relay-log
-    auto_increment_increment = {{ .Values.replication.replicas }}
-    auto_increment_offset = {{ $i }}
-    {{- end }}
-
 
     [client]
     port=3306
@@ -443,11 +392,6 @@ slave:
     ## Persistent Volume size
     ##
     size: 8Gi
-    ## selector can be used to match an existing PersistentVolume
-    ## selector:
-    ##   matchLabels:
-    ##     app: my-app
-    selector: {}
 
   ## Add extra init containers
   ##
@@ -541,7 +485,7 @@ metrics:
   image:
     registry: docker.io
     repository: bitnami/mysqld-exporter
-    tag: 0.12.1-debian-10-r235
+    tag: 0.12.1-debian-10-r139
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -629,3 +573,16 @@ metrics:
     ## [Kube Prometheus Selector Label](https://github.com/bitnami/charts/tree/master/bitnami/prometheus-operator#exporters)
     selector:
       prometheus: kube-prometheus
+
+## Bats Framework (= Bash Automated Testing System) is needed to test if MariaDB is accessible
+## See test-runner.yaml and tests.yaml for details.
+## To run the tests after the deployment, enter "helm test <release-name>".
+tests:
+  enabled: true
+  resources: {}
+  testFramework:
+    image:
+      registry: docker.io
+      repository: dduportal/bats
+      tag: 0.4.0
+    resources: {}

@@ -3,7 +3,6 @@ apiVersion: {{ template "mariadb.statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
   name: {{ template "slave.fullname" . }}
-  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "mariadb.name" . }}
     chart: {{ template "mariadb.chart" . }}
@@ -27,13 +26,15 @@ spec:
   template:
     metadata:
       {{- if .Values.slave.annotations }}
-      annotations: {{- include "mariadb.tplValue" (dict "value" .Values.slave.annotations "context" $) | nindent 8 }}
+      annotations:
+        {{- range $key, $value := .Values.slave.annotations }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
       {{- end }}
       labels:
         app: {{ template "mariadb.name" . }}
         chart: {{ template "mariadb.chart" . }}
         release: {{ .Release.Name }}
-        heritage: {{ .Release.Service }}
         component: slave
         {{- include "mariadb.podLabels" . | nindent 8 }}
     spec:
@@ -124,7 +125,7 @@ spec:
               value: "root"
             {{- if .Values.rootUser.injectSecretsAsVolume }}
             - name: MARIADB_MASTER_ROOT_PASSWORD_FILE
-              value: {{ default "/opt/bitnami/mariadb/secrets/mariadb-root-password" .Values.rootUser.injectSecretsFile }}
+              value: "/opt/bitnami/mariadb/secrets/mariadb-root-password"
             {{- else }}
             - name: MARIADB_MASTER_ROOT_PASSWORD
               valueFrom:
@@ -136,7 +137,7 @@ spec:
               value: "{{ .Values.replication.user }}"
             {{- if .Values.replication.injectSecretsAsVolume }}
             - name: MARIADB_REPLICATION_PASSWORD_FILE
-              value: {{ default "/opt/bitnami/mariadb/secrets/mariadb-replication-password" .Values.replication.injectSecretsFile }}
+              value: "/opt/bitnami/mariadb/secrets/mariadb-replication-password"
             {{- else }}
             - name: MARIADB_REPLICATION_PASSWORD
               valueFrom:
@@ -219,7 +220,7 @@ spec:
           env:
             {{- if .Values.rootUser.injectSecretsAsVolume }}
             - name: MARIADB_ROOT_PASSWORD_FILE
-              value: {{ default "/opt/bitnami/mysqld-exporter/secrets/mariadb-root-password" .Values.rootUser.injectSecretsFile }}
+              value: "/opt/bitnami/mysqld-exporter/secrets/mariadb-root-password"
             {{- else }}
             - name: MARIADB_ROOT_PASSWORD
               valueFrom:
@@ -279,7 +280,7 @@ spec:
         {{- if or .Values.rootUser.injectSecretsAsVolume .Values.replication.injectSecretsAsVolume }}
         - name: mariadb-credentials
           secret:
-            secretName: {{ template "mariadb.secretName" . }}
+            secretName: {{ template "mariadb.fullname" . }}
             items:
               {{- if .Values.rootUser.injectSecretsAsVolume }}
               - key: mariadb-root-password
@@ -311,8 +312,5 @@ spec:
           requests:
             storage: {{ .Values.slave.persistence.size | quote }}
         {{ include "mariadb.slave.storageClass" . }}
-        {{- if .Values.slave.persistence.selector }}
-        selector: {{- include "mariadb.tplValue" (dict "value" .Values.slave.persistence.selector "context" $) | nindent 10 }}
-        {{- end -}}
 {{- end }}
 {{- end }}

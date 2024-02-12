@@ -294,6 +294,7 @@ data:
       if (req.http.x-proxy-auth != "{{ .Values.nginx.x_proxy_auth }}") {
         return (synth(403, "Not allowed."));
       }
+      {{- end }}
 
       # Fixes "Too many restarts" error
       if (req.restarts > 0) {

@@ -61,12 +61,9 @@ db:
 
 mysql:
   enabled: true
+  replicas: 3
+  router:
+    replicas: 2
 
 mariadb:
   enabled: false
-
-# TODO: drupal user and password
-# TODO: delete mysql pvc on removal
-# TODO: resources
-# TODO: datadirVolumeClaimTemplate
-# TODO: podSpec

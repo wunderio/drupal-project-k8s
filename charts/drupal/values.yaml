@@ -753,10 +753,26 @@ db:
 # see: https://github.com/mysql/mysql-operator
 mysql:
   enabled: false
-  replicas: 3
-  routerReplicas: 2
+  # version: 8.3.0
+  replicas: 1
+  router:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 16Mi
+      limits:
+        memory: 32Mi
   secrets:
     root: drupal
+  resources:
+    requests:
+      cpu: 100m
+      memory: 800Mi
+    limits:
+      memory: 1600Mi
+
+
   # see: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-spec-innodbclusterspeclogs
   # logs:
   #   slowQuery:

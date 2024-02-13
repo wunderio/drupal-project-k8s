@@ -64,6 +64,13 @@ mysql:
   replicas: 3
   router:
     replicas: 2
+  # nodeSelector:
+  #   silta-role: drupal
+  # resources:
+  #   requests:
+  #     cpu: 500m
+  #     memory: 1Gi
+  # TODO: test mycnf & logs
 
 mariadb:
   enabled: false

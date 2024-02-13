@@ -765,14 +765,14 @@ mysql:
         memory: 32Mi
   secrets:
     root: drupal
+  nodeSelector: {}
   resources:
     requests:
       cpu: 100m
       memory: 800Mi
     limits:
+      cpu: 500m
       memory: 1600Mi
-
-
   # see: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-spec-innodbclusterspeclogs
   # logs:
   #   slowQuery:
@@ -783,6 +783,12 @@ mysql:
   #   [mysqld]
   #   innodb_buffer_pool_size=200M
   #   innodb_log_file_size=2G
+  # Only provisioned initially, updates are not supported. Patch persistent volume claim if needed.
+  datadirVolumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 2Gi
 
 # Percona XtraDB Cluster
 # see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml

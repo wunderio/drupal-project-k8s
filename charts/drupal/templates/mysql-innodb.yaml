@@ -11,16 +11,16 @@
 apiVersion: mysql.oracle.com/v2
 kind: InnoDBCluster
 metadata:
-  # ERR1
-  # * InnoDBCluster.mysql.oracle.com "feature-test-cluster-mysql-operator-mysql" is invalid: 
-  #   metadata.name: Too long: may not be longer than 40
-  # ERR2
-  # Handler 'on_innodbcluster_create' failed temporarily: Error in InnoDBCluster spec: 
-  # Cluster name feature-test-cluster-mysql-operator-db is too long. Must be < 28
   name: {{ include "silta.mysql-cluster.name" . }}
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    # Trigger resource update to scale deployment back up when it was scaled down
+    last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
+
 spec:
   # See: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-title-spec-innodbcluster
-  # TODO: find available versions, pin to the latest stable
   {{- if .Values.mysql.version }}
   version: {{ .Values.mysql.version }}
   {{- end }}
@@ -29,30 +29,34 @@ spec:
     instances: {{ .Values.mysql.router.replicas }}
     dpLabels:
       release: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
     podSpec:
       containers:
       - name: router
         resources:
           {{- .Values.mysql.router.resources | toYaml | nindent 10 }}
-
   secretName: {{ .Release.Name }}-mysql
   tlsUseSelfSigned: true
   stsLabels:
     release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
   datadirVolumeClaimLabels:
-    release: {{ .Release.Name }}  
-  # datadirVolumeClaimTemplate:
-  #   accessModes: [ "ReadWriteOnce" ]
-  #   resources:
-  #     requests:
-  #       storage: 5Gi
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  datadirVolumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 5Gi
   podSpec:
-    # nodeSelector: {}
+    nodeSelector:
+      {{- .Values.mysql.nodeSelector | toYaml | nindent 8 }}
+    tolerations:
+      {{- include "drupal.tolerations" .Values.mysql.nodeSelector | nindent 8 }}
     containers:
     - name: mysql
       resources:
         {{- .Values.mysql.resources | toYaml | nindent 8 }}
-  
   {{- if .Values.mysql.logs }}
   logs:
     {{ .Values.mysql.logs | toYaml | nindent 4 }}
@@ -61,12 +65,14 @@ spec:
   mycnf: 
     {{ .Values.mysql.mycnf | toYaml | nindent 4 }}
   {{- end }}
-
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ .Release.Name }}-mysql
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 type: Opaque
 data:
   rootUser: {{ print "root" | b64enc | quote }}

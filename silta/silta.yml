@@ -65,21 +65,21 @@ mariadb-galera:
   # - Kill 2nd replica (-1), then first (-0) and before first two are ready, 
   # kill third (-2). Cluster should recover (but it does not).
 
-   galera:
-     bootstrap:
-       bootstrapFromNode: 0
-       forceSafeToBootstrap: true
-       forceBootstrap: true
+galera:
+  bootstrap:
+    bootstrapFromNode: 0
+    forceSafeToBootstrap: true
+    forceBootstrap: true
 
-   initdbScripts:
-     my_init_script.sh: |
-       #!/bin/sh
-       if [[ $(hostname) == *-0  ]]; then
-         echo "First node"
-         mysql -P 3306 -uroot -prandompassword -e "create database new_database";
-       else
-         echo "No first node"
-       fi
+  initdbScripts:
+    my_init_script.sh: |
+      #!/bin/sh
+      if [[ $(hostname) == *-0  ]]; then
+        echo "First node"
+        mysql -P 3306 -uroot -prandompassword -e "create database new_database";
+      else
+        echo "No first node"
+      fi
 
 mariadb:
   enabled: false

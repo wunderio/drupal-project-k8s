@@ -2,9 +2,9 @@
 name: Silta chart tests
 
 on:
-  # Run for pull requests, but there's an additional draft filter later on
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  # # Run for pull requests, but there's an additional draft filter later on
+  # pull_request:
+  #   types: [opened, synchronize, reopened, ready_for_review]
   
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -168,8 +168,31 @@ jobs:
           curl --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} https://${CLUSTER_DOMAIN} -ILk --fail
           curl --resolve ${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} http://${CLUSTER_DOMAIN} -IL --fail
 
+      - name: Install mysql operator 
+        run: |
+          # Install CRD for mysql-operator (forked version)
+          kubectl apply -f https://raw.githubusercontent.com/wunderio/mysql-operator/fork/deploy/deploy-crds.yaml
+          
+          # Install mysql-operator (forked version)
+          helm upgrade --install mysql-operator mysql-operator/mysql-operator \
+            --namespace mysql-operator --create-namespace \
+            --set image.registry="wunderio" \
+            --set image.repository="" \
+            --set image.name="mysql-community-operator" \
+            --set image.tag="8.3.0-2.1.2-mod" \
+            --wait
+
       - name: Build Drupal chart images, deploy and test 
         run: |
+
+          function info {
+            echo "Error occurred, printing debug info"
+            kubectl get pods -A
+            kubectl get events -A
+            kubectl get innodbcluster -A
+          }
+
+          trap "info" ERR
 
           MINIKUBE_IP=$(minikube ip)
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80

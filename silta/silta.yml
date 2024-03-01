@@ -5,10 +5,10 @@
 # for all possible options.
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
-  enabled: true
+  enabled: false
 
 memcached:
   enabled: false
@@ -68,8 +68,11 @@ mysql:
   #   silta-role: drupal
   # resources:
   #   requests:
-  #     cpu: 500m
-  #     memory: 1Gi
+  #     cpu: 200m
+  #     memory: 256Mi
+  #   limits:
+  #     cpu: 400m
+  #     memory: 2Gi
   # TODO: test mycnf & logs
 
 mariadb:

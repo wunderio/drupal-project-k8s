@@ -774,11 +774,6 @@ mysql:
       cpu: 500m
       memory: 1600Mi
   # see: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-spec-innodbclusterspeclogs
-  # logs:
-  #   slowQuery:
-  #     enabled: true
-  #     collect: true
-  #     longQueryTime: 10
   # mycnf: |
   #   [mysqld]
   #   innodb_buffer_pool_size=200M

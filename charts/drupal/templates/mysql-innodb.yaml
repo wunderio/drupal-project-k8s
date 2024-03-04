@@ -57,10 +57,6 @@ spec:
     - name: mysql
       resources:
         {{- .Values.mysql.resources | toYaml | nindent 8 }}
-  {{- if .Values.mysql.logs }}
-  logs:
-    {{ .Values.mysql.logs | toYaml | nindent 4 }}
-  {{- end }}      
   {{- if .Values.mysql.mycnf }}
   mycnf: 
     {{ .Values.mysql.mycnf | toYaml | nindent 4 }}

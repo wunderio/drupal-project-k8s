@@ -9,7 +9,7 @@ exposeDomains:
     hostname: drupal-project-k8s-staging.fastly.wdr.io
 
 varnish:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   enabled: true

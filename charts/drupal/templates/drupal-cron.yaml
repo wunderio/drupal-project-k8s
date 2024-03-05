@@ -9,6 +9,7 @@ metadata:
   name: {{ $releaseNameTrimmed }}-cron-{{ $nameAppendix }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
+    cronjob: "true"
 spec:
   {{- if $.Values.timezone }}
   {{- if eq ( include "drupal.cron.timezone-support" $ ) "true" }}

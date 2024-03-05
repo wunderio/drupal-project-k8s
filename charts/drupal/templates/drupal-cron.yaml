@@ -37,6 +37,12 @@ spec:
             {{- include "drupal.php-container" $ | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" $ | nindent 14 }}
+              {{- if $job.php_ini }}
+              - name: config
+                mountPath: /usr/local/etc/php/conf.d/silta_cron.ini
+                readOnly: true
+                subPath: php_ini_{{ $index }}
+              {{ end }}
             command: ["/bin/bash", "-c"]
             args:
               - |

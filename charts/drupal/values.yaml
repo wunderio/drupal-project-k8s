@@ -272,7 +272,7 @@ php:
           drush cron;
         fi
 
-    # Add custom php.ini file overrides for the cronjob. 
+    # Add custom php.ini file overrides for the cronjob.
     # Use the same syntax as in php.ini file
     # Example:
     # php_ini: |

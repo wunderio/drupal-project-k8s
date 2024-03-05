@@ -4,6 +4,10 @@
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
 
+exposeDomains:
+  dk8s:
+    hostname: drupal-project-k8s-staging.fastly.wdr.io
+
 varnish:
   enabled: true
 
@@ -44,6 +48,7 @@ silta-release:
               name: drupal-project
 
 nginx:
+  x_proxy_auth: "testing123"
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;

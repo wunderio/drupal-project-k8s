@@ -55,3 +55,14 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+    drupal_with_override:
+      # Disable cron jobs in feature environments by using non-existing date.
+      # The ~ symbol will be replaced by a random digit from 0 to 9.
+      # This will avoid running all cron jobs at the same time.
+      schedule: '~ 0 31 2 *'
+      php_ini: |
+        [PHP]
+        memory_limit=1G
+        upload_max_filesize=100M
+        max_execution_time=120
+        max_input_vars=10000

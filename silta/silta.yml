@@ -49,6 +49,13 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 php:
+  resources:
+    #requests:
+    #  cpu: 5m
+    #  memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 200Mi
   cron:
     drupal:
       # Disable cron jobs in feature environments by using non-existing date.
@@ -63,6 +70,6 @@ php:
         requests:
           cpu: 40m
           memory: 50Mi
-        #limits:
+        limits:
         #  cpu: 80m
-        #  memory: 1000Mi
+          memory: 250Mi

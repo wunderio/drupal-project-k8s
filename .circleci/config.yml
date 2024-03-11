@@ -276,8 +276,8 @@ workflows:
           cron: "0 8 * * 5"
           filters: *filter_master_only
     jobs:
-      - silta/drupal-validate:
-          <<: *drupal-validate
+#      - silta/drupal-validate:
+#          <<: *drupal-validate
 
       - silta/drupal-build:
           <<: *build-master

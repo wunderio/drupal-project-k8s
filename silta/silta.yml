@@ -72,4 +72,4 @@ php:
           memory: 50Mi
         limits:
         #  cpu: 80m
-          memory: 250Mi
+        #  memory: 250Mi

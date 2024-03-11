@@ -49,6 +49,8 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 php:
+  php_ini:
+    max_execution_time: 90
   cron:
     drupal:
       # Disable cron jobs in feature environments by using non-existing date.

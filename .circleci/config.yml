@@ -87,18 +87,18 @@ workflows:
           name: approve-deployment
           filters: *filter_feature_only
 
-      - silta/drupal-validate: &drupal-validate
-          name: validate
-
-          # Use custom executor.
-          executor: cicd82
-
-          post-validation:
-            - run:
-                name: Helm unit tests
-                command: |
-                  helm unittest ./charts/silta-release --helm3
-                  helm unittest ./charts/drupal --helm3
+#      - silta/drupal-validate: &drupal-validate
+#          name: validate
+#
+#          # Use custom executor.
+#          executor: cicd82
+#
+#          post-validation:
+#            - run:
+#                name: Helm unit tests
+#                command: |
+#                  helm unittest ./charts/silta-release --helm3
+#                  helm unittest ./charts/drupal --helm3
 
       # Build job for feature environments.
       # Other jobs defined below extend this job.

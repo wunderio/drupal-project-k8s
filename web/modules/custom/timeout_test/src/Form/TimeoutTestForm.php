@@ -5,12 +5,29 @@ namespace Drupal\timeout_test\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Timeout test form.
+ */
 class TimeoutTestForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId() {
     return 'timeout_test_form';
   }
 
+  /**
+   * Form constructor.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   The form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form['timeout'] = [
@@ -25,6 +42,14 @@ class TimeoutTestForm extends FormBase {
     return $form;
   }
 
+  /**
+   * Form submission handler.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $timeout = $form_state->getValue('timeout') ?: 0;
     sleep($timeout);

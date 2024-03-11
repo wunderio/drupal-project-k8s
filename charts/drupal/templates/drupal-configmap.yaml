@@ -40,6 +40,7 @@ data:
     request_order = GP
     post_max_size = {{ .Values.php.php_ini.post_max_size }}
     upload_max_filesize = {{ .Values.php.php_ini.upload_max_filesize }}
+    max_execution_time = {{ .Values.php.php_ini.max_execution_time }}
 
     [Date]
     date.timezone = Europe/Helsinki
@@ -142,8 +143,8 @@ data:
 
       send_timeout                60s;
       sendfile                    on;
-      client_body_timeout         60s;
-      client_header_timeout       60s;
+      client_body_timeout         {{ .Values.php.php_ini.max_execution_time }}s;
+      client_header_timeout       {{ .Values.php.php_ini.max_execution_time }}s;
       ## This value is set to be identical with PHP's post_max_size.
       client_max_body_size        {{ .Values.php.php_ini.post_max_size }};
       client_body_buffer_size     128k;

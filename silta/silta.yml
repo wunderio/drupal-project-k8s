@@ -67,9 +67,9 @@ php:
       command: |
         echo "Test1"
       resources:
-        requests:
-          cpu: 40m
-          memory: 50Mi
+        #requests:
+        #  cpu: 40m
+        #  memory: 50Mi
         #limits:
-        #  cpu: 80m
-        #  memory: 250Mi
+          cpu: 80m
+          memory: 250Mi

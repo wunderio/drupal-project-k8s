@@ -55,3 +55,14 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+    test1:
+      schedule: '~ 0 31 2 *'
+      command: |
+        echo "Test1"
+      resources:
+        requests:
+          cpu: 40m
+          memory: 50Mi
+        #limits:
+        #  cpu: 80m
+        #  memory: 1000Mi

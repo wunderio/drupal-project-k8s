@@ -47,6 +47,8 @@ nginx:
   extraConfig: |
     # Show server host name as header
     add_header X-Backend-Server $hostname;
+    client_body_timeout 90s;
+    client_header_timeout 90s;
 
 php:
   php_ini:

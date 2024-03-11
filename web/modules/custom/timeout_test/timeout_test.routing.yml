@@ -1,0 +1,14 @@
+timeout_test.get:
+  path: '/timeout-test/get'
+  defaults:
+    _controller: '\Drupal\timeout_test\Controller\TimeoutController::get'
+  requirements:
+    _access: 'TRUE'
+
+timeout_test.post:
+  path: '/timeout-test/post'
+  defaults:
+    _form: '\Drupal\timeout_test\Form\TimeoutTestForm'
+    _title: 'Timeout test POST'
+  requirements:
+    _access: 'TRUE'

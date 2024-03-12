@@ -70,6 +70,6 @@ php:
         #requests:
         #  cpu: 40m
         #  memory: 50Mi
-        #limits:
+        limits:
           cpu: 80m
           memory: 250Mi

@@ -144,6 +144,9 @@ ssl:
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
+  # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
+  x_proxy_auth: ""
+
   # Possible Values: debug, info, notice, warn, error, crit, alert, or emerg.
   loglevel: error
 
@@ -279,6 +282,15 @@ php:
           drush cron;
         fi
 
+    # Add custom php.ini file overrides for the cronjob.
+    # Use the same syntax as in php.ini file
+    # Example:
+    # php_ini: |
+        # [PHP]
+        # memory_limit=128M
+
+    # php_ini: |
+
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
 
@@ -347,6 +359,7 @@ php:
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
+    max_execution_time: 60
     # Custom php settings block. May override parameters previously defined.
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
@@ -804,12 +817,10 @@ pxc-db:
     passwords:
       root: drupal
       pmmserver: drupal
-      root: drupal
       xtrabackup: drupal
       monitor: drupal
       clustercheck: drupal
       proxyadmin: drupal
-      pmmserver: drupal
       operator: drupal
       replication: drupal
 

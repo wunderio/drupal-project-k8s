@@ -1,0 +1,267 @@
+# Create minikube test deployments on different kubernetes versions
+name: Silta chart tests
+
+on:
+  # # Run for pull requests, but there's an additional draft filter later on
+  # pull_request:
+  #   types: [opened, synchronize, reopened, ready_for_review]
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # schedule:
+  #   # Run compatability tests each Monday at 9
+  #   - cron: '0 9 * * 1'
+
+jobs:
+  minikube-test:
+    name: Minikube
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Available minikube kubernetes version list: 
+        # "minikube config defaults kubernetes-version"
+        # and https://kubernetes.io/releases/patch-releases/
+        kubernetes-version: ["1.28.3"]
+        # kubernetes-version: ["v1.22.17", "v1.23.17", "v1.24.17", "v1.25.16", "1.26.11", "1.27.8", "1.28.4", "latest"]
+    env:
+      CLUSTER_DOMAIN: minikube.local.wdr.io
+      K8S_PROJECT_REPO_DIR: k8s-project-repositories
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Silta CLI setup
+        run: |
+          mkdir -p ~/.local/bin
+
+          # Latest tagged release
+          latest_release_url=$(curl -s https://api.github.com/repos/wunderio/silta-cli/releases/latest | jq -r '.assets[] | .browser_download_url | select(endswith("linux-amd64.tar.gz"))')
+          curl -sL $latest_release_url | tar xz -C ~/.local/bin
+
+          silta version
+      - name: Helm and repository setup
+        run: |
+          # Install Helm 3
+          HELM_VERSION=v3.6.3
+          curl -o /tmp/helm.tar.gz https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz \
+            && tar -zxvf /tmp/helm.tar.gz -C /tmp \
+            && mv /tmp/linux-amd64/helm ~/.local/bin/helm \
+            && helm repo add jetstack https://charts.jetstack.io \
+            && helm repo add instana https://agents.instana.io/helm \
+            && helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner \
+            && helm repo add twun https://helm.twun.io \
+            && helm repo add bitnami https://charts.bitnami.com/bitnami \
+            && helm repo add wunderio https://storage.googleapis.com/charts.wdr.io \
+            && helm repo add percona https://percona.github.io/percona-helm-charts/ \
+            && helm repo add mysql-operator https://mysql.github.io/mysql-operator/ \
+            && helm repo add elastic https://helm.elastic.co \
+            && helm repo add codecentric https://codecentric.github.io/helm-charts \
+            && helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx \
+            && helm repo add nginx-stable https://helm.nginx.com/stable \
+            && helm plugin install https://github.com/quintush/helm-unittest --version 0.2.4 \
+            && helm repo update
+
+      - name: Download and start minikube
+        run: |
+          CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
+
+          curl -Lo ~/.local/bin/minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x ~/.local/bin/minikube
+          minikube version
+          minikube start \
+            --kubernetes-version "${{ matrix.kubernetes-version }}" \
+            --insecure-registry "${CLUSTER_DOCKER_REGISTRY}" \
+            --cni auto \
+            --wait all 
+      # Could use "medyagh/setup-minikube" but it does not have a way to pass "--insecure-registry" flag
+      # https://github.com/medyagh/setup-minikube/pull/33  
+      # - name: Start minikube 1.21.14
+      #   with:
+      #     # "stable" for the latest stable build, or "latest" for the latest development build
+      #     kubernetes-version: v1.21.14
+      #     insecure-registry: "registry.minikube.local.wdr.io:80"
+      #   uses: medyagh/setup-minikube@master
+      - name: MetalLB setup
+        run: |
+          MINIKUBE_IP=$(minikube ip)
+
+          ##############
+          # MetalLB setup
+          # https://github.com/kubernetes/minikube/issues/10307#issuecomment-1024575716
+
+          METALLB_IP_START=${MINIKUBE_IP}
+          METALLB_IP_END=${MINIKUBE_IP}
+
+          minikube addons enable metallb
+          sleep 10
+
+          # Patch MetalLB config with updated IP address range
+          kubectl apply -f - -n metallb-system << EOF
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: config
+            namespace: metallb-system
+          data:
+            config: |
+              address-pools:
+              - name: default
+                protocol: layer2
+                addresses:
+                - ${METALLB_IP_START}-${METALLB_IP_END}
+          EOF
+
+          # # Patch MetalLB images to use the correct registry
+          # # Workaround for https://github.com/metallb/metallb/issues/1862
+          # # Remove once this is tagged and released (> v1.29.0)
+          # # https://github.com/kubernetes/minikube/pull/16056
+          # image="quay.io/metallb/controller:v0.9.6@sha256:6932cf255dd7f06f550c7f106b9a206be95f847ab8cb77aafac7acd27def0b00"
+          # kubectl scale -n metallb-system deployment/controller --replicas=0
+          # kubectl patch deployment -n metallb-system controller --type=json -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "'${image}'"}]'
+          # kubectl scale -n metallb-system deployment/controller --replicas=1
+          # image="quay.io/metallb/speaker:v0.9.6@sha256:7a400205b4986acd3d2ff32c29929682b8ff8d830837aff74f787c757176fa9f"
+          # kubectl patch daemonset -n metallb-system speaker --type=json -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "'${image}'"}]'
+
+          sleep 5
+
+          NAMESPACE=metallb-system
+          APP=metallb
+          TIMEOUT=30s
+
+          function metallb_logs() {
+            echo "Timed out waiting for ${COMPONENT} to become ready"
+            kubectl get events -n ${NAMESPACE}
+            kubectl logs --sort-by='.metadata.creationTimestamp' -l app=${APP} -l component=${COMPONENT} -n ${NAMESPACE}
+            exit 1
+          }
+
+          for COMPONENT in controller speaker
+          do
+            kubectl wait \
+              --for condition=ready pod \
+              -l app=${APP} -l component=${COMPONENT} \
+              -n ${NAMESPACE} \
+              --timeout=${TIMEOUT} || metallb_logs
+          done
+
+      - name: silta-cluster chart setup and test
+        run: |
+
+          MINIKUBE_IP=$(minikube ip)
+          
+          helm upgrade --install \
+            cert-manager jetstack/cert-manager \
+            --namespace cert-manager \
+            --create-namespace \
+            --version v1.8.0 \
+            --set installCRDs=true \
+            --set global.logLevel=1 \
+            --wait
+
+          helm upgrade --install silta-cluster wunderio/silta-cluster \
+            --create-namespace \
+            --namespace silta-cluster \
+            --set clusterDomain=${CLUSTER_DOMAIN} \
+            --values silta-cluster/minikube.yml \
+            --wait
+
+          # Cluster landing page test
+          curl --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} https://${CLUSTER_DOMAIN} -ILk --fail
+          curl --resolve ${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} http://${CLUSTER_DOMAIN} -IL --fail
+
+      - name: Install mysql operator 
+        run: |
+          # Install CRD for mysql-operator (forked version)
+          kubectl apply -f https://raw.githubusercontent.com/wunderio/mysql-operator/fork/deploy/deploy-crds.yaml
+          
+          # Install mysql-operator (forked version)
+          helm upgrade --install mysql-operator mysql-operator/mysql-operator \
+            --namespace mysql-operator --create-namespace \
+            --set image.registry="wunderio" \
+            --set image.repository="" \
+            --set image.name="mysql-community-operator" \
+            --set image.tag="8.3.0-2.1.2-mod" \
+            --wait
+
+      - name: Build Drupal chart images, deploy and test 
+        run: |
+
+          function info {
+            echo "Error occurred, printing debug info"
+            kubectl get pods -A
+            kubectl get events -A
+            kubectl get innodbcluster -A
+          }
+
+          trap "info" ERR
+
+          MINIKUBE_IP=$(minikube ip)
+          CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
+
+          # Composer install
+          # PHP_COMPOSER_VERSION=2.1.12
+          # php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+          #   php composer-setup.php --version=${PHP_COMPOSER_VERSION} --install-dir=$HOME/.local/bin --filename=composer && \
+          #   php -r "unlink('composer-setup.php');" && \
+          #   composer --version
+
+          composer install -n --prefer-dist --ignore-platform-reqs --optimize-autoloader
+
+          # Tunnel to in-cluster docker registry. Required due to docker push inability to use selfsigned/insecure repositories that ain't local
+          # Find a free port. Credit: stefanobaghino / https://unix.stackexchange.com/posts/423052/revisions
+          DOCKER_REGISTRY_PORT=$(comm -23 <(seq 5000 6000 | sort) <(ss -Htan | awk '{print $4}' | cut -d':' -f2 | sort -u) | shuf | head -n 1)
+          BRIDGED_DOCKER_REGISTRY="localhost:${DOCKER_REGISTRY_PORT}"
+          kubectl -n silta-cluster port-forward service/silta-cluster-docker-registry $DOCKER_REGISTRY_PORT:80 2>&1 >/dev/null &
+
+          # Build images
+
+          NGINX_IMAGE=/drupal-project-k8s/test-drupal-nginx:latest
+          PHP_IMAGE=/drupal-project-k8s/test-drupal-php:latest
+          SHELL_IMAGE=/drupal-project-k8s/test-drupal-shell:latest
+
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${NGINX_IMAGE} -f "silta/nginx.Dockerfile" ./web
+          docker image push ${BRIDGED_DOCKER_REGISTRY}${NGINX_IMAGE}
+          
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${PHP_IMAGE} -f "silta/php.Dockerfile" .
+          docker image push ${BRIDGED_DOCKER_REGISTRY}${PHP_IMAGE}
+
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${SHELL_IMAGE} -f "silta/shell.Dockerfile" .
+          docker image push ${BRIDGED_DOCKER_REGISTRY}${SHELL_IMAGE}
+
+          # Dependency build for local chart
+          helm dependency build "./charts/drupal"
+
+          # Chart unit tests
+          helm unittest ./charts/drupal --helm3
+
+          # Dry-run drupal chart with test values
+          helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
+
+          silta ci release deploy \
+              --release-name test \
+              --chart-name ./charts/drupal \
+              --branchname test \
+              --silta-environment-name test \
+              --nginx-image-url ${CLUSTER_DOCKER_REGISTRY}${NGINX_IMAGE} \
+              --php-image-url ${CLUSTER_DOCKER_REGISTRY}${PHP_IMAGE} \
+              --shell-image-url ${CLUSTER_DOCKER_REGISTRY}${SHELL_IMAGE} \
+              --cluster-domain "${CLUSTER_DOMAIN}" \
+              --cluster-type minikube \
+              --db-root-pass "rootpw" \
+              --db-user-pass "dbpw" \
+              --gitauth-username "test" \
+              --gitauth-password "test" \
+              --namespace drupal-project-k8s \
+              --helm-flags "--set ssl.issuer=selfsigned" \
+              --silta-config silta/silta.yml,silta/silta.minikube.yml \
+              --deployment-timeout 15m
+
+          kubectl exec -it deploy/test-shell -n drupal-project-k8s -- drush si -y
+
+          # Web request test
+          curl http://test.drupal-project-k8s.${CLUSTER_DOMAIN} \
+              --user silta:demo --location-trusted \
+              --head --insecure --location \
+              --resolve test.drupal-project-k8s.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
+              --resolve test.drupal-project-k8s.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
+              --retry 5 --retry-delay 5 \
+              --fail 

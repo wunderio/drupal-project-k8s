@@ -516,6 +516,14 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "mysql": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "replicas": { "type": "integer" },
+        "routerReplicas": { "type": "integer" }
+      }
+    },
     "pxc-db": {
       "type": "object",
       "properties": {
@@ -527,7 +535,7 @@
       "properties": {
         "primary": {
           "type": "string",
-          "enum": [ "", "mariadb", "pxc-db" ]
+          "enum": [ "", "mariadb", "mysql", "pxc-db" ]
         }
       }
     },

@@ -52,17 +52,6 @@ spec:
                   exit 1
                 fi
 
-                # By default run a cron job in a very simple manner.
-                if [ '{{ $.Values.logging.format }}' == 'default' ]; then
-                  {{ $job.command | nindent 18 }}
-                  exit
-                fi
-
-                if [ '{{ $.Values.logging.format }}' != 'json' ]; then
-                  echo 'Incorrect value in silta.yml: logging.format: Expecting "default" or "json", found "{{ $.Values.logging.format }}".' 1>&2
-                  exit 1
-                fi
-
                 # Disable debugging while setting up things.
                 # Don't output the set command itself.
                 { set +x ; } 2>/dev/null
@@ -72,6 +61,7 @@ spec:
                 script="/tmp/cron.$$"
                 stats="/tmp/stats.$$"
                 output="/tmp/output.$$"
+                output_truncated="/tmp/output_truncated.$$"
                 output_json="/tmp/output_json.$$"
 
                 # We need to save the executable command(s) into a file,
@@ -98,14 +88,32 @@ spec:
                 # Get rid of this by extracting only the stats.
                 stats="$(grep -E '"duration_s".*"peak_mem_kb"' ${stats})"
 
+                # if the log entry is too big shorten it.
+                output_size=$(stat --format=%s "$output")
+                if [[ "$output_size" -gt 8192 ]]; then
+                  {
+                    head --bytes=4096 < "$output"
+                    echo -en "\n\n[---------- truncated ----------]\n\n"
+                    tail --bytes=4096 < "$output"
+                  } > "$output_truncated"
+                  mv "$output_truncated" "$output"
+                fi
+
+                # Append newline at the end of the output
+                # because otherwise JSON would be on the same line.
+                if [[ $(tail -c1 "$output" | wc -l) -eq 0 ]]; then
+                  echo
+                fi
+
                 # Convert the command output to JSON.
                 php -r 'print json_encode(file_get_contents("/dev/stdin"))."\n";' < "${output}" > "${output_json}"
 
                 cron_name="{{ $index }}"
 
                 # Assemble the JSON output.
+                # Add special markers (==) which helps json extraction by a log consumer.
                 cat << JSON
-                {"cron_name":"${cron_name}",${stats},"exit_code":${exit_code},"output":$(cat "${output_json}")}
+                =={"cron_name":"${cron_name}",${stats},"exit_code":${exit_code},"output_size":$output_size,"output":$(cat "${output_json}")}==
                 JSON
 
                 # Use the exit code of the actual cron command.

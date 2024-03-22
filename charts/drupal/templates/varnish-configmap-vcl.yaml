@@ -13,7 +13,7 @@ data:
     import directors;
 
     backend prod1_http1 {
-      .host = "{{ .Release.Name }}-drupal";
+      .host = "{{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}";
       .port = "80";
       {{ .Values.varnish.backend_config | nindent 6 | trim }}
     }

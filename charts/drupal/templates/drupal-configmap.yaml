@@ -416,7 +416,7 @@ data:
 
         # Proxy to mailhog container
         rewrite /mailhog(.*) $1 break;
-        proxy_pass http://{{ .Release.Name }}-mailhog:8025/;
+        proxy_pass http://{{ .Release.Name }}-mailhog.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}:8025/;
 
         # Websock connection
         chunked_transfer_encoding on;

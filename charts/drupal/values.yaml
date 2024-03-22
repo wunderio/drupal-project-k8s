@@ -24,6 +24,10 @@ environmentName: ""
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
+# Cluster domain for the Kubernetes cluster.
+# Used internally, do not change unless You know what You are doing.
+k8sClusterDomain: "cluster.local."
+
 # The app label added to our Kubernetes resources.
 app: drupal
 

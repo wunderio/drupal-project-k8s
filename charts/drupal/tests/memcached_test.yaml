@@ -15,7 +15,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: MEMCACHED_HOST
-            value: RELEASE-NAME-memcached
+            value: RELEASE-NAME-memcached.NAMESPACE.svc.cluster.local.
 
   - it: sets no memcached hostname in drupal environment if memcached is disabled
     template: drupal-deployment.yaml
@@ -26,4 +26,4 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: MEMCACHED_HOST
-            value: RELEASE-NAME-memcached
+            value: RELEASE-NAME-memcached.NAMESPACE.svc.cluster.local.

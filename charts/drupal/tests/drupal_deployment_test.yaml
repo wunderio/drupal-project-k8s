@@ -210,7 +210,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: SMTP_ADDRESS
-            value: RELEASE-NAME-mailhog:1025
+            value: RELEASE-NAME-mailhog.NAMESPACE.svc.cluster.local.:1025
   - it: sets ssmtp environment variables correctly
     template: drupal-deployment.yaml
     set:
@@ -294,7 +294,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: VARNISH_ADMIN_HOST
-            value: RELEASE-NAME-varnish
+            value: RELEASE-NAME-varnish.NAMESPACE.svc.cluster.local.
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -318,7 +318,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: VARNISH_ADMIN_HOST
-            value: RELEASE-NAME-varnish
+            value: RELEASE-NAME-varnish.NAMESPACE.svc.cluster.local.
       - notContains:
           path: spec.template.spec.containers[0].env
           content:

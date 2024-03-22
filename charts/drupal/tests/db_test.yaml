@@ -50,12 +50,12 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: MARIADB_DB_HOST
-            value: RELEASE-NAME-mariadb
+            value: RELEASE-NAME-mariadb.NAMESPACE.svc.cluster.local.
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: PXC_DB_HOST
-            value: RELEASE-NAME-proxysql
+            value: RELEASE-NAME-proxysql.NAMESPACE.svc.cluster.local.
   - it: does not set db environments when dbms are disabled
     template: drupal-deployment.yaml
     set:
@@ -66,12 +66,12 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: MARIADB_DB_HOST
-            value: RELEASE-NAME-mariadb
+            value: RELEASE-NAME-mariadb.NAMESPACE.svc.cluster.local.
       - notContains:
           path: spec.template.spec.containers[0].env
           content:
             name: PXC_DB_HOST
-            value: RELEASE-NAME-proxysql
+            value: RELEASE-NAME-proxysql.NAMESPACE.svc.cluster.local.
   - it: sets correct db host when mariadb enabled and primary db
     template: drupal-deployment.yaml
     set:
@@ -83,7 +83,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: DB_HOST
-            value: RELEASE-NAME-mariadb
+            value: RELEASE-NAME-mariadb.NAMESPACE.svc.cluster.local.
   - it: sets correct db host when pxc enabled and primary db
     template: drupal-deployment.yaml
     set:
@@ -95,6 +95,6 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: DB_HOST
-            value: RELEASE-NAME-proxysql
+            value: RELEASE-NAME-proxysql.NAMESPACE.svc.cluster.local.
 
   

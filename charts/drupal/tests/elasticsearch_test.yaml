@@ -15,7 +15,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: ELASTICSEARCH_HOST
-            value: RELEASE-NAME-es
+            value: RELEASE-NAME-es.NAMESPACE.svc.cluster.local.
 
   - it: sets no elasticsearch hostname in drupal environment if elasticsearch is disabled
     template: drupal-deployment.yaml
@@ -26,4 +26,4 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: ELASTICSEARCH_HOST
-            value: RELEASE-NAME-es
+            value: RELEASE-NAME-es.NAMESPACE.svc.cluster.local.

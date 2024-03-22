@@ -3,6 +3,7 @@
   "additionalProperties": false,
   "properties": {
     "clusterDomain": { "type": "string" },
+    "k8sClusterDomain": { "type": "string" },
     "projectName": { "type": "string" },
     "environmentName": { "type": "string" },
     "branchName": { "type": "string" },

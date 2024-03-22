@@ -57,9 +57,9 @@ www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Names
 
 {{- define "drupal.endpoint" -}}
 {{- if .Values.varnish.enabled -}}
-{{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.cluster.local:80
+{{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}:80
 {{- else -}}
-{{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
+{{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}:80
 {{- end -}}
 {{- end -}}
 

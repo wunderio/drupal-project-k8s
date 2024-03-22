@@ -88,7 +88,7 @@ imagePullSecrets:
 {{- define "smtp.env" }}
 - name: SMTP_ADDRESS
   {{- if .Values.mailhog.enabled }}
-  value: "{{ .Release.Name }}-mailhog:1025"
+  value: "{{ .Release.Name }}-mailhog.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
@@ -106,7 +106,7 @@ imagePullSecrets:
 # Duplicate SMTP env variables for ssmtp bundled with amazee php image
 - name: SSMTP_MAILHUB
   {{- if .Values.mailhog.enabled }}
-  value: "{{ .Release.Name }}-mailhog:1025"
+  value: "{{ .Release.Name }}-mailhog.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
@@ -130,7 +130,7 @@ imagePullSecrets:
 - name: MARIADB_DB_NAME
   value: "{{ .Values.mariadb.db.name }}"
 - name: MARIADB_DB_HOST
-  value: {{ .Release.Name }}-mariadb
+  value: {{ .Release.Name }}-mariadb.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 - name: MARIADB_DB_PASS
   valueFrom:
     secretKeyRef:
@@ -143,7 +143,7 @@ imagePullSecrets:
 - name: PXC_DB_NAME
   value: "drupal"
 - name: PXC_DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-proxysql
+  value: {{ include "pxc-database.fullname" . }}-proxysql.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 - name: PXC_DB_PASS
   valueFrom:
     secretKeyRef:
@@ -156,7 +156,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "{{ .Values.mariadb.db.name }}"
 - name: DB_HOST
-  value: {{ .Release.Name }}-mariadb
+  value: {{ .Release.Name }}-mariadb.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
@@ -169,7 +169,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-proxysql
+  value: {{ include "pxc-database.fullname" . }}-proxysql.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
@@ -203,7 +203,7 @@ imagePullSecrets:
 {{- fail "Do not use 'memcache' in release name or deployment will fail" -}}
 {{- end }}
 - name: MEMCACHED_HOST
-  value: {{ .Release.Name }}-memcached
+  value: {{ .Release.Name }}-memcached.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 {{- end }}
 {{- if .Values.redis.enabled }}
 {{- if contains "redis" .Release.Name -}}
@@ -213,7 +213,7 @@ imagePullSecrets:
 {{- fail ".Values.redis.auth.password value required." }}
 {{- end }}
 - name: REDIS_HOST
-  value: {{ .Release.Name }}-redis-master
+  value: {{ .Release.Name }}-redis-master.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 - name: REDIS_PASS
   valueFrom:
     secretKeyRef:
@@ -222,7 +222,7 @@ imagePullSecrets:
 {{- end }}
 {{- if .Values.elasticsearch.enabled }}
 - name: ELASTICSEARCH_HOST
-  value: {{ .Release.Name }}-es
+  value: {{ .Release.Name }}-es.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 {{- end }}
 {{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
 {{- if .Values.mailhog.enabled }}
@@ -234,7 +234,7 @@ imagePullSecrets:
 {{- end}}
 {{- if .Values.varnish.enabled }}
 - name: VARNISH_ADMIN_HOST
-  value: {{ .Release.Name }}-varnish
+  value: {{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 - name: VARNISH_ADMIN_PORT
   value: "6082"
 - name: VARNISH_CONTROL_KEY
@@ -254,7 +254,7 @@ imagePullSecrets:
   value: {{ .Values.php.drupalCoreVersion | quote }}
 {{- if .Values.solr.enabled }}
 - name: SOLR_HOST
-  value: {{ .Release.Name }}-solr
+  value: {{ .Release.Name }}-solr.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}
 {{- end }}
 # Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
@@ -285,9 +285,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: 127.0.0.1,localhost,.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-memcached.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-redis.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-es.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-solr.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: 127.0.0.1,localhost,.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-memcached.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-redis.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-es,{{ .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }},{{ .Release.Name }}-solr.{{ .Release.Namespace }}.svc.{{ .Values.k8sClusterDomain }}{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 

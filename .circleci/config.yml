@@ -109,10 +109,18 @@ workflows:
           executor: cicd82
 
           codebase-build:
-            # - run:
-            #     name: Download feature branch build of silta cli
-            #     command: |
-            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+            - run:
+                name: Test env vars
+                command: |
+                  set -x
+                  echo $TEST_ENV_VAR
+                  export TEST_ENV_VAR=1
+                  echo $TEST_ENV_VAR
+            - run:
+                name: Test env vars
+                command: |
+                  set -x
+                  echo $TEST_ENV_VAR
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev

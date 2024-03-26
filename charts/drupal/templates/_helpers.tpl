@@ -369,9 +369,18 @@ done
     {{- end }}
   {{- end }}
 
-  {{ if .Values.elasticsearch.enabled }}
-    {{ include "drupal.wait-for-elasticsearch-command" . }}
-  {{ end }}
+  {{- if .Values.elasticsearch.enabled }}
+    {{- include "drupal.wait-for-elasticsearch-command" . }}
+    {{- if and .Release.IsInstall .Values.referenceData.elasticsearch }}
+      if [[ -f /app/reference-data/elasticsearch.tar.gz || -f /app/reference-data/elasticsearch.tar.gz ]]; then
+        echo "Importing elasticsearch reference data"
+        mkdir /tmp/elasticsearch
+        tar -xzf /app/reference-data/elasticsearch.tar.gz -C /tmp/elasticsearch
+        multielasticdump --direction=load --input=/tmp/elasticsearch --output=http://${ELASTICSEARCH_HOST}:9200/
+        echo "Elasticsearch reference data imported"
+      fi
+    {{- end }}
+  {{- end }}
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
@@ -395,6 +404,7 @@ done
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+
   echo "Dump reference database."
   dump_dir=/tmp/reference-data-export/
   mkdir "${dump_dir}"
@@ -462,6 +472,15 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     /app/reference-data/{{ $index }}
   {{ end -}}
   {{- end }}
+
+  {{- if .Values.referenceData.elasticsearch }}
+  echo "Creating reference data for elasticsearch"
+  mkdir /tmp/elasticsearch
+  multielasticdump --direction=dump --input=http://${ELASTICSEARCH_HOST}:9200/ --output=/tmp/elasticsearch
+  tar -czf /tmp/elasticsearch.tar.gz -C /tmp/elasticsearch .
+  cp /tmp/elasticsearch.tar.gz /app/reference-data
+  {{- end }}
+
 else
   echo "Drupal is not installed, skipping reference database dump."
 fi
@@ -519,6 +538,9 @@ fi
 
 {{- define "drupal.backup-command" -}}
   {{ include "drupal.backup-command.dump-database" . }}
+  {{- if and .Values.elasticsearch.enabled .Values.backup.elasticsearch }}
+  {{- include "drupal.backup-command.dump-elasticsearch" . }}
+  {{- end }}
   {{ include "drupal.backup-command.archive-store-backup" . }}
 {{- end }}
 
@@ -545,6 +567,24 @@ fi
   echo "Database backup complete."
 {{- end }}
 
+{{- define "drupal.backup-command.dump-elasticsearch" }}
+  set -e
+  
+  if ! command -v multielasticdump &> /dev/null
+  then
+    echo "multielasticdump could not be found. Elasticsearch backup failed."
+    exit 1
+  fi
+  
+  # Dump elasticsearch data
+  echo "Starting Elasticsearch backup."
+  mkdir /tmp/elasticsearch
+  multielasticdump --direction=dump --input=http://${ELASTICSEARCH_HOST}:9200/ --output=/tmp/elasticsearch
+  tar -czf /tmp/elasticsearch.tar.gz -C /tmp/elasticsearch .
+  
+  echo "Elasticsearch backup complete."
+{{- end }}
+
 {{- define "drupal.backup-command.archive-store-backup" -}}
 
   # Compress the database dump and copy it into the backup folder.
@@ -554,6 +594,13 @@ fi
 
   # Create a folder for the backup
   mkdir -p $BACKUP_LOCATION
+  
+  {{- if .Values.elasticsearch.enabled }}
+  # Copy the elasticsearch dump into the backup folder.
+  cp /tmp/elasticsearch.tar.gz $BACKUP_LOCATION/
+  {{- end }}
+
+  # Copy the database dump into the backup folder.
   cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
   {{- if not .Values.backup.skipFiles }}

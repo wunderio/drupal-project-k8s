@@ -55,3 +55,12 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+
+backup:
+  enabled: true
+  schedule: "*/10 * * * *"
+  retention: 3
+
+referenceData:
+  enabled: true
+  referenceEnvironment: 'feature/esdump'

@@ -3,6 +3,11 @@
 #
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
+# Subchart with few functionality that is reused for our other charts
+silta-release:
+  # Enable downscaler by default.
+  downscaler:
+    enabled: false
 
 varnish:
   enabled: false

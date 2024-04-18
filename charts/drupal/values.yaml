@@ -624,6 +624,8 @@ varnish:
 elasticsearch:
   enabled: false
 
+  #### elastic/elasticsearch values ####
+
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
   imageTag: 6.8.22
@@ -670,6 +672,17 @@ elasticsearch:
           operator: NotIn
           values:
           - static-ip
+
+  ##### bitnamicharts/elasticsearch values #####
+  # https://github.com/bitnami/charts/blob/7359f94e1c61801f043b4515f697575830f814e1/bitnami/elasticsearch/values.yaml
+  master:
+    replicaCount: 1
+  coordinating:
+    replicaCount: 1
+  data:
+    replicaCount: 1
+  ingest:
+    replicaCount: 1
 
 # Memcache service overrides
 # see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml

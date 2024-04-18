@@ -22,11 +22,15 @@ dependencies:
   version: 5.1.x
   repository: https://codecentric.github.io/helm-charts
   condition: mailhog.enabled
+# - name: elasticsearch
+#   version: 8.5.x
+#   # repository: https://helm.elastic.co
+#   # Forked at https://github.com/elastic/helm-charts/commit/2fd64d0af65f14df7aa01da591919460dabac4b3
+#   repository: file://../elasticsearch
+#   condition: elasticsearch.enabled
 - name: elasticsearch
-  version: 8.5.x
-  # repository: https://helm.elastic.co
-  # Forked at https://github.com/elastic/helm-charts/commit/2fd64d0af65f14df7aa01da591919460dabac4b3
-  repository: file://../elasticsearch
+  version: 20.0.x
+  repository: oci://registry-1.docker.io/bitnamicharts
   condition: elasticsearch.enabled
 - name: silta-release
   version: ^1.x

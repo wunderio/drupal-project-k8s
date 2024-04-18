@@ -46,3 +46,11 @@ https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/templates
 {{- $releaseNameHash := sha256sum .Release.Name | trunc 3 -}}
 {{- (gt (len .Release.Name) 22) | ternary ( print (.Release.Name | trunc 18) print $releaseNameHash ) .Release.Name }}
 {{- end -}}
+
+{{/*
+Binami elasticsearch service name adjustment because there is no tpl wrapper for master.servicenameOverride
+https://github.com/bitnami/charts/blob/7359f94e1c61801f043b4515f697575830f814e1/bitnami/elasticsearch/templates/_helpers.tpl#L44C1-L60C12
+*/}}
+{{- define "elasticsearch.service.name" -}}
+{{ .Release.Name }}-es
+{{- end -}}

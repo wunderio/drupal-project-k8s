@@ -674,15 +674,48 @@ elasticsearch:
           - static-ip
 
   ##### bitnamicharts/elasticsearch values #####
-  # https://github.com/bitnami/charts/blob/7359f94e1c61801f043b4515f697575830f814e1/bitnami/elasticsearch/values.yaml
+  # see: https://github.com/bitnami/charts/blob/7359f94e1c61801f043b4515f697575830f814e1/bitnami/elasticsearch/values.yaml
+  image:
+    # Available image tags: https://hub.docker.com/r/bitnami/elasticsearch/tags/
+    # tag: 6.8.23
+    tag: 7.17.20
+    # tag: 8.12.1-debian-11-r3
   master:
     replicaCount: 1
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 1024Mi
   coordinating:
     replicaCount: 1
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 1024Mi
   data:
     replicaCount: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1536Mi
+      limits:
+        cpu: 1
+        memory: 3072Mi
   ingest:
     replicaCount: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 640Mi
+      limits:
+        cpu: 1
+        memory: 1024Mi
 
 # Memcache service overrides
 # see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml

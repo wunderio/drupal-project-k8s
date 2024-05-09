@@ -1,8 +1,11 @@
 # Subchart with few functionality that is reused for our other charts
 silta-release:
-  # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
+  # Enable downscaler by default.
   downscaler:
     enabled: true
+    # Allows to modify How long should This release be active until downscaled. Value examples: 10y, 4w, 1h
+    # releaseMinAge: '1w'
+    releaseMinAge: ''
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
@@ -89,10 +92,10 @@ ingress:
             period: 1s
             average: 32
             burst: 90
-      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rps: "60"
       nginx.ingress.kubernetes.io/limit-rpm: "300"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-      nginx.ingress.kubernetes.io/limit-connections: "20"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+      nginx.ingress.kubernetes.io/limit-connections: "100"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -111,6 +114,11 @@ cluster:
 backendConfig:
   securityPolicy:
     name: "silta-ingress"
+
+# Timezone to be used by the services that support it.
+# List of timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List (use the TZ identifier column)
+# The default timezone for most container images is UTC.
+timezone: ""
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
@@ -135,6 +143,9 @@ ssl:
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
+
+  # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
+  x_proxy_auth: ""
 
   # Possible Values: debug, info, notice, warn, error, crit, alert, or emerg.
   loglevel: error
@@ -202,6 +213,11 @@ nginx:
   #   paths:
   #     - "^/sites/[^/]+/files/(?:css|js)/"
 
+  # Nginx status pages will be available at /nginx_status and /nginx_vts,
+  # accessible from nginx.noauthips and localhost.
+  status_page:
+    enabled: true
+
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
   sessionAffinity: false
 
@@ -240,6 +256,21 @@ php:
     # This will be put under [www] process pool.
     extraConfig: |
 
+    # PHP-FPM status page will be available at /php_status, accessible
+    # from nginx.noauthips and localhost.
+    status_page:
+      enabled: true
+
+  cronJobDefaults:
+    # resources:
+    #   requests:
+    #     cpu: 500m
+    #     memory: 488Mi
+    #   limits:
+    #     memory: 488Mi
+    # nodeSelector:
+    #   cloud.google.com/gke-nodepool: static-ip
+
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   cron:
     drupal:
@@ -251,8 +282,20 @@ php:
           drush cron;
         fi
 
+    # Add custom php.ini file overrides for the cronjob.
+    # Use the same syntax as in php.ini file
+    # Example:
+    # php_ini: |
+        # [PHP]
+        # memory_limit=128M
+
+    # php_ini: |
+
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
+
+      # Specify a how many attempts should be made before considering a cron job as failed.
+      backoffLimit: 1
 
       # Set resources specifically for cron jobs. If not set, they will be
       # inherited from php.resources.
@@ -286,7 +329,7 @@ php:
       if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
         drush cache-clear all || true
       else
-        drush cache-rebuild || true
+        drush eval "drupal_flush_all_caches();" || true
       fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y
@@ -316,6 +359,7 @@ php:
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
+    max_execution_time: 60
     # Custom php settings block. May override parameters previously defined.
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
@@ -500,6 +544,9 @@ backup:
 # see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
 mariadb:
   enabled: true
+  image:
+    # https://hub.docker.com/r/bitnami/mariadb/tags
+    tag: 10.6.15-debian-11-r24
   replication:
     enabled: false
   db:
@@ -546,7 +593,7 @@ varnish:
       cpu: 25m
       memory: 32Mi
   image: wunderio/silta-varnish
-  imageTag: 6-v0.2
+  imageTag: 6-v1
   # https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
   # https://varnish-cache.org/docs/6.6/reference/varnishd.html#list-of-parameters
@@ -573,6 +620,7 @@ varnish:
     .connect_timeout        = 10s;
     .between_bytes_timeout  = 10s;
 
+# https://github.com/elastic/helm-charts/blob/2fd64d0af65f14df7aa01da591919460dabac4b3/elasticsearch/values.yaml
 elasticsearch:
   enabled: false
 
@@ -584,6 +632,16 @@ elasticsearch:
   minimumMasterNodes: 1
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+
+  # Note: "roles" definition is ignored for 6.x images due to subchart compatability reasons.
+
+  # Drupal integration module still requires non-ssl connection
+  # related param: elasticsearch.extraEnvs[xpack.security.enabled]
+  createCert: false
+  protocol: http
+  extraEnvs:
+    - name: xpack.security.enabled
+      value: "false"
 
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
@@ -599,7 +657,7 @@ elasticsearch:
   resources:
     requests:
       cpu: 200m
-      memory: 512Mi
+      memory: 640Mi
     limits:
       memory: 1Gi
 
@@ -640,6 +698,8 @@ redis:
     password: ""
   replica:
     # replicaCount: 1
+    autoscaling:
+      enabled: false
   master:
     resources:
       limits:
@@ -657,7 +717,7 @@ mailhog:
     # Set image repository to "mailhog/mailhog" to reenable logging.
     repository: wunderio/silta-mailhog
     # Set image tag to "" to reenable logging.
-    tag: silent
+    tag: v1
   resources:
     requests:
       cpu: 1m
@@ -676,7 +736,7 @@ solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
   image: wunderio/silta-solr
-  imageTag: 8
+  imageTag: 8-v1
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
@@ -713,7 +773,7 @@ db:
   primary: mariadb
 
 # Percona XtraDB Cluster
-# see: https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/values.yaml
+# see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml
 pxc-db:
   enabled: false
   allowUnsafeConfigurations: false
@@ -737,8 +797,10 @@ pxc-db:
       # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
       pxc_strict_mode=PERMISSIVE
     persistence:
+      enabled: true
       size: 8Gi
-  haproxy:
+  proxysql:
+    enabled: true
     resources:
       requests:
         cpu: 100m
@@ -749,12 +811,18 @@ pxc-db:
   logcollector:
     enabled: false
   backup:
-    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
-    #enabled: false
-    schedule: []
+    enabled: false
+    # schedule: []
   secrets:
     passwords:
       root: drupal
+      pmmserver: drupal
+      xtrabackup: drupal
+      monitor: drupal
+      clustercheck: drupal
+      proxyadmin: drupal
+      operator: drupal
+      replication: drupal
 
 # Fastly Signal Sciences support
 # https://docs.fastly.com/signalsciences/
@@ -778,3 +846,10 @@ signalsciences:
 logging:
   # Currently supported formats are "default" and "json".
   format: default
+
+# Obfuscate parts of the full domain name.
+# Available values for maskSubdomains are:
+# - releaseName (scrambles release name subdomain, e.g., xxx.project.silta.tld)
+# - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
+# - both (obfuscates both, e.g., zzz.silta.tld)
+# maskSubdomains: both

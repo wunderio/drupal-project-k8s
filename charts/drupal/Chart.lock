@@ -4,7 +4,7 @@ dependencies:
   version: 7.5.2
 - name: pxc-db
   repository: https://percona.github.io/percona-helm-charts/
-  version: 1.9.1
+  version: 1.12.3
 - name: memcached
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 4.2.27
@@ -16,9 +16,9 @@ dependencies:
   version: 5.1.0
 - name: elasticsearch
   repository: file://../elasticsearch
-  version: 7.8.1
+  version: 8.5.1
 - name: silta-release
   repository: file://../silta-release
-  version: 0.1.1
-digest: sha256:c3512a904de793d2705c98da4735d5ea3d58243442111dfcdf7c7f18b640d7b6
-generated: "2023-01-26T16:58:38.528197461+02:00"
+  version: 1.0.0
+digest: sha256:74ab4b2e06e75563a3838c0a20311d052e2d7aeb6e00b4602fae6e9a2fd77fa0
+generated: "2023-10-03T12:07:07.444943085+03:00"

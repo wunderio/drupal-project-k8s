@@ -57,11 +57,19 @@ ports:
 {{- end }}
 
 {{- define "drupal.volumes" -}}
-{{- range $index, $mount := $.Values.mounts }}
+{{- range $index, $mount := $.Values.mounts -}}
 {{- if eq $mount.enabled true }}
 - name: drupal-{{ $index }}
+{{- if hasKey $mount "secretName" }}
+  secret:
+    secretName: {{ $mount.secretName }}
+{{- else if hasKey $mount "configMapName" }}
+  configMap:
+    name: {{ $mount.configMapName }}
+{{- else }}
   persistentVolumeClaim:
     claimName: {{ $.Release.Name }}-{{ $index }}
+{{- end }}
 {{- end }}
 {{- end }}
 - name: config
@@ -135,11 +143,11 @@ imagePullSecrets:
 - name: PXC_DB_NAME
   value: "drupal"
 - name: PXC_DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: PXC_DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
@@ -161,11 +169,11 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- end }}
@@ -179,8 +187,14 @@ imagePullSecrets:
   value: "{{ .Values.environmentName }}"
 - name: RELEASE_NAME
   value: "{{ .Release.Name }}"
+{{- if not .Values.php.env.DRUSH_OPTIONS_URI }}
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
+{{- end }}
+{{- if .Values.timezone }}
+- name: TZ
+  value: {{ .Values.timezone | quote }}
+{{- end }}
 {{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
@@ -245,7 +259,11 @@ imagePullSecrets:
 # Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
+{{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) (kindIs "invalid" $val) }}
   value: {{ $val | quote }}
+{{- else }}
+  {{ $val | toYaml | indent 4 | trim }}
+{{- end }}
 {{- end }}
 {{- range $index, $mount := $.Values.mounts }}
 {{- if eq $mount.enabled true }}
@@ -298,7 +316,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
+until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -311,13 +329,13 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
 {{- define "drupal.wait-for-elasticsearch-command" }}
 TIME_WAITING=0
 echo -n "Waiting for Elasticsearch.";
-until curl --silent --connect-timeout 2 "$ELASTICSEARCH_HOST:9200" ; do
+until curl --silent --connect-timeout 2 "{{ .Values.elasticsearch.protocol }}://${ELASTICSEARCH_HOST}:9200" -k ; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -644,6 +662,12 @@ batch/v1beta1
 {{- end }}
 {{- end }}
 
+{{- define "drupal.cron.timezone-support" }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "25" ) }}true
+{{- else }}false
+{{- end }}
+{{- end }}
+
 {{- define "drupal.autoscaling.api-version" }}
 {{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "23" ) }}
 autoscaling/v2
@@ -651,3 +675,9 @@ autoscaling/v2
 autoscaling/v2beta1
 {{- end }}
 {{- end }}
+
+{{- define "masking.prefix-alert" -}}
+{{ if $.Values.domainPrefixes }}
+{{ fail "Cannot use domain prefixes together with domain masking"}}
+{{- end -}}
+{{- end -}}

@@ -183,7 +183,7 @@ data:
         set beresp.http.x-ttl = "10m";
       }
 
-      if (bereq.url ~ "\.(jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)\??.*$") {
+      if (bereq.url ~ "^[^?]*\.(jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)(\?.*)?$") {
         # Strip any cookies before static files are inserted into cache.
         unset beresp.http.set-cookie;
         if(beresp.status == 200){
@@ -288,7 +288,12 @@ data:
       # Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable,
       # which backend to use.
       # also used to modify the request
-
+      {{- if ne .Values.nginx.x_proxy_auth "" }}
+      # Block request if proxy header is set but does not match defined value
+      if (req.http.x-proxy-auth != "{{ .Values.nginx.x_proxy_auth }}") {
+        return (synth(403, "Not allowed."));
+      }
+      {{- end }}
       # Fixes "Too many restarts" error
       if (req.restarts > 0) {
         set req.hash_always_miss = true;
@@ -378,6 +383,19 @@ data:
       if (req.url ~ "_ping.php") {
         return (pass);
       }
+
+      {{- if .Values.nginx.status_page.enabled }}
+      // No varnish for nginx status page
+      if (req.url ~ "^/nginx_status$") {
+        return (pass);
+      }
+      if (req.url ~ "^/nginx_vts$") {
+        return (pass);
+      }
+      if (req.url ~ "^/php_status$") {
+        return (pass);
+      }
+      {{- end }}
 
       {{- if .Values.mailhog.enabled }}
       // No varnish for mailhog

@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:proxy
 
 executors:
   cicd73:
@@ -108,11 +108,8 @@ workflows:
           # Use custom executor.
           executor: cicd82
 
+          silta_cli_version: test
           codebase-build:
-            - run:
-                name: Download feature branch build of silta cli
-                command: |
-                  curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev

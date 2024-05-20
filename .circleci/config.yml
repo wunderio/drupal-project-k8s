@@ -109,10 +109,10 @@ workflows:
           executor: cicd82
 
           codebase-build:
-            # - run:
-            #     name: Download feature branch build of silta cli
-            #     command: |
-            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+            - run:
+                name: Download feature branch build of silta cli
+                command: |
+                  curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev
@@ -131,6 +131,7 @@ workflows:
           # Use a local chart during development.
           chart_name: "./charts/drupal"
           chart_repository: ""
+          silta_cli_version: test
           pre-release:
             - run:
                 name: Add helm repositories and build local chart

@@ -1,12 +1,3 @@
-# Subchart with few functionality that is reused for our other charts
-silta-release:
-  # Enable downscaler by default.
-  downscaler:
-    enabled: true
-    # Allows to modify How long should This release be active until downscaled. Value examples: 10y, 4w, 1h
-    # releaseMinAge: '1w'
-    releaseMinAge: ''
-
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
@@ -23,6 +14,41 @@ environmentName: ""
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
+
+silta-release:
+  downscaler:
+    enabled: true
+    # Allows to modify How long should This release be active until downscaled. Value examples: 10y, 4w, 1h
+    releaseMinAge: ''
+
+  branchName: ""
+
+  # Access to pods is limited to the current namespace by default. Specify exceptions here.
+  # Note that the key is only used for documentation purposes and to facilitate overrides.
+  # Structure:
+  #
+  #  nameYourAccessException:
+  #    additionalPodSelector:
+  #      # The current release is selected by default, add additional pod selectors here.
+  #      app: drupal
+  #
+  #    # This is passed directly to the "from" clause of the Kubernetes NetworkPolicy resource.
+  #    from:
+  #      - namespaceSelector:
+  #          matchLabels:
+  #            name: other-namespace
+  ingressAccess: {}
+
+  # HTTP proxy for outgoing traffic
+  proxy:
+    enabled: false
+    url: 'silta-cluster-proxy.silta-cluster'
+    port: 80
+
+    # Set a comma-separated list of hostnames or hostname suffixes that should not be proxied,
+    # such as cluster-internal services from other namespaces. For example, for unproxied access
+    # to services in the namespace "foo", use ".foo" as the value.
+    no_proxy: ""
 
 # The app label added to our Kubernetes resources.
 app: drupal

@@ -14,7 +14,7 @@
 {{ include "silta-release.networkPolicy" (merge $params . ) }}
 ---
 # Iterate through exceptions
-{{- range $index, $accessDefinition := .Values.ingressAccess -}}
+{{- range $index, $accessDefinition := (index .Values "silta-release").ingressAccess -}}
 {{- $podSelectors := $accessDefinition.additionalPodSelector -}}
 {{- $from := $accessDefinition.from -}}
 {{- $params := dict "id" $index "additionalPodSelectors" $podSelectors "from" $from -}}

@@ -17,14 +17,15 @@ tests:
   - it: specified exceptions are added
     template: network-policy.yaml
     set:
-      ingressAccess:
-        nameYourAccessException:
-          additionalPodSelector:
-            foo: bar
-          from:
-            - namespaceSelector:
-                matchLabels:
-                  name: other-namespace
+      silta-release:
+        ingressAccess:
+          nameYourAccessException:
+            additionalPodSelector:
+              foo: bar
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    name: other-namespace
     asserts:
       - documentIndex: 4
         equal:

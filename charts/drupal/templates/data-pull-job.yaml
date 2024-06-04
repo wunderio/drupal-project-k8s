@@ -1,0 +1,58 @@
+apiVersion: {{ include "drupal.cron.api-version" . | trim }}
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-datapull
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  {{- if .Values.timezone }}
+  {{- if eq ( include "drupal.cron.timezone-support" . ) "true" }}
+  timeZone: {{ .Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      metadata:
+        labels:
+          {{- include "drupal.release_labels" . | nindent 10 }}
+      enableServiceLinks: false
+      securityContext:
+        fsGroup: 82
+      containers:
+      - name: pull
+        image: {{ .Values.php.image | quote }}
+        env: {{ include "drupal.env" . | nindent 10 }}
+        volumeMounts:
+          {{- range $index, $mount := $.Values.mounts }}
+          {{- if eq $mount.enabled true }}
+          - name: drupal-{{ $index }}
+            mountPath: /mount/{{ $index }}
+          {{- end }}
+          {{- end }}
+          - name: data-volume
+            mountPath: /tmp/sync
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            {{- include "drupal.data-pull-command" . | indent 12 }}
+      restartPolicy: Never
+      volumes:
+        {{- include "drupal.volumes" . | nindent 8 }}
+        - name: data-volume
+          ephemeral:
+            volumeClaimTemplate:
+              metadata:
+                labels:
+                  {{- include "drupal.release_labels" . | nindent 18 }}
+              spec:
+                accessModes: [ "ReadWriteOnce" ]
+                resources:
+                  requests:
+                    storage: {{ (index .Values "silta-release").sync.storage.size | quote }}
+        {{- include "drupal.imagePullSecrets" . | nindent 10 }}

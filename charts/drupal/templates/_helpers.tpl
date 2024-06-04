@@ -517,6 +517,30 @@ fi
   {{- end }}
 {{- end }}
 
+{{- define "drupal.data-pull-command" }}
+set -e
+
+DESTINATION=/tmp/sync
+mkdir -p $DESTINATION
+
+# Dump database
+IGNORE_TABLES=""
+IGNORED_TABLES=""
+for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTableContent }}'` ;
+do
+  IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
+  IGNORED_TABLES="$IGNORED_TABLES $TABLE";
+done
+
+/usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > ${DESTINATION}/db.sql
+/usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> ${DESTINATION}/db.sql
+
+# Copy mounts
+mkdir ${DESTINATION}/mounts
+echo "Copying mounts"
+rsync -rvu --temp-dir=/tmp/ "/mount/" "${DESTINATION}/mounts/"
+{{- end }}
+
 {{- define "drupal.backup-command" -}}
   {{ include "drupal.backup-command.dump-database" . }}
   {{ include "drupal.backup-command.archive-store-backup" . }}

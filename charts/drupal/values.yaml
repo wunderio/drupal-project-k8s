@@ -50,6 +50,11 @@ silta-release:
     # to services in the namespace "foo", use ".foo" as the value.
     no_proxy: ""
 
+  # TODO: schema
+  sync:
+    storage: 
+      size: 10G
+
 # The app label added to our Kubernetes resources.
 app: drupal
 

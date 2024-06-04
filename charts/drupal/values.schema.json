@@ -636,6 +636,7 @@
             "no_proxy": { "type": "string"}
           }
         },
+        "sync": {"type": "object"},
         "global": { "type": "object"}
       }
     },

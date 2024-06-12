@@ -245,7 +245,7 @@ workflows:
       # Extends the job defined for master environments.
       - silta/drupal-build:
           <<: *build-master
-          name: build-deploy-prod
+          name: build-prod
           context: silta_finland
           filters: *filter_production_only
 
@@ -253,12 +253,12 @@ workflows:
       # Extends the job defined for feature environments.
       - silta/drupal-deploy:
           <<: *deploy
-          name: build-deploy-prod
+          name: deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
           decrypt_files: silta/secrets_prod_signalsciences
           context: silta_finland
           requires:
-            - build-deploy-prod
+            - build-prod
           filters: *filter_production_only
 
       # Test site availability by requesting _ping.php.

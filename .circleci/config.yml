@@ -18,7 +18,7 @@ executors:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v1
   cicd82:
     docker:
-      - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-test20240613
+      - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-v1
 
 jobs:
   site-test:

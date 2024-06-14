@@ -97,8 +97,8 @@ workflows:
             - run:
                 name: Helm unit tests
                 command: |
-                  helm unittest ./charts/silta-release --helm3
-                  helm unittest ./charts/drupal --helm3
+                  helm unittest ./charts/silta-release
+                  helm unittest ./charts/drupal
 
       # Build job for feature environments.
       # Other jobs defined below extend this job.

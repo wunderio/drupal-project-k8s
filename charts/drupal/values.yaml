@@ -468,6 +468,11 @@ referenceData:
     limits:
       memory: 488Mi
 
+# Release sync configuration. Storage is used for data synchronization and process is handled by the Silta HUB.
+silta-hub:
+  sync:
+    storage: 10G
+
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
 # Uses formatters from fakerphp.github.io/formatters
 gdprDump:

@@ -1,12 +1,12 @@
 {{- $mariadbha := index .Values "mariadb-ha" }}
 {{- if $mariadbha.enabled }}
-{{- if not ( .Capabilities.APIVersions.Has "mariadb.mmontes.io/v1alpha1" ) }}
-{{- fail "API mariadb.mmontes.io/v1alpha1 unavailable, ask cluster administrator to enable mariadb-operator support in Silta cluster first!" }}
+{{- if not ( .Capabilities.APIVersions.Has "k8s.mariadb.com/v1alpha1" ) }}
+{{- fail "API k8s.mariadb.com/v1alpha1 unavailable, ask cluster administrator to enable mariadb-operator support in Silta cluster first!" }}
 {{- end }}
-{{- if lt (int $mariadbha.replicas) 2 }}
-{{- fail "mariadb-ha.replicas must be at least 2" }}
+{{- if lt (int $mariadbha.replicas) 3 }}
+{{- fail "mariadb-ha.replicas must be at least 3" }}
 {{- end }}
-apiVersion: mariadb.mmontes.io/v1alpha1
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: MariaDB
 metadata:
   name: {{ .Release.Name }}-mariadb-ha
@@ -57,12 +57,16 @@ spec:
   resources:
     {{ $mariadbha.resources | toYaml | nindent 4 }}
   {{- end }}
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: {{ $mariadbha.persistence.size | quote}}
-    accessModes:
-      - ReadWriteOnce
+  storage:
+    size: {{ $mariadbha.persistence.size | quote}}
+    resizeInUseVolumes: true
+    waitForVolumeResize: true
+    volumeClaimTemplate:
+      resources:
+        requests:
+          storage: {{ $mariadbha.persistence.size | quote}}
+      accessModes:
+        - ReadWriteOnce
   # Error writing Galera config: open /etc/mysql/mariadb.conf.d/0-galera.cnf: permission denied
   # https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/GALERA.md#permission-denied-writing-galera-configuration
   podSecurityContext:

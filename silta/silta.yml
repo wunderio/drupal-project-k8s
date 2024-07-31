@@ -68,7 +68,7 @@ mariadb:
 
 mariadb-ha:
   enabled: true
-  replicas: 2
+  replicas: 3
 
 db:
   primary: mariadb-ha

@@ -160,7 +160,7 @@ imagePullSecrets:
 - name: MARIADB_HA_DB_NAME
   value: "drupal"
 - name: MARIADB_HA_DB_HOST
-  value: {{ .Release.Name }}-mariadb-ha
+  value: {{ .Release.Name }}-mariadb-ha-primary
 - name: MARIADB_HA_DB_PASS
   valueFrom:
     secretKeyRef:
@@ -199,7 +199,7 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: {{ .Release.Name }}-mariadb-ha
+  value: {{ .Release.Name }}-mariadb-ha-primary
 - name: DB_PASS
   valueFrom:
     secretKeyRef:

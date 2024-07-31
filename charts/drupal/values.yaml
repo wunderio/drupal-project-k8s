@@ -797,8 +797,8 @@ mariadb-ha:
   image: "mariadb:11.0.3"
   imagePullPolicy: IfNotPresent
   password: drupal
-  # At least 2 replicas required 
-  replicas: 2
+  # Odd number of replicas required, at least 3
+  replicas: 3
   persistence:
     # Test / doc resizing
     size: 5Gi 

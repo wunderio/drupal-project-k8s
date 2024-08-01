@@ -62,6 +62,13 @@ spec:
     resizeInUseVolumes: true
     waitForVolumeResize: true
     volumeClaimTemplate:
+      metadata:
+        labels:
+          app: mariadb
+          release: {{ .Release.Name }}
+          app.kubernetes.io/instance: {{ .Release.Name }}
+          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          helm.sh/chart: {{ include "drupal.chart" . }}
       resources:
         requests:
           storage: {{ $mariadbha.persistence.size | quote}}
@@ -81,5 +88,27 @@ metadata:
 type: Opaque
 data:
   password: "{{ $mariadbha.password | b64enc }}"
-  
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-mariadb-ha
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  podSelector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      app: mariadb
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - port: 3306
+    - port: 5555
+    from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: mariadb-operator
 {{- end }}

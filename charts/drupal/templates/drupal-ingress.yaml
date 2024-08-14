@@ -2,7 +2,7 @@
 {{- $context_ssl := .Values.ssl }}
 {{- $letsencrypt_in_use := false }}
 {{- if $ingress.tls }}
-{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging" "gts" "gts-staging") }}
 {{- $letsencrypt_in_use = true }}
 {{- end }}
 {{- end }}
@@ -53,7 +53,11 @@ metadata:
 
     {{- if eq $ingress.type "gce" }}
     {{- if $letsencrypt_in_use }}
+    {{ if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
     cert-manager.io/cluster-issuer: letsencrypt
+    {{- else }}
+    cert-manager.io/cluster-issuer: gts
+    {{- end }}
     {{- end }}
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
@@ -62,7 +66,11 @@ metadata:
 
     {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
     {{- if $letsencrypt_in_use }}
+    {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }} 
     cert-manager.io/cluster-issuer: letsencrypt
+    {{- else }}
+    cert-manager.io/cluster-issuer: gts
+    {{- end }}
     {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
@@ -165,7 +173,7 @@ spec:
 {{- if eq $domain.ingress $ingress_index }}
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}
-{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging" "gts" "gts-staging") }}
 {{- $letsencrypt_in_use = true }}
 {{- end }}
 {{- end }}
@@ -221,7 +229,11 @@ metadata:
 
     {{- if eq $ingress.type "gce" }}
     {{- if $letsencrypt_in_use }}
+    {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
     cert-manager.io/cluster-issuer: letsencrypt
+    {{- else }}
+    cert-manager/cluster-issuer: gts
+    {{- end }}
     {{- end }}
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
@@ -230,7 +242,11 @@ metadata:
 
     {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
     {{- if $letsencrypt_in_use }}
+    {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
     cert-manager.io/cluster-issuer: letsencrypt
+    {{- else }}
+    cert-manager.io/cluster-issuer: gts
+    {{- end }}
     {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}

@@ -1,7 +1,7 @@
 {{- $context_ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
-{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging" "gts" "gts-staging") }}
 apiVersion: {{ include "cert-manager.api-version" . | trim }}
 kind: Certificate
 metadata:
@@ -132,7 +132,7 @@ data:
 {{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}
-{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging" "gts" "gts-staging") }}
 apiVersion: {{ include "cert-manager.api-version" $ | trim }}
 kind: Certificate
 metadata:

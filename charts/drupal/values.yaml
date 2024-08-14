@@ -133,7 +133,7 @@ singleSubdomain: false
 ssl:
   # Enable HTTPS for this deployment
   enabled:  true
-  # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  # Possible issuers: letsencrypt-staging, letsencrypt, gts, gts-staging, selfsigned, custom
   issuer: letsencrypt
   # Only when certificate type is custom
   # ca: ""

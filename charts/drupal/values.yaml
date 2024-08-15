@@ -632,9 +632,7 @@ elasticsearch:
   minimumMasterNodes: 1
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
-
   # Note: "roles" definition is ignored for 6.x images due to subchart compatability reasons.
-
   # Drupal integration module still requires non-ssl connection
   # related param: elasticsearch.extraEnvs[xpack.security.enabled]
   createCert: false
@@ -642,10 +640,8 @@ elasticsearch:
   extraEnvs:
     - name: xpack.security.enabled
       value: "false"
-
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
-
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
   xpack:
@@ -660,7 +656,8 @@ elasticsearch:
       memory: 640Mi
     limits:
       memory: 1Gi
-
+  sysctlInitContainer:
+    enabled: false
   nodeAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
     - weight: 100

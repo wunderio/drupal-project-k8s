@@ -464,7 +464,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     {{ range $folderIndex, $folderPattern := $.Values.referenceData.ignoreFolders -}}
     --exclude="{{ $folderPattern }}" \
     {{ end -}}
-    --delete \
+    --delete --delete-excluded \
     /app/reference-data/{{ $index }}
   {{ end -}}
   {{- end }}

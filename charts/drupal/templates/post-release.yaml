@@ -47,6 +47,10 @@ spec:
         {{- if or (eq .Values.referenceData.referenceEnvironment .Values.environmentName) (not .Values.referenceData.skipMount) }}
         - name: reference-data-volume
           persistentVolumeClaim:
+            {{- if (lookup "v1" "PersistentVolumeClaim" .Release.Namespace (printf "%s-reference" (include "drupal.referenceEnvironment" $ ))) }}
+            claimName: {{ include "drupal.referenceEnvironment" . }}-reference
+            {{- else }}
             claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+            {{- end }}
         {{- end -}}
         {{- end }}

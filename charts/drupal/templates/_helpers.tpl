@@ -68,7 +68,11 @@ ports:
     name: {{ $mount.configMapName }}
 {{- else }}
   persistentVolumeClaim:
+    {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" }}
+    claimName: {{ $.Release.Name }}-{{ $index }}2
+    {{- else }}
     claimName: {{ $.Release.Name }}-{{ $index }}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -687,3 +691,9 @@ autoscaling/v2beta1
 {{ fail "Cannot use domain prefixes together with domain masking"}}
 {{- end -}}
 {{- end -}}
+
+{{- define "silta-cluster.rclone.has-provisioner" }}
+{{- if ( $.Capabilities.APIVersions.Has "silta.wdr.io/v1" ) }}true
+{{- else }}false
+{{- end }}
+{{- end }}

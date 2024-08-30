@@ -658,9 +658,6 @@ elasticsearch:
       memory: 1Gi
   sysctlInitContainer:
     enabled: false
-  esConfig:
-    elasticsearch.yml: |
-      node.store.allow_mmap: false
   nodeAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
     - weight: 100

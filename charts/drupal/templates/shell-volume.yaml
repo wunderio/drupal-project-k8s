@@ -30,7 +30,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" }}
+  {{- if and ( eq $.Values.shell.mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
   name: {{ .Release.Name }}-ssh-keys2
   {{- else }}
   name: {{ .Release.Name }}-ssh-keys

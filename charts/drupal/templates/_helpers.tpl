@@ -68,7 +68,7 @@ ports:
     name: {{ $mount.configMapName }}
 {{- else }}
   persistentVolumeClaim:
-    {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" }}
+    {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
     claimName: {{ $.Release.Name }}-{{ $index }}2
     {{- else }}
     claimName: {{ $.Release.Name }}-{{ $index }}

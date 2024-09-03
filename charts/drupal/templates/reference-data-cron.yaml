@@ -48,7 +48,7 @@ spec:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: reference-data-volume
               persistentVolumeClaim:
-                {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" }}
+                {{- if and ( eq $.Values.referenceData.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
                 claimName: {{ include "drupal.referenceEnvironment" . }}-reference
                 {{- else }}
                 claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data

@@ -32,7 +32,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" }}
+  {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
   name: {{ $.Release.Name }}-{{ $index }}2
   {{- else }}
   name: {{ $.Release.Name }}-{{ $index }}
@@ -90,7 +90,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" }}
+  {{- if and ( eq $.Values.referenceData.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
   name: {{ include "drupal.referenceEnvironment" . }}-reference
   {{- else }}
   name: {{ include "drupal.referenceEnvironment" . }}-reference-data

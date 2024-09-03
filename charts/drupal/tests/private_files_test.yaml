@@ -25,7 +25,7 @@ tests:
           count: 2
         template: drupal-volumes.yaml
 
-  - it: private files should be disabled by default (with provisioner)
+  - it: private files should be disabled by default (silta-shared storageclass, with provisioner)
     template: drupal-deployment.yaml
     capabilities:
       apiVersions:
@@ -40,6 +40,26 @@ tests:
             name: "drupal-private-files"
             persistentVolumeClaim:
               claimName: RELEASE-NAME-private-files2
+      # Only one volume is defined.
+      - hasDocuments:
+          count: 1
+        template: drupal-volumes.yaml
+
+  - it: private files should be disabled by default (non-silta-shared storageclass, with provisioner)
+    template: drupal-deployment.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts.private-files.storageClassName: foo
+    asserts:
+      # No private files volume is mounted.
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
       # Only one volume is defined.
       - hasDocuments:
           count: 1

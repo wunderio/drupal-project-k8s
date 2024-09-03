@@ -18,7 +18,7 @@ executors:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v1
   cicd82:
     docker:
-      - image: wunderio/silta-cicd:circleci-php8.2-node20-composer2-v1
+      - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-v1
 
 jobs:
   site-test:
@@ -97,8 +97,8 @@ workflows:
             - run:
                 name: Helm unit tests
                 command: |
-                  helm unittest ./charts/silta-release --helm3
-                  helm unittest ./charts/drupal --helm3
+                  helm unittest ./charts/silta-release
+                  helm unittest ./charts/drupal
 
       # Build job for feature environments.
       # Other jobs defined below extend this job.

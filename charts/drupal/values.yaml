@@ -92,10 +92,10 @@ ingress:
             period: 1s
             average: 32
             burst: 90
-      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rps: "60"
       nginx.ingress.kubernetes.io/limit-rpm: "300"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-      nginx.ingress.kubernetes.io/limit-connections: "20"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+      nginx.ingress.kubernetes.io/limit-connections: "100"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -772,6 +772,20 @@ solr:
       accessModes:
         - ReadWriteOnce
 
+# ClamAV daemon for virus scanning.
+clamav:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/clamav/clamav/
+  image: clamav/clamav
+  imageTag: stable
+  freshclamExtraConfig: ""
+  resources:
+    requests:
+      cpu: 1
+      memory: 2Gi
+    limits:
+      cpu: 1500m
+      memory: 3Gi
 db:
   # Available options: mariadb, pxc-db
   primary: mariadb
@@ -835,14 +849,14 @@ signalsciences:
   accesskeyid: ""
   secretaccesskey: ""
   image: signalsciences/sigsci-agent
-  imageTag: 4.40.0
+  imageTag: latest
   # sidecar container resources
   resources:
     requests:
       cpu: 20m
       memory: 40Mi
     limits:
-      cpu: 40m
+      cpu: 200m
       memory: 300Mi
 
 # Logging configurations for services that support them.

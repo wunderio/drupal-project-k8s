@@ -92,10 +92,10 @@ ingress:
             period: 1s
             average: 32
             burst: 90
-      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rps: "60"
       nginx.ingress.kubernetes.io/limit-rpm: "300"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-      nginx.ingress.kubernetes.io/limit-connections: "20"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+      nginx.ingress.kubernetes.io/limit-connections: "100"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -143,6 +143,9 @@ ssl:
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
+
+  # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
+  x_proxy_auth: ""
 
   # Possible Values: debug, info, notice, warn, error, crit, alert, or emerg.
   loglevel: error
@@ -258,6 +261,16 @@ php:
     status_page:
       enabled: true
 
+  cronJobDefaults:
+    # resources:
+    #   requests:
+    #     cpu: 500m
+    #     memory: 488Mi
+    #   limits:
+    #     memory: 488Mi
+    # nodeSelector:
+    #   cloud.google.com/gke-nodepool: static-ip
+
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   cron:
     drupal:
@@ -268,6 +281,15 @@ php:
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
         fi
+
+    # Add custom php.ini file overrides for the cronjob.
+    # Use the same syntax as in php.ini file
+    # Example:
+    # php_ini: |
+        # [PHP]
+        # memory_limit=128M
+
+    # php_ini: |
 
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
@@ -337,6 +359,7 @@ php:
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
+    max_execution_time: 60
     # Custom php settings block. May override parameters previously defined.
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
@@ -745,6 +768,20 @@ solr:
       accessModes:
         - ReadWriteOnce
 
+# ClamAV daemon for virus scanning.
+clamav:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/clamav/clamav/
+  image: clamav/clamav
+  imageTag: stable
+  freshclamExtraConfig: ""
+  resources:
+    requests:
+      cpu: 1
+      memory: 2Gi
+    limits:
+      cpu: 1500m
+      memory: 3Gi
 db:
   # Available options: mariadb, pxc-db
   primary: mariadb
@@ -794,12 +831,10 @@ pxc-db:
     passwords:
       root: drupal
       pmmserver: drupal
-      root: drupal
       xtrabackup: drupal
       monitor: drupal
       clustercheck: drupal
       proxyadmin: drupal
-      pmmserver: drupal
       operator: drupal
       replication: drupal
 
@@ -810,14 +845,14 @@ signalsciences:
   accesskeyid: ""
   secretaccesskey: ""
   image: signalsciences/sigsci-agent
-  imageTag: 4.40.0
+  imageTag: latest
   # sidecar container resources
   resources:
     requests:
       cpu: 20m
       memory: 40Mi
     limits:
-      cpu: 40m
+      cpu: 200m
       memory: 300Mi
 
 # Logging configurations for services that support them.

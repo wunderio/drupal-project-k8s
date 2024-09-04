@@ -18,7 +18,7 @@ executors:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v1
   cicd82:
     docker:
-      - image: wunderio/silta-cicd:circleci-php8.2-node20-composer2-v1
+      - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-v1
 
 jobs:
   site-test:
@@ -42,10 +42,51 @@ commands:
           command: |
             curl -u $SITE_TEST_BAUTH <<parameters.site_url>>
 
+# Variables
+
+filter_feature_only: &filter_feature_only
+  branches:
+    ignore:
+      - production
+      - master
+      - &test_cluster /feature\/test-cluster(\/.*)?/
+      - &aws_cluster /feature\/aws-cluster(\/.*)?/
+      - &aks_cluster /feature\/aks-cluster(\/.*)?/
+
+filter_test_cluster_only: &filter_test_cluster_only
+  branches:
+    only:
+      - *test_cluster
+
+filter_aws_cluster_only: &filter_aws_cluster_only
+  branches:
+    only:
+      - *aws_cluster
+
+filter_aks_cluster_only: &filter_aks_cluster_only
+  branches:
+    only:
+      - *aks_cluster
+
+filter_master_only: &filter_master_only
+  branches:
+    only:
+      - master
+
+filter_production_only: &filter_production_only
+  branches:
+    only:
+      - production
+
 workflows:
   version: 2
   commit:
     jobs:
+      - approval:
+          type: approval
+          name: approve-deployment
+          filters: *filter_feature_only
+
       - silta/drupal-validate: &drupal-validate
           name: validate
 
@@ -56,8 +97,8 @@ workflows:
             - run:
                 name: Helm unit tests
                 command: |
-                  helm unittest ./charts/silta-release --helm3
-                  helm unittest ./charts/drupal --helm3
+                  helm unittest ./charts/silta-release
+                  helm unittest ./charts/drupal
 
       # Build job for feature environments.
       # Other jobs defined below extend this job.
@@ -75,13 +116,9 @@ workflows:
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev
-          filters:
-            branches:
-              ignore:
-                - production
-                - /feature\/test-cluster(\/.*)?/
-                - /feature\/aws-cluster(\/.*)?/
-                - /feature\/aks-cluster(\/.*)?/
+          requires:
+            - approve-deployment
+          filters: *filter_feature_only
 
       # Deploy job for feature environments.
       # Other jobs defined below extend this job.
@@ -104,19 +141,14 @@ workflows:
                   helm dependency build ./charts/drupal
             - run:
                 name: Dry-run helm install
-                command: helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
+                command: |
+                  http_proxy=$SILTA_PROXY HTTPS_PROXY=$SILTA_PROXY \
+                    helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           silta_config: silta/silta.yml
           context: silta_dev
           requires:
             - build
-          filters:
-            branches:
-              ignore:
-                - production
-                - master
-                - /feature\/test-cluster(\/.*)?/
-                - /feature\/aws-cluster(\/.*)?/
-                - /feature\/aks-cluster(\/.*)?/
+          filters: *filter_feature_only
 
       # Build job for test cluster.
       # Extends the job defined for feature environments.
@@ -124,10 +156,8 @@ workflows:
           <<: *build
           name: build-test
           context: silta_test
-          filters:
-            branches:
-              only:
-                - /feature\/test-cluster(\/.*)?/
+          requires: [ ]
+          filters: *filter_test_cluster_only
 
       # Deploy job for test cluster.
       # Extends the job defined for feature environments.
@@ -138,10 +168,15 @@ workflows:
           context: silta_test
           requires:
             - build-test
-          filters:
-            branches:
-              only:
-                - /feature\/test-cluster(\/.*)?/
+          filters: *filter_test_cluster_only
+
+      # Build job for master environment.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build: &build-master
+          <<: *build
+          name: build-master
+          requires: [ ]
+          filters: *filter_master_only
 
       # Deploy job for master environment.
       # Extends the job defined for feature environments.
@@ -149,21 +184,16 @@ workflows:
           <<: *deploy
           name: deploy-master
           silta_config: silta/silta.yml,silta/silta-master.yml
-          filters:
-            branches:
-              only:
-                - master
+          requires:
+            - build-master
+          filters: *filter_master_only
 
       # Build job for master environment in AKS cluster.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build: &build-master-aks
-          <<: *build
+          <<: *build-master
           name: build-aks-master
           context: silta_aks
-          filters:
-            branches:
-              only:
-                - master
 
       # Deploy job for master environment in AKS cluster.
       # Extends the job defined for master environments.
@@ -176,15 +206,12 @@ workflows:
             - build-aks-master
 
       # Build job for AKS cluster.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
           name: build-aks
           context: silta_aks
-          filters:
-            branches:
-              only:
-                - /feature\/aks-cluster(\/.*)?/
+          filters: *filter_aks_cluster_only
 
       # Deploy job for AKS cluster.
       # Extends the job defined for feature environments.
@@ -195,21 +222,15 @@ workflows:
           context: silta_aks
           requires:
             - build-aks
-          filters:
-            branches:
-              only:
-                - /feature\/aks-cluster(\/.*)?/
+          filters: *filter_aks_cluster_only
 
       # Build job for AWS cluster.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
           name: build-aws
           context: silta_aws
-          filters:
-            branches:
-              only:
-                - /feature\/aws-cluster(\/.*)?/
+          filters: *filter_aws_cluster_only
 
       # Deploy job for AWS cluster.
       # Extends the job defined for feature environments.
@@ -220,20 +241,15 @@ workflows:
           context: silta_aws
           requires:
             - build-aws
-          filters:
-            branches:
-              only:
-                - /feature\/aws-cluster(\/.*)?/
+          filters: *filter_aws_cluster_only
 
       # Build job for production environment.
-      # Extends the job defined for feature environments.
+      # Extends the job defined for master environments.
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
           name: build-deploy-prod
           context: silta_finland
-          filters:
-            branches:
-              only: production
+          filters: *filter_production_only
 
       # Deploy job for production environment.
       # Extends the job defined for feature environments.
@@ -245,9 +261,7 @@ workflows:
           context: silta_finland
           requires:
             - build-deploy-prod
-          filters:
-            branches:
-              only: production
+          filters: *filter_production_only
 
       # Test site availability by requesting _ping.php.
       - site-test: &site-test
@@ -255,26 +269,20 @@ workflows:
           requires:
             - "deploy-master"
             - "Deploy master to AKS cluster"
-          filters:
-            branches:
-              only:
-                - master
+          filters: *filter_master_only
 
   # Weekly build and deploy master and master-aks environments.
   weekly-build:
     triggers:
       - schedule:
           cron: "0 8 * * 5"
-          filters:
-            branches:
-              only:
-                - master
+          filters: *filter_master_only
     jobs:
       - silta/drupal-validate:
           <<: *drupal-validate
 
       - silta/drupal-build:
-          <<: *build
+          <<: *build-master
 
       - silta/drupal-deploy:
           <<: *deploy-master

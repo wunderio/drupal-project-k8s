@@ -1,0 +1,77 @@
+{{- if .Values.mysql.enabled }}
+{{- if not ( .Capabilities.APIVersions.Has "mysql.oracle.com/v2" ) }}
+{{- fail "API mysql.oracle.com/v2 unavailable, ask cluster administrator to enable Mysql InnoDBCluster support in Silta cluster first!" }}
+{{- end }}
+{{- if or (gt (.Values.mysql.replicas | toString | atoi) 9) (lt (.Values.mysql.replicas | toString | atoi) 1) }}
+{{- fail "Invalid mysql.replicas value, must be between 1 and 9" }}
+{{- end }}
+{{- if or (gt (.Values.mysql.router.replicas | toString | atoi) 9) (lt (.Values.mysql.router.replicas | toString | atoi) 1) }}
+{{- fail "Invalid mysql.router.replicas value, must be between 1 and 9" }}
+{{- end }}
+apiVersion: mysql.oracle.com/v2
+kind: InnoDBCluster
+metadata:
+  name: {{ include "silta.mysql-cluster.name" . }}
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    # Trigger resource update to scale deployment back up when it was scaled down
+    last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
+
+spec:
+  # See: https://dev.mysql.com/doc/mysql-operator/en/mysql-operator-properties.html#mysql-operator-title-spec-innodbcluster
+  {{- if .Values.mysql.version }}
+  version: {{ .Values.mysql.version }}
+  {{- end }}
+  instances: {{ .Values.mysql.replicas }}
+  router:
+    instances: {{ .Values.mysql.router.replicas }}
+    dpLabels:
+      release: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+    podSpec:
+      containers:
+      - name: router
+        resources:
+          {{- .Values.mysql.router.resources | toYaml | nindent 10 }}
+  secretName: {{ .Release.Name }}-mysql
+  tlsUseSelfSigned: true
+  stsLabels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  datadirVolumeClaimLabels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  datadirVolumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 5Gi
+  podSpec:
+    nodeSelector:
+      {{- .Values.mysql.nodeSelector | toYaml | nindent 8 }}
+    tolerations:
+      {{- include "drupal.tolerations" .Values.mysql.nodeSelector | nindent 8 }}
+    containers:
+    - name: mysql
+      resources:
+        {{- .Values.mysql.resources | toYaml | nindent 8 }}
+  {{- if .Values.mysql.mycnf }}
+  mycnf: 
+    {{ .Values.mysql.mycnf | toYaml | nindent 4 }}
+  {{- end }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-mysql
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+type: Opaque
+data:
+  rootUser: {{ print "root" | b64enc | quote }}
+  rootPassword: {{ .Values.mysql.secrets.root | b64enc | quote }}
+  rootHost: {{ print "%" | b64enc | quote }}
+{{- end }}

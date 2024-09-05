@@ -137,6 +137,19 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+{{- if .Values.mysql.enabled }}
+- name: MYSQL_DB_USER
+  value: "root"
+- name: MYSQL_DB_NAME
+  value: "drupal"
+- name: MYSQL_DB_HOST
+  value: "{{ include "silta.mysql-cluster.name" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+- name: MYSQL_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mysql
+      key: rootPassword
+{{- end }}
 {{- if index ( index .Values "pxc-db" ) "enabled" }}
 - name: PXC_DB_USER
   value: "root"
@@ -162,6 +175,19 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
+{{- end }}
+{{- if and .Values.mysql.enabled ( eq .Values.db.primary "mysql" ) }}
+- name: DB_USER
+  value: "root"
+- name: DB_NAME
+  value: "drupal"
+- name: DB_HOST
+  value: "{{ include "silta.mysql-cluster.name" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mysql
+      key: rootPassword
 {{- end }}
 {{- if and ( index ( index .Values "pxc-db" ) "enabled" ) ( eq .Values.db.primary "pxc-db" ) }}
 - name: DB_USER
@@ -687,3 +713,8 @@ autoscaling/v2beta1
 {{ fail "Cannot use domain prefixes together with domain masking"}}
 {{- end -}}
 {{- end -}}
+
+{{- define "silta.mysql-cluster.name" }}
+{{- $releaseNameHash := sha256sum .Release.Name | trunc 3 }}
+{{- (gt (len .Release.Name) 21) | ternary ( print (.Release.Name | trunc 18) print $releaseNameHash ) .Release.Name }}-mysql
+{{- end }}

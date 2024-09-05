@@ -202,6 +202,34 @@ spec:
                   values:
                   - mariadb
               topologyKey: topology.kubernetes.io/zone
+          # Preferrably keep pods on the same node as the mysql database.
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: release
+                  operator: In
+                  values:
+                  - "{{ .Release.Name }}"
+                - key: component
+                  operator: In
+                  values:
+                  - mysqld
+              topologyKey: kubernetes.io/hostname
+          # Preferrably keep pods in the same zone as the mysql database.
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: release
+                  operator: In
+                  values:
+                  - "{{ .Release.Name }}"
+                - key: component
+                  operator: In
+                  values:
+                  - mysqld
+              topologyKey: topology.kubernetes.io/zone
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 10

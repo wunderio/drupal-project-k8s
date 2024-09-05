@@ -217,6 +217,7 @@ workflows:
       - silta/drupal-deploy: &build-master-silta-finland-production-a
           <<: *deploy-master
           name: "Deploy master to silta-finland-production-a cluster"
+          silta_config: silta/silta.yml,silta/silta-master.yml,silta/silta-finland-production-a.yml
           context: silta_finland_production_a
           requires:
             - build-silta-finland-production-a-master

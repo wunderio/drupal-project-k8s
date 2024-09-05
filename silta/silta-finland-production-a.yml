@@ -1,0 +1,3 @@
+ingress:
+  default:
+    type: nginx

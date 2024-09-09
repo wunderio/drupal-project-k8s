@@ -240,7 +240,7 @@ tests:
         content:
           name: "reference-data-volume"
           persistentVolumeClaim:
-            claimName: foo-reference-data
+            claimName: foo-reference
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:

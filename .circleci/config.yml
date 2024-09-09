@@ -205,6 +205,23 @@ workflows:
           requires:
             - build-aks-master
 
+      # Build job for master environment in silta-finland-production-a cluster.
+      # Extends the job defined for master environments.
+      - silta/drupal-build: &build-master-silta-finland-production-a
+          <<: *build-master
+          name: build-silta-finland-production-a-master
+          context: silta_finland_production_a
+
+      # Deploy job for master environment in silta-finland-production-a cluster.
+      # Extends the job defined for master environments.
+      - silta/drupal-deploy: &build-master-silta-finland-production-a
+          <<: *deploy-master
+          name: "Deploy master to silta-finland-production-a cluster"
+          silta_config: silta/silta.yml,silta/silta-master.yml,silta/silta-finland-production-a.yml
+          context: silta_finland_production_a
+          requires:
+            - build-silta-finland-production-a-master
+
       # Build job for AKS cluster.
       # Extends the job defined for master environments.
       - silta/drupal-build:

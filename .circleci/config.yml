@@ -109,7 +109,7 @@ workflows:
       # Other jobs defined below extend this job.
       - silta/drupal-build: &build
           name: build
-          resource_class: silta/test-runner
+          # resource_class: silta/test-runner
           # Use custom executor.
           executor: cicd82
 

@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:feature/circle_ip_range_deploy_job
 
 executors:
   cicd73:
@@ -132,6 +132,10 @@ workflows:
           chart_name: "./charts/drupal"
           chart_repository: ""
           pre-release:
+            - run:
+                name: Print outgoing IP
+                command: |
+                  curl https://checkip.amazonaws.com
             - run:
                 name: Add helm repositories and build local chart
                 command: |

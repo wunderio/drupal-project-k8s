@@ -109,7 +109,7 @@ workflows:
       # Other jobs defined below extend this job.
       - silta/drupal-build: &build
           name: build
-
+          resource_class: silta/test-runner
           # Use custom executor.
           executor: cicd82
 
@@ -129,7 +129,7 @@ workflows:
       # Other jobs defined below extend this job.
       - silta/drupal-deploy: &deploy
           name: deploy
-          circleci_ip_ranges: true
+          resource_class: silta/test-runner
           # Use custom executor.
           executor: cicd82
 

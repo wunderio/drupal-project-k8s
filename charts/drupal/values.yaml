@@ -161,7 +161,7 @@ nginx:
       memory: 244Mi
 
   # Set of values to enable and use http basic authentication
-  # It is implemented only for very basic protection (like web crawlers)
+  # It is implemented only for very basic protection (like web crawlers)
   basicauth:
     enabled: true
 
@@ -872,3 +872,78 @@ logging:
 # - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
 # - both (obfuscates both, e.g., zzz.silta.tld)
 # maskSubdomains: both
+
+milvus:
+  enabled: true
+  mode: distributed
+  standalone:
+    replicas: 1
+  proxy:
+    replicas: 2
+  queryNode:
+    replicas: 2
+  dataNode:
+    replicas: 2
+  indexNode:
+    replicas: 2
+  dataCoord:
+    replicas: 1
+  rootCoord:
+    replicas: 1
+  queryCoord:
+    replicas: 1
+  indexCoord:
+    replicas: 1
+  
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
+  
+  nodeSelector: {}
+  
+  etcd:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 1Gi
+  
+  minio:
+    mode: distributed
+    replicas: 4
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 2Gi
+  
+  pulsar:
+    enabled: true
+    components:
+      autorecovery: false
+      functions: false
+      toolset: false
+    zookeeper:
+      replicaCount: 3
+    bookkeeper:
+      replicaCount: 3
+    broker:
+      replicaCount: 3
+    proxy:
+      replicaCount: 2
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 2Gi

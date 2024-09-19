@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   silta: silta/silta@dev:master
+  kubernetes: circleci/kubernetes@1.3.0
 
 executors:
   cicd73:
@@ -30,6 +31,21 @@ jobs:
           site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php
       - site-query:
           site_url: https://master.drupal-project-k8s.silta-aks.wdr.io/_ping.php
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - kubernetes/install-kubectl
+      - kubernetes/install-helm
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            helm repo add milvus https://milvus-io.github.io/milvus-helm/
+            helm repo update
+            helm dependency update ./drupal
+            helm upgrade --install my-release ./drupal -f ./drupal/values.yaml
 
 commands:
   site-query:

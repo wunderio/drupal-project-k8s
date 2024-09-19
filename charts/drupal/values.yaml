@@ -787,6 +787,39 @@ clamav:
     limits:
       cpu: 1500m
       memory: 3Gi
+
+milvus:
+  enabled: true
+  mode: distributed
+  # ... other configurations ...
+
+  minio:
+    mode: standalone  # Change this from 'distributed' to 'standalone'
+    replicas: 1       # Reduce this to 1 for simplicity
+    resources:
+      requests:
+        cpu: 100m     # Reduce CPU request
+        memory: 256Mi # Reduce memory request
+      limits:
+        cpu: 500m     # Reduce CPU limit
+        memory: 512Mi # Reduce memory limit
+    persistence:
+      enabled: true
+      size: 5Gi       # Reduce storage size if needed
+    service:
+      type: ClusterIP # Ensure this is set to ClusterIP
+    auth:
+      rootUser: minioadmin     # Set a root user
+      rootPassword: minioadmin # Set a root password
+
+  config:
+    minio:
+      address: milvus-minio:9000
+      accessKey: minioadmin
+      secretKey: minioadmin
+      useSSL: false
+      bucketName: milvus
+
 db:
   # Available options: mariadb, pxc-db
   primary: mariadb
@@ -872,78 +905,3 @@ logging:
 # - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
 # - both (obfuscates both, e.g., zzz.silta.tld)
 # maskSubdomains: both
-
-milvus:
-  enabled: true
-  mode: distributed
-  standalone:
-    replicas: 1
-  proxy:
-    replicas: 2
-  queryNode:
-    replicas: 2
-  dataNode:
-    replicas: 2
-  indexNode:
-    replicas: 2
-  dataCoord:
-    replicas: 1
-  rootCoord:
-    replicas: 1
-  queryCoord:
-    replicas: 1
-  indexCoord:
-    replicas: 1
-  
-  resources:
-    requests:
-      cpu: 500m
-      memory: 1Gi
-    limits:
-      cpu: 2
-      memory: 4Gi
-  
-  nodeSelector: {}
-  
-  etcd:
-    replicaCount: 3
-    resources:
-      requests:
-        cpu: 200m
-        memory: 512Mi
-      limits:
-        cpu: 1
-        memory: 1Gi
-  
-  minio:
-    mode: distributed
-    replicas: 4
-    resources:
-      requests:
-        cpu: 250m
-        memory: 512Mi
-      limits:
-        cpu: 1
-        memory: 2Gi
-  
-  pulsar:
-    enabled: true
-    components:
-      autorecovery: false
-      functions: false
-      toolset: false
-    zookeeper:
-      replicaCount: 3
-    bookkeeper:
-      replicaCount: 3
-    broker:
-      replicaCount: 3
-    proxy:
-      replicaCount: 2
-    resources:
-      requests:
-        cpu: 250m
-        memory: 512Mi
-      limits:
-        cpu: 1
-        memory: 2Gi

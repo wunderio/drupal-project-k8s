@@ -702,17 +702,21 @@ redis:
     # mandatory value
     password: ""
   replica:
+    enableServiceLinks: false   
     # replicaCount: 1
     autoscaling:
       enabled: false
   master:
+    enableServiceLinks: false  
     resources:
       limits:
         cpu: 250m
         memory: 512Mi
       requests:
         cpu: 50m
-        memory: 256Mi
+        memory: 256Mi 
+  sentinel:
+    enableServiceLinks: false 
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml

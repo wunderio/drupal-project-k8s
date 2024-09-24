@@ -93,7 +93,7 @@ workflows:
 
       - silta/drupal-validate: &drupal-validate
           name: validate
-
+          resource_class: silta/test-runner
           # Use custom executor.
           executor: cicd82
 
@@ -108,7 +108,7 @@ workflows:
       # Other jobs defined below extend this job.
       - silta/drupal-build: &build
           name: build
-          # resource_class: silta/test-runner
+          resource_class: silta/test-runner
           # Use custom executor.
           executor: cicd82
 
@@ -117,6 +117,10 @@ workflows:
             #     name: Download feature branch build of silta cli
             #     command: |
             #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+            - run:
+                name: Print outgoing IP
+                command: |
+                  curl https://checkip.amazonaws.com
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev

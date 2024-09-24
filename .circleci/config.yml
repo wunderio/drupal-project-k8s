@@ -1,8 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:circle_ip_range_deploy_job
-
+  silta: silta/silta@dev:custom-runner
 executors:
   cicd73:
     docker:

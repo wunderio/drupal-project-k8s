@@ -2307,16 +2307,16 @@
         },
         {
             "name": "drupal/core-composer-scaffold",
-            "version": "10.1.6",
+            "version": "10.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-composer-scaffold.git",
-                "reference": "1ccd7db5ff8a5425b5bbba9b9a05e366363c0a51"
+                "reference": "63effa1bc644e80a269e8b4415e627491d26fd3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-composer-scaffold/zipball/1ccd7db5ff8a5425b5bbba9b9a05e366363c0a51",
-                "reference": "1ccd7db5ff8a5425b5bbba9b9a05e366363c0a51",
+                "url": "https://api.github.com/repos/drupal/core-composer-scaffold/zipball/63effa1bc644e80a269e8b4415e627491d26fd3f",
+                "reference": "63effa1bc644e80a269e8b4415e627491d26fd3f",
                 "shasum": ""
             },
             "require": {
@@ -2351,9 +2351,9 @@
                 "drupal"
             ],
             "support": {
-                "source": "https://github.com/drupal/core-composer-scaffold/tree/10.1.6"
+                "source": "https://github.com/drupal/core-composer-scaffold/tree/10.2.3"
             },
-            "time": "2023-04-30T16:15:32+00:00"
+            "time": "2024-01-26T14:59:30+00:00"
         },
         {
             "name": "drupal/core-dev",

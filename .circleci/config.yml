@@ -113,7 +113,8 @@ workflows:
             #     name: Download feature branch build of silta cli
             #     command: |
             #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
-            - silta/drupal-composer-install
+            - silta/drupal-composer-install:
+                web-root: "web"
             - silta/npm-install-build
           context: silta_dev
           requires:

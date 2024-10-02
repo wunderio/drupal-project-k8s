@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:pullsecrets
 
 executors:
   cicd73:
@@ -109,10 +109,11 @@ workflows:
           executor: cicd82
 
           codebase-build:
-            # - run:
-            #     name: Download feature branch build of silta cli
-            #     command: |
-            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
+            - run:
+                name: Download feature branch build of silta cli
+                command: |
+                  # https://github.com/wunderio/silta-cli/tree/refs/heads/feature/pullsecrets
+                  curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev
@@ -132,6 +133,11 @@ workflows:
           chart_name: "./charts/drupal"
           chart_repository: ""
           pre-release:
+            - run:
+                name: Download feature branch build of silta cli
+                command: |
+                  # https://github.com/wunderio/silta-cli/tree/refs/heads/feature/pullsecrets
+                  curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - run:
                 name: Add helm repositories and build local chart
                 command: |

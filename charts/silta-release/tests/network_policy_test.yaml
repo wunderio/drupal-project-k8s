@@ -11,7 +11,7 @@ tests:
           value: "RELEASE-NAME"
       - documentIndex: 0
         equal:
-          path: spec.ingress[0].from[0].namespaceSelector.matchLabels.kubernetes\.io\/metadata\.name
+          path: spec.ingress[0].from[0].namespaceSelector.matchLabels["kubernetes.io/metadata.name"]
           value: "NAMESPACE"
 
   - it: specified exceptions are added
@@ -32,5 +32,5 @@ tests:
           value: "RELEASE-NAME"
       - documentIndex: 4
         equal:
-          path: spec.ingress[0].from[0].namespaceSelector.matchLabels.kubernetes\.io\/metadata\.name
+          path: spec.ingress[0].from[0].namespaceSelector.matchLabels["kubernetes.io/metadata.name"]
           value: "other-namespace"

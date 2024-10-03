@@ -36,7 +36,12 @@ spec:
       automaticFailover: true
   rootPasswordSecretKeyRef:
     name: {{ .Release.Name }}-mariadb-ha
+    key: root-password
+    generate: false
+  passwordSecretKeyRef:
+    name: {{ .Release.Name }}-mariadb-ha
     key: password
+    generate: false
   {{- if $mariadbha.myCnf }}
   myCnf: |
     {{ $mariadbha.myCnf | nindent 4 }}

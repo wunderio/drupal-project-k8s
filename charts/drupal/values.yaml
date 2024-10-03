@@ -592,7 +592,7 @@ mariadb:
 # provider: mariadb-operator
 mariadb-ha:
   enabled: false
-  image: "docker-registry1.mariadb.com/library/mariadb:11.0"
+  image: "docker-registry1.mariadb.com/library/mariadb:11.4"
   imagePullPolicy: IfNotPresent
   password: drupal
   rootPassword: drupal

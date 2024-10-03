@@ -156,7 +156,7 @@ imagePullSecrets:
 {{- end }}
 {{- if index ( index .Values "mariadb-ha" ) "enabled" }}
 - name: MARIADB_HA_DB_USER
-  value: "root"
+  value: "drupal"
 - name: MARIADB_HA_DB_NAME
   value: "drupal"
 - name: MARIADB_HA_DB_HOST

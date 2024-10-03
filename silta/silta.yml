@@ -62,19 +62,7 @@ mariadb:
 
 mariadb-ha:
   enabled: true
-  replicas: 3
+
 
 db:
   primary: mariadb-ha
-
-# TODO: test nodeselectors, tolerations and affinity (+unittests)
-
-# TODO: resource requests and limits
-
-# TODO: Chart tests (helm unittest)
-
-# TODO: add doc
-# 1. mariadb-operator subchart values & crd setup
-# 2. CRD API for drupal template
-# https://github.com/mariadb-operator/mariadb-operator
-# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/GALERA.md

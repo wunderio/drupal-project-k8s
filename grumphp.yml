@@ -26,8 +26,12 @@ grumphp:
       run_on: '%grumphp.run_on_paths%'
     php_stan:
       run_on: '%grumphp.run_on_paths%'
-    yaml_lint: ~
-    json_lint: ~
+    yaml_lint:
+      ignore_patterns:
+        - '/charts/'
+    json_lint:
+      ignore_patterns:
+        - '/charts/'
     # PHPUnit will fail with 0 tests.
     phpunit:
       testsuite: unit

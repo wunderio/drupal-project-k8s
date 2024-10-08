@@ -49,6 +49,7 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 php:
+  drupalCoreVersion: "10"
   cron:
     drupal:
       # Disable cron jobs in feature environments by using non-existing date.

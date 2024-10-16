@@ -57,4 +57,4 @@ php:
       schedule: '~ 0 31 2 *'
 
 # Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets.
-imagePullSecret: "dGVzdGZvb2Jhcgo="
+imagePullSecret: "CnsKICAiYXV0aHMiOiB7CiAgICAiaHR0cHM6Ly9pbmRleC5kb2NrZXIuaW8vdjEvIjogewogICAgICAiYXV0aCI6ICJiYXNlNjQodXNlcm5hbWU6cGFzc3dvcmQpIgogICAgfQogIH0KfQo="

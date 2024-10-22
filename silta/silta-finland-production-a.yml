@@ -1,0 +1,11 @@
+exposeDomains:
+  test1:
+    hostname: drupal-project-k8s-test1.dev.wdr.io
+
+# Fastly WAF.
+signalsciences:
+  enabled: true
+
+# Enable daily backups.
+backup:
+  enabled: true

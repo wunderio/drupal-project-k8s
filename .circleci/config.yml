@@ -294,7 +294,7 @@ workflows:
       - silta/drupal-deploy:
           <<: *deploy-prod
           name: deploy-prod-a
-          silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_a_signalsciences
+          silta_config: silta/silta.yml,silta/silta-finland-production-a.yml,silta/secrets_prod_a_signalsciences
           decrypt_files: silta/secrets_prod_a_signalsciences
           context: silta_finland_production_a
           requires:

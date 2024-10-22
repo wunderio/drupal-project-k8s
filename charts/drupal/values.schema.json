@@ -7,6 +7,7 @@
     "environmentName": { "type": "string" },
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
+    "imagePullSecret": { "type": "string" },
     "app": { "type": "string" },
     "webRoot": { "type": "string" },
 
@@ -470,6 +471,36 @@
         }
       }
     },
+    "silta-hub": { 
+      "type": "object",
+      "properties": {
+        "sync": { 
+          "type": "object",
+          "properties": {
+            "resources": {
+              "type": "object",
+              "properties": {
+                "requests": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                },
+                "limits": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "storage": { "type": "string" }
+          }
+        }
+      }
+    },
     "gdprDump": {
       "type": "object",
       "additionalProperties": {
@@ -653,6 +684,36 @@
                 "storageClassName": { "type": "string" },
                 "csiDriverName": { "type": "string" },
                 "accessModes": { "type": "array" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "clamav": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "image": { "type": "string" },
+        "imageTag": { "type": ["string", "integer"] },
+        "freshclamExtraConfig": { "type": "string" },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
               }
             }
           }

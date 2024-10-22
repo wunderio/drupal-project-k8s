@@ -24,6 +24,9 @@ environmentName: ""
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
+# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets. 
+imagePullSecret: ""
+
 # The app label added to our Kubernetes resources.
 app: drupal
 
@@ -468,6 +471,11 @@ referenceData:
     limits:
       memory: 488Mi
 
+# Release sync configuration. Storage is used for data synchronization and process is handled by the Silta HUB.
+silta-hub:
+  sync:
+    storage: 10G
+
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
 # Uses formatters from fakerphp.github.io/formatters
 gdprDump:
@@ -546,7 +554,7 @@ mariadb:
   enabled: true
   image:
     # https://hub.docker.com/r/bitnami/mariadb/tags
-    tag: 10.6.15-debian-11-r24
+    tag: 10.6-debian-12
   replication:
     enabled: false
   db:
@@ -768,6 +776,20 @@ solr:
       accessModes:
         - ReadWriteOnce
 
+# ClamAV daemon for virus scanning.
+clamav:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/clamav/clamav/
+  image: clamav/clamav
+  imageTag: stable
+  freshclamExtraConfig: ""
+  resources:
+    requests:
+      cpu: 1
+      memory: 2Gi
+    limits:
+      cpu: 1500m
+      memory: 3Gi
 db:
   # Available options: mariadb, pxc-db
   primary: mariadb

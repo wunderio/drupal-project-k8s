@@ -61,14 +61,17 @@ spec:
             - containerPort: 3306
               name: mariadb
             resources:
-              requests:
-                {{- .Values.backup.resources | toYaml | nindent 14 }}
+              {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
+                {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+                claimName: {{ .Release.Name }}-backup2
+                {{- else }}
                 claimName: {{ .Release.Name }}-backup
+                {{- end }}
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 

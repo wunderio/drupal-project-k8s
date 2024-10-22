@@ -18,7 +18,10 @@ executors:
       - image: wunderio/silta-cicd:circleci-php8.0-node14-composer2-v1
   cicd82:
     docker:
-      - image: wunderio/silta-cicd:circleci-php8.2-node20-composer2-v1
+      - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-v1
+  cicd83:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
 
 jobs:
   site-test:
@@ -91,14 +94,14 @@ workflows:
           name: validate
 
           # Use custom executor.
-          executor: cicd82
+          executor: cicd83
 
           post-validation:
             - run:
                 name: Helm unit tests
                 command: |
-                  helm unittest ./charts/silta-release --helm3
-                  helm unittest ./charts/drupal --helm3
+                  helm unittest ./charts/silta-release
+                  helm unittest ./charts/drupal
 
       # Build job for feature environments.
       # Other jobs defined below extend this job.
@@ -106,13 +109,12 @@ workflows:
           name: build
 
           # Use custom executor.
-          executor: cicd82
+          executor: cicd83
+
+          # Uncomment the line below to use the test build of silta cli.
+          #silta_cli_version: test
 
           codebase-build:
-            # - run:
-            #     name: Download feature branch build of silta cli
-            #     command: |
-            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev
@@ -126,11 +128,15 @@ workflows:
           name: deploy
 
           # Use custom executor.
-          executor: cicd82
+          executor: cicd83
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"
           chart_repository: ""
+
+          # Uncomment the line below to use the test build of silta cli.
+          #silta_cli_version: test
+
           pre-release:
             - run:
                 name: Add helm repositories and build local chart
@@ -245,15 +251,22 @@ workflows:
 
       # Build job for production environment.
       # Extends the job defined for master environments.
-      - silta/drupal-build:
+      - silta/drupal-build: &build-prod
           <<: *build-master
           name: build-prod
           context: silta_finland
           filters: *filter_production_only
 
+      # Build job for production environment in prod-a.wdr.io cluster.
+      # Extends the job defined for master environments.
+      - silta/drupal-build:
+          <<: *build-prod
+          name: build-prod-a
+          context: silta_finland_production_a
+
       # Deploy job for production environment.
       # Extends the job defined for feature environments.
-      - silta/drupal-deploy:
+      - silta/drupal-deploy: &deploy-prod
           <<: *deploy
           name: deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
@@ -262,6 +275,15 @@ workflows:
           requires:
             - build-prod
           filters: *filter_production_only
+
+      # Deploy job for production environment in prod-a.wdr.io cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy-prod
+          name: deploy-prod-a
+          context: silta_finland_production_a
+          requires:
+            - build-prod-a
 
       # Test site availability by requesting _ping.php.
       - site-test: &site-test

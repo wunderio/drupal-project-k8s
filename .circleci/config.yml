@@ -211,23 +211,6 @@ workflows:
           requires:
             - build-aks-master
 
-      # Build job for master environment in silta-finland-production-a cluster.
-      # Extends the job defined for master environments.
-      - silta/drupal-build: &build-master-silta-finland-production-a
-          <<: *build-master
-          name: build-silta-finland-production-a-master
-          context: silta_finland_production_a
-
-      # Deploy job for master environment in silta-finland-production-a cluster.
-      # Extends the job defined for master environments.
-      - silta/drupal-deploy: &build-master-silta-finland-production-a
-          <<: *deploy-master
-          name: "Deploy master to silta-finland-production-a cluster"
-          silta_config: silta/silta.yml,silta/silta-master.yml,silta/silta-finland-production-a.yml
-          context: silta_finland_production_a
-          requires:
-            - build-silta-finland-production-a-master
-
       # Build job for AKS cluster.
       # Extends the job defined for master environments.
       - silta/drupal-build:
@@ -268,23 +251,39 @@ workflows:
 
       # Build job for production environment.
       # Extends the job defined for master environments.
-      - silta/drupal-build:
+      - silta/drupal-build: &build-prod
           <<: *build-master
-          name: build-deploy-prod
+          name: build-prod
           context: silta_finland
           filters: *filter_production_only
 
+      # Build job for production environment in prod-a.wdr.io cluster.
+      # Extends the job defined for master environments.
+      - silta/drupal-build:
+          <<: *build-prod
+          name: build-prod-a
+          context: silta_finland_production_a
+
       # Deploy job for production environment.
       # Extends the job defined for feature environments.
-      - silta/drupal-deploy:
+      - silta/drupal-deploy: &deploy-prod
           <<: *deploy
-          name: build-deploy-prod
+          name: deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
           decrypt_files: silta/secrets_prod_signalsciences
           context: silta_finland
           requires:
             - build-deploy-prod
           filters: *filter_production_only
+
+      # Deploy job for production environment in prod-a.wdr.io cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy-prod
+          name: deploy-prod-a
+          context: silta_finland_production_a
+          requires:
+            - build-prod-a
 
       # Test site availability by requesting _ping.php.
       - site-test: &site-test

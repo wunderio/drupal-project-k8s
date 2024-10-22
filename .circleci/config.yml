@@ -273,7 +273,7 @@ workflows:
           decrypt_files: silta/secrets_prod_signalsciences
           context: silta_finland
           requires:
-            - build-deploy-prod
+            - build-prod
           filters: *filter_production_only
 
       # Deploy job for production environment in prod-a.wdr.io cluster.

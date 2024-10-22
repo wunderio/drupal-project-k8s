@@ -1,6 +1,6 @@
 exposeDomains:
   test1:
-    hostname: drupal-project-k8s-test1.dev.wdr.io
+    hostname: drupal-project-k8s-test1.prod-a.wdr.io
 
 # Fastly WAF.
 signalsciences:

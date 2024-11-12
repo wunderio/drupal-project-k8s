@@ -31,6 +31,7 @@ spec:
           labels:
             {{- include "drupal.release_labels" $ | nindent 12 }}
             cronjob: "true"
+            cronjob-name: {{ $index | quote }}
         spec:
           enableServiceLinks: false
           containers:

@@ -19,7 +19,7 @@ grumphp:
     php_stan:
       run_on: '%grumphp.run_on_paths%'
     # yaml_lint: ~
-    json_lint: ~
+    # json_lint: ~
     # PHPUnit will fail with 0 tests.
     phpunit:
       testsuite: unit

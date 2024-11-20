@@ -1,0 +1,29 @@
+uuid: 2cabae05-7439-4576-9020-5435ef03463a
+langcode: en
+status: true
+dependencies:
+  module:
+    - ai_search
+_core:
+  default_config_hash: 8kRfcph8j1_2b8UCXBDdpMios9ACCgm0KgIisvO1uJE
+id: ai_search
+name: 'AI Search'
+description: 'Uses Milvus vector database.'
+backend: search_api_ai_search
+backend_config:
+  chat_model: openai__gpt-3.5-turbo
+  database: milvus
+  database_settings:
+    database_name: default
+    collection: aiSearch
+    metric: cosine_similarity
+  embeddings_engine: lmstudio__text-embedding-nomic-embed-text-v1.5
+  embeddings_engine_configuration:
+    set_dimensions: 0
+    dimensions: 768
+  embedding_strategy: contextual_chunks
+  embedding_strategy_configuration:
+    chunk_size: '500'
+    chunk_min_overlap: '100'
+    contextual_content_max_percentage: '30'
+  embedding_strategy_details: ''

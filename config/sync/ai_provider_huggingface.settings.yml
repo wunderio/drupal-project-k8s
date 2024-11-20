@@ -1,0 +1,9 @@
+_core:
+  default_config_hash: oSITRMqGFqf-DFoi14UJyhtKTcqw_zpkWk7GwuNsbvE
+api_key: huggingface_token
+models:
+  chat:
+    - google/gemma-2-2b-it
+    - mistralai/Mistral-7B-Instruct-v0.2
+  embeddings:
+    - intfloat/e5-mistral-7b-instruct

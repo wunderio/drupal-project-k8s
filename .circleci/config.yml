@@ -160,7 +160,8 @@ workflows:
                 command: |
                   http_proxy=$SILTA_PROXY HTTPS_PROXY=$SILTA_PROXY \
                     helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
-          silta_config: silta/silta.yml
+          silta_config: silta/silta.yml,silta/secrets
+          decrypt_files: silta/secrets
           context: silta_dev
           requires:
             - build

@@ -1,0 +1,21 @@
+uuid: d61c2de0-4d8f-43a3-9821-f9368f5db8ab
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.openai_assistant
+    - field.field.block_content.openai_assistant.field_assistant
+  enforced:
+    module:
+      - openai_assistants
+_core:
+  default_config_hash: _ovbX1Z9hT4910EPWmWxkPrzaoCdsRdoWe4vdImGpx8
+id: block_content.openai_assistant.default
+targetEntityType: block_content
+bundle: openai_assistant
+mode: default
+content: {  }
+hidden:
+  field_assistant: true
+  langcode: true
+  search_api_excerpt: true

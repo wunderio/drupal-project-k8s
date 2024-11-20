@@ -1,0 +1,13 @@
+uuid: 9b10f0c1-e7eb-48f6-b46c-2a92a30e8744
+langcode: en
+status: true
+dependencies:
+  module:
+    - ai_logging
+_core:
+  default_config_hash: F3xWltPKCK0IDadpIOKbIQEYXhK6Ao2stp_B5z83FGg
+id: ai_log_delete_action
+label: 'Delete ai logs'
+type: ai_log
+plugin: 'entity:delete_action:ai_log'
+configuration: {  }

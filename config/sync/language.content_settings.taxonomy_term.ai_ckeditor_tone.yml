@@ -1,0 +1,11 @@
+uuid: 8ba0b46c-a2a8-4819-bc0c-1266917096e8
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.ai_ckeditor_tone
+id: taxonomy_term.ai_ckeditor_tone
+target_entity_type_id: taxonomy_term
+target_bundle: ai_ckeditor_tone
+default_langcode: site_default
+language_alterable: false

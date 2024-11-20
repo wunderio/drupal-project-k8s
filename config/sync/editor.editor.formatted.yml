@@ -1,0 +1,63 @@
+uuid: 3327e30e-9e73-4aac-94b2-b7f742aefa38
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.formatted
+  module:
+    - ckeditor5
+format: formatted
+editor: ckeditor5
+settings:
+  toolbar:
+    items:
+      - heading
+      - bold
+      - italic
+      - bulletedList
+      - numberedList
+      - link
+      - augmentor
+      - aickeditor
+  plugins:
+    ai_ckeditor_ai:
+      plugins:
+        ai_ckeditor_completion:
+          provider: openai__gpt-4o
+          enabled: true
+        ai_ckeditor_help:
+          enabled: true
+        ai_ckeditor_summarize:
+          provider: openai__gpt-4o
+          enabled: true
+        ai_ckeditor_tone:
+          autocreate: false
+          provider: openai__gpt-4o
+          tone_vocabulary: ai_ckeditor_tone
+          enabled: true
+        ai_ckeditor_translate:
+          autocreate: false
+          provider: openai__gpt-4o
+          translate_vocabulary: ai_ckeditor_translation
+          enabled: true
+    augmentor_ckeditor5_augmentor:
+      augmentors:
+        23414324-198c-43bf-a722-2af89921f38d: 'Product name generator'
+        2b9b118f-5c2e-4e3a-81df-2a88e95508b0: Sarcastic
+        9291270d-5624-4a33-9677-825ea7b46a4a: 'Article generator'
+        be906973-8413-4ae3-9375-6e4108323349: 'Artikkelin generointi'
+        8b1761f7-77bb-476e-97a5-7ffe0eb8c69e: Selkokieleksi
+    ckeditor5_heading:
+      enabled_headings:
+        - heading2
+        - heading3
+        - heading4
+        - heading5
+        - heading6
+    ckeditor5_list:
+      properties:
+        reversed: true
+        startIndex: true
+      multiBlock: true
+image_upload:
+  status: false

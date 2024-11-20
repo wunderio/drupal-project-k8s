@@ -1,0 +1,37 @@
+uuid: 982c5da2-c608-4176-a540-ceb4f417c866
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.article.field_image_generation_prompt
+id: node.article.field_image_generation_prompt.default
+label: 'Main image generation prompt Default'
+rule: llm_simple_string_long
+input_mode: base
+weight: 103
+worker_type: batch
+entity_type: node
+bundle: article
+field_name: field_image_generation_prompt
+edit_mode: false
+base_field: body
+prompt: "Based on the context create a one sentence image prompt that visualizes the context of the article. Make the images photo realistic.\r\n\r\nContext:\r\n{{ context }}"
+token: ''
+plugin_config:
+  automator_enabled: 1
+  automator_rule: llm_simple_string_long
+  automator_mode: base
+  automator_base_field: body
+  automator_prompt: "Based on the context create a one sentence image prompt that visualizes the context of the article. Make the images photo realistic.\r\n\r\nContext:\r\n{{ context }}"
+  automator_token: ''
+  automator_edit_mode: 0
+  automator_label: 'Main image generation prompt Default'
+  automator_weight: '103'
+  automator_worker_type: batch
+  automator_ai_provider: openai
+  automator_ai_model: gpt-4o
+  automator_configuration_max_tokens: '4096'
+  automator_configuration_temperature: '1'
+  automator_configuration_frequency_penalty: '0'
+  automator_configuration_presence_penalty: '0'
+  automator_configuration_top_p: '1'

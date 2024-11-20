@@ -1,0 +1,33 @@
+uuid: fd599199-9a5d-441e-92c8-964a86352b82
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.page.field_summary_by_ai
+id: node.page.field_summary_by_ai.default
+label: 'Summary by AI (Mistral 7B)'
+rule: llm_simple_string_long
+input_mode: base
+weight: 101
+worker_type: batch
+entity_type: node
+bundle: page
+field_name: field_summary_by_ai
+edit_mode: false
+base_field: body
+prompt: "Provide a summary of the given text. Limit the summary to 400 characters.\r\n\r\nText:\r\n{{ context }}\r\n\r\nSummary:"
+token: ''
+plugin_config:
+  automator_enabled: 1
+  automator_rule: llm_simple_string_long
+  automator_mode: base
+  automator_base_field: body
+  automator_prompt: "Provide a summary of the given text. Limit the summary to 400 characters.\r\n\r\nText:\r\n{{ context }}\r\n\r\nSummary:"
+  automator_token: ''
+  automator_edit_mode: 0
+  automator_label: 'Summary by AI (Mistral 7B)'
+  automator_weight: '101'
+  automator_worker_type: batch
+  automator_ai_provider: huggingface
+  automator_ai_model: mistral-mistral-7b-instruct
+  automator_code_block_type: html

@@ -1,0 +1,16 @@
+uuid: 95145938-e6dc-4885-8751-38a0db377660
+langcode: en
+status: true
+dependencies:
+  module:
+    - openai_assistants
+  enforced:
+    module:
+      - openai_assistants
+_core:
+  default_config_hash: 0ShL_t-Cog-kaWOYda0V-5LTsmzdmgjsNqFNa2IuqYY
+id: openai_assistant.pdf
+label: PDF
+description: ''
+targetEntityType: openai_assistant
+cache: true

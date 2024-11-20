@@ -1,0 +1,34 @@
+uuid: 20a0463a-5e8f-422e-ba44-b196d06849ce
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_main_image
+    - media.type.image
+    - node.type.page
+  module:
+    - tmgmt_content
+third_party_settings:
+  tmgmt_content:
+    excluded: false
+id: node.page.field_main_image
+field_name: field_main_image
+entity_type: node
+bundle: page
+label: 'Main image'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,41 @@
+display:
+  default:
+    display_title: Master
+    display_options:
+      exposed_form:
+        options:
+          submit_button: Käytä
+          reset_button_label: Palauta
+          exposed_sorts_label: Lajittele
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      pager:
+        options:
+          expose:
+            items_per_page_label: 'Merkintöjä sivua kohti'
+            items_per_page_options_all_label: '- Kaikki -'
+            offset_label: Offset
+          tags:
+            previous: '‹ previous'
+            next: 'next ›'
+      fields:
+        state:
+          separator: ', '
+        label:
+          label: Tunnus
+        source_language_1:
+          separator: ', '
+        target_language:
+          separator: ', '
+        translator:
+          label: Sisältölähde
+        tags_count:
+          label: Tagit
+        operations:
+          label: Operations
+      filters:
+        translator:
+          expose:
+            label: Sisältölähde
+  page_1:
+    display_title: Sivu

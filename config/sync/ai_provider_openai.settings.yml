@@ -1,0 +1,4 @@
+_core:
+  default_config_hash: NaMwBmd3grCeNz0Ed_R7xJhXfkPctx6-fqcRSB2Fpks
+api_key: openai_api_key
+moderation: true

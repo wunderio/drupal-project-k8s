@@ -1,11 +1,9 @@
-uuid: 2cabae05-7439-4576-9020-5435ef03463a
+uuid: 332ef376-0a11-43fe-b13a-eb2cea3adff8
 langcode: en
 status: true
 dependencies:
   module:
     - ai_search
-_core:
-  default_config_hash: 8kRfcph8j1_2b8UCXBDdpMios9ACCgm0KgIisvO1uJE
 id: ai_search
 name: 'AI Search'
 description: 'Uses Milvus vector database.'
@@ -17,10 +15,10 @@ backend_config:
     database_name: default
     collection: aiSearch
     metric: cosine_similarity
-  embeddings_engine: lmstudio__text-embedding-nomic-embed-text-v1.5
+  embeddings_engine: openai__text-embedding-3-large
   embeddings_engine_configuration:
     set_dimensions: 0
-    dimensions: 768
+    dimensions: 3072
   embedding_strategy: contextual_chunks
   embedding_strategy_configuration:
     chunk_size: '500'

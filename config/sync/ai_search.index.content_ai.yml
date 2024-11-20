@@ -1,5 +1,3 @@
-_core:
-  default_config_hash: yKph9Cye44LhKKu2d7NIubRKBe6FV4tEDclTdBf4JKg
 control_field_max_length: false
 exclude_chunk_from_metadata: false
 indexing_options:

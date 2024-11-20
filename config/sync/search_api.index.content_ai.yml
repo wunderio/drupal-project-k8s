@@ -1,4 +1,4 @@
-uuid: cc93fef7-f132-4ff9-9741-660dd288f10f
+uuid: eba36b65-eca9-4378-9c65-7c6f0ee6cc49
 langcode: en
 status: true
 dependencies:
@@ -8,8 +8,6 @@ dependencies:
   module:
     - node
     - search_api
-_core:
-  default_config_hash: '-7heIOkUjz9mSumfqbHkJB_ZNSgUFeB_dcGWVzg1EsM'
 id: content_ai
 name: 'Content (AI)'
 description: ''

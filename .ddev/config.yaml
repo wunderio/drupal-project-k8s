@@ -20,7 +20,7 @@ web_environment:
   - DB_USER_DRUPAL=db
   - DB_PASS_DRUPAL=db
   - DB_HOST_DRUPAL=db
-  - DRUSH_OPTIONS_URI=https://drupal-k8s.ddev.site
+  - DRUSH_OPTIONS_URI=https://drupal-project-k8s.ddev.site
   - ENVIRONMENT_NAME=ddev
   - EXEC_GRUMPHP_COMMAND=ddev php
   - HASH_SALT=notsosecurehash

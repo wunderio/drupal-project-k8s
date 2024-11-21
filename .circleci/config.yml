@@ -42,10 +42,11 @@ jobs:
       - run:
           name: Deploy to Kubernetes
           command: |
+            export KRAFT_CLUSTER_ID=$(kubectl get secret --namespace "drupal-project-k8s" feature-milvus-kafka-kraft-cluster-id -o jsonpath="{.data.kraft-cluster-id}" | base64 -d)
             helm repo add milvus https://milvus-io.github.io/milvus-helm/
             helm repo update
             helm dependency update ./drupal
-            helm upgrade --install my-release ./drupal -f ./drupal/values.yaml
+            helm upgrade --install my-release ./drupal -f ./drupal/values.yaml --set kraft.clusterId=$KRAFT_CLUSTER_ID
 
 commands:
   site-query:

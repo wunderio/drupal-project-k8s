@@ -1,0 +1,19 @@
+uuid: 4f18c5d9-e538-4b45-9067-c3de487cc126
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_image_generation_prompt
+field_name: field_image_generation_prompt
+entity_type: node
+type: string_long
+settings:
+  case_sensitive: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

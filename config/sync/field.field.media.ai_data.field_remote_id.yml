@@ -1,0 +1,24 @@
+uuid: 21d2dc1e-b1d9-496d-828b-101a061aede7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_remote_id
+    - media.type.ai_data
+  enforced:
+    module:
+      - openai_files
+_core:
+  default_config_hash: IQGVsgWVZYfxL-s2oZ8VqlZSW7aCfjv0jXTxgUADVJI
+id: media.ai_data.field_remote_id
+field_name: field_remote_id
+entity_type: media
+bundle: ai_data
+label: 'Remote ID'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

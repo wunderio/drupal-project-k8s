@@ -1,0 +1,25 @@
+uuid: b8a3b063-530c-4b24-8d6f-1dae8a575fa4
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - openai_assistants
+  enforced:
+    module:
+      - openai_assistants
+_core:
+  default_config_hash: K8n_c8Xgk-PBypuQPK8ochMQcWU9ph0SeebeonaREOY
+id: block_content.field_assistant
+field_name: field_assistant
+entity_type: block_content
+type: entity_reference
+settings:
+  target_type: openai_assistant
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,19 @@
+uuid: fb74ed24-3c7d-4cfa-a7ac-a55459e35f6c
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - openai_files
+_core:
+  default_config_hash: Z59_GspJYHOHFXtymobxayfec4OXWaMoBRni-6W47t8
+id: ai_data
+label: 'AI Data'
+description: 'Documents to use as data for AI.'
+source: file
+queue_thumbnail_downloads: false
+new_revision: true
+source_configuration:
+  source_field: field_media_file
+field_map:
+  name: name

@@ -1,0 +1,37 @@
+uuid: 1365a78c-a8f4-4df3-87ca-84fb040cd086
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.article.field_image_search_keywords
+id: node.article.field_image_search_keywords.default
+label: 'Image search keywords Default'
+rule: llm_simple_string
+input_mode: base
+weight: 100
+worker_type: batch
+entity_type: node
+bundle: article
+field_name: field_image_search_keywords
+edit_mode: false
+base_field: body
+prompt: "Based on the context, please write a few words that can be used as search words in a stock photo database. Translate the words into English if the language in the context is not English. Use simple words. Do not use proper nouns. The total amount of characters must not exceed 100 characters.\r\n\r\nContext:\r\n{{ context }}"
+token: ''
+plugin_config:
+  automator_enabled: 1
+  automator_rule: llm_simple_string
+  automator_mode: base
+  automator_base_field: body
+  automator_prompt: "Based on the context, please write a few words that can be used as search words in a stock photo database. Translate the words into English if the language in the context is not English. Use simple words. Do not use proper nouns. The total amount of characters must not exceed 100 characters.\r\n\r\nContext:\r\n{{ context }}"
+  automator_token: ''
+  automator_edit_mode: 0
+  automator_label: 'Image search keywords Default'
+  automator_weight: '100'
+  automator_worker_type: batch
+  automator_ai_provider: openai
+  automator_ai_model: gpt-4o
+  automator_configuration_max_tokens: '4096'
+  automator_configuration_temperature: '1'
+  automator_configuration_frequency_penalty: '0'
+  automator_configuration_presence_penalty: '0'
+  automator_configuration_top_p: '1'

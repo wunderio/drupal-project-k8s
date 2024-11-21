@@ -1,0 +1,45 @@
+uuid: 3fa35543-4378-4880-a343-7b80786f6aad
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.media_library
+  module:
+    - media_pixabay
+    - views
+name: pixabay_browser
+label: 'Pixabay + Media library browser'
+display: modal
+display_configuration:
+  width: ''
+  height: ''
+  link_text: 'Select entities'
+  auto_open: false
+selection_display: no_display
+selection_display_configuration: {  }
+widget_selector: tabs
+widget_selector_configuration: {  }
+widgets:
+  a1a9bc46-b534-4d2c-b5f9-bc3ce7c12cc1:
+    id: pixabay
+    uuid: a1a9bc46-b534-4d2c-b5f9-bc3ce7c12cc1
+    label: 'Pixabay image search'
+    weight: -9
+    settings:
+      upload_location: 'public://Pixabay/[PIXABAY_SEARCH_TERM]/'
+      submit_text: 'Select entities'
+      search_text: 'Pixabay search'
+      search_placeholder: 'Enter search terms...'
+      extensions: 'png gif jpg jpeg webp'
+      media_type: image
+      image_size: _1280
+  f49abd27-66a1-4768-84b7-0677bce66765:
+    id: view
+    uuid: f49abd27-66a1-4768-84b7-0677bce66765
+    label: 'Media library'
+    weight: -10
+    settings:
+      submit_text: 'Select entities'
+      auto_select: false
+      view: media_library
+      view_display: entity_browser_1

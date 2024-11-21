@@ -1,0 +1,5 @@
+_core:
+  default_config_hash: 5NZOobHFb17N--ZKFQxPuIXV5y5hRVdDMLJw07UQq4w
+api_key: ''
+server: 'http://milvus'
+port: 19530

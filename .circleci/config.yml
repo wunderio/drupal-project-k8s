@@ -106,6 +106,8 @@ workflows:
             tags:
               only:
                 - /^test\/.*/
+            branches:
+              ignore: /.*/
 
       # Build job for feature environments.
       # Other jobs defined below extend this job.

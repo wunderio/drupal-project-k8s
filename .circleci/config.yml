@@ -80,6 +80,9 @@ filter_production_only: &filter_production_only
   branches:
     only:
       - production
+  tags:
+    only:
+      - /^test\/.*/
 
 workflows:
   version: 2
@@ -102,12 +105,6 @@ workflows:
                 command: |
                   helm unittest ./charts/silta-release
                   helm unittest ./charts/drupal
-          filters:
-            tags:
-              only:
-                - /^test\/.*/
-            branches:
-              ignore: /.*/
 
       # Build job for feature environments.
       # Other jobs defined below extend this job.

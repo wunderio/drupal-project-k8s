@@ -732,3 +732,11 @@ autoscaling/v2beta1
 {{- else }}false
 {{- end }}
 {{- end }}
+
+{{- define "drupal.serviceAccountName" }}
+{{- if .Values.serviceAccount.name }}
+{{- .Values.serviceAccount.name }}
+{{- else }}
+{{- .Release.Name }}-sa
+{{- end }}
+{{- end }}

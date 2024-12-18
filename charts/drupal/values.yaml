@@ -589,6 +589,34 @@ mariadb:
               - static-ip
   enableServiceLinks: false
 
+# see: https://github.com/bitpoke/mysql-operator/blob/d23113e7375dfd35c64144be160dd15b95688222/deploy/charts/mysql-cluster/values.yaml
+mysql-cluster:
+  enabled: false
+  replicas: 3
+  podSpec:
+    # nodeSelector: {}
+    # tolerations: []
+    resources:
+      requests:
+        memory: 512Mi
+        cpu:    200m
+  volumeSpec:
+    persistentVolumeClaim:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+  # mysqlConf:
+  #   innodb-buffer-size: 128M
+  rootPassword: "drupal"
+  appUser: "drupal"
+  appPassword: "drupal"
+  appDatabase: "drupal"
+  
+  
+  #  labels:
+  #    release: "{{ .Release.Name }}"
+  
 varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
   # to configure varnish for Your site correctly.
@@ -788,7 +816,7 @@ clamav:
       cpu: 1500m
       memory: 3Gi
 db:
-  # Available options: mariadb, pxc-db
+  # Available options: mariadb, mysql-cluster, pxc-db
   primary: mariadb
 
 # Percona XtraDB Cluster

@@ -5,6 +5,9 @@ dependencies:
 - name: pxc-db
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.3
+- name: mysql-cluster
+  repository: https://helm-charts.bitpoke.io
+  version: 0.6.3
 - name: memcached
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 4.2.27
@@ -20,5 +23,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.0
-digest: sha256:74ab4b2e06e75563a3838c0a20311d052e2d7aeb6e00b4602fae6e9a2fd77fa0
-generated: "2023-10-03T12:07:07.444943085+03:00"
+digest: sha256:5e05688997fc9b23c154a70cef07c7feb29b90fa961d7c1d27f636ceee006b40
+generated: "2024-12-18T16:24:23.051430078+02:00"

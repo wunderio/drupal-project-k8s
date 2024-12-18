@@ -10,6 +10,10 @@ dependencies:
   version: 1.12.x
   repository: https://percona.github.io/percona-helm-charts/
   condition: pxc-db.enabled
+- name: mysql-cluster
+  version: 0.6.x
+  repository: https://helm-charts.bitpoke.io
+  condition: mysql-cluster.enabled
 - name: memcached
   version: 4.2.x
   repository: https://storage.googleapis.com/charts.wdr.io

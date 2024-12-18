@@ -10,6 +10,7 @@ tests:
   - it: sets mariadb user
     template: drupal-deployment.yaml
     set:
+      mariadb.enabled: true
       mariadb.db.user: testuser
     asserts:
       - contains:

@@ -546,6 +546,12 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "mysql-cluster": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "pxc-db": {
       "type": "object",
       "properties": {
@@ -557,7 +563,7 @@
       "properties": {
         "primary": {
           "type": "string",
-          "enum": [ "", "mariadb", "pxc-db" ]
+          "enum": [ "", "mariadb", "mysql-cluster", "pxc-db" ]
         }
       }
     },

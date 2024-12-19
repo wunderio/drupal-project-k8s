@@ -141,6 +141,7 @@ workflows:
                   helm repo add elastic https://helm.elastic.co
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
+                  helm repo add bitpoke https://helm-charts.bitpoke.io
                   helm dependency build ./charts/drupal
             - run:
                 name: Dry-run helm install

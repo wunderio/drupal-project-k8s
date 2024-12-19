@@ -46,3 +46,22 @@ https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/templates
 {{- $releaseNameHash := sha256sum .Release.Name | trunc 3 -}}
 {{- (gt (len .Release.Name) 22) | ternary ( print (.Release.Name | trunc 18) print $releaseNameHash ) .Release.Name }}
 {{- end -}}
+
+{{/*
+Bitpoke mysql-cluster chart name adjustments for having correct release name for it's resources.
+*/}}
+{{- define "mysql-cluster.fullname" -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "mysql-cluster.clusterName" -}}
+{{- printf "%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "mysql-cluster.secretName" -}}
+{{- printf "%s-hadb" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "mysql-cluster.backupSecretName" -}}
+{{- printf "%s-hadb-backup" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}

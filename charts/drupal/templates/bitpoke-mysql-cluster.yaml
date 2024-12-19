@@ -1,0 +1,29 @@
+{{- if (index (index .Values "mysql-cluster") "enabled") }}
+{{- if not ( .Capabilities.APIVersions.Has "mysql.presslabs.org/v1alpha1" ) }}
+{{- fail "API mysql.presslabs.org/v1alpha1 unavailable, ask cluster administrator to install Bitpoke MySQL Operator in Silta cluster first!" }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-db
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  podSelector:
+    matchLabels:
+      # release: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/name: mysql
+      # app: mysql
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - port: 3306
+    - port: 8080
+    from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: mysql-operator
+{{- end }}

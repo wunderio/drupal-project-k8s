@@ -155,16 +155,16 @@ imagePullSecrets:
       key: root
 {{- end }}
 {{- if index ( index .Values "mysql-cluster" ) "enabled" }}
-- name: MARIADB_GALERA_DB_USER
+- name: MYSQL_CLUSTER_DB_USER
   value: "root"
-- name: MARIADB_GALERA_DB_NAME
+- name: MYSQL_CLUSTER_DB_NAME
   value: "drupal"
-- name: MARIADB_GALERA_DB_HOST
-  value: {{ .Release.Name }}-mysql-cluster-db-mysql-master
-- name: MARIADB_GALERA_DB_PASS
+- name: MYSQL_CLUSTER_DB_HOST
+  value: {{ .Release.Name }}-mysql-master
+- name: MYSQL_CLUSTER_DB_PASS
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-mysql-cluster-db
+      name: {{ .Release.Name }}-db
       key: PASSWORD
 {{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
@@ -186,11 +186,11 @@ imagePullSecrets:
 - name: DB_NAME
   value: "{{ .Values.mariadb.db.name }}"
 - name: DB_HOST
-  value: {{ .Release.Name }}-mysql-cluster-db-mysql-master
+  value: {{ .Release.Name }}-mysql-master
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-mysql-cluster-db
+      name: {{ .Release.Name }}-db
       key: PASSWORD
 {{- end }}
 {{- if and ( index ( index .Values "pxc-db" ) "enabled" ) ( eq .Values.db.primary "pxc-db" ) }}

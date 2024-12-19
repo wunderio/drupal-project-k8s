@@ -1,0 +1,42 @@
+display:
+  default:
+    display_title: Oletus
+    display_options:
+      fields:
+        media_bulk_form:
+          action_title: Toiminto
+        thumbnail__target_id:
+          separator: ', '
+        name:
+          separator: ', '
+        bundle:
+          label: Type
+          separator: ', '
+        uid:
+          separator: ', '
+        status:
+          label: Tila
+          separator: ', '
+        changed:
+          separator: ', '
+        operations:
+          label: Operations
+      pager:
+        options:
+          expose:
+            items_per_page_label: 'Merkintöjä sivua kohti'
+            items_per_page_options_all_label: '- Kaikki -'
+            offset_label: Offset
+      exposed_form:
+        options:
+          reset_button_label: Palauta
+          exposed_sorts_label: Lajittele
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      filters:
+        bundle:
+          expose:
+            label: Type
+        status:
+          expose:
+            label: 'True'

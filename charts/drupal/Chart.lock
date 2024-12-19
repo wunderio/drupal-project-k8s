@@ -20,5 +20,8 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.0
-digest: sha256:74ab4b2e06e75563a3838c0a20311d052e2d7aeb6e00b4602fae6e9a2fd77fa0
-generated: "2023-10-03T12:07:07.444943085+03:00"
+- name: milvus
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 9.0.5
+digest: sha256:09aa2b3865832e710ac64487ebe04d782705ba7328e33dd67efe925fcfdaf9e4
+generated: "2024-09-19T16:07:24.986209+03:00"

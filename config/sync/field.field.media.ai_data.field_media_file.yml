@@ -1,0 +1,32 @@
+uuid: 9e25cb49-58f0-4f14-982e-9fb777ddee11
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_media_file
+    - media.type.ai_data
+  module:
+    - file
+  enforced:
+    module:
+      - openai_files
+_core:
+  default_config_hash: RWdC6Pko0DMj5gvR9cr6d_vOg8pyEhanjRQewQOuDQI
+id: media.ai_data.field_media_file
+field_name: field_media_file
+entity_type: media
+bundle: ai_data
+label: File
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'txt doc docx pdf'
+  max_filesize: ''
+  description_field: false
+field_type: file

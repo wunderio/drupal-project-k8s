@@ -1,0 +1,51 @@
+_core:
+  default_config_hash: RGedRkFydKZjS0ZJ6vbtZH00KbhYVGsK-ABILHdQLyw
+prompt_logging: false
+prompt_logging_tags: ''
+default_providers:
+  chat:
+    provider_id: openai
+    model_id: gpt-4o
+  embeddings:
+    provider_id: openai
+    model_id: text-embedding-3-large
+  moderation:
+    provider_id: openai
+    model_id: text-moderation-latest
+  speech_to_text:
+    provider_id: openai
+    model_id: whisper-1
+  text_to_image:
+    provider_id: openai
+    model_id: dall-e-3
+  text_to_speech:
+    provider_id: openai
+    model_id: tts-1-hd
+  audio_to_audio:
+    provider_id: ''
+    model_id: null
+  image_and_audio_to_video:
+    provider_id: ''
+    model_id: null
+  image_to_video:
+    provider_id: ''
+    model_id: null
+  speech_to_speech:
+    provider_id: ''
+    model_id: null
+models:
+  huggingface:
+    chat:
+      mistral-mistral-7b-instruct:
+        operation_type: chat
+        model_id: mistral-mistral-7b-instruct
+        label: 'Mistral Mistral-7B Instruct'
+        chat_with_image_vision: 0
+        chat_with_audio: 0
+        chat_with_video: 0
+        chat_system_role: 1
+        chat_json_output: 0
+        max_input_tokens: '32768'
+        max_output_tokens: '4096'
+        huggingface_endpoint: mistralai/Mistral-7B-Instruct-v0.2
+        provider: huggingface

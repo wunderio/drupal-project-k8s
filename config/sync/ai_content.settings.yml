@@ -1,0 +1,7 @@
+_core:
+  default_config_hash: 3Z9v-hb7YMbil_kbCz38MI1XTwApOEufze3093c_HTE
+analyse_policies_enabled: openai__text-moderation-latest
+tone_adjust_enabled: openai__gpt-4o
+summarise_enabled: openai__gpt-4o
+suggest_title_enabled: openai__gpt-4o
+suggest_tax_enabled: openai__gpt-4o

@@ -31,3 +31,7 @@ dependencies:
 - name: silta-release
   version: ^1.x
   repository: file://../silta-release
+- name: milvus
+  version: "9.0.5"  # This matches the version from the Milvus Chart.yaml you provided
+  repository: "oci://registry-1.docker.io/bitnamicharts"
+  condition: milvus.enabled

@@ -1,0 +1,44 @@
+display:
+  default:
+    display_title: Oletus
+    display_options:
+      fields:
+        user_bulk_form:
+          label: Massapäivitys
+        status:
+          label: Tila
+          settings:
+            format_custom_true: Active
+        roles_target_id:
+          label: Roles
+        operations:
+          label: Operations
+        mail:
+          separator: ', '
+      pager:
+        options:
+          expose:
+            items_per_page_label: 'Merkintöjä sivua kohti'
+            items_per_page_options_all_label: '- Kaikki -'
+            offset_label: Offset
+      exposed_form:
+        options:
+          reset_button_label: Palauta
+          exposed_sorts_label: Lajittele
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      filters:
+        status:
+          group_info:
+            label: Tila
+            group_items:
+              1:
+                title: Active
+        roles_target_id:
+          expose:
+            label: Rooli
+  page_1:
+    display_title: Sivu
+    display_options:
+      menu:
+        title: List

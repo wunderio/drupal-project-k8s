@@ -1,0 +1,175 @@
+_core:
+  default_config_hash: 51ghAGK7M2JjBgvporrHodLbCLCjJxqMPzS_vySJMOU
+augmentors:
+  23414324-198c-43bf-a722-2af89921f38d:
+    label: 'Product name generator'
+    weight: null
+    debug: null
+    type: chatgpt
+    configuration:
+      label: 'Product name generator'
+      uuid: 23414324-198c-43bf-a722-2af89921f38d
+      id: chatgpt
+      weight: ''
+      key: openai_api_key
+      debug: 0
+      settings:
+        label: 'Product name generator'
+        key: openai_api_key
+        model: gpt-4o
+        messages:
+          0:
+            role: system
+            content: 'You will be provided with a product description and seed words, and your task is to generate product names.'
+          1:
+            role: user
+            content: '{input}'
+          actions: {  }
+        temperature: '1'
+        max_tokens: '1000'
+        top_p: '0'
+        'n': '1'
+        frequency_penalty: '0'
+        presence_penalty: '0'
+        user_tracking: 1
+        debug: 0
+  2b9b118f-5c2e-4e3a-81df-2a88e95508b0:
+    label: Sarcastic
+    weight: null
+    debug: null
+    type: chatgpt
+    configuration:
+      label: Sarcastic
+      uuid: 2b9b118f-5c2e-4e3a-81df-2a88e95508b0
+      id: chatgpt
+      weight: ''
+      key: openai_api_key
+      debug: 0
+      settings:
+        label: Sarcastic
+        key: openai_api_key
+        model: gpt-4o
+        messages:
+          0:
+            role: system
+            content: 'You are Marv, a chatbot that reluctantly answers questions with sarcastic responses.'
+          1:
+            role: user
+            content: 'How many pounds are in a kilogram?'
+          2:
+            role: assistant
+            content: 'This again? There are 2.2 pounds in a kilogram. Please make a note of this.'
+          3:
+            role: user
+            content: 'What does HTML stand for?'
+          4:
+            role: assistant
+            content: 'Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.'
+          5:
+            role: user
+            content: 'When did the first airplane fly?'
+          6:
+            role: assistant
+            content: 'On December 17, 1903, Wilbur and Orville Wright made the first flights. I wish they’d come and take me away.'
+          7:
+            role: user
+            content: '{input}'
+          actions: {  }
+        temperature: '1'
+        max_tokens: '2000'
+        top_p: '0'
+        'n': '1'
+        frequency_penalty: '0'
+        presence_penalty: '0'
+        user_tracking: 1
+        debug: 0
+  9291270d-5624-4a33-9677-825ea7b46a4a:
+    label: 'Article generator'
+    weight: null
+    debug: null
+    type: chatgpt
+    configuration:
+      label: 'Article generator'
+      uuid: 9291270d-5624-4a33-9677-825ea7b46a4a
+      id: chatgpt
+      weight: ''
+      key: openai_api_key
+      debug: 0
+      settings:
+        label: 'Article generator'
+        key: openai_api_key
+        model: gpt-4o
+        messages:
+          0:
+            role: user
+            content: "Your task is to create a comprehensive article for the following input:\r\n\r\nInput:\r\n{input}"
+          actions: {  }
+        temperature: '1'
+        max_tokens: '2000'
+        top_p: '0'
+        'n': '1'
+        frequency_penalty: '0'
+        presence_penalty: '0'
+        user_tracking: 1
+        debug: 0
+  be906973-8413-4ae3-9375-6e4108323349:
+    label: 'Artikkelin generointi'
+    weight: null
+    debug: null
+    type: chatgpt
+    configuration:
+      label: 'Artikkelin generointi'
+      uuid: be906973-8413-4ae3-9375-6e4108323349
+      id: chatgpt
+      weight: ''
+      key: openai_api_key
+      debug: 0
+      settings:
+        label: 'Artikkelin generointi'
+        key: openai_api_key
+        model: gpt-4o
+        messages:
+          0:
+            role: user
+            content: "Tehtäväsi on luoda kattava artikkeli annetusta sisällöstä:\r\n\r\nSisältö:\r\n{input}"
+          actions: {  }
+        temperature: '1'
+        max_tokens: '2000'
+        top_p: '0'
+        'n': '1'
+        frequency_penalty: '0'
+        presence_penalty: '0'
+        user_tracking: 1
+        debug: 0
+  8b1761f7-77bb-476e-97a5-7ffe0eb8c69e:
+    label: Selkokieleksi
+    weight: null
+    debug: null
+    type: chatgpt
+    configuration:
+      label: Selkokieleksi
+      uuid: 8b1761f7-77bb-476e-97a5-7ffe0eb8c69e
+      id: chatgpt
+      weight: ''
+      key: openai_api_key
+      debug: 0
+      settings:
+        label: Selkokieleksi
+        key: openai_api_key
+        model: gpt-4o
+        messages:
+          0:
+            role: system
+            content: 'Muunna sisältö selkokieliseksi, jotta lapsikin sen ymmärtää.'
+          1:
+            role: user
+            content: '{input}'
+          actions: {  }
+        temperature: '1'
+        max_tokens: '2000'
+        top_p: '0'
+        'n': '1'
+        frequency_penalty: '0'
+        presence_penalty: '0'
+        user_tracking: 1
+        debug: 0

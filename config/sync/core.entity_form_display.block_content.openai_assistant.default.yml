@@ -1,0 +1,43 @@
+uuid: 09c517eb-c64b-4a77-bd63-5129fd8fd44f
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.openai_assistant
+    - field.field.block_content.openai_assistant.field_assistant
+  enforced:
+    module:
+      - openai_assistants
+_core:
+  default_config_hash: NqqwNl8Ucx4BlQh53CHCKJgZMaJEZ8ZjB3fPlxleeiE
+id: block_content.openai_assistant.default
+targetEntityType: block_content
+bundle: openai_assistant
+mode: default
+content:
+  field_assistant:
+    type: entity_reference_autocomplete
+    weight: 1
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  info:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+hidden: {  }

@@ -1,0 +1,31 @@
+uuid: d70fd3c5-b245-426c-a4b2-36b60bd6813e
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.openai_assistant
+    - field.storage.block_content.field_assistant
+  enforced:
+    module:
+      - openai_assistants
+_core:
+  default_config_hash: lC2ixOwgPzd9lnISkP6EyabGuUDQluGNeVvN-jhForY
+id: block_content.openai_assistant.field_assistant
+field_name: field_assistant
+entity_type: block_content
+bundle: openai_assistant
+label: Assistant
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:openai_assistant'
+  handler_settings:
+    target_bundles: null
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+field_type: entity_reference

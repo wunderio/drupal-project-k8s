@@ -594,6 +594,8 @@ mysql-cluster:
   enabled: false
   replicas: 3
   podSpec:
+    labels:
+      release: "{{ .Release.Name }}"
     # nodeSelector: {}
     # tolerations: []
     resources:

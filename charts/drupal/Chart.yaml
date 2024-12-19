@@ -12,7 +12,8 @@ dependencies:
   condition: pxc-db.enabled
 - name: mysql-cluster
   version: 0.6.x
-  repository: https://helm-charts.bitpoke.io
+  repository: file://../mysql-cluster
+  # repository: https://helm-charts.bitpoke.io
   condition: mysql-cluster.enabled
 - name: memcached
   version: 4.2.x

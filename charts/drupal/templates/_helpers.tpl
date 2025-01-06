@@ -164,7 +164,7 @@ imagePullSecrets:
 - name: MYSQL_CLUSTER_DB_PASS
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-db
+      name: {{ .Release.Name }}-hadb
       key: PASSWORD
 {{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
@@ -190,7 +190,7 @@ imagePullSecrets:
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-db
+      name: {{ .Release.Name }}-hadb
       key: PASSWORD
 {{- end }}
 {{- if and ( index ( index .Values "pxc-db" ) "enabled" ) ( eq .Values.db.primary "pxc-db" ) }}

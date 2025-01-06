@@ -58,26 +58,9 @@ php:
 
 mysql-cluster:
   enabled: true
-
-  # FOR FUTURE REFERENCE: Test recovery before merging. 
-  # Sequence to break cluster:
-  # - Kill 2nd replica (-1), then first (-0) and before first two are ready, 
-  # kill third (-2). Cluster should recover (but it does not).
-
-#   galera:
-#     bootstrap:
-#       bootstrapFromNode: 0
-#       forceSafeToBootstrap: true
-
-  # initdbScripts:
-  #   my_init_script.sh: |
-  #     #!/bin/sh
-  #     if [[ $(hostname) == *-0  ]]; then
-  #       echo "First node"
-  #       mysql -P 3306 -uroot -prandompassword -e "create database new_database";
-  #     else
-  #       echo "No first node"
-  #     fi
+  # TODO:
+  # - service name issue, it's always "mysql". https://github.com/bitpoke/mysql-operator/issues/537
+  # - downscaler, statefulset is always mirrored from mysqlcluster resource
 
 mariadb:
   enabled: false

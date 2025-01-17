@@ -331,7 +331,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
+until /usr/bin/mariadb-admin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -371,8 +371,8 @@ done
 {{- end }}
 
 {{- define "drupal.data-pull-command" }}
-set -e 
-  
+set -e
+
 {{ include "drupal.import-reference-files" . }}
 
 {{ include "drupal.wait-for-db-command" . }}
@@ -585,8 +585,8 @@ fi
 
   # Take a database dump.
   echo "Starting database backup."
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
   echo "Database backup complete."
 {{- end }}
 
@@ -655,7 +655,7 @@ fi
   TIME_WAITING=0
   echo "Waiting for database.";
 
-  until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
+  until /usr/bin/mariadb-admin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
     sleep 1s
     TIME_WAITING=$((TIME_WAITING+1))

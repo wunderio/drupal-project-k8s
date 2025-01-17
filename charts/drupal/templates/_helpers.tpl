@@ -331,7 +331,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until /usr/bin/mariadb-admin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
+until /usr/bin/mariadb-admin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent --skip-ssl; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))

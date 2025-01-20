@@ -1,0 +1,27 @@
+# DDEV configuration for Drupal AI Experiments
+# See the documentation for more options:
+# https://ddev.readthedocs.io/en/stable/users/configuration/config/
+name: drupal-project-k8s
+type: drupal
+docroot: web
+php_version: "8.2"
+webserver_type: nginx-fpm
+xdebug_enabled: true
+additional_hostnames: []
+additional_fqdns: []
+database:
+    type: mariadb
+    version: "10.11"
+use_dns_when_possible: true
+composer_version: "2"
+disable_settings_management: true
+web_environment:
+  - DB_NAME_DRUPAL=db
+  - DB_USER_DRUPAL=db
+  - DB_PASS_DRUPAL=db
+  - DB_HOST_DRUPAL=db
+  - DRUSH_OPTIONS_URI=https://drupal-project-k8s.ddev.site
+  - ENVIRONMENT_NAME=ddev
+  - EXEC_GRUMPHP_COMMAND=ddev php
+  - HASH_SALT=notsosecurehash
+corepack_enable: false

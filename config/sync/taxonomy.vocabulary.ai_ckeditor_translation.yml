@@ -1,0 +1,9 @@
+uuid: 7d7904b1-9408-49c5-b61d-937d3ee09afd
+langcode: en
+status: true
+dependencies: {  }
+name: 'AI CKEditor Translation'
+vid: ai_ckeditor_translation
+description: null
+weight: 0
+new_revision: false

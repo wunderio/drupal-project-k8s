@@ -1,0 +1,84 @@
+uuid: fe56533e-d302-4c80-9a8c-c862e2d7469a
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.formatted
+    - media.type.image
+    - node.type.article
+    - taxonomy.vocabulary.ai_ckeditor_tone
+    - taxonomy.vocabulary.ai_ckeditor_translation
+  module:
+    - ai_ckeditor
+    - ai_content
+    - ai_translate
+    - augmentor
+    - content_translation
+    - entity_browser
+    - file
+    - filter
+    - media
+    - node
+    - openai_assistants
+    - openai_seo
+    - path
+    - system
+    - taxonomy
+    - tmgmt
+    - toolbar
+_core:
+  default_config_hash: dJ0L2DNSj5q6XVZAGsuVDpJTh5UeYkIPwKrUOOpr8YI
+id: authenticated
+label: 'Authenticated user'
+weight: -9
+is_admin: false
+permissions:
+  - 'access administration pages'
+  - 'access ai content tools'
+  - 'access content'
+  - 'access content overview'
+  - 'access media overview'
+  - 'access pixabay_browser entity browser pages'
+  - 'access taxonomy overview'
+  - 'access toolbar'
+  - 'administer menu'
+  - 'administer url aliases'
+  - 'chat with assistant'
+  - 'create ai content translation'
+  - 'create article content'
+  - 'create content translations'
+  - 'create image media'
+  - 'create media'
+  - 'create seo reports'
+  - 'create terms in ai_ckeditor_tone'
+  - 'create terms in ai_ckeditor_translation'
+  - 'create translation jobs'
+  - 'create url aliases'
+  - 'delete media'
+  - 'delete own article content'
+  - 'delete own files'
+  - 'delete own image media'
+  - 'edit any article content'
+  - 'edit any image media'
+  - 'edit own article content'
+  - 'edit own image media'
+  - 'edit terms in ai_ckeditor_tone'
+  - 'edit terms in ai_ckeditor_translation'
+  - 'execute augmentor'
+  - 'submit translation jobs'
+  - 'translate article node'
+  - 'translate editable entities'
+  - 'update any media'
+  - 'update content translations'
+  - 'update media'
+  - 'use ai ckeditor'
+  - 'use text format formatted'
+  - 'view all media revisions'
+  - 'view any image media revisions'
+  - 'view article revisions'
+  - 'view media'
+  - 'view own unpublished content'
+  - 'view own unpublished media'
+  - 'view seo reports'
+  - 'view the administration theme'
+  - 'view vocabulary labels'

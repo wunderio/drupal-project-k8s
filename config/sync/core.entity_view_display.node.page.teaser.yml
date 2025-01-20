@@ -1,0 +1,45 @@
+uuid: bdd2f090-6a36-4ff9-8f3b-51056f669a70
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.page.ai_automator_status
+    - field.field.node.page.body
+    - field.field.node.page.field_image_generation_prompt
+    - field.field.node.page.field_image_search_keywords
+    - field.field.node.page.field_main_image
+    - field.field.node.page.field_main_image_ai
+    - field.field.node.page.field_related_images
+    - field.field.node.page.field_summary_by_ai
+    - node.type.page
+  module:
+    - text
+    - user
+id: node.page.teaser
+targetEntityType: node
+bundle: page
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  ai_automator_status: true
+  field_image_generation_prompt: true
+  field_image_search_keywords: true
+  field_main_image: true
+  field_main_image_ai: true
+  field_related_images: true
+  field_summary_by_ai: true
+  langcode: true

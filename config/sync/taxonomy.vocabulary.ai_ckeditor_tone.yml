@@ -1,0 +1,9 @@
+uuid: 61edaa30-742f-41f8-8af2-c9ade43d6ab1
+langcode: en
+status: true
+dependencies: {  }
+name: 'AI CKEditor Tone'
+vid: ai_ckeditor_tone
+description: 'Adjust tone of text in CKEditor AI Assistant'
+weight: 0
+new_revision: false

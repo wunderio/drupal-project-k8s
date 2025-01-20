@@ -1,0 +1,20 @@
+uuid: e165f34c-1992-48cc-b66a-c1059a297b42
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+    - openai_assistants
+    - openai_seo
+    - system
+_core:
+  default_config_hash: j5zLMOdJBqC0bMvSdth5UebkprJB8g_2FXHqhfpJzow
+id: anonymous
+label: 'Anonymous user'
+weight: -10
+is_admin: false
+permissions:
+  - 'access content'
+  - 'chat with assistant'
+  - 'view media'
+  - 'view seo reports'

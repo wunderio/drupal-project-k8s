@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   silta: silta/silta@dev:master
+  kubernetes: circleci/kubernetes@1.3.0
 
 executors:
   cicd73:
@@ -33,6 +34,22 @@ jobs:
           site_url: https://master.drupal-project-k8s.dev.wdr.io/_ping.php
       - site-query:
           site_url: https://master.drupal-project-k8s.silta-aks.wdr.io/_ping.php
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - kubernetes/install-kubectl
+      - kubernetes/install-helm
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            export MINIO_PASSWORD=$(kubectl get secret --namespace "drupal-project-k8s" feature-milvus-minio -o jsonpath="{.data.root-password}" | base64 -d)
+            helm repo add milvus https://milvus-io.github.io/milvus-helm/
+            helm repo update
+            helm dependency update ./drupal
+            helm upgrade --install my-release ./drupal -f ./drupal/values.yaml --set milvus.minio.auth.rootPassword=$MINIO_PASSWORD
 
 commands:
   site-query:
@@ -150,7 +167,8 @@ workflows:
                 command: |
                   http_proxy=$SILTA_PROXY HTTPS_PROXY=$SILTA_PROXY \
                     helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
-          silta_config: silta/silta.yml
+          silta_config: silta/silta.yml,silta/secrets
+          decrypt_files: silta/secrets
           context: silta_dev
           requires:
             - build

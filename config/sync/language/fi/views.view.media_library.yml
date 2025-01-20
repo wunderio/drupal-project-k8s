@@ -1,0 +1,53 @@
+display:
+  default:
+    display_title: Oletus
+    display_options:
+      fields:
+        media_bulk_form:
+          action_title: Toiminto
+      pager:
+        options:
+          tags:
+            next: ››
+            previous: ‹‹
+          expose:
+            items_per_page_label: 'Merkintöjä sivua kohti'
+            items_per_page_options_all_label: '- Kaikki -'
+            offset_label: Offset
+      exposed_form:
+        options:
+          reset_button_label: Palauta
+          exposed_sorts_label: Lajittele
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      filters:
+        name:
+          expose:
+            label: Name
+  page:
+    display_title: Sivu
+    display_options:
+      fields:
+        media_bulk_form:
+          action_title: Toiminto
+        name:
+          separator: ', '
+        edit_media:
+          text: Muokkaa
+        delete_media:
+          text: Poista
+  widget:
+    display_options:
+      filters:
+        name:
+          expose:
+            label: Name
+  widget_table:
+    display_options:
+      fields:
+        name:
+          label: Name
+      filters:
+        name:
+          expose:
+            label: Name

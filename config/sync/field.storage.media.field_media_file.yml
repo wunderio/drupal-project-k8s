@@ -1,0 +1,28 @@
+uuid: f57e1987-7c7d-4705-afbd-641957b728d7
+langcode: en
+status: true
+dependencies:
+  module:
+    - file
+    - media
+  enforced:
+    module:
+      - openai_files
+_core:
+  default_config_hash: UrNBeNVID_xz7KeXh0BxBzlzIYkqj0plEbD-g-emxZ0
+id: media.field_media_file
+field_name: field_media_file
+entity_type: media
+type: file
+settings:
+  target_type: file
+  display_field: false
+  display_default: false
+  uri_scheme: public
+module: file
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

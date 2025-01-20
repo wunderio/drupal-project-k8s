@@ -1,0 +1,37 @@
+uuid: 6b10c556-253d-4ccb-b6f1-0183bc436eac
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.page.field_main_image_ai
+id: node.page.field_main_image_ai.default
+label: 'Main image (AI generated) Default'
+rule: llm_image_generation
+input_mode: base
+weight: 105
+worker_type: batch
+entity_type: node
+bundle: page
+field_name: field_main_image_ai
+edit_mode: false
+base_field: field_image_generation_prompt
+prompt: '{{ context }}'
+token: ''
+plugin_config:
+  automator_enabled: 1
+  automator_rule: llm_image_generation
+  automator_mode: base
+  automator_base_field: field_image_generation_prompt
+  automator_prompt: '{{ context }}'
+  automator_token: ''
+  automator_edit_mode: 0
+  automator_label: 'Main image (AI generated) Default'
+  automator_weight: '105'
+  automator_worker_type: batch
+  automator_ai_provider: openai
+  automator_ai_model: dall-e-3
+  automator_configuration_n: '1'
+  automator_configuration_response_format: url
+  automator_configuration_size: 1024x1024
+  automator_configuration_quality: hd
+  automator_configuration_style: vivid

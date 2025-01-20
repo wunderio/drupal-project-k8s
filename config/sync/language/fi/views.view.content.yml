@@ -1,0 +1,28 @@
+display:
+  default:
+    display_title: Oletus
+    display_options:
+      fields:
+        title:
+          label: Title
+        type:
+          separator: ', '
+        status:
+          label: Tila
+        operations:
+          label: Operations
+      exposed_form:
+        options:
+          reset_button_label: Palauta
+          exposed_sorts_label: Lajittele
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      filters:
+        title:
+          expose:
+            label: Title
+        status:
+          expose:
+            label: Tila
+  page_1:
+    display_title: Sivu

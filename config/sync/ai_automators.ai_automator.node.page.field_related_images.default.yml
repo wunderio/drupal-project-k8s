@@ -1,0 +1,29 @@
+uuid: cad3e644-d4ac-432b-9a23-a0117bf275d7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.page.field_related_images
+id: node.page.field_related_images.default
+label: 'Related images (AI automated) Default'
+rule: ai_automator_pixabay_image
+input_mode: base
+weight: 101
+worker_type: batch
+entity_type: node
+bundle: page
+field_name: field_related_images
+edit_mode: false
+base_field: field_image_search_keywords
+prompt: ''
+token: ''
+plugin_config:
+  automator_enabled: 1
+  automator_rule: ai_automator_pixabay_image
+  automator_image_pixabay_amount: '3'
+  automator_mode: base
+  automator_base_field: field_image_search_keywords
+  automator_edit_mode: 0
+  automator_label: 'Related images (AI automated) Default'
+  automator_weight: '101'
+  automator_worker_type: batch

@@ -164,7 +164,7 @@ nginx:
       memory: 244Mi
 
   # Set of values to enable and use http basic authentication
-  # It is implemented only for very basic protection (like web crawlers)
+  # It is implemented only for very basic protection (like web crawlers)
   basicauth:
     enabled: true
 
@@ -796,6 +796,39 @@ clamav:
     limits:
       cpu: 1500m
       memory: 3Gi
+
+milvus:
+  enabled: true
+  mode: distributed
+  # ... other configurations ...
+
+  minio:
+    mode: standalone  # Change this from 'distributed' to 'standalone'
+    replicas: 1       # Reduce this to 1 for simplicity
+    resources:
+      requests:
+        cpu: 100m     # Reduce CPU request
+        memory: 256Mi # Reduce memory request
+      limits:
+        cpu: 500m     # Reduce CPU limit
+        memory: 512Mi # Reduce memory limit
+    persistence:
+      enabled: true
+      size: 5Gi       # Reduce storage size if needed
+    service:
+      type: ClusterIP # Ensure this is set to ClusterIP
+    auth:
+      rootUser: minioadmin     # Set a root user
+      rootPassword: minioadmin # Set a root password
+
+  config:
+    minio:
+      address: milvus-minio:9000
+      accessKey: minioadmin
+      secretKey: minioadmin
+      useSSL: false
+      bucketName: milvus
+
 db:
   # Available options: mariadb, pxc-db
   primary: mariadb

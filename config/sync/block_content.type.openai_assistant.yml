@@ -1,0 +1,13 @@
+uuid: 0f1b7eb8-c015-4416-b8c2-a695f983e7ce
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - openai_assistants
+_core:
+  default_config_hash: MzWwyQAuDof075GbvLMmr4P2N1dvzFmwTAoz7AvDCMg
+id: openai_assistant
+label: 'OpenAI Assistant'
+revision: false
+description: 'Display an OpenAI assistant for users to interact with.'

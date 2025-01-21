@@ -27,6 +27,8 @@ silta-release:
   # proxy:
   #   enabled: true
   #   no_proxy: ".example.com"
+  downscaler:
+    releaseMinAge: '1w'
   ingressAccess:
     test:
       additionalPodSelector:

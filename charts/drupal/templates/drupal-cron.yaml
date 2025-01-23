@@ -156,6 +156,24 @@ spec:
             {{- include "drupal.tolerations" $.Values.php.nodeSelector | nindent 12 }}
             {{- end }}
             {{- end }}
+            {{- if $.Values.php.tolerations }}
+            {{ $.Values.php.tolerations | toYaml | nindent 12 }}
+            {{- end }}
+          affinity:
+            {{- if $job.affinity }}
+            {{- if ($.Values.php.cronJobDefaults).affinity }}
+            {{- tpl ( merge $job.affinity (merge $.Values.php.cronJobDefaults.affinity $.Values.php.affinity) $ | toYaml ) | nindent 12 }}
+            {{- else }}
+            {{- tpl ( merge $job.affinity $.Values.php.affinity | toYaml ) $ | nindent 12 }}
+            {{- end }}
+            {{- else }}
+            {{- if ($.Values.php.cronJobDefaults).affinity }}
+            {{- tpl ( merge $.Values.php.cronJobDefaults.affinity $.Values.php.affinity | toYaml ) $ | nindent 12 }}
+            {{- else }}
+            {{- tpl ( $.Values.php.affinity | toYaml ) $ | nindent 12 }}
+            {{- end }}
+            {{- end }}
+
           volumes:
             {{- include "drupal.volumes" $ | nindent 12 }}
 

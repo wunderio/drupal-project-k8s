@@ -70,14 +70,23 @@ spec:
       nodeSelector:
         {{ if .Values.shell.nodeSelector }}
         {{- .Values.shell.nodeSelector | toYaml | nindent 8 }}
-        {{ else }}
+        {{- else }}
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
         {{- end }}
       tolerations:
         {{ if .Values.shell.nodeSelector }}
         {{- include "drupal.tolerations" .Values.shell.nodeSelector | nindent 8 }}
-        {{ else }}
+        {{- else }}
         {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
+        {{- end }}
+        {{- if .Values.shell.tolerations }}
+        {{- .Values.shell.tolerations | toYaml | nindent 8 }}
+        {{- end }}
+      affinity:
+        {{- if .Values.shell.affinity }}
+        {{- tpl ( .Values.shell.affinity | toYaml ) . | nindent 8 }}
+        {{- else }}
+        {{- tpl ( .Values.php.affinity | toYaml ) . | nindent 8 }}
         {{- end }}
       volumes:
       {{- include "drupal.volumes" . | nindent 6 }}

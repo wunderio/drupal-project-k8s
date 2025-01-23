@@ -55,3 +55,19 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+
+# mysql-cluster:
+#   enabled: true
+#   # TODO:
+#   # - service name issue, it's always "mysql". https://github.com/bitpoke/mysql-operator/issues/537
+#   # - downscaler, statefulset is always mirrored from mysqlcluster resource
+
+# mariadb:
+#   enabled: false
+
+# db:
+#   primary: mysql-cluster
+
+# elasticsearch:
+#   sysctlInitContainer:
+#     enabled: false

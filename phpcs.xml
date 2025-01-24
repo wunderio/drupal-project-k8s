@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- See http://pear.php.net/manual/en/package.php.php-codesniffer.annotated-ruleset.php -->
+<!-- See test http://pear.php.net/manual/en/package.php.php-codesniffer.annotated-ruleset.php -->
 <ruleset name="Drupal Custom">
     <description>Drupal coding standard</description>
 

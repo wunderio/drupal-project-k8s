@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  silta: silta/silta@dev:master
+  silta: silta/silta@dev:custom-proxy-command
 
 executors:
   cicd73:
@@ -118,6 +118,8 @@ workflows:
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev
+          custom-command: |
+            echo "Custom command testing, build job"
           requires:
             - approve-deployment
           filters: *filter_feature_only
@@ -152,6 +154,8 @@ workflows:
                     helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           silta_config: silta/silta.yml
           context: silta_dev
+          custom-command: |
+            echo "Custom command testing, deploy job"
           requires:
             - build
           filters: *filter_feature_only

@@ -154,8 +154,6 @@ workflows:
                     helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           silta_config: silta/silta.yml
           context: silta_dev
-          custom-command: |
-            echo "Custom command testing, deploy job"
           requires:
             - build
           filters: *filter_feature_only

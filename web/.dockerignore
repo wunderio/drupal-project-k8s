@@ -1,4 +1,4 @@
-# Ignore file for the nginx container.
+## Ignore file for the nginx container.
 **/*.md
 **/CHANGELOG*
 **/README*

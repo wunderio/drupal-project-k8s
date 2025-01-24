@@ -31,6 +31,13 @@ chart versions, breaks deployment. So we add conditional on it.
 {{- end -}}
 
 {{/*
+serviceAccountName can't be templated in the elasticsearch chart so we override it.
+*/}}
+{{- define "elasticsearch.serviceAccount" -}}
+{{- include "drupal.serviceAccountName" . }}
+{{- end -}}
+
+{{/*
 The mariadb chart switched to an incompatible naming scheme,
 we make it compatible by overriding the following templates.
 */}}

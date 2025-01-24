@@ -1,3 +1,4 @@
+# comment
 grumphp:
   stop_on_failure: true
   process_timeout: 300

@@ -112,7 +112,7 @@ workflows:
           executor: cicd83
 
           # Uncomment the line below to use the test build of silta cli.
-          #silta_cli_version: test
+          silta_cli_version: test
 
           codebase-build:
             - silta/drupal-composer-install
@@ -135,7 +135,7 @@ workflows:
           chart_repository: ""
 
           # Uncomment the line below to use the test build of silta cli.
-          #silta_cli_version: test
+          silta_cli_version: test
 
           pre-release:
             - run:

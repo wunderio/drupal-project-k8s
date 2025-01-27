@@ -117,9 +117,10 @@ workflows:
           codebase-build:
             - silta/drupal-composer-install
             - silta/npm-install-build
-          context: silta_dev
+
           custom-command: |
-            echo "Custom command testing, build job"
+            echo "testing custom command"
+          context: silta_dev
           requires:
             - approve-deployment
           filters: *filter_feature_only

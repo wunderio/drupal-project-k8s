@@ -153,7 +153,7 @@ workflows:
                     helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           silta_config: silta/silta.yml
           context: silta_dev
-          custom-command: |
+          custom-proxy-command: |
             if [[ -n "$TUNNEL_USER_HOST" ]]; then
               echo "Running slightly customized proxy setup"
               ssh -o StrictHostKeyChecking=accept-new -D 1337 -C -N -q -f "$TUNNEL_USER_HOST"

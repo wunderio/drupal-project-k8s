@@ -118,8 +118,6 @@ workflows:
             - silta/drupal-composer-install
             - silta/npm-install-build
 
-          custom-command: |
-            echo "testing custom command"
           context: silta_dev
           requires:
             - approve-deployment
@@ -155,6 +153,26 @@ workflows:
                     helm install --dry-run --generate-name ./charts/drupal --values charts/drupal/test.values.yaml
           silta_config: silta/silta.yml
           context: silta_dev
+          custom-command: |
+            if [[ -n "$TUNNEL_USER_HOST" ]]; then
+              echo "Running slightly customized proxy setup"
+              ssh -o StrictHostKeyChecking=accept-new -D 1337 -C -N -q -f "$TUNNEL_USER_HOST"
+              echo 'export SILTA_PROXY=socks5://localhost:1337' >> $BASH_ENV
+              if command -v gcloud &> /dev/null; then
+                gcloud config set proxy/type socks5
+                gcloud config set proxy/address 127.0.0.1
+                gcloud config set proxy/port 1337
+              fi
+              if command -v silta &> /dev/null; then
+                if [ "$CLUSTER_TYPE" == "aws" ] && command -v pproxy &> /dev/null; then
+                  pproxy -r socks5://127.0.0.1:1337 --daemon
+                  silta config set proxy http://localhost:8080
+                else
+                  silta config set proxy socks5://localhost:1337
+                fi
+              fi
+              echo "Proxy is ready for outgoing connections"
+            fi
           requires:
             - build
           filters: *filter_feature_only

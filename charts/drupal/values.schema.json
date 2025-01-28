@@ -8,6 +8,14 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "imagePullSecret": { "type": "string" },
+    "serviceAccount": { 
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "automountServiceAccountToken": { "type": "boolean" }
+      }
+    },
     "app": { "type": "string" },
     "webRoot": { "type": "string" },
 
@@ -698,6 +706,7 @@
         "enabled": { "type": "boolean" },
         "image": { "type": "string" },
         "imageTag": { "type": ["string", "integer"] },
+        "clamdExtraConfig": { "type": "string" },
         "freshclamExtraConfig": { "type": "string" },
         "resources": {
           "type": "object",

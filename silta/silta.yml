@@ -22,6 +22,14 @@ mounts:
   private-files:
     enabled: true
 
+  webroot:
+    enabled: true
+    storage: 512Mi
+    # mountPath: /tmp/webroot
+    # rsync -avx /app/web/* /tmp/webroot/
+    mountPath: /app/web
+    storageClassName: nfs-shared
+
 # Allow access from another namespace for testing purposes.
 silta-release:
   # proxy:
@@ -49,6 +57,9 @@ nginx:
     add_header X-Backend-Server $hostname;
 
 php:
+  php_ini:
+    extraConfig: |
+      opcache.enable=0
   cron:
     drupal:
       # Disable cron jobs in feature environments by using non-existing date.

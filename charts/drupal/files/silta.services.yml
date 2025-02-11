@@ -4,13 +4,13 @@ parameters:
       handlers:
         - name: 'stream'
           formatter: 'json'
-          processors:
-            - 'message_placeholder'
-            - 'current_user'
-            - 'request_uri'
-            - 'ip'
-            - 'referer'
-            - 'filter_backtrace'
+#          processors:
+#            - 'message_placeholder'
+#            - 'current_user'
+#            - 'request_uri'
+#            - 'ip'
+#            - 'referer'
+#            - 'filter_backtrace'
 
 services:
   monolog.handler.stream:

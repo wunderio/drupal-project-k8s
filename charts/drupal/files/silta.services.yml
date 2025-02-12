@@ -3,7 +3,7 @@ parameters:
     default:
       handlers:
         - name: 'stream'
-#          formatter: 'json'
+          formatter: 'logstash'
 #          processors:
 #            - 'message_placeholder'
 #            - 'current_user'

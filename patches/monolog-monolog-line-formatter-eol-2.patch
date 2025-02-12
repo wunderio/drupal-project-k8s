@@ -1,0 +1,24 @@
+diff --git a/src/Monolog/Formatter/LineFormatter.php b/src/Monolog/Formatter/LineFormatter.php
+index e6e78983..fa48e426 100644
+--- a/src/Monolog/Formatter/LineFormatter.php
++++ b/src/Monolog/Formatter/LineFormatter.php
+@@ -23,7 +23,7 @@ use Monolog\Utils;
+  */
+ class LineFormatter extends NormalizerFormatter
+ {
+-    public const SIMPLE_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
++    public const SIMPLE_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
+ 
+     /** @var string */
+     protected $format;
+@@ -126,7 +126,9 @@ class LineFormatter extends NormalizerFormatter
+             }
+         }
+ 
+-        return $output;
++        // Make sure we have proper line endings.
++        // I suspect the logic above removes what's being added in SIMPLE_FORMAT constant.
++        return $output . "\r\n";
+     }
+ 
+     public function formatBatch(array $records): string

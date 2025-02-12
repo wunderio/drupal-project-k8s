@@ -3,7 +3,6 @@ parameters:
     default:
       handlers:
         - name: 'stream'
-          formatter: 'normalizer'
 #          processors:
 #            - 'message_placeholder'
 #            - 'current_user'

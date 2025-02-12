@@ -1,0 +1,13 @@
+diff --git a/src/Monolog/Formatter/LineFormatter.php b/src/Monolog/Formatter/LineFormatter.php
+index e6e78983..c6f750f5 100644
+--- a/src/Monolog/Formatter/LineFormatter.php
++++ b/src/Monolog/Formatter/LineFormatter.php
+@@ -23,7 +23,7 @@ use Monolog\Utils;
+  */
+ class LineFormatter extends NormalizerFormatter
+ {
+-    public const SIMPLE_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
++    public const SIMPLE_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n";
+ 
+     /** @var string */
+     protected $format;

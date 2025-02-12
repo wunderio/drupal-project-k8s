@@ -113,6 +113,10 @@
             ]
         },
         "composer-exit-on-patch-failure": true,
-        "patches": []
+        "patches": {
+            "monolog/monolog": {
+                "Local patch: Add propper EOL for LineFormatter": "patches/monolog-monolog-line-formatter-eol.patch"
+            }
+        }
     }
 }

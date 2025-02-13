@@ -115,7 +115,7 @@
         "composer-exit-on-patch-failure": true,
         "patches": {
             "monolog/monolog": {
-                "Local patch: Alter monolog LineFormatter's SIMPLE_FORMAT (Attempt #2)" : "patches/monolog-line-formatter-patch-2.patch"
+                "Local patch: Alter monolog LineFormatter's SIMPLE_FORMAT (Attempt #3)" : "patches/monolog-line-formatter-patch-3.patch"
             }
         }
     }

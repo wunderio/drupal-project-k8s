@@ -2,7 +2,7 @@
   rules:
     - if: $CI_COMMIT_BRANCH == "production"
       when: never
-    - if: $CI_COMMIT_BRANCH = "master"
+    - if: $CI_COMMIT_BRANCH == "master"
       when: never
     - if: $CI_COMMIT_BRANCH =~ /feature\/test-cluster(\/.*)?/
       when: never
@@ -44,8 +44,8 @@ build-job:
       when: never
 
 deploy-job:
-  stage: test
+  stage: deploy
   script:
     - echo "This job tests something"
   rules:
-    - !reference [.filter_feature_only, rules]
+    - when: never

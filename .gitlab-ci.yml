@@ -16,7 +16,6 @@ default:
 
 stages:
   - build
-  - deploy
 
 build-job:
   stage: build
@@ -43,9 +42,3 @@ build-job:
     - if: $CI_COMMIT_BRANCH =~ /feature\/aks-cluster(\/.*)?/
       when: never
 
-deploy-job:
-  stage: deploy
-  script:
-    - echo "This job tests something"
-  rules:
-    - when: never

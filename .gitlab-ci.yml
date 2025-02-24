@@ -34,7 +34,7 @@ build-job:
   rules:
     - if: $CI_COMMIT_BRANCH == "production"
       when: never
-    - if: $CI_COMMIT_BRANCH = "master"
+    - if: $CI_COMMIT_BRANCH == "master"
       when: never
     - if: $CI_COMMIT_BRANCH =~ /feature\/test-cluster(\/.*)?/
       when: never

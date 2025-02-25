@@ -1,3 +1,11 @@
+.setup_silta_cli:
+  script: |
+    echo "Install silta-cli"
+    mkdir -p ~/.local/bin
+    latest_release_url=$(curl -sL https://api.github.com/repos/wunderio/silta-cli/releases/latest | grep -o -E "https://(.*)silta-(.*)-linux-amd64.tar.gz" | head -1)
+    curl -sL $latest_release_url | tar xz -C ~/.local/bin
+    silta version
+
 .filter_feature_only:
   rules:
     - if: $CI_COMMIT_BRANCH == "production"
@@ -21,12 +29,7 @@ stages:
 build-job:
   stage: build
   script:
-    - |
-      echo "Install silta-cli"
-      mkdir -p ~/.local/bin
-      latest_release_url=$(curl -s https://api.github.com/repos/wunderio/silta-cli/releases/latest | jq -r '.assets[] | .browser_download_url | select(endswith("linux-amd64.tar.gz"))')
-      curl -sL $latest_release_url | tar xz -C ~/.local/bin
-      silta version
+    - !reference [.setup_silta_cli, script]
     - composer install -n --prefer-dist --ignore-platform-reqs --no-dev --optimize-autoloader
     - npm install && npm run build
     # Todo Docker setup

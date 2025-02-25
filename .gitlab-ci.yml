@@ -1,10 +1,16 @@
-.setup_silta_cli:
-  script: |
+.commands:
+  setup_silta_cli: |
     echo "Install silta-cli"
     mkdir -p ~/.local/bin
     latest_release_url=$(curl -sL https://api.github.com/repos/wunderio/silta-cli/releases/latest | grep -o -E "https://(.*)silta-(.*)-linux-amd64.tar.gz" | head -1)
     curl -sL $latest_release_url | tar xz -C ~/.local/bin
     silta version
+  drupal_composer_install: |
+    echo "Composer install"
+    composer install -n --prefer-dist --ignore-platform-reqs --no-dev --optimize-autoloader
+  npm_install_build: |
+    echo "Npm install"
+    npm install && npm run build
 
 .filter_feature_only:
   rules:
@@ -29,9 +35,9 @@ stages:
 build-job:
   stage: build
   script:
-    - !reference [.setup_silta_cli, script]
-    - composer install -n --prefer-dist --ignore-platform-reqs --no-dev --optimize-autoloader
-    - npm install && npm run build
+    - !reference [.commands, setup_silta_cli]
+    - !reference [.commands, drupal_composer_install]
+    - !reference [.commands, npm_install_build]
     # Todo Docker setup
     - silta config set proxy socks5://localhost:1337
   rules:

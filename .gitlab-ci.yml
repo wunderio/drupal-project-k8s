@@ -10,6 +10,7 @@
       when: never
     - if: $CI_COMMIT_BRANCH =~ /feature\/aks-cluster(\/.*)?/
       when: never
+    - when: on_success
 
 default:
   image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
@@ -31,15 +32,5 @@ build-job:
     # Todo Docker setup
     - silta config set proxy socks5://localhost:1337
   rules:
-    - if: $CI_COMMIT_BRANCH == "production"
-      when: never
-    - if: $CI_COMMIT_BRANCH == "master"
-      when: never
-    - if: $CI_COMMIT_BRANCH =~ /feature\/test-cluster(\/.*)?/
-      when: never
-    - if: $CI_COMMIT_BRANCH =~ /feature\/aws-cluster(\/.*)?/
-      when: never
-    - if: $CI_COMMIT_BRANCH =~ /feature\/aks-cluster(\/.*)?/
-      when: never
-    - when: on_success
+    - !reference [.filter_feature_only, rules]
 

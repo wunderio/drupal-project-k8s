@@ -42,4 +42,5 @@ build-job:
     - silta config set proxy socks5://localhost:1337
   rules:
     - !reference [.filter_feature_only, rules]
+    - if: $CI_COMMIT_TAG
 

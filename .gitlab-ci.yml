@@ -30,9 +30,10 @@ default:
   image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
 
 stages:
+  - arbitrary
   - build
 
-build-job:
+build-job1:
   stage: build
   script:
     - !reference [.commands, setup_silta_cli]
@@ -42,5 +43,30 @@ build-job:
     - silta config set proxy socks5://localhost:1337
   rules:
     - !reference [.filter_feature_only, rules]
-    - if: $CI_COMMIT_TAG
+
+build-job2:
+  stage: build
+  script:
+    - echo "Build job 2"
+    - sleep 30
+  needs:
+    - build-job1
+  rules:
+    - !reference [.filter_feature_only, rules]
+
+build-job3:
+  stage: build
+  script:
+    - echo "Build job 3"
+    - sleep 30
+  rules:
+    - !reference [.filter_feature_only, rules]
+
+arbitrary-job1:
+  stage: arbitrary
+  script:
+    - echo "Arbitrary job 1"
+    - sleep 30
+  rules:
+    - !reference [.filter_feature_only, rules]
 

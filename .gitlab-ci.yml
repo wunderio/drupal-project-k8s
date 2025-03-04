@@ -144,9 +144,8 @@ default:
   image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
 
 variables:
-  # Todo: Create a separate service account for the runner and use it here.
-  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-gitlab-runner
-  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE_ALLOWED: .*
+  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-executor-sa
+  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE_ALLOWED: ^gitlab-executor-sa$
 
 stages:
   - build
@@ -154,6 +153,7 @@ stages:
 build-job0:
   stage: build
   script:
+    - echo "Running with service account: $KUBERNETES_SERVICE_ACCOUNT"
     - kubectl get pods
     - sleep 300
   rules:

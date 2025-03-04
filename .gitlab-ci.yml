@@ -146,6 +146,7 @@ default:
 variables:
   # Todo: Create a separate service account for the runner and use it here.
   KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-gitlab-runner
+  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE_ALLOWED: .*
 
 stages:
   - build

@@ -144,8 +144,15 @@ default:
   image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
 
 stages:
-  - arbitrary
   - build
+
+build-job0:
+  stage: build
+  script:
+    - kubectl get pods
+    - sleep 300
+  rules:
+    - !reference [.filter_feature_only, rules]
 
 build-job1:
   stage: build
@@ -158,32 +165,6 @@ build-job1:
     - !reference [.commands, docker_login]
     - !reference [.commands, set_release_name]
     - !reference [.commands, docker_build_nginx]
-  rules:
-    - !reference [.filter_feature_only, rules]
-
-build-job2:
-  stage: build
-  script:
-    - echo "Build job 2"
-    - sleep 30
-  needs:
-    - build-job1
-  rules:
-    - !reference [.filter_feature_only, rules]
-
-build-job3:
-  stage: build
-  script:
-    - echo "Build job 3"
-    - sleep 30
-  rules:
-    - !reference [.filter_feature_only, rules]
-
-arbitrary-job1:
-  stage: arbitrary
-  script:
-    - echo "Arbitrary job 1"
-    - sleep 30
   rules:
     - !reference [.filter_feature_only, rules]
 

@@ -153,7 +153,7 @@ stages:
 build-job0:
   stage: build
   script:
-    - echo "Running with service account: $KUBERNETES_SERVICE_ACCOUNT"
+    - echo "Running with service account $KUBERNETES_SERVICE_ACCOUNT"
     - kubectl get pods
     - sleep 300
   rules:

@@ -143,6 +143,10 @@
 default:
   image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
 
+variables:
+  # Todo: Create a separate service account for the runner and use it here.
+  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-gitlab-runner
+
 stages:
   - build
 

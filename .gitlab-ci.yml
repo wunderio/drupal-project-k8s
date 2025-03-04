@@ -11,6 +11,120 @@
   npm_install_build: |
     echo "Npm install"
     npm install && npm run build
+  setup_silta_proxy: |
+    echo "Set up silta proxy"
+    if [[ -n "$TUNNEL_USER_HOST" ]]; then
+      ssh -o StrictHostKeyChecking=accept-new -D 1337 -C -N -q -f "$TUNNEL_USER_HOST"
+      echo 'export SILTA_PROXY=socks5://localhost:1337' >> $BASH_ENV
+      if command -v gcloud &> /dev/null; then
+        gcloud config set proxy/type socks5
+        gcloud config set proxy/address 127.0.0.1
+        gcloud config set proxy/port 1337
+      fi
+      if command -v silta &> /dev/null; then
+        if [ "$CLUSTER_TYPE" == "aws" ] && command -v pproxy &> /dev/null; then
+          pproxy -r socks5://127.0.0.1:1337 --daemon
+          silta config set proxy http://localhost:8080
+        else
+          silta config set proxy socks5://localhost:1337
+        fi
+      fi
+      echo "Proxy is ready for outgoing connections"
+    fi
+  cloud_login: |
+    echo "Cloud login"
+    KUBECTL_CONFIG_VAR="${SILTA_CLUSTER_ID}_KUBECTL_CONFIG"
+
+    # If project kubectl is set, use it to connect to the cluster.
+    if [ ! -z "${!KUBECTL_CONFIG_VAR}" ]; then
+      export KUBECTL_CONFIG="${!KUBECTL_CONFIG_VAR}"
+      echo "export KUBECTL_CONFIG=${!KUBECTL_CONFIG_VAR}" >> $BASH_ENV
+      silta cloud login --cluster-name "${CLUSTER_NAME}"
+
+    # Otherwise, try to use global credentials and check exit code.
+    else
+      set +e
+      silta cloud login --cluster-name "${CLUSTER_NAME}"
+
+      # if exit code is not 0, request kubectl injection via silta dashboard api
+      if [ $? -ne 0 ]; then
+        set -e
+        echo "Cluster connection credentials are missing."
+
+        if [ ! -z "${SILTA_DASHBOARD_URL}" ]; then
+          echo "Attempting to request cluster connection credentials from the Silta Dashboard API."
+          NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"
+          # Request kubeconfig injection from the Silta Dashboard API via curl request.
+          curl -X POST "${SILTA_DASHBOARD_URL}/api/circleci/reload-ns-rbac" \
+            -H "Content-type: application/x-www-form-urlencoded" \
+            -d "rbac_reload_key=${SILTA_DASHBOARD_KEY}" \
+            -d "cluster=${SILTA_CLUSTER_ID}" \
+            -d "namespace=${NAMESPACE}"
+          echo ""
+          echo "Credentials requested, please rerun the build."
+        fi
+        exit 1
+      fi
+    fi
+  docker_login: |
+    echo "Docker login"
+    silta ci image login
+  set_release_name: |
+    echo "Set release name"
+    NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"
+    # Use branch name or fall back to "production" if it's a tag.
+    BRANCHNAME="${CIRCLE_BRANCH:-${CIRCLE_TAG:+production}}"
+
+    RELEASE_NAME=$(silta ci release name --branchname "${BRANCHNAME}" --release-suffix "<<parameters.release-suffix>>")
+    SILTA_ENVIRONMENT_NAME=$(silta ci release environmentname --branchname "${BRANCHNAME}" --release-suffix "<<parameters.release-suffix>>")
+
+    echo "export RELEASE_NAME='$RELEASE_NAME'" >> "$BASH_ENV"
+    echo "export NAMESPACE='$NAMESPACE'" >> "$BASH_ENV"
+    echo "export SILTA_ENVIRONMENT_NAME='$SILTA_ENVIRONMENT_NAME'" >> "$BASH_ENV"
+
+    echo "The release name for this branch is \"$RELEASE_NAME\" in the \"$NAMESPACE\" namespace"
+  docker_build_nginx: |
+    echo "Build nginx"
+    NAMESPACE="${CIRCLE_PROJECT_REPONAME,,}"
+    BRANCHNAME="${CIRCLE_BRANCH}"
+
+    IMAGE_URL=$(silta ci image url \
+      --image-repo-host "${DOCKER_REPO_HOST}" \
+      --image-repo-project "${DOCKER_REPO_PROJ}" \
+      --namespace "${NAMESPACE}" \
+      --image-identifier "nginx" \
+      --build-path "" \
+      --dockerfile "nginx.Dockerfile" \
+      --image-tag "" \
+      --image-tag-prefix "v1" \
+    )
+
+    if [ '<<parameters.expose_image>>' = 'true' ]; then
+      # Persist the image identifier and tag so it is available during deployment.
+      echo "export nginx_IMAGE_IDENTIFIER='nginx'" >> "$BASH_ENV"
+      echo "export nginx_IMAGE_URL='${IMAGE_URL}'" >> "$BASH_ENV"
+    fi
+
+    # Create temporary file for storing build process exit code with "build_process" prefix.
+    exit_code_file=$(mktemp /tmp/build-docker-image.XXXXXX)
+    touch $exit_code_file
+
+    # Trap and store exit code of the build process.
+    trap 'echo $? > $exit_code_file' EXIT
+
+    # Build the docker image.
+    silta ci image build \
+      --image-repo-host "${DOCKER_REPO_HOST}" \
+      --image-repo-project "${DOCKER_REPO_PROJ}" \
+      --namespace "${NAMESPACE}" \
+      --image-identifier "nginx" \
+      --build-path "<<parameters.path>>" \
+      --dockerfile "<<parameters.dockerfile>>" \
+      --image-tag-prefix "<<parameters.docker-hash-prefix>>" \
+      --image-tag "<<parameters.tag>>" \
+      --branchname "${BRANCHNAME}" \
+      --image-reuse <<parameters.reuse_image>>
+
 
 .filter_feature_only:
   rules:
@@ -39,8 +153,11 @@ build-job1:
     - !reference [.commands, setup_silta_cli]
     - !reference [.commands, drupal_composer_install]
     - !reference [.commands, npm_install_build]
-    # Todo Docker setup
-    - silta config set proxy socks5://localhost:1337
+    - !reference [.commands, setup_silta_proxy]
+    - !reference [.commands, cloud_login]
+    - !reference [.commands, docker_login]
+    - !reference [.commands, set_release_name]
+    - !reference [.commands, docker_build_nginx]
   rules:
     - !reference [.filter_feature_only, rules]
 

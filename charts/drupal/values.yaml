@@ -742,7 +742,6 @@ redis:
 mailpit:
   enabled: false
 
-
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:

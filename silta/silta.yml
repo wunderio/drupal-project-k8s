@@ -11,7 +11,7 @@ mailpit:
   enabled: true
 
 mailhog:
-  enabled: true
+  enabled: false
 
 elasticsearch:
   enabled: true

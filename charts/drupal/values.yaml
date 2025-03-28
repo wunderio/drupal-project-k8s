@@ -741,9 +741,6 @@ redis:
 # Mailpit service overrides
 mailpit:
   enabled: false
-  mailpit:
-    # Override the webroot to ease proxying under /mailpit path on Drupal
-    webroot: /mailpit
   resources:
     requests:
       cpu: 1m

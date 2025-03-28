@@ -742,8 +742,10 @@ redis:
 mailpit:
   enabled: false
   extraEnvVars:
-    - MP_SMTP_AUTH_ACCEPT_ANY: "true"
-    - MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+    - name: MP_SMTP_AUTH_ACCEPT_ANY
+      value: "true"
+    - name: MP_SMTP_AUTH_ALLOW_INSECURE
+      value: "true"
   resources:
     requests:
       cpu: 1m

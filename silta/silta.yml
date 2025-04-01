@@ -10,9 +10,6 @@ varnish:
 mailpit:
   enabled: true
 
-mailhog:
-  enabled: false
-
 elasticsearch:
   enabled: true
 

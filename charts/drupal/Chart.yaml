@@ -24,7 +24,7 @@ dependencies:
   condition: mailhog.enabled
 - name: mailpit
   version: 0.23.x
-  repository: https://jouve.github.io/charts/
+  repository: file://../forked/jouve/mailpit-0.23.1
   condition: mailpit.enabled
 - name: elasticsearch
   version: 8.5.x

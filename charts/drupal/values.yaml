@@ -754,6 +754,7 @@ mailpit:
     limits:
       cpu: 50m
       memory: 100M
+  enableServiceLinks: false
   mailpit:
     # This is for easier proxying from Drupal's nginx
     webroot: /mailpit

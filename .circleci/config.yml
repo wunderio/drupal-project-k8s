@@ -97,7 +97,7 @@ workflows:
           name: validate
 
           # Use custom executor.
-          executor: cicd83
+          executor: cicd83-sqlite345
 
           post-validation:
             - run:
@@ -112,7 +112,7 @@ workflows:
           name: build
 
           # Use custom executor.
-          executor: cicd83
+          executor: cicd83-sqlite345
 
           # Uncomment the line below to use the test build of silta cli.
           #silta_cli_version: test
@@ -131,7 +131,7 @@ workflows:
           name: deploy
 
           # Use custom executor.
-          executor: cicd83
+          executor: cicd83-sqlite345
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"

@@ -134,9 +134,9 @@ imagePullSecrets:
 
 {{- define "drupal.ref-data-env" }}
 - name: REF_DATA_COPY_DB
-  value: {{ .Values.referenceData.copyDatabase | default true | quote }}
+  value: {{ .Values.referenceData.copyDatabase | quote }}
 - name: REF_DATA_COPY_FILES
-  value: {{ .Values.referenceData.copyFiles | default true | quote }}
+  value: {{ .Values.referenceData.copyFiles | quote }}
 {{- end }}
 
 {{- define "drupal.db-env" }}

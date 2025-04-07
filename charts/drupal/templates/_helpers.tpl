@@ -132,6 +132,13 @@ imagePullSecrets:
       key: password
 {{- end }}
 
+{{- define "drupal.ref-data-env" }}
+- name: REF_DATA_COPY_DB
+  value: {{ .Values.referenceData.copyDatabase | default true | quote }}
+- name: REF_DATA_COPY_FILES
+  value: {{ .Values.referenceData.copyFiles | default true | quote }}
+{{- end }}
+
 {{- define "drupal.db-env" }}
 {{- if .Values.mariadb.enabled }}
 - name: MARIADB_DB_USER
@@ -241,6 +248,9 @@ imagePullSecrets:
 {{- end }}
 {{ include "smtp.env" . }}
 {{- end}}
+{{- if .Values.referenceData.enabled }}
+  {{ include "drupal.ref-data-env" . }}
+{{- end }}
 {{- if .Values.varnish.enabled }}
 - name: VARNISH_ADMIN_HOST
   value: {{ .Release.Name }}-varnish

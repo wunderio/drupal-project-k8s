@@ -7,6 +7,9 @@
 varnish:
   enabled: true
 
+mailpit:
+  enabled: true
+
 elasticsearch:
   enabled: true
 

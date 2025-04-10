@@ -5,6 +5,7 @@ metadata:
   name: {{ .Release.Name }}-hub
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+    partialSyncSupported: "yes"
 data:
   syncStorageSize: {{ $hub_values.sync.storage | quote }}
   {{- if $hub_values.sync.resources }}

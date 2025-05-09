@@ -565,7 +565,7 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
         echo "Parallel import command finished."
 
       elif [[ "$import_method" == "sequential" ]]; then
-        echo "Importing SQL files in sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
+        echo "Importing SQL files sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
         find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
           echo "Importing ${sql_file}"
           if ! mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then

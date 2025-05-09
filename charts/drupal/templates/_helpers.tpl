@@ -433,7 +433,7 @@ wait
 
   # Attempt to remove the _installing file at the very beginning, ignoring errors if it doesn't exist.
   # This cleans up state from a potential previous failed install run.
-  rm -f "$INSTALLING_FILE"
+  rm -f "$INSTALLING_FILE" || true
 
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}

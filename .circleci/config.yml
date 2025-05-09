@@ -127,6 +127,8 @@ workflows:
       - silta/drupal-deploy: &deploy
           name: deploy
 
+          helm_flags: "--history-max=2"
+
           # Use custom executor.
           executor: cicd83
 

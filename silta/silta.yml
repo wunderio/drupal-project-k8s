@@ -4,8 +4,12 @@
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
 
+exposeDomains:
+  fastly:
+    hostname: drupal-project-k8s-staging.fastly.wdr.io
+
 varnish:
-  enabled: true
+  enabled: false
 
 mailpit:
   enabled: true

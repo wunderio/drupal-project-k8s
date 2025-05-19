@@ -143,7 +143,6 @@ workflows:
                 command: |
                   helm repo add elastic https://helm.elastic.co
                   helm repo add jouve https://jouve.github.io/charts/
-                  helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
             - run:

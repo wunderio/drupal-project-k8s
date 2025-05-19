@@ -773,7 +773,7 @@ mailpit:
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
-  enabled: false
+  enabled: true
   enableServiceLinks: false
   image:
     # Set image repository to "mailhog/mailhog" to reenable logging.

@@ -15,18 +15,18 @@ tooling:
     description: "Runs Composer commands"
     cmd:
       - appserver: /usr/local/bin/composer
-    grumphp:
-      description: "Runs grumphp commands"
-      cmd:
-        - appserver: ./vendor/bin/grumphp
-    npm:
-      description: "Runs npm commands"
-      service: node
-    xdebug:
-      description: "Loads Xdebug in the selected mode"
-      cmd:
-        - appserver: /app/.lando/xdebug.sh
-      user: root
+  grumphp:
+    description: "Runs grumphp commands"
+    cmd:
+      - appserver: ./vendor/bin/grumphp
+  npm:
+    description: "Runs npm commands"
+    service: node
+  xdebug:
+    description: "Loads Xdebug in the selected mode"
+    cmd:
+      - appserver: /app/.lando/xdebug.sh
+    user: root
 
 services:
   appserver:

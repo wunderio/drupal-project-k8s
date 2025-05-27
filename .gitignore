@@ -30,3 +30,6 @@ node_modules
 charts/*/charts
 /.editorconfig
 /.gitattributes
+
+# Ignore mailpit data
+.lando/data-mailpit

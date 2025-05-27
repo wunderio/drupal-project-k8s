@@ -1,52 +1,86 @@
 name: Silta
-recipe: drupal9
+recipe: drupal11
 
 config:
-  php: "7.4"
+  php: "8.3"
   via: nginx
   webroot: web
-  database: "mariadb:10.3"
   xdebug: off
   config:
     php: .lando/php.ini
+    database: .lando/my.cnf
 
 tooling:
-  grumphp:
-    description: "Runs grumphp commands"
+  composer:
+    description: "Runs Composer commands"
     cmd:
-      - appserver: ./vendor/bin/grumphp
-  npm:
-    description: "Runs npm commands"
-    service: node
-  xdebug:
-    description: "Loads Xdebug in the selected mode"
-    cmd:
-      - appserver: /app/.lando/xdebug.sh
-    user: root
+      - appserver: /usr/local/bin/composer
+    grumphp:
+      description: "Runs grumphp commands"
+      cmd:
+        - appserver: ./vendor/bin/grumphp
+    npm:
+      description: "Runs npm commands"
+      service: node
+    xdebug:
+      description: "Loads Xdebug in the selected mode"
+      cmd:
+        - appserver: /app/.lando/xdebug.sh
+      user: root
 
 services:
   appserver:
+    # Install dependencies when building lando.
     build:
       - "composer install"
+    # Uncomment if you need a specific timezone for example for integrations
+    #run_as_root:
+    #  - ln -snf /usr/share/zoneinfo/Europe/Helsinki /etc/localtime
+    #  - echo "Europe/Helsinki" > /etc/timezone
+    # Uncomment this if you need to edit files inside the container
+    #build_as_root:
+    #  - apt update -y
+    #  - apt install vim -y
     overrides:
       environment:
+        # Database credentials are defined in the .lando/.env file
+        # to be available in both the adminer and appserver containers.
+        DRUSH_OPTIONS_URI: https://silta.lndo.site
+        SMTP_ADDRESS: mailpit:1025
+        ENVIRONMENT_NAME: lando
+        EXEC_GRUMPHP_COMMAND: "lando php"
         HASH_SALT: notsosecurehash
-        ENVIRONMENT_NAME: local
-        DB_NAME_DRUPAL: drupal9
-        DB_USER_DRUPAL: drupal9
-        DB_PASS_DRUPAL: drupal9
-        DB_HOST_DRUPAL: database
         # Support debugging with XDEBUG 3.
         XDEBUG_MODE:
         PHP_IDE_CONFIG: serverName=appserver
-  mailhog:
-    type: mailhog
-    hogfrom:
-      - appserver
+  node:
+    type: "node:20"
+    build:
+      - "npm install"
+  database:
+    type: "mariadb:10.6.20"
+  mailpit:
+    type: lando
+    api: 3
+    ssl: true
+    sslExpose: false
+    services:
+      image: axllent/mailpit
+      volumes:
+        - .lando/data-mailpit:/data
+      ports:
+        - "8025"  # Web UI
+        - "1025"  # SMTP
+      environment:
+        MP_MAX_MESSAGES: 5000
+        MP_DATA_FILE: /data/mailpit.db
+        MP_SMTP_AUTH_ACCEPT_ANY: 1
+        MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      command: "/mailpit"
 
 proxy:
-  mailhog:
-    - mail-silta.lndo.site
+  mailpit:
+    - mail.silta.lndo.site:8025
 
 events:
   post-db-import:
@@ -56,4 +90,4 @@ env_file:
   - .lando/.env
 
 # Tested with Lando version
-version: v3.1.4
+version: v3.23.24

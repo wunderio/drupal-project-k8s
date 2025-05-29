@@ -37,3 +37,6 @@ charts/*/charts
 # Ignore local DB dumps
 *.sql
 *.sql.gz
+
+# OS X
+.DS_Store

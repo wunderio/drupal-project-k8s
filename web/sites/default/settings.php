@@ -50,8 +50,9 @@ if (getenv('SILTA_CLUSTER') && file_exists($app_root . '/' . $site_path . '/sett
 }
 
 /**
- * Silta cluster configuration overrides.
+ * Varnish configuration overrides.
  */
-if (getenv('SILTA_CLUSTER') && getenv('VARNISH_ADMIN_HOST') && file_exists($app_root . '/' . $site_path . '/varnish.settings.silta.php')) {
-  include $app_root . '/' . $site_path . '/varnish.settings.silta.php';
+if (getenv('VARNISH_ADMIN_HOST')) {
+  $config['varnish_purger.settings.fdf89fb91a']['hostname'] = trim(getenv('VARNISH_ADMIN_HOST'));
+  $config['varnish_purger.settings.fdf89fb91a']['port'] = '80';
 }

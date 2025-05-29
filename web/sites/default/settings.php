@@ -48,3 +48,10 @@ if (getenv('LANDO_INFO') && file_exists($app_root . '/' . $site_path . '/setting
 if (getenv('SILTA_CLUSTER') && file_exists($app_root . '/' . $site_path . '/settings.silta.php')) {
   include $app_root . '/' . $site_path . '/settings.silta.php';
 }
+
+/**
+ * Silta cluster configuration overrides.
+ */
+if (getenv('SILTA_CLUSTER') && getenv('VARNISH_ADMIN_HOST') && file_exists($app_root . '/' . $site_path . '/varnish.settings.silta.php')) {
+  include $app_root . '/' . $site_path . '/varnish.settings.silta.php';
+}

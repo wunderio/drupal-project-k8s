@@ -54,6 +54,7 @@ services:
         ENVIRONMENT_NAME: lando
         EXEC_GRUMPHP_COMMAND: "lando php"
         HASH_SALT: notsosecurehash
+        VARNISH_ADMIN_HOST: varnish
         # Support debugging with XDEBUG 3.
         XDEBUG_MODE:
         PHP_IDE_CONFIG: serverName=appserver

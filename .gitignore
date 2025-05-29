@@ -33,3 +33,7 @@ charts/*/charts
 
 # Ignore mailpit data
 .lando/data-mailpit
+
+# Ignore local DB dumps
+*.sql
+*.sql.gz

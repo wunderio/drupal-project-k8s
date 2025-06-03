@@ -552,7 +552,7 @@
           }
         }
       }
-    },
+     },
     "mariadb": {
       "type": "object",
       "properties": {

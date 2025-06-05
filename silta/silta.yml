@@ -4,14 +4,18 @@
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
 
+exposeDomains:
+  example:
+    hostname: blackhole.fastly.wdr.io
+
 varnish:
-  enabled: true
+  enabled: false
 
 mailpit:
-  enabled: true
+  enabled: false
 
 elasticsearch:
-  enabled: true
+  enabled: false
 
 memcached:
   enabled: false

@@ -4,6 +4,12 @@
 # See https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 # for all possible options.
 
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+
+
 exposeDomains:
   example:
     hostname: blackhole.fastly.wdr.io
@@ -18,7 +24,7 @@ elasticsearch:
   enabled: false
 
 memcached:
-  enabled: false
+  enabled: true
 
 redis:
   enabled: false
@@ -62,3 +68,11 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
+
+
+mariadb:
+  master:
+    persistence:
+      # Database storage disk space allocation
+      # Request assistance from ops team after changing this on existing deployment.
+      size: 10G

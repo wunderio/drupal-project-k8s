@@ -1,3 +1,46 @@
+# Drupal Project with DDoS Mitigation Training Environment
+
+This project includes a DDoS mitigation training environment for testing and learning purposes.
+
+## DDoS Mitigation Training Setup
+
+### Prerequisites
+- Access to the Kubernetes cluster
+- `kubectl` configured with appropriate permissions
+
+### Initial Setup
+
+1. **Ensure Fastly blackhole service is active**
+   - Visit https://blackhole.fastly.wdr.io
+   - If the site shows a maintenance page, click the "Launch" button
+   - Wait about a minute for the service to become active
+
+2. **Adjust PHP container CPU requests**
+   ```bash
+   kubectl patch deployment ddos-mitigation-drupal -n drupal-project-k8s -p '{"spec":{"template":{"spec":{"containers":[{"name":"php","resources":{"requests":{"cpu":"500m"}}}]}}}}'
+   ```
+   *Note: This adjustment prevents the autoscaler from overreacting during training.*
+
+### Running the Training
+
+1. **Deploy the attack pod**
+   ```bash
+   kubectl apply -f attack-pod.yml
+   ```
+
+2. **Monitor the attack**
+   - Use Kubernetes dashboard or CLI tools to monitor the impact
+   - Observe how the system responds to the simulated DDoS attack
+
+### Cleanup
+
+When training is complete, remove the attack pod:
+```bash
+kubectl delete pod ddos-training-attacker -n drupal-project-k8s
+```
+
+---
+
 # Wunder template for Drupal projects
 
 [![CircleCI](https://circleci.com/gh/wunderio/drupal-project/tree/master.svg?style=svg)](https://circleci.com/gh/wunderio/drupal-project/tree/master)

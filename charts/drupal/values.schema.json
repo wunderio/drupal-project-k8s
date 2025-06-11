@@ -8,7 +8,7 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "imagePullSecret": { "type": "string" },
-    "serviceAccount": { 
+    "serviceAccount": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -450,6 +450,9 @@
         "enabled": { "type": "boolean" },
         "referenceEnvironment": { "type": "string" },
         "schedule": { "type": "string" },
+        "databaseImportMethod": { "type": "string" },
+        "copyDatabase": { "type": "boolean" },
+        "copyFiles": { "type": "boolean" },
         "updateAfterDeployment": { "type": "boolean" },
         "ignoreFolders": { "type": "array" },
         "maxFileSize": { "type": "string" },
@@ -621,6 +624,12 @@
     "redis": {
       "type": "object",
       "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "mailpit": {
+      "type": "object",
       "properties": {
         "enabled": { "type": "boolean" }
       }

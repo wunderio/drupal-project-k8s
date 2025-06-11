@@ -90,3 +90,6 @@ mariadb:
 # Fastly WAF.
 signalsciences:
   enabled: true
+
+mailpit:
+  enabled: false

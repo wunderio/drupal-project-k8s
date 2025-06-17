@@ -928,7 +928,8 @@ logging:
 
 # Obfuscate parts of the full domain name.
 # Available values for maskSubdomains are:
-# - releaseName (scrambles release name subdomain, e.g., xxx.project.silta.tld)
-# - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
-# - both (obfuscates both, e.g., zzz.silta.tld)
-# maskSubdomains: both
+# - none (no obfuscation, e.g., branch.project.<clusterDomain>)
+# - releaseName (scrambles release name subdomain, e.g., xxx.project.<clusterDomain>)
+# - projectName (scrambles project name subdomain, e.g., release.yyy.<clusterDomain>)
+# - both (obfuscates both, e.g., zzz.<clusterDomain>)
+maskSubdomains: none

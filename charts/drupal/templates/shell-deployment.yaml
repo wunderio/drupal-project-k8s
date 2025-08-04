@@ -75,7 +75,9 @@ spec:
         {{- if .Values.shell.nodeSelector }}
         {{- .Values.shell.nodeSelector | toYaml | nindent 8 }}
         {{- else }}
+        {{- if .Values.php.nodeSelector }}
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
+        {{- end }}
         {{- end }}
       {{- end }}
       {{- if or .Values.shell.tolerations .Values.php.tolerations .Values.shell.nodeSelector .Values.php.nodeSelector }}
@@ -83,13 +85,16 @@ spec:
         {{ if .Values.shell.nodeSelector }}
         {{- include "drupal.tolerations" .Values.shell.nodeSelector | nindent 8 }}
         {{- else }}
+        {{- if .Values.php.nodeSelector }}
         {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
+        {{- end }}
         {{- end }}
         {{- if .Values.shell.tolerations }}
         {{- .Values.shell.tolerations | toYaml | nindent 8 }}
-        {{- end }}
+        {{- else }}
         {{- if .Values.php.tolerations }}
         {{- .Values.php.tolerations | toYaml | nindent 8 }}
+        {{- end }}
         {{- end }}
       {{- end }}
       {{- if or .Values.shell.affinity .Values.php.affinity }}
@@ -97,7 +102,9 @@ spec:
         {{- if .Values.shell.affinity }}
         {{- tpl ( .Values.shell.affinity | toYaml ) . | nindent 8 }}
         {{- else }}
+        {{- if .Values.php.affinity }}
         {{- tpl ( .Values.php.affinity | toYaml ) . | nindent 8 }}
+        {{- end }}
         {{- end }}
       {{- end }}
       volumes:

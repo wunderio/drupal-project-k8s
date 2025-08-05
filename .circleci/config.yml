@@ -53,6 +53,7 @@ filter_feature_only: &filter_feature_only
       - production
       - master
       - &test_cluster /feature\/test-cluster(\/.*)?/
+      - &test_b_cluster /feature\/test-b-cluster(\/.*)?/
       - &aws_cluster /feature\/aws-cluster(\/.*)?/
       - &aks_cluster /feature\/aks-cluster(\/.*)?/
 
@@ -60,6 +61,11 @@ filter_test_cluster_only: &filter_test_cluster_only
   branches:
     only:
       - *test_cluster
+
+filter_test_b_cluster_only: &filter_test_b_cluster_only
+  branches:
+    only:
+      - *test_b_cluster
 
 filter_aws_cluster_only: &filter_aws_cluster_only
   branches:
@@ -175,6 +181,15 @@ workflows:
           requires: [ ]
           filters: *filter_test_cluster_only
 
+      # Build job for test-b cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-build:
+          <<: *build
+          name: build-test-b
+          context: silta_test_b
+          requires: [ ]
+          filters: *filter_test_b_cluster_only
+
       # Deploy job for test cluster.
       # Extends the job defined for feature environments.
       - silta/drupal-deploy:
@@ -185,6 +200,17 @@ workflows:
           requires:
             - build-test
           filters: *filter_test_cluster_only
+
+      # Deploy job for test-b cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy
+          name: deploy-test-b
+          silta_config: silta/silta.yml,silta/silta-test-b.yml
+          context: silta_test_b
+          requires:
+            - build-test-b
+          filters: *filter_test_b_cluster_only
 
       # Build job for master environment.
       # Extends the job defined for feature environments.

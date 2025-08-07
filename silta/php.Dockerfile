@@ -1,6 +1,6 @@
 # Dockerfile for the Drupal container.
 # Cache bust.
-FROM wunderio/silta-php-fpm:8.3-fpm-v1.2-test1
+FROM wunderio/silta-php-fpm:8.3-fpm-v1.2-test2
 
 COPY --chown=www-data:www-data . /app
 

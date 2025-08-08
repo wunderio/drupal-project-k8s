@@ -81,7 +81,12 @@ data:
   {{- if .Values.signalsciences.enabled }}
   nginx_signalsciences_conf: |
     load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
+
+  {{- $nginxMajor := regexFind "^([0-9]+)" .Values.nginx.version }}
+  {{- $nginxMinor := regexFind "^[0-9]+\\.([0-9]+)" .Values.nginx.version }}
+  {{- if and ( eq $nginxMajor "1" ) ( lt $nginxMinor "28" ) }}
     load_module /etc/nginx/modules/ndk_http_module.so;
+  {{- end }}
   {{- end }}
 
   {{- if .Values.nginx.status_page.enabled }}

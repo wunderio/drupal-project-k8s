@@ -82,11 +82,11 @@ data:
   nginx_signalsciences_conf: |
     load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
 
-  {{- /* NDK module is required only for nginx versions < 1.28. */}}
+  {{- /* NDK module is required only for nginx versions < 1.26. */}}
   {{- $versionParts := split "." .Values.nginx.version }}
   {{- $nginxMajor := $versionParts._0 }}
   {{- $nginxMinor := $versionParts._1 }}
-  {{- if and ( eq $nginxMajor "1" ) ( lt $nginxMinor "28" ) }}
+  {{- if and ( eq $nginxMajor "1" ) ( lt $nginxMinor "26" ) }}
     load_module /etc/nginx/modules/ndk_http_module.so;
   {{- end }}
   {{- end }}

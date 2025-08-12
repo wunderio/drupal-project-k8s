@@ -90,6 +90,15 @@ workflows:
           name: approve-deployment
           filters: *filter_feature_only
 
+      - approval: &approve-prod
+          type: approval
+          name: approve-prod
+          filters: *filter_production_only
+
+      - approval:
+          <<: *approve-prod
+          name: approve-prod-a
+
       - silta/drupal-validate: &drupal-validate
           name: validate
 
@@ -142,6 +151,7 @@ workflows:
                 name: Add helm repositories and build local chart
                 command: |
                   helm repo add elastic https://helm.elastic.co
+                  helm repo add jouve https://jouve.github.io/charts/
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
@@ -255,6 +265,8 @@ workflows:
           <<: *build-master
           name: build-prod
           context: silta_finland
+          requires:
+            - approve-prod
           filters: *filter_production_only
 
       # Build job for production environment in prod-a.wdr.io cluster.
@@ -262,6 +274,8 @@ workflows:
       - silta/drupal-build:
           <<: *build-prod
           name: build-prod-a
+          requires:
+            - approve-prod-a
           context: silta_finland_production_a
 
       # Deploy job for production environment.
@@ -281,6 +295,8 @@ workflows:
       - silta/drupal-deploy:
           <<: *deploy-prod
           name: deploy-prod-a
+          silta_config: silta/silta.yml,silta/silta-finland-production-a.yml,silta/secrets_prod_a_signalsciences
+          decrypt_files: silta/secrets_prod_a_signalsciences
           context: silta_finland_production_a
           requires:
             - build-prod-a

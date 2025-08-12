@@ -86,7 +86,7 @@ data:
   {{- $versionParts := split "." .Values.nginx.version }}
   {{- $nginxMajor := $versionParts._0 }}
   {{- $nginxMinor := $versionParts._1 }}
-  {{- if and ( eq $nginxMajor "1" ) ( lt $nginxMinor "26" ) }}
+  {{- if or (empty $nginxMajor) (and (eq $nginxMajor "1" ) ( lt $nginxMinor "26" )) }}
     load_module /etc/nginx/modules/ndk_http_module.so;
   {{- end }}
   {{- end }}

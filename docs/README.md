@@ -60,5 +60,5 @@ Follow the project's coding standards and testing requirements:
 
 1. Run automated tests before committing
 2. Update documentation for significant changes
-3. Follow [documentation standards](../.ai/rules/docs.md)
+3. Follow project documentation standards
 4. Test data anonymization changes thoroughly

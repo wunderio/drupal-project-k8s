@@ -14,13 +14,68 @@ elasticsearch:
   enabled: true
 
 memcached:
-  enabled: false
+  enabled: true
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-memcached
+    tag: 1.6.8-debian-10-r0
+  metrics:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: wunderio/bitnami-memcached-exporter
+      tag: 0.7.0-debian-10-r79
+
+mariadb:
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-mariadb
+    tag: 10.3.23-debian-10-r38
+  volumePermissions:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: wunderio/bitnami-minideb
+      tag: buster
+  metrics:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: wunderio/bitnami-mysqld-exporter
+      tag: 0.12.1-debian-10-r139
 
 redis:
-  enabled: false
+  enabled: true
   auth:
     password: "foo"
-
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-redis
+    tag: 6.2.7-debian-11-r11
+  sentinel:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: wunderio/bitnami-redis-sentinel
+      tag: 6.2.7-debian-11-r12
+  metrics:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: wunderio/bitnami-redis-exporter
+      tag: 1.43.0-debian-11-r4
+  volumePermissions:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: wunderio/bitnami-bitnami-shell
+      tag: 11-debian-11-r11
+  sysctl:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: wunderio/bitnami-bitnami-shell
+      tag: 11-debian-11-r11
 mounts:
   private-files:
     enabled: true

@@ -774,6 +774,8 @@ memcached:
     - -m 118
     # MaxItemSize
     - -I 4M
+  # Fixes: https://github.com/bitnami/charts/pull/6265
+  tolerations: []
 
 # https://github.com/bitnami/charts/blob/d4dba2b393167d79b8c8f65b46c48b70ee3a9662/bitnami/redis/values.yaml
 redis:

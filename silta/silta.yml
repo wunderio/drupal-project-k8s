@@ -60,5 +60,6 @@ php:
       schedule: '~ 0 31 2 *'
 
 mariadb:
-  repository: bitnamilegacy/mariadb
-  tag: 11.4-debian-12
+  image:
+    repository: bitnamilegacy/mariadb
+    tag: 11.4-debian-12

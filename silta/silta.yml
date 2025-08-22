@@ -63,3 +63,7 @@ mariadb:
   image:
     repository: bitnamilegacy/mariadb
     tag: 11.4-debian-12
+  master:
+    resources:
+      limits:
+        memory: 2Gi

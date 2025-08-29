@@ -327,7 +327,7 @@ php:
         cpu: 500m
         memory: 488Mi
       limits:
-        memory: 488Mi
+        memory: 1Gi
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.

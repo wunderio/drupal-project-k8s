@@ -1,5 +1,5 @@
 # Dockerfile for the Drupal container.
-FROM wunderio/silta-php-fpm:8.3-fpm-v1-test5
+FROM wunderio/silta-php-fpm:8.3-fpm-v1-test6
 
 COPY --chown=www-data:www-data . /app
 

@@ -27,6 +27,5 @@ tests:
           data:
             storageClassName: nfs-shared
     asserts:
-      - documentIndex: 1
-        exists:
+      - exists:
           path: spec.volumeClaimTemplates[0].metadata.annotations['storage.silta/storage-path']

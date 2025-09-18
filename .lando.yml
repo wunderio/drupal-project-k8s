@@ -1,4 +1,4 @@
-name: Silta
+name: silta
 recipe: drupal11
 
 config:
@@ -15,10 +15,22 @@ tooling:
     description: "Runs Composer commands"
     cmd:
       - appserver: /usr/local/bin/composer
+  drush:
+    description: "Runs Drush commands"
+    cmd:
+      - appserver: ./vendor/bin/drush
   grumphp:
     description: "Runs grumphp commands"
     cmd:
       - appserver: ./vendor/bin/grumphp
+  phpunit:
+    description: "Runs PHPUnit tests"
+    service: appserver
+    cmd: "./vendor/bin/phpunit"
+  gdpr-dump:
+    description: "Runs GDPR dump for database anonymization"
+    service: appserver
+    cmd: "gdpr-dump"
   npm:
     description: "Runs npm commands"
     service: node
@@ -36,7 +48,10 @@ services:
   appserver:
     # Install dependencies when building lando.
     build:
-      - "composer install"
+      - composer install
+    build_as_root:
+      - curl -L https://github.com/Smile-SA/gdpr-dump/releases/latest/download/gdpr-dump.phar -o /usr/local/bin/gdpr-dump
+      - chmod +x /usr/local/bin/gdpr-dump
     # Uncomment if you need a specific timezone for example for integrations
     #run_as_root:
     #  - ln -snf /usr/share/zoneinfo/Europe/Helsinki /etc/localtime
@@ -55,6 +70,10 @@ services:
         EXEC_GRUMPHP_COMMAND: "lando php"
         HASH_SALT: notsosecurehash
         VARNISH_ADMIN_HOST: varnish
+        # PHPUnit test environment variables
+        SIMPLETEST_BASE_URL: "https://silta.lndo.site"
+        SIMPLETEST_DB: "mysql://drupal11:drupal11@database/drupal11"
+        BROWSERTEST_OUTPUT_DIRECTORY: "/app/web/sites/simpletest/browser_output"
         # Support debugging with XDEBUG 3.
         XDEBUG_MODE:
         PHP_IDE_CONFIG: serverName=appserver
@@ -100,9 +119,6 @@ proxy:
   varnish:
     - varnish.silta.lndo.site
 
-events:
-  post-db-import:
-    - appserver: "cd $LANDO_WEBROOT && drush cache:rebuild -y && drush @local user:login"
 
 env_file:
   - .lando/.env

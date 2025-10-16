@@ -1,0 +1,29 @@
+database:
+  host: 'database'
+  user: 'drupal11'
+  password: 'drupal11'
+  name: 'drupal11'
+
+tables:
+  cache:
+    truncate: true
+  cache_*:
+    truncate: true
+  sessions:
+    truncate: true
+  watchdog:
+    truncate: true
+  users_field_data:
+    converters:
+      mail:
+        converter: 'randomizeEmail'
+        unique: true
+      init:
+        converter: 'fromContext'
+        parameters:
+          key: 'processed_data.mail'
+      name:
+        converter: 'randomizeText'
+        unique: true
+      pass:
+        converter: 'randomizeText'

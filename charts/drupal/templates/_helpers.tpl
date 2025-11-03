@@ -658,8 +658,8 @@ fi
 
   # Take a database dump.
   echo "Starting database backup."
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /backup-tmp/db.sql
+  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /backup-tmp/db.sql
   echo "Database backup complete."
 {{- end }}
 
@@ -668,11 +668,11 @@ fi
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   echo "Compressing database backup."
-  gzip -k1 /tmp/db.sql
+  gzip -k1 /backup-tmp/db.sql
 
   # Create a folder for the backup
   mkdir -p $BACKUP_LOCATION
-  cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
+  cp /backup-tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
   {{- if not .Values.backup.skipFiles }}
   {{ range $index, $mount := .Values.mounts -}}
@@ -740,7 +740,7 @@ fi
   done
 
   echo "Importing database dump for validation"
-  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
+  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /backup-tmp/db.sql
   drush status --fields=bootstrap
 
 {{- end }}

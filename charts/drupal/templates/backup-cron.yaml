@@ -37,6 +37,9 @@ spec:
             cronjob: "true"
         spec:
           enableServiceLinks: false
+          securityContext:
+            fsGroup: 1001
+            runAsUser: 1001
           containers:
           - name: backup
             {{- include "drupal.php-container" . | nindent 12 }}
@@ -44,6 +47,8 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: {{ .Release.Name }}-backup
                 mountPath: /backups
+              - name: {{ .Release.Name }}-bck-tmp
+                mountPath: /backup-tmp
             command: ["/bin/bash", "-c"]
             args:
               - |
@@ -60,6 +65,9 @@ spec:
             ports:
             - containerPort: 3306
               name: mariadb
+            volumeMounts:
+            - name: {{ .Release.Name }}-bck-mdb
+              mountPath: {{ $.Values.mariadb.master.persistence.mountPath }}
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
@@ -83,6 +91,33 @@ spec:
                 {{- else }}
                 claimName: {{ .Release.Name }}-backup
                 {{- end }}
+            - name: {{ .Release.Name }}-bck-tmp
+              ephemeral:
+                volumeClaimTemplate:
+                  metadata:
+                    labels:
+                      {{- include "drupal.release_labels" . | nindent 22 }}
+                  spec:
+                    accessModes:
+                      - ReadWriteOnce
+                    resources:
+                      requests:
+                        storage: {{ .Values.backup.storage }}
+            - name: {{ .Release.Name }}-bck-mdb
+              ephemeral:
+                volumeClaimTemplate:
+                  metadata:
+                    labels:
+                      {{- include "drupal.release_labels" . | nindent 22 }}
+                  spec:
+                    {{- if .Values.mariadb.master.persistence.storageClass }}
+                    storageClassName: {{ .Values.mariadb.master.persistence.storageClass }}
+                    {{- end }}
+                    accessModes:
+                      {{- .Values.mariadb.master.persistence.accessModes | toYaml | nindent 22 }}
+                    resources:
+                      requests:
+                        storage: {{ .Values.mariadb.master.persistence.size }}
           serviceAccountName: {{ include "drupal.serviceAccountName" . }}
 {{- end }}
 

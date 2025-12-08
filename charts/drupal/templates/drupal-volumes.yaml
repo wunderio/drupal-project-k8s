@@ -3,6 +3,7 @@
 {{- $releaseNameTrimmed := substr 0 (int (sub 54 (len $index))) $.Release.Name }}
 {{- if eq $mount.enabled true }}
 {{- if and (not (hasKey $mount "configMapName")) (not (hasKey $mount "secretName")) -}}
+{{- if and (not (hasKey $mount "medium")) (not (eq $mount.medium "Memory")) }}
 {{- if eq $mount.storageClassName "silta-shared" }}
 {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
 # Mount-enabled: {{ $mount.enabled  }}
@@ -59,6 +60,8 @@ spec:
 {{- end -}}
 {{- end }}
 {{- end }}
+{{- end }}
+
 
 {{- if .Values.referenceData.enabled }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}

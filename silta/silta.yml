@@ -24,6 +24,11 @@ redis:
 mounts:
   private-files:
     enabled: true
+  twig-cache:
+    enabled: true
+    storage: 512M
+    mountPath: /app/twig-cache
+    medium: Memory
 
 # Allow access from another namespace for testing purposes.
 silta-release:

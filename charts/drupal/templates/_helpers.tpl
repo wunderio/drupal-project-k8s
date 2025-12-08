@@ -66,6 +66,10 @@ ports:
 {{- else if hasKey $mount "configMapName" }}
   configMap:
     name: {{ $mount.configMapName }}
+{{- else if hasKey $mount "medium" }}
+  emptyDir:
+    medium: {{ $mount.medium }}
+    sizeLimit: {{ $mount.storage }}
 {{- else }}
   persistentVolumeClaim:
     {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
@@ -526,8 +530,9 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   fi
 
   if [ "${REF_DATA_COPY_FILES:-}" == "true" ]; then
-    {{ range $index, $mount := .Values.mounts -}}
-    {{- if eq $mount.enabled true -}}
+    {{ range $index, $mount := .Values.mounts }}
+    {{- if eq $mount.enabled true }}
+    {{- if and (not (hasKey $mount "medium")) (not (eq $mount.medium "Memory")) }}
     # File backup for {{ $index }} volume.
     echo "Dump reference files for {{ $index }} volume."
 
@@ -540,6 +545,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
       --delete --delete-excluded \
       /app/reference-data/{{ $index }}
     {{ end -}}
+    {{- end }}
     {{- end }}
   fi
 else
@@ -616,6 +622,7 @@ fi
 if [ "${REF_DATA_COPY_FILES:-}" == "true" ]; then
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
+  {{- if and (not (hasKey $mount "medium")) (not (eq $mount.medium "Memory")) }}
   if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
     echo "Importing {{ $index }} files"
     # skip subfolders
@@ -627,6 +634,7 @@ if [ "${REF_DATA_COPY_FILES:-}" == "true" ]; then
     done
   fi
   {{ end -}}
+  {{- end }}
   {{- end }}
 fi
 {{- end }}
@@ -677,12 +685,14 @@ fi
   {{- if not .Values.backup.skipFiles }}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
+  {{- if and (not (hasKey $mount "medium")) (not (eq $mount.medium "Memory")) }}
   # File backup for {{ $index }} volume.
   # If files get changed while the tar command is running, tar will exit with code 1.
   # We ignore this as we want the rest of the job to still get run.
   echo "Starting {{ $index }} volume backup."
   tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }} || ( export exitcode=$?; [[ $exitcode -eq 1 ]] || exit )
   {{- end -}}
+  {{- end }}
   {{- end }}
   {{- end }}
 

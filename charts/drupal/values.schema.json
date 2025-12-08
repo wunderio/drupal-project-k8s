@@ -457,6 +457,7 @@
           "enabled": { "type": "boolean" },
           "storage": { "type": "string" },
           "mountPath": { "type": "string" },
+          "medium": { "type": "string" },
           "storageClassName": { "type": "string" },
           "csiDriverName": { "type": "string" }
         }

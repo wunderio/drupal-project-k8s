@@ -624,15 +624,16 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
-# see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/mariadb-7.5.2/values.yaml
 mariadb:
   enabled: true
   image:
     # https://hub.docker.com/r/bitnamilegacy/mariadb/tags
     # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
+    # https://hub.docker.com/r/wunderio/silta-mariadb/tags ("-bc" tags only)
     registry: docker.io
-    repository: wunderio/bitnami-mariadb
-    tag: 11.4-debian-12-u
+    repository: wunderio/silta-mariadb
+    tag: 11.4-bc
   replication:
     enabled: false
   db:

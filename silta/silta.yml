@@ -17,7 +17,7 @@ memcached:
   enabled: false
 
 redis:
-  enabled: false
+  enabled: true
   auth:
     password: "foo"
 

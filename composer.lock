@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ff8880d52816b7c5d819d7183a102b41",
+    "content-hash": "5b9e9bc6224040813514dff1c8f16dd7",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2445,72 +2445,6 @@
             "homepage": "https://www.drupal.org/project/purge",
             "support": {
                 "source": "https://git.drupalcode.org/project/purge"
-            }
-        },
-        {
-            "name": "drupal/redis",
-            "version": "2.0.0-alpha1",
-            "source": {
-                "type": "git",
-                "url": "https://git.drupalcode.org/project/redis.git",
-                "reference": "2.0.0-alpha1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/redis-2.0.0-alpha1.zip",
-                "reference": "2.0.0-alpha1",
-                "shasum": "d15c6d3e36b228be92b986b921fad79812ca6be2"
-            },
-            "require": {
-                "drupal/core": "^9.3 || ^10 || ^11"
-            },
-            "suggest": {
-                "ext-redis": "Required to use the PhpRedis as redis driver (^4.0|^5.0).",
-                "ext-relay": "Required to use the Relay as Redis driver (^0.5|^1.0).",
-                "predis/predis": "Required to use the Predis as redis driver (^1.1|^2.0)."
-            },
-            "type": "drupal-module",
-            "extra": {
-                "drupal": {
-                    "version": "2.0.0-alpha1",
-                    "datestamp": "1762689227",
-                    "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Alpha releases are not covered by Drupal security advisories."
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Drupal\\redis\\": "src"
-                }
-            },
-            "notification-url": "https://packages.drupal.org/8/downloads",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "berdir",
-                    "homepage": "https://www.drupal.org/user/214652"
-                },
-                {
-                    "name": "greg.1.anderson",
-                    "homepage": "https://www.drupal.org/user/438598"
-                },
-                {
-                    "name": "kporras07",
-                    "homepage": "https://www.drupal.org/user/1349780"
-                },
-                {
-                    "name": "pounard",
-                    "homepage": "https://www.drupal.org/user/240164"
-                }
-            ],
-            "description": "Integration of Drupal with the Redis key-value store.",
-            "homepage": "https://www.drupal.org/project/redis",
-            "support": {
-                "source": "https://git.drupalcode.org/project/redis"
             }
         },
         {
@@ -15395,14 +15329,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "drupal/redis": 15
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.3"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

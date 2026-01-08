@@ -25,6 +25,9 @@ executors:
   cicd84:
     docker:
       - image: wunderio/silta-cicd:circleci-php8.4-node24-composer2-v1
+  cicd85:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.5-node24-composer2-v1
 
 jobs:
   site-test:
@@ -106,7 +109,7 @@ workflows:
           name: validate
 
           # Use custom executor.
-          executor: cicd84
+          executor: cicd85
 
           post-validation:
             - run:
@@ -121,7 +124,7 @@ workflows:
           name: build
 
           # Use custom executor.
-          executor: cicd84
+          executor: cicd85
 
           # Uncomment the line below to use the test build of silta cli.
           #silta_cli_version: test
@@ -140,7 +143,7 @@ workflows:
           name: deploy
 
           # Use custom executor.
-          executor: cicd84
+          executor: cicd85
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"

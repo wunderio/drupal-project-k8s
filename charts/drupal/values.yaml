@@ -772,8 +772,8 @@ memcached:
   # https://hub.docker.com/r/wunderio/bitnami-memcached/tags
   image:
     registry: docker.io
-    repository: wunderio/bitnami-memcached
-    tag: 1.6.8-debian-10-r0
+    repository: wunderio/silta-memcached
+    tag: 1.6-bc
   replicaCount: 1
   serviceAccount:
     create: true

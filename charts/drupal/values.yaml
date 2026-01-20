@@ -825,6 +825,8 @@ redis:
 # see: https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml
 mailpit:
   enabled: false
+  image:
+    tag: v1.28.2
   extraEnvVars:
     - name: MP_SMTP_AUTH_ACCEPT_ANY
       value: "true"
@@ -875,7 +877,13 @@ solr:
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
-  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m", "-a", "-Dlog4j2.formatMsgNoLookups=true"]
+  commandArgs: [
+    "start", 
+    "-p", "8983", 
+    "-f", "-force", 
+    "-m", "256m", 
+    "-a", "-Dlog4j2.formatMsgNoLookups=true -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError"
+  ]
 
   # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
   # Solr init container will contents of this folder to actual solr container.

@@ -739,6 +739,24 @@ fi
 
 {{- end }}
 
+{{- define "drupal.pre-release-command" -}}
+  set -e
+
+  {{- include "drupal.wait-for-db-command" . }}
+  
+  {{- if .Values.elasticsearch.enabled }}
+    {{ include "drupal.wait-for-elasticsearch-command" . }}
+  {{ end }}
+
+  {{- if .Values.php.preupgrade.backup }}
+    {{- include "drupal.backup-command" . }}
+  {{- end }}
+
+  {{- if .Values.php.preupgrade.command }}
+    {{- .Values.php.preupgrade.command }}
+  {{- end }}
+{{- end }}
+
 {{- define "cert-manager.api-version" }}
 {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
 cert-manager.io/v1

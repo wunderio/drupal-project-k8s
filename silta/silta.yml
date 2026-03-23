@@ -59,8 +59,52 @@ php:
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
 
-php:
   preupgrade:
     # backup: true
     command: "echo 'Pre-upgrade command'"
 
+  php_ini:
+    extraConfig: |
+      ; [opentelemetry]
+      ; extension=opentelemetry.so
+      
+      [otelsilta]
+      extension=otelsilta.so
+      
+      otelsilta.enabled = 1
+
+      otelsilta.sample_rate = 1
+      otelsilta.slow_request_threshold_ms = 100
+
+      otelsilta.excluded_urls = "/ping,/health,/metrics"
+      
+      ; Features
+      otelsilta.features.errors = 1
+      otelsilta.features.db = 0
+      otelsilta.features.http = 1
+      otelsilta.features.cache = 1
+      otelsilta.features.templates = 1
+      otelsilta.features.functions = 1
+      otelsilta.features.profiling = 1
+
+      otelsilta.max_spans_per_trace = 300
+      otelsilta.max_attributes_per_span = 32
+
+      ; Set to 0 to disable depth gating (no limit).
+      otelsilta.max_span_depth = 0
+
+      ; Set to 0 to disable aggregation (microseconds)
+      otelsilta.min_span_duration_ms = 5
+
+      otelsilta.debug = 0
+
+  env:
+    # OTEL_PHP_AUTOLOAD_ENABLED: "true"
+    # OTEL_RESOURCE_ATTRIBUTES: "k8s.container.name=php"
+    # OTEL_SERVICE_NAME: php
+    # OTEL_TRACES_EXPORTER: otlp
+    # OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+    # OTEL_PROPAGATORS: sbaggage,tracecontext
+    OTELSILTA_CONTAINER_NAME: php
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.monitoring:4318/v1/traces
+    

@@ -19,6 +19,9 @@ executors:
   cicd82:
     docker:
       - image: wunderio/silta-cicd:circleci-php8.2-node22-composer2-v1
+  cicd83:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
 
 jobs:
   site-test:
@@ -87,11 +90,20 @@ workflows:
           name: approve-deployment
           filters: *filter_feature_only
 
+      - approval: &approve-prod
+          type: approval
+          name: approve-prod
+          filters: *filter_production_only
+
+      - approval:
+          <<: *approve-prod
+          name: approve-prod-a
+
       - silta/drupal-validate: &drupal-validate
           name: validate
 
           # Use custom executor.
-          executor: cicd82
+          executor: cicd83
 
           post-validation:
             - run:
@@ -106,13 +118,12 @@ workflows:
           name: build
 
           # Use custom executor.
-          executor: cicd82
+          executor: cicd83
+
+          # Uncomment the line below to use the test build of silta cli.
+          #silta_cli_version: test
 
           codebase-build:
-            # - run:
-            #     name: Download feature branch build of silta cli
-            #     command: |
-            #       curl -sL https://github.com/wunderio/silta-cli/releases/download/test/silta-test-linux-amd64.tar.gz | tar xz -C ~/.local/bin
             - silta/drupal-composer-install
             - silta/npm-install-build
           context: silta_dev
@@ -126,16 +137,21 @@ workflows:
           name: deploy
 
           # Use custom executor.
-          executor: cicd82
+          executor: cicd83
 
           # Use a local chart during development.
           chart_name: "./charts/drupal"
           chart_repository: ""
+
+          # Uncomment the line below to use the test build of silta cli.
+          #silta_cli_version: test
+
           pre-release:
             - run:
                 name: Add helm repositories and build local chart
                 command: |
                   helm repo add elastic https://helm.elastic.co
+                  helm repo add jouve https://jouve.github.io/charts/
                   helm repo add codecentric https://codecentric.github.io/helm-charts
                   helm repo add percona https://percona.github.io/percona-helm-charts/
                   helm dependency build ./charts/drupal
@@ -205,23 +221,6 @@ workflows:
           requires:
             - build-aks-master
 
-      # Build job for master environment in silta-finland-production-a cluster.
-      # Extends the job defined for master environments.
-      - silta/drupal-build: &build-master-silta-finland-production-a
-          <<: *build-master
-          name: build-silta-finland-production-a-master
-          context: silta_finland_production_a
-
-      # Deploy job for master environment in silta-finland-production-a cluster.
-      # Extends the job defined for master environments.
-      - silta/drupal-deploy: &build-master-silta-finland-production-a
-          <<: *deploy-master
-          name: "Deploy master to silta-finland-production-a cluster"
-          silta_config: silta/silta.yml,silta/silta-master.yml,silta/silta-finland-production-a.yml
-          context: silta_finland_production_a
-          requires:
-            - build-silta-finland-production-a-master
-
       # Build job for AKS cluster.
       # Extends the job defined for master environments.
       - silta/drupal-build:
@@ -262,23 +261,45 @@ workflows:
 
       # Build job for production environment.
       # Extends the job defined for master environments.
-      - silta/drupal-build:
+      - silta/drupal-build: &build-prod
           <<: *build-master
-          name: build-deploy-prod
+          name: build-prod
           context: silta_finland
+          requires:
+            - approve-prod
           filters: *filter_production_only
+
+      # Build job for production environment in prod-a.wdr.io cluster.
+      # Extends the job defined for master environments.
+      - silta/drupal-build:
+          <<: *build-prod
+          name: build-prod-a
+          requires:
+            - approve-prod-a
+          context: silta_finland_production_a
 
       # Deploy job for production environment.
       # Extends the job defined for feature environments.
-      - silta/drupal-deploy:
+      - silta/drupal-deploy: &deploy-prod
           <<: *deploy
-          name: build-deploy-prod
+          name: deploy-prod
           silta_config: silta/silta.yml,silta/silta-prod.yml,silta/secrets_prod_signalsciences
           decrypt_files: silta/secrets_prod_signalsciences
           context: silta_finland
           requires:
-            - build-deploy-prod
+            - build-prod
           filters: *filter_production_only
+
+      # Deploy job for production environment in prod-a.wdr.io cluster.
+      # Extends the job defined for feature environments.
+      - silta/drupal-deploy:
+          <<: *deploy-prod
+          name: deploy-prod-a
+          silta_config: silta/silta.yml,silta/silta-finland-production-a.yml,silta/secrets_prod_a_signalsciences
+          decrypt_files: silta/secrets_prod_a_signalsciences
+          context: silta_finland_production_a
+          requires:
+            - build-prod-a
 
       # Test site availability by requesting _ping.php.
       - site-test: &site-test

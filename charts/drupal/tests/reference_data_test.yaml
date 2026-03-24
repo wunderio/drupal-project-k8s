@@ -226,6 +226,9 @@ tests:
 
   - it: does not skip mounting on the reference environments
     template: post-release.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
     set:
       environmentName: 'FOO'
       referenceData:
@@ -234,7 +237,7 @@ tests:
     asserts:
     - template: drupal-volumes.yaml
       hasDocuments:
-        count: 4
+        count: 2
     - contains:
         path: spec.template.spec.volumes
         content:

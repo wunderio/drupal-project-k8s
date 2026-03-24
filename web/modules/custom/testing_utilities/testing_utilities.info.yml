@@ -1,0 +1,8 @@
+name: 'Testing Utilities'
+type: module
+description: 'Development and testing utilities for data anonymization, validation, and compliance testing'
+core_version_requirement: ^11
+package: Testing
+dependencies:
+  - drupal:user
+  - drupal:system

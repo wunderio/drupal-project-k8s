@@ -24,6 +24,15 @@ environmentName: ""
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
+# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets.
+imagePullSecret: ""
+
+serviceAccount:
+  # Default value: [Release.Name]-sa
+  name: ""
+  # Mount service account token to the containers.
+  automountServiceAccountToken: false
+
 # The app label added to our Kubernetes resources.
 app: drupal
 
@@ -84,6 +93,10 @@ ingress:
     type: traefik
     tls: true
     redirect-https: true
+    # rateLimit:
+    #   average: 32
+    #   burst: 300
+    #   period: 1s
     extraAnnotations:
       traefik.ingress.kubernetes.io/rate-limit: |
         extractorfunc: client.ip
@@ -142,6 +155,8 @@ ssl:
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
+  # The nginx version, for example "1.28". This can be set by your CI system using the --set parameter.
+  version: ""
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
   # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
@@ -227,8 +242,14 @@ nginx:
   # Extra configuration block in location context.
   locationExtraConfig: |
 
+  # Note: This will be deprecated in the future, use nginx.httpConfig instead.
   # Extra configuration to pass to nginx as a file
   extraConfig: |
+
+  # Configuration for http context.
+  httpConfig:
+    client_header_buffer_size: "4k"
+    large_client_header_buffers: "8 16K"
 
   # Toggle open_files_cache.
   # Naming follows https://nginx.org/en/docs/http/ngx_http_core_module.html#open_file_cache directive
@@ -282,17 +303,16 @@ php:
           drush cron;
         fi
 
-    # Add custom php.ini file overrides for the cronjob.
-    # Use the same syntax as in php.ini file
-    # Example:
-    # php_ini: |
-        # [PHP]
-        # memory_limit=128M
+      # Add custom php.ini file overrides for the cronjob.
+      # Use the same syntax as in php.ini file
+      # Example:
+      # php_ini: |
+          # [PHP]
+          # memory_limit=128M
 
-    # php_ini: |
-
-      # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
+      tolerations: []
+      affinity: {}
 
       # Specify a how many attempts should be made before considering a cron job as failed.
       backoffLimit: 1
@@ -375,6 +395,53 @@ php:
   # Set a restriction on where the php pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
+  tolerations: []
+  affinity:
+    podAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      # Preferrably keep pods on the same node as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: kubernetes.io/hostname
+      # Preferrably keep pods in the same zone as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: topology.kubernetes.io/zone
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 10
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: deployment
+              operator: In
+              values:
+              - drupal
 
 # Configuration for everything that runs in shell container.
 shell:
@@ -412,6 +479,8 @@ shell:
   # Set a restriction on where the shell pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
 # Configure the dynamically mounted volumes
 mounts:
@@ -438,6 +507,16 @@ referenceData:
 
   # When to automatically update the reference data.
   schedule: '~ 3 * * *'
+
+  # The method used to import the database tables. Can be either 'parallel' or 'sequential'.
+  # Parallel is faster but might in some cases be unstable. In that case, use sequential instead.
+  databaseImportMethod: 'parallel'
+
+  # Whether to copy the database, only used programmatically.
+  copyDatabase: true
+
+  # Whether to copy files, only used programmatically.
+  copyFiles: true
 
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
@@ -468,6 +547,11 @@ referenceData:
     limits:
       memory: 488Mi
 
+# Release sync configuration. Storage is used for data synchronization and process is handled by the Silta HUB.
+silta-hub:
+  sync:
+    storage: 10G
+
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
 # Uses formatters from fakerphp.github.io/formatters
 gdprDump:
@@ -492,9 +576,8 @@ gdprDump:
           parameters:
             key: 'processed_data.mail'
         name:
-          converter: 'faker'
-          parameters:
-            formatter: 'name'
+          converter: 'randomizeText'
+          unique: true
         pass:
           converter: 'randomizeText'
     commerce_order:
@@ -533,6 +616,10 @@ backup:
   #  Do not backup files
   #skipFiles: true
 
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
   # Resources for the backup cron job.
   resources:
     requests:
@@ -541,12 +628,16 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
-# see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/mariadb-7.5.2/values.yaml
 mariadb:
   enabled: true
   image:
-    # https://hub.docker.com/r/bitnami/mariadb/tags
-    tag: 10.6.15-debian-11-r24
+    # https://hub.docker.com/r/bitnamilegacy/mariadb/tags
+    # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
+    # https://hub.docker.com/r/wunderio/silta-mariadb/tags ("-bc" tags only)
+    registry: docker.io
+    repository: wunderio/silta-mariadb
+    tag: 11.4-bc
   replication:
     enabled: false
   db:
@@ -582,6 +673,8 @@ mariadb:
               operator: NotIn
               values:
               - static-ip
+  serviceAccount:
+    create: true
   enableServiceLinks: false
 
 varnish:
@@ -646,6 +739,10 @@ elasticsearch:
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
 
+  rbac:
+    create: true
+    automountToken: false
+
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
   xpack:
@@ -672,10 +769,19 @@ elasticsearch:
           - static-ip
 
 # Memcache service overrides
-# see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/memcached-4.2.27/values.yaml
 memcached:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/memcached/tags
+  # https://hub.docker.com/r/wunderio/bitnami-memcached/tags
+  image:
+    registry: docker.io
+    repository: wunderio/silta-memcached
+    tag: 1.6-bc
   replicaCount: 1
+  serviceAccount:
+    create: true
+  automountServiceAccountToken: false
   resources:
     requests:
       cpu: 10m
@@ -688,10 +794,19 @@ memcached:
     - -m 118
     # MaxItemSize
     - -I 4M
+  # Fixes: https://github.com/bitnami/charts/pull/6265
+  tolerations: []
 
-# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/redis-16.13.2/values.yaml
 redis:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/redis/tags
+  # https://hub.docker.com/r/wunderio/bitnami-redis/tags
+  # https://hub.docker.com/r/wunderio/silta-redis/tags
+  image:
+    registry: docker.io
+    repository: wunderio/silta-redis
+    tag: 7.4-bc
   architecture: standalone
   auth:
     # mandatory value
@@ -708,11 +823,38 @@ redis:
       requests:
         cpu: 50m
         memory: 256Mi
+  serviceAccount:
+    automountServiceAccountToken: false
 
+# Mailpit service overrides
+# see: https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml
+mailpit:
+  enabled: false
+  image:
+    tag: v1.28.2
+  extraEnvVars:
+    - name: MP_SMTP_AUTH_ACCEPT_ANY
+      value: "true"
+    - name: MP_SMTP_AUTH_ALLOW_INSECURE
+      value: "true"
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
+    limits:
+      cpu: 50m
+      memory: 100M
+  mailpit:
+    # This is for easier proxying from Drupal's nginx
+    webroot: /mailpit
+  enableServiceLinks: false
+
+# Important! This service is deprecated and will be removed from future releases. Please use "mailpit" instead.
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
   enabled: false
+  enableServiceLinks: false
   image:
     # Set image repository to "mailhog/mailhog" to reenable logging.
     repository: wunderio/silta-mailhog
@@ -740,7 +882,13 @@ solr:
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
-  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m", "-a", "-Dlog4j2.formatMsgNoLookups=true"]
+  commandArgs: [
+    "start", 
+    "-p", "8983", 
+    "-f", "-force", 
+    "-m", "256m", 
+    "-a", "-Dlog4j2.formatMsgNoLookups=true -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError"
+  ]
 
   # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
   # Solr init container will contents of this folder to actual solr container.
@@ -774,6 +922,9 @@ clamav:
   # Available image tags: https://hub.docker.com/r/clamav/clamav/
   image: clamav/clamav
   imageTag: stable
+  # See https://docs.clamav.net/manual/Usage/Configuration.html#clamdconf
+  clamdExtraConfig: ""
+  # See https://docs.clamav.net/manual/Usage/Configuration.html#freshclamconf
   freshclamExtraConfig: ""
   resources:
     requests:
@@ -863,7 +1014,8 @@ logging:
 
 # Obfuscate parts of the full domain name.
 # Available values for maskSubdomains are:
-# - releaseName (scrambles release name subdomain, e.g., xxx.project.silta.tld)
-# - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
-# - both (obfuscates both, e.g., zzz.silta.tld)
-# maskSubdomains: both
+# - none (no obfuscation, e.g., branch.project.<clusterDomain>)
+# - releaseName (scrambles release name subdomain, e.g., xxx.project.<clusterDomain>)
+# - projectName (scrambles project name subdomain, e.g., release.yyy.<clusterDomain>)
+# - both (obfuscates both, e.g., zzz.<clusterDomain>)
+maskSubdomains: none

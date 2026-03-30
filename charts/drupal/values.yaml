@@ -93,6 +93,10 @@ ingress:
     type: traefik
     tls: true
     redirect-https: true
+    # rateLimit:
+    #   average: 32
+    #   burst: 300
+    #   period: 1s
     extraAnnotations:
       traefik.ingress.kubernetes.io/rate-limit: |
         extractorfunc: client.ip
@@ -635,15 +639,16 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
-# see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/mariadb-7.5.2/values.yaml
 mariadb:
   enabled: true
   image:
     # https://hub.docker.com/r/bitnamilegacy/mariadb/tags
     # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
+    # https://hub.docker.com/r/wunderio/silta-mariadb/tags ("-bc" tags only)
     registry: docker.io
-    repository: wunderio/bitnami-mariadb
-    tag: 11.4-debian-12-u
+    repository: wunderio/silta-mariadb
+    tag: 11.4-bc
   replication:
     enabled: false
   db:
@@ -782,8 +787,8 @@ memcached:
   # https://hub.docker.com/r/wunderio/bitnami-memcached/tags
   image:
     registry: docker.io
-    repository: wunderio/bitnami-memcached
-    tag: 1.6.8-debian-10-r0
+    repository: wunderio/silta-memcached
+    tag: 1.6-bc
   replicaCount: 1
   serviceAccount:
     create: true
@@ -808,10 +813,11 @@ redis:
   enabled: false
   # https://hub.docker.com/r/bitnamilegacy/redis/tags
   # https://hub.docker.com/r/wunderio/bitnami-redis/tags
+  # https://hub.docker.com/r/wunderio/silta-redis/tags
   image:
     registry: docker.io
-    repository: wunderio/bitnami-redis
-    tag: 6.2.7-debian-11-r11
+    repository: wunderio/silta-redis
+    tag: 7.4-bc
   architecture: standalone
   auth:
     # mandatory value
@@ -835,6 +841,8 @@ redis:
 # see: https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml
 mailpit:
   enabled: false
+  image:
+    tag: v1.28.2
   extraEnvVars:
     - name: MP_SMTP_AUTH_ACCEPT_ANY
       value: "true"
@@ -885,7 +893,13 @@ solr:
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
-  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m", "-a", "-Dlog4j2.formatMsgNoLookups=true"]
+  commandArgs: [
+    "start", 
+    "-p", "8983", 
+    "-f", "-force", 
+    "-m", "256m", 
+    "-a", "-Dlog4j2.formatMsgNoLookups=true -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError"
+  ]
 
   # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
   # Solr init container will contents of this folder to actual solr container.

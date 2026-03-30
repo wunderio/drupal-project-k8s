@@ -600,13 +600,6 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
       gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
       pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
     fi
-
-    # Clear caches before doing anything else.
-    if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then
-      drush cache-clear all;
-    else
-      drush cache-rebuild;
-    fi
   else
     printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
   fi
@@ -821,6 +814,12 @@ autoscaling/v2beta1
 
 {{- define "silta-cluster.rclone.has-provisioner" }}
 {{- if ( $.Capabilities.APIVersions.Has "silta.wdr.io/v1" ) }}true
+{{- else }}false
+{{- end }}
+{{- end }}
+
+{{- define "silta-cluster.traefik3.enabled" }}
+{{- if ( $.Capabilities.APIVersions.Has "traefik.io/v1alpha1" ) }}true
 {{- else }}false
 {{- end }}
 {{- end }}

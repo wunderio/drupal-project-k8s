@@ -428,8 +428,9 @@ wait
   set -e
 
   INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
-
   rm -f "$INSTALLING_FILE" || true
+
+  trap 'rm -f "$INSTALLING_FILE" || true' EXIT
 
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}

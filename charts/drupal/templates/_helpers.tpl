@@ -709,6 +709,10 @@ fi
   ls -lh /backups/*
 {{- end }}
 
+{{- define "drupal.cleanup-job" }}
+rm -f "{{ include "drupal.installing-file" . }}" || true
+{{- end }}
+
 {{- define "mariadb.db-validation" -}}
 
   set -e

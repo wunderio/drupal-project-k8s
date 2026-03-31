@@ -428,8 +428,9 @@ wait
   set -e
 
   INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
-
   rm -f "$INSTALLING_FILE" || true
+
+  trap 'rm -f "$INSTALLING_FILE" || true' EXIT
 
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}
@@ -706,6 +707,10 @@ fi
   # List content of backup folder
   echo "Current backups:"
   ls -lh /backups/*
+{{- end }}
+
+{{- define "drupal.cleanup-job" }}
+rm -f "{{ include "drupal.installing-file" . }}" || true
 {{- end }}
 
 {{- define "mariadb.db-validation" -}}

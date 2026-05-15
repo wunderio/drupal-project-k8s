@@ -8,18 +8,22 @@ varnish:
   enabled: true
 
 mailpit:
-  enabled: true
+  enabled: false
 
 elasticsearch:
-  enabled: true
+  enabled: false
 
 memcached:
   enabled: false
 
 redis:
-  enabled: false
+  enabled: true
+  image:
+    registry: docker.io
+    repository: wunderio/silta-redis
+    tag: 8.6-debian13-v2
   auth:
-    password: "foo"
+    password: "fo014196hdkja_sx"
 
 mounts:
   private-files:
@@ -58,8 +62,6 @@ php:
       # The ~ symbol will be replaced by a random digit from 0 to 9.
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
-
-php:
   preupgrade:
     # backup: true
     command: "echo 'Pre-upgrade command'"

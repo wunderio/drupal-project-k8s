@@ -350,7 +350,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
+until mariadb-admin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -363,7 +363,7 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+mariadb -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
 {{- define "drupal.wait-for-elasticsearch-command" }}
@@ -381,8 +381,12 @@ until curl --silent --connect-timeout 2 "{{ .Values.elasticsearch.protocol }}://
 done
 {{- end }}
 
+{{- define "drupal.installing-file" -}}
+{{ .Values.webRoot }}/sites/default/files/_installing
+{{- end }}
+
 {{- define "drupal.installation-in-progress-test" -}}
--f {{ $.Values.webRoot }}/sites/default/files/_installing
+-f {{ include "drupal.installing-file" . }}
 {{- end -}}
 
 {{- define "drupal.data-push-command" }}
@@ -392,11 +396,15 @@ done
 {{- define "drupal.data-pull-command" }}
 set -e
 
+INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
+
+rm -f "$INSTALLING_FILE" || true
+
 {{ include "drupal.import-reference-files" . }}
 
 {{ include "drupal.wait-for-db-command" . }}
 {{ include "drupal.create-db" . }}
-touch {{ .Values.webRoot }}/sites/default/files/_installing
+touch "$INSTALLING_FILE"
 {{ include "drupal.import-reference-db" . }}
 
 {{ if .Values.elasticsearch.enabled }}
@@ -405,7 +413,7 @@ touch {{ .Values.webRoot }}/sites/default/files/_installing
 
 {{ .Values.php.postinstall.command }}
 
-rm {{ .Values.webRoot }}/sites/default/files/_installing
+rm -f "$INSTALLING_FILE" || true
 
 {{ .Values.php.postupgrade.command }}
 {{- if .Values.php.postupgrade.afterCommand }}
@@ -419,6 +427,11 @@ wait
 {{- define "drupal.post-release-command" -}}
   set -e
 
+  INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
+  rm -f "$INSTALLING_FILE" || true
+
+  trap 'rm -f "$INSTALLING_FILE" || true' EXIT
+
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}
   {{- end }}
@@ -427,7 +440,7 @@ wait
   {{ include "drupal.create-db" . }}
 
   {{ if .Release.IsInstall }}
-    touch {{ .Values.webRoot }}/sites/default/files/_installing
+    touch "$INSTALLING_FILE"
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
@@ -439,7 +452,7 @@ wait
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm {{ .Values.webRoot }}/sites/default/files/_installing
+    rm -f "$INSTALLING_FILE" || true
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
@@ -478,11 +491,11 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
       /tmp/db.sql \
       '/-- Table structure for table/-1' \
       '{*}'
-    # First file is the mysqldump header, rename it to "header"
+    # First file is the mariadb-dump header, rename it to "header"
     mv table-0000 header
     # Find last table file
     last_table=$(find -type f -name 'table-*' | sort -n | tail -n1)
-    # Split last table file to extract mysqldump footer, which starts with a line including "@OLD_"
+    # Split last table file to extract mariadb-dump footer, which starts with a line including "@OLD_"
     csplit \
       --silent \
       --prefix='last-' \
@@ -526,6 +539,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
       --exclude="{{ $folderPattern }}" \
       {{ end -}}
       --delete --delete-excluded \
+      --ignore-missing-args \
       /app/reference-data/{{ $index }}
     {{ end -}}
     {{- end }}
@@ -553,12 +567,12 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
 
       if [[ "$import_method" == "parallel" ]]; then
         echo "Importing SQL files in parallel. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
-        find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+        find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mariadb -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
         pipeline_exit_code=$? # Capture exit code of the pipeline (most likely influenced by xargs)
 
         # Check if xargs reported an error (any non-zero exit status)
         if [ "$pipeline_exit_code" -ne 0 ]; then
-          echo "ERROR: One or more parallel imports failed. Check the logs above for specific mysql errors."
+          echo "ERROR: One or more parallel imports failed. Check the logs above for specific mariadb errors."
           exit 1
         fi
 
@@ -568,8 +582,8 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
         echo "Importing SQL files sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
         find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
           echo "Importing ${sql_file}"
-          if ! mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
-            echo "ERROR: Failed to import ${sql_file}. Check the logs above for specific mysql errors."
+          if ! mariadb -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
+            echo "ERROR: Failed to import ${sql_file}. Check the logs above for specific mariadb errors."
             exit 1
           fi
         done
@@ -587,13 +601,6 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
       gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
       pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
     fi
-
-    # Clear caches before doing anything else.
-    if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then
-      drush cache-clear all;
-    else
-      drush cache-rebuild;
-    fi
   else
     printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
   fi
@@ -607,11 +614,11 @@ if [ "${REF_DATA_COPY_FILES:-}" == "true" ]; then
   if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
     echo "Importing {{ $index }} files"
     # skip subfolders
-    rsync -r --delete --temp-dir=/tmp/ --filter "- */" "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
+    rsync -r --delete --ignore-missing-args --temp-dir=/tmp/ --filter "- */" "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
     # run rsync for each subfolder
     for f in /app/reference-data/{{ $index }}/*/; do
       subfolder="$(realpath -s $f)"
-      rsync -r --delete --temp-dir=/tmp/ "${subfolder}" "{{ $mount.mountPath }}" &
+      rsync -r --delete --ignore-missing-args --temp-dir=/tmp/ "${subfolder}" "{{ $mount.mountPath }}" &
     done
   fi
   {{ end -}}
@@ -646,8 +653,8 @@ fi
 
   # Take a database dump.
   echo "Starting database backup."
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
   echo "Database backup complete."
 {{- end }}
 
@@ -702,6 +709,10 @@ fi
   ls -lh /backups/*
 {{- end }}
 
+{{- define "drupal.cleanup-job" }}
+rm -f "{{ include "drupal.installing-file" . }}" || true
+{{- end }}
+
 {{- define "mariadb.db-validation" -}}
 
   set -e
@@ -716,7 +727,7 @@ fi
   TIME_WAITING=0
   echo "Waiting for database.";
 
-  until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
+  until mariadb-admin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
     sleep 1s
     TIME_WAITING=$((TIME_WAITING+1))
@@ -728,9 +739,27 @@ fi
   done
 
   echo "Importing database dump for validation"
-  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
+  mariadb -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
   drush status --fields=bootstrap
 
+{{- end }}
+
+{{- define "drupal.pre-release-command" -}}
+  set -e
+
+  {{- include "drupal.wait-for-db-command" . }}
+  
+  {{- if .Values.elasticsearch.enabled }}
+    {{ include "drupal.wait-for-elasticsearch-command" . }}
+  {{ end }}
+
+  {{- if .Values.php.preupgrade.backup }}
+    {{- include "drupal.backup-command" . }}
+  {{- end }}
+
+  {{- if .Values.php.preupgrade.command }}
+    {{- .Values.php.preupgrade.command }}
+  {{- end }}
 {{- end }}
 
 {{- define "cert-manager.api-version" }}
@@ -790,6 +819,12 @@ autoscaling/v2beta1
 
 {{- define "silta-cluster.rclone.has-provisioner" }}
 {{- if ( $.Capabilities.APIVersions.Has "silta.wdr.io/v1" ) }}true
+{{- else }}false
+{{- end }}
+{{- end }}
+
+{{- define "silta-cluster.traefik3.enabled" }}
+{{- if ( $.Capabilities.APIVersions.Has "traefik.io/v1alpha1" ) }}true
 {{- else }}false
 {{- end }}
 {{- end }}

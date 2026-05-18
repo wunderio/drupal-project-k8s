@@ -78,6 +78,12 @@ php:
       # This will avoid running all cron jobs at the same time.
       schedule: '~ 0 31 2 *'
 
+php:
+  preupgrade:
+    # backup: true
+    command: "echo 'Pre-upgrade command'"
+
+
 
 mariadb:
   master:

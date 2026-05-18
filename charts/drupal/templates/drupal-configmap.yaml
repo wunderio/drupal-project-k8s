@@ -81,7 +81,14 @@ data:
   {{- if .Values.signalsciences.enabled }}
   nginx_signalsciences_conf: |
     load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
+
+  {{- /* NDK module is required only for nginx versions < 1.26. */}}
+  {{- $versionParts := split "." .Values.nginx.version }}
+  {{- $nginxMajor := $versionParts._0 }}
+  {{- $nginxMinor := $versionParts._1 }}
+  {{- if or (empty $nginxMajor) (and (eq $nginxMajor "1" ) ( lt $nginxMinor "26" )) }}
     load_module /etc/nginx/modules/ndk_http_module.so;
+  {{- end }}
   {{- end }}
 
   {{- if .Values.nginx.status_page.enabled }}
@@ -147,8 +154,6 @@ data:
       ## This value is set to be identical with PHP's post_max_size.
       client_max_body_size        {{ .Values.php.php_ini.post_max_size }};
       client_body_buffer_size     128k;
-      client_header_buffer_size   4k;
-      large_client_header_buffers 8 16K;
       keepalive_timeout           15 10;
       keepalive_requests          100;
       reset_timedout_connection   on;
@@ -202,6 +207,19 @@ data:
         ~^/(?<no_slash>.*)$ $no_slash;
       }
 
+      {{- if .Values.nginx.httpConfig  }}
+      # nginx.httpConfig values
+      {{- range $k, $v := .Values.nginx.httpConfig  }}
+      {{- if not (eq $v "null") }}
+      {{- if (contains "\n" $v) }}
+      {{- printf "%s %s" $k (tpl $v $) | nindent 6 }}
+      {{- else }}
+      {{ $k }} {{ tpl $v $ }};
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+    
       include conf.d/*.conf;
     }
 
@@ -510,11 +528,6 @@ data:
           try_files $uri @drupal;
         }
 
-        location ~* ^.+\.(?:pdf|pptx?)$ {
-          expires 30d;
-          tcp_nodelay off;
-        }
-
         ## Advanced Help module makes each module provided README available.
         location ~* ^/help/[^/]*/README\.txt$ {
           try_files $uri @drupal;
@@ -821,6 +834,10 @@ data:
 
     # Prevent requests during the site installation process.
     if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
+      PID=$(pgrep -o php-fpm || true)
+      if [ -n "$PID" ]; then
+        echo "Installation in progress, failing health check." > /proc/$PID/fd/2;
+      fi
       exit 1;
     fi
 

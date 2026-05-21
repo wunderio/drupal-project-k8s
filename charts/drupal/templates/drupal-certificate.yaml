@@ -30,7 +30,7 @@ spec:
     rotationPolicy: "Always"
 ---
 {{- range $index, $prefix := .Values.domainPrefixes }}
-{{- $params := dict "prefix" $prefix  -}}
+{{- $params := dict "prefix" $prefix  }}
 apiVersion: {{ include "cert-manager.api-version" $ | trim }}
 kind: Certificate
 metadata:
@@ -81,7 +81,7 @@ spec:
     rotationPolicy: "Always"
 ---
 {{- range $index, $prefix := .Values.domainPrefixes }}
-{{- $params := dict "prefix" $prefix  -}}
+{{- $params := dict "prefix" $prefix  }}
 apiVersion: {{ include "cert-manager.api-version" $ | trim }}
 kind: Certificate
 metadata:
@@ -132,6 +132,42 @@ data:
 ---
 {{- end }}
 
+{{- else }}
+apiVersion: {{ include "cert-manager.api-version" . | trim }}
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Release.Name }}-tls
+  dnsNames:
+  - {{ include "drupal.domain" . | quote }}
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
+---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+{{- $params := dict "prefix" $prefix  }}
+apiVersion: {{ include "cert-manager.api-version" $ | trim }}
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  dnsNames:
+  - '{{ include "drupal.domain" (merge $params $ ) }}'
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
+---
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -205,6 +241,24 @@ data:
   {{- end }}
   tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
   tls.key: {{ $domain.ssl.key | default "" | b64enc }}
+---
+{{- end }}
+{{- else }}
+apiVersion: {{ include "cert-manager.api-version" $ | trim }}
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  dnsNames:
+  - {{ $domain.hostname | quote }}
+  issuerRef:
+    name: {{ $domain.ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
 ---
 {{- end }}
 {{- end }}

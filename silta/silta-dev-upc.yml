@@ -2,3 +2,44 @@
 referenceData:
   enabled: true
   referenceEnvironment: 'feature/dev-upc-cluster/reference'
+
+# Settings for default site provided by this deployment
+ssl:
+  enabled:  true
+  # issuer: cloudflare
+  issuer: letsencrypt
+
+exposeDomains:
+  cftest:
+    hostname: cftest.silta-test.wdr.io
+    ssl:
+      enabled: true
+      issuer: cloudflare
+  cftest2:
+    hostname: test2.silta-test.wdr.io
+    ssl:
+      enabled: true
+  cftest3:
+    hostname: test3.silta-test.wdr.io
+    ssl:
+      enabled: true
+      issuer: custom
+      crt: |-
+        -----BEGIN CERTIFICATE-----
+        -----END CERTIFICATE-----
+      key: |-
+        -----BEGIN RSA PRIVATE KEY-----
+        -----END RSA PRIVATE KEY-----
+      ca: |-
+        -----BEGIN CERTIFICATE-----
+        -----END CERTIFICATE-----
+  cftest4:
+    hostname: test4.silta-test.wdr.io
+    ssl:
+      enabled: true
+      issuer: selfsigned
+
+  cftest5:
+    hostname: test5.silta-test.wdr.io
+    ssl:
+      enabled: false

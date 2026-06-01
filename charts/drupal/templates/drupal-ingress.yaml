@@ -165,7 +165,7 @@ spec:
 
 {{- $cluster_issuer := "" }}
 {{- range $index, $domain := $.Values.exposeDomains }}
-{{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
+{{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
 {{- if eq $domain.ingress $ingress_index }}
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}

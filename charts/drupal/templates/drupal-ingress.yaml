@@ -68,7 +68,7 @@ metadata:
     {{- end }}
 
     {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
-    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name | replace "--" "-" }}-rl@kubernetescrd
     {{- end }}
 
     {{- if (index .Values "silta-release").downscaler.enabled }}
@@ -236,7 +236,7 @@ metadata:
     {{- end }}
 
     {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
-    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl-{{ $ingress_index }}@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name | replace "--" "-" }}-rl-{{ $ingress_index }}@kubernetescrd
     {{- end }}
 
     {{- if (index $.Values "silta-release").downscaler.enabled }}

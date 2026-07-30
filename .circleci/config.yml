@@ -1,5 +1,18 @@
 version: 2.1
 
+parameters:
+  # Extra silta config files appended by wunderio/silta-images when validating
+  # freshly released images (e.g. ",silta/silta-test-redis.yml").
+  # Empty on normal runs. Note: the value starts with a comma.
+  test_silta_config:
+    type: string
+    default: ""
+  # Helm flags injecting the released image tag, e.g.
+  # "--set-string redis.image.tag=7.4-v1.2.3". Empty on normal runs.
+  test_helm_flags:
+    type: string
+    default: ""
+
 orbs:
   silta: silta/silta@dev:master
 
@@ -199,7 +212,8 @@ workflows:
       - silta/drupal-deploy: &deploy-master
           <<: *deploy
           name: deploy-master
-          silta_config: silta/silta.yml,silta/silta-master.yml
+          silta_config: silta/silta.yml,silta/silta-master.yml<< pipeline.parameters.test_silta_config >>
+          helm_flags: "--history-max=4 << pipeline.parameters.test_helm_flags >>"
           requires:
             - build-master
           filters: *filter_master_only

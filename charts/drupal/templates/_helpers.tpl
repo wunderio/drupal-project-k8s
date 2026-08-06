@@ -197,15 +197,6 @@ imagePullSecrets:
       key: root
 {{- end }}
 {{- end }}
-{{- define "drupal.pre-release-env" }}
-{{- if .Values.timezone }}
-- name: TZ
-value: {{ .Values.timezone | quote }}
-{{- end }}
-{{- include "drupal.db-env" . }}
-- name: ERROR_LEVEL
-value: {{ .Values.php.errorLevel }}
-{{- end }}
 {{- define "drupal.env" }}
 - name: SILTA_CLUSTER
   value: "1"
@@ -219,6 +210,11 @@ value: {{ .Values.php.errorLevel }}
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
 {{- end }}
+{{- if .Values.timezone }}
+- name: TZ
+  value: {{ .Values.timezone | quote }}
+{{- end }}
+{{- define "drupal.pre-release-env" }}
 {{- if .Values.timezone }}
 - name: TZ
   value: {{ .Values.timezone | quote }}

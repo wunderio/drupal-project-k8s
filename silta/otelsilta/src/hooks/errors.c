@@ -20,69 +20,51 @@ static void (*orig_error_cb)(int, zend_string *, const uint32_t,
 
 static void otelsilta_throw_exception_hook(zend_object *exception) {
     if (OTELSILTA_G(enabled) && OTELSILTA_G(feature_errors) &&
-        !OTELSILTA_G(cli_mode)) {
-        /* Force sampling so errors are always captured */
-        if (!OTELSILTA_G(request_active)) {
-            OTELSILTA_G(has_error) = 1;
-            otelsilta_tracer_force_sample();
-        }
+        !OTELSILTA_G(cli_mode) && OTELSILTA_G(request_active)) {
 
-        if (OTELSILTA_G(request_active)) {
-            zend_class_entry *ce    = exception->ce;
-            const char       *cname = ce ? ZSTR_VAL(ce->name) : "Exception";
+        otelsilta_span_t *span = otelsilta_tracer_current_span();
+        if (!span) span = OTELSILTA_G(root_span);
 
-            /* Get exception message */
-            zval *msg_zv = zend_read_property(ce, exception,
-                                               "message", sizeof("message") - 1,
-                                               1, NULL);
-            const char *msg = "";
-            if (msg_zv && Z_TYPE_P(msg_zv) == IS_STRING) {
-                msg = Z_STRVAL_P(msg_zv);
-            }
+        if (span) {
+            if (span->event_count >= OTELSILTA_MAX_EVENTS_PER_SPAN) {
+                /* cheap path: don't build a stacktrace we would discard */
+                span->event_dropped++;
+            } else {
+                zend_class_entry *ce = exception->ce;
+                const char *cname = ce ? ZSTR_VAL(ce->name) : "Exception";
 
-            /* Get stack trace string */
-            zval trace_str;
-            ZVAL_UNDEF(&trace_str);
-            zend_call_method_with_0_params(
-                exception, ce, NULL, "gettraceasstring", &trace_str);
+                zval *msg_zv = zend_read_property(ce, exception,
+                    "message", sizeof("message") - 1, 1, NULL);
+                const char *msg = (msg_zv && Z_TYPE_P(msg_zv) == IS_STRING)
+                                  ? Z_STRVAL_P(msg_zv) : "";
 
-            /* Create an error span */
-            char span_name[512];
-            snprintf(span_name, sizeof(span_name), "exception %s", cname);
+                zval trace_str;
+                ZVAL_UNDEF(&trace_str);
+                zend_call_method_with_0_params(
+                    exception, ce, NULL, "gettraceasstring", &trace_str);
 
-            otelsilta_span_t *span =
-                otelsilta_tracer_start_span(span_name, SPAN_KIND_INTERNAL);
-
-            if (span) {
-                otelsilta_span_set_str(span, "exception.type",    cname);
-                otelsilta_span_set_str(span, "exception.message", msg);
+                char st[OTELSILTA_EVENT_STACKTRACE_LEN];
+                st[0] = '\0';
                 if (Z_TYPE(trace_str) == IS_STRING) {
-                    otelsilta_span_set_str(span, "exception.stacktrace",
-                                           Z_STRVAL(trace_str));
+                    size_t n = Z_STRLEN(trace_str);
+                    if (n >= sizeof(st)) {
+                        memcpy(st, Z_STRVAL(trace_str), sizeof(st) - 16);
+                        strcpy(st + sizeof(st) - 16, "...(truncated)");
+                    } else {
+                        memcpy(st, Z_STRVAL(trace_str), n);
+                        st[n] = '\0';
+                    }
                 }
-                otelsilta_span_set_status(span, SPAN_STATUS_ERROR, msg);
-                otelsilta_tracer_end_span(span);
-            }
 
-            /* Also annotate the currently active span */
-            otelsilta_span_t *cur = otelsilta_tracer_current_span();
-            if (cur && cur != span) {
-                otelsilta_span_set_str(cur, "exception.type",    cname);
-                otelsilta_span_set_str(cur, "exception.message", msg);
-                otelsilta_span_set_status(cur, SPAN_STATUS_ERROR, msg);
-            }
+                otelsilta_span_add_event(span, cname, msg, st);
 
-            OTELSILTA_G(has_error) = 1;
-
-            if (Z_TYPE(trace_str) != IS_UNDEF) {
-                zval_ptr_dtor(&trace_str);
+                if (Z_TYPE(trace_str) != IS_UNDEF) zval_ptr_dtor(&trace_str);
             }
         }
+        /* Deliberately NO has_error / status change: a throw is not an error. */
     }
 
-    if (orig_throw_exception_hook) {
-        orig_throw_exception_hook(exception);
-    }
+    if (orig_throw_exception_hook) orig_throw_exception_hook(exception);
 }
 
 /* ---- Error callback ---- */
@@ -91,11 +73,14 @@ static void otelsilta_error_cb(int type, zend_string *error_filename,
                                 const uint32_t error_lineno,
                                 zend_string *message) {
     /* Only intercept fatal and catchable-fatal errors */
-    int is_fatal = (type == E_ERROR          ||
-                    type == E_PARSE          ||
-                    type == E_CORE_ERROR     ||
-                    type == E_COMPILE_ERROR  ||
-                    type == E_RECOVERABLE_ERROR);
+    /* PHP 8 ORs E_DONT_BAIL (0x8000) into `type` for uncaught errors;
+     * mask it (and any high flags) off before comparing severities. */
+    int base = type & E_ALL;
+    int is_fatal = (base == E_ERROR          ||
+                    base == E_PARSE          ||
+                    base == E_CORE_ERROR     ||
+                    base == E_COMPILE_ERROR  ||
+                    base == E_RECOVERABLE_ERROR);
 
     if (is_fatal && OTELSILTA_G(enabled) && OTELSILTA_G(feature_errors) &&
         !OTELSILTA_G(cli_mode)) {
@@ -108,28 +93,17 @@ static void otelsilta_error_cb(int type, zend_string *error_filename,
         }
 
         if (OTELSILTA_G(request_active)) {
-            char span_name[64];
-            snprintf(span_name, sizeof(span_name), "php.error");
+            otelsilta_span_t *span = otelsilta_tracer_current_span();
+            if (!span) span = OTELSILTA_G(root_span);
 
-            otelsilta_span_t *span =
-                otelsilta_tracer_start_span(span_name, SPAN_KIND_INTERNAL);
+            char loc[OTELSILTA_EVENT_STACKTRACE_LEN];
+            snprintf(loc, sizeof(loc), "%s:%u", fname, error_lineno);
 
-            if (span) {
-                char loc[512];
-                snprintf(loc, sizeof(loc), "%s:%u", fname, error_lineno);
-                otelsilta_span_set_str(span, "error.type",     "PHP Error");
-                otelsilta_span_set_str(span, "error.message",  msg);
-                otelsilta_span_set_str(span, "error.location", loc);
-                otelsilta_span_set_int(span, "error.php_type", (zend_long)type);
-                otelsilta_span_set_status(span, SPAN_STATUS_ERROR, msg);
-                otelsilta_tracer_end_span(span);
-            }
+            if (span) otelsilta_span_add_event(span, "PHP Error", msg, loc);
 
-            /* Annotate root span */
-            otelsilta_span_t *root = OTELSILTA_G(root_span);
-            if (root) {
-                otelsilta_span_set_status(root, SPAN_STATUS_ERROR, msg);
-            }
+            if (OTELSILTA_G(root_span))
+                otelsilta_span_set_status(OTELSILTA_G(root_span),
+                                          SPAN_STATUS_ERROR, msg);
 
             OTELSILTA_G(has_error) = 1;
         }

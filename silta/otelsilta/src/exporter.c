@@ -123,6 +123,15 @@ static void append_span_json(smart_str *out, const otelsilta_span_t *s,
     for (int i = 0; i < s->attribute_count; i++) {
         append_attribute(out, &s->attributes[i], i == 0);
     }
+    if (s->event_dropped > 0) {
+        char db[32];
+        if (s->attribute_count > 0) smart_str_appends(out, ",");
+        smart_str_appends(out,
+            "{\"key\":\"exception.dropped\",\"value\":{\"intValue\":\"");
+        snprintf(db, sizeof(db), "%d", s->event_dropped);
+        smart_str_appends(out, db);
+        smart_str_appends(out, "\"}}");
+    }
     smart_str_appends(out, "]");
 
     /* Status */
@@ -137,6 +146,41 @@ static void append_span_json(smart_str *out, const otelsilta_span_t *s,
         smart_str_appends(out, "\"");
     }
     smart_str_appends(out, "}");
+
+    /* Events */
+    if (s->event_count > 0 && s->events) {
+        smart_str_appends(out, ",\"events\":[");
+        for (int i = 0; i < s->event_count; i++) {
+            const otelsilta_span_event_t *ev = &s->events[i];
+            if (i > 0) smart_str_appends(out, ",");
+            smart_str_appends(out, "{\"timeUnixNano\":\"");
+            char ns_str[32];
+            snprintf(ns_str, sizeof(ns_str), "%llu", (unsigned long long)ev->time_unix_nano);
+            smart_str_appends(out, ns_str);
+            smart_str_appends(out, "\",\"name\":\"exception\",\"attributes\":[");
+            char esc_type[256], esc_msg[OTELSILTA_MAX_STR_LEN * 2],
+                 esc_st[OTELSILTA_EVENT_STACKTRACE_LEN * 2];
+            json_escape(ev->type, esc_type, sizeof(esc_type));
+            json_escape(ev->message, esc_msg, sizeof(esc_msg));
+            smart_str_appends(out,
+                "{\"key\":\"exception.type\",\"value\":{\"stringValue\":\"");
+            smart_str_appends(out, esc_type);
+            smart_str_appends(out, "\"}},");
+            smart_str_appends(out,
+                "{\"key\":\"exception.message\",\"value\":{\"stringValue\":\"");
+            smart_str_appends(out, esc_msg);
+            smart_str_appends(out, "\"}}");
+            if (ev->stacktrace[0] != '\0') {
+                json_escape(ev->stacktrace, esc_st, sizeof(esc_st));
+                smart_str_appends(out,
+                    ",{\"key\":\"exception.stacktrace\",\"value\":{\"stringValue\":\"");
+                smart_str_appends(out, esc_st);
+                smart_str_appends(out, "\"}}");
+            }
+            smart_str_appends(out, "]}");
+        }
+        smart_str_appends(out, "]");
+    }
 
     smart_str_appends(out, "}");
 }

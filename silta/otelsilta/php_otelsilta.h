@@ -25,6 +25,13 @@
 #define OTELSILTA_MAX_STR_LEN           1024
 #define OTELSILTA_SPAN_STACK_SIZE       64
 #define OTELSILTA_OB_SPAN_STACK_SIZE    128
+#define OTELSILTA_MAX_EVENTS_PER_SPAN   5
+#define OTELSILTA_EVENT_STACKTRACE_LEN  2048
+/* errors.c truncation math (memcpy of sizeof(st)-16 then a 15-byte marker)
+ * requires this buffer be at least 32 bytes; guard against future shrink. */
+#if OTELSILTA_EVENT_STACKTRACE_LEN < 32
+# error "OTELSILTA_EVENT_STACKTRACE_LEN must be >= 32"
+#endif
 
 /* ---- Attribute ---- */
 
@@ -62,6 +69,13 @@ typedef enum {
     SPAN_KIND_CONSUMER = 5
 } otelsilta_span_kind_t;
 
+typedef struct {
+    uint64_t time_unix_nano;
+    char     type[128];        /* exception.type, or "PHP Error" for fatals */
+    char     message[512];     /* exception.message */
+    char     stacktrace[OTELSILTA_EVENT_STACKTRACE_LEN]; /* "" when omitted */
+} otelsilta_span_event_t;
+
 typedef struct _otelsilta_span_t {
     char                    trace_id[33];       /* 32 hex chars + NUL */
     char                    span_id[17];        /* 16 hex chars + NUL */
@@ -75,6 +89,9 @@ typedef struct _otelsilta_span_t {
     otelsilta_attribute_t   attributes[OTELSILTA_MAX_ATTRIBUTES];
     int                     attribute_count;
     int                     is_finished;
+    otelsilta_span_event_t *events;        /* NULL until first event */
+    int                     event_count;
+    int                     event_dropped; /* throws beyond the per-span cap */
     struct _otelsilta_span_t *next;             /* intrusive linked list */
 } otelsilta_span_t;
 

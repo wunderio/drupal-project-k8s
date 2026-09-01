@@ -256,6 +256,12 @@ void otelsilta_tracer_make_sampling_decision(void) {
 
 void otelsilta_tracer_request_shutdown(void) {
     if (!OTELSILTA_G(request_active)) {
+        /* A 5xx response is an error even if we didn't sample the request. */
+        if (!OTELSILTA_G(has_error) && OTELSILTA_G(enabled) &&
+            !OTELSILTA_G(cli_mode)) {
+            long code = SG(sapi_headers).http_response_code;
+            if (code >= 500) OTELSILTA_G(has_error) = 1;
+        }
         /* If we have errors but weren't sampled, force-sample now */
         if (OTELSILTA_G(has_error) && OTELSILTA_G(enabled)) {
             otelsilta_tracer_force_sample();

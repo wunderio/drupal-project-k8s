@@ -25,6 +25,12 @@ void otelsilta_span_set_status(otelsilta_span_t *span,
                                 otelsilta_span_status_t status,
                                 const char *message);
 
+/* Add an event to the span; returns 1 if recorded, 0 if dropped/invalid. */
+int  otelsilta_span_add_event(otelsilta_span_t *span,
+                              const char *type,
+                              const char *message,
+                              const char *stacktrace);
+
 /* Free the span and its linked successors. */
 void otelsilta_span_free_all(otelsilta_span_t *head);
 

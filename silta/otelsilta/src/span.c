@@ -92,9 +92,34 @@ void otelsilta_span_set_status(otelsilta_span_t *span,
     }
 }
 
+int otelsilta_span_add_event(otelsilta_span_t *span,
+                             const char *type,
+                             const char *message,
+                             const char *stacktrace) {
+    if (!span) return 0;
+    if (span->event_count >= OTELSILTA_MAX_EVENTS_PER_SPAN) {
+        span->event_dropped++;
+        return 0;
+    }
+    if (!span->events) {
+        span->events = (otelsilta_span_event_t *)ecalloc(
+            OTELSILTA_MAX_EVENTS_PER_SPAN, sizeof(otelsilta_span_event_t));
+    }
+    otelsilta_span_event_t *ev = &span->events[span->event_count];
+    ev->time_unix_nano = otelsilta_time_ns();
+    strncpy(ev->type,    type    ? type    : "", sizeof(ev->type) - 1);
+    strncpy(ev->message, message ? message : "", sizeof(ev->message) - 1);
+    if (stacktrace && stacktrace[0]) {
+        strncpy(ev->stacktrace, stacktrace, sizeof(ev->stacktrace) - 1);
+    }
+    span->event_count++;
+    return 1;
+}
+
 void otelsilta_span_free_all(otelsilta_span_t *head) {
     while (head) {
         otelsilta_span_t *next = head->next;
+        if (head->events) efree(head->events);
         efree(head);
         head = next;
     }

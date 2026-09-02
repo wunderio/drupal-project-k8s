@@ -2,6 +2,7 @@
 #include "span.h"
 #include "propagation.h"
 #include "routing/router.h"
+#include "sanitizer.h"
 #include "php_otelsilta.h"
 
 #include "SAPI.h"
@@ -274,7 +275,11 @@ void otelsilta_tracer_make_sampling_decision(void) {
 
     otelsilta_span_set_str(root, "http.method", method);
     otelsilta_span_set_str(root, "http.route",  route);
-    otelsilta_span_set_str(root, "http.url",    uri);
+    {
+        char clean_url[OTELSILTA_MAX_STR_LEN];
+        otelsilta_sanitize_url(uri, clean_url, sizeof(clean_url));
+        otelsilta_span_set_str(root, "http.url", clean_url);
+    }
 
     /* Push root onto stack */
     OTELSILTA_G(root_span) = root;
@@ -393,7 +398,11 @@ void otelsilta_tracer_force_sample(void) {
 
     otelsilta_span_set_str(root, "http.method", method);
     otelsilta_span_set_str(root, "http.route",  route);
-    otelsilta_span_set_str(root, "http.url",    uri);
+    {
+        char clean_url[OTELSILTA_MAX_STR_LEN];
+        otelsilta_sanitize_url(uri, clean_url, sizeof(clean_url));
+        otelsilta_span_set_str(root, "http.url", clean_url);
+    }
 
     OTELSILTA_G(root_span)         = root;
     OTELSILTA_G(span_stack)[0]     = root;

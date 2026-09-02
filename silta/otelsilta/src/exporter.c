@@ -374,6 +374,20 @@ static int send_all(int fd, const char *buf, size_t len, int timeout_ms) {
     return 0;
 }
 
+/* ---- Helper: export timeout clamping ----
+ *
+ * Clamp the configured export timeout (ms) to a sensible range:
+ * - minimum 50ms (avoid timeout-less operations)
+ * - maximum 5s (avoid hanging on export for too long)
+ * Note: getaddrinfo() remains untimed (out of scope for this clamping).
+ */
+static int export_timeout_ms(void) {
+    zend_long t = OTELSILTA_G(export_timeout_ms);
+    if (t < 50)   t = 50;
+    if (t > 5000) t = 5000;
+    return (int)t;
+}
+
 static void http_post_otlp(const char *url, const char *body, size_t body_len) {
     char host[256], port[8], path[1024];
 
@@ -417,7 +431,7 @@ static void http_post_otlp(const char *url, const char *body, size_t body_len) {
     if (cr < 0) {
         /* Wait for connect to complete */
         struct pollfd pfd = { .fd = fd, .events = POLLOUT };
-        int pr = poll(&pfd, 1, 2000);
+        int pr = poll(&pfd, 1, export_timeout_ms());
         if (pr <= 0) {
             close(fd);
             otelsilta_debug_log("otelsilta: connect timeout to %s:%s",
@@ -455,8 +469,8 @@ static void http_post_otlp(const char *url, const char *body, size_t body_len) {
     }
 
     /* Send header + body */
-    if (send_all(fd, hdr, (size_t)hdr_len, 2000) != 0 ||
-        send_all(fd, body, body_len, 2000) != 0) {
+    if (send_all(fd, hdr, (size_t)hdr_len, export_timeout_ms()) != 0 ||
+        send_all(fd, body, body_len, export_timeout_ms()) != 0) {
         close(fd);
         otelsilta_debug_log("otelsilta: send failed to %s", url);
         return;
@@ -466,7 +480,7 @@ static void http_post_otlp(const char *url, const char *body, size_t body_len) {
      * status code for debug logging, don't need the body). */
     char resp[256];
     struct pollfd pfd = { .fd = fd, .events = POLLIN };
-    int pr = poll(&pfd, 1, 2000);
+    int pr = poll(&pfd, 1, export_timeout_ms());
     if (pr > 0) {
         ssize_t n = read(fd, resp, sizeof(resp) - 1);
         if (n > 0) {

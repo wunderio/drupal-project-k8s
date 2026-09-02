@@ -56,6 +56,7 @@ static void php_otelsilta_init_globals(zend_otelsilta_globals *g) {
     g->debug_mode               = 0;
     g->max_span_depth           = 5;
     g->min_span_duration_ms     = 1;
+    g->export_timeout_ms        = 500;
 }
 
 /* ===== INI entries ===== */
@@ -123,6 +124,9 @@ PHP_INI_BEGIN()
         zend_otelsilta_globals, otelsilta_globals)
     STD_PHP_INI_ENTRY("otelsilta.min_span_duration_ms", "1", PHP_INI_ALL,
         OnUpdateLong, min_span_duration_ms,
+        zend_otelsilta_globals, otelsilta_globals)
+    STD_PHP_INI_ENTRY("otelsilta.export_timeout_ms", "500", PHP_INI_ALL,
+        OnUpdateLong, export_timeout_ms,
         zend_otelsilta_globals, otelsilta_globals)
 PHP_INI_END()
 
@@ -391,6 +395,17 @@ PHP_FUNCTION(otelsilta_test_parse_traceparent) {
     add_assoc_long(return_value, "flags", (zend_long)flags);
 }
 
+/* internal test seam — not a public API */
+PHP_FUNCTION(otelsilta_test_sanitize_url) {
+    char *url; size_t url_len;
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+        Z_PARAM_STRING(url, url_len)
+    ZEND_PARSE_PARAMETERS_END();
+    char clean_url[OTELSILTA_MAX_STR_LEN];
+    otelsilta_sanitize_url(url, clean_url, sizeof(clean_url));
+    RETURN_STRING(clean_url);
+}
+
 /* ===== Function table ===== */
 
 /* Arginfo for userland functions (PHP 8.0+) */
@@ -433,6 +448,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_parse_traceparent, 0, 0, 1)
     ZEND_ARG_INFO(0, header)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_sanitize_url, 0, 0, 1)
+    ZEND_ARG_TYPE_INFO(0, url, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_span_start,          arginfo_otelsilta_span_start)
     PHP_FE(otelsilta_span_finish,         arginfo_otelsilta_span_finish)
@@ -444,6 +463,7 @@ static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_test_merge_headers, arginfo_otelsilta_test_merge_headers)
     PHP_FE(otelsilta_test_spans,          arginfo_otelsilta_test_spans)
     PHP_FE(otelsilta_test_parse_traceparent, arginfo_otelsilta_test_parse_traceparent)
+    PHP_FE(otelsilta_test_sanitize_url,   arginfo_otelsilta_test_sanitize_url)
     PHP_FE_END
 };
 

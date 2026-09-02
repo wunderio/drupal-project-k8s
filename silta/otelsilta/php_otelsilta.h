@@ -122,6 +122,7 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     bool  debug_mode;
     bool       cli_enabled;    /* allow tracing under the CLI SAPI (tests) */
     char      *excluded_urls;          /* comma-separated URL prefixes */
+    zend_long  export_timeout_ms;      /* socket timeout for OTLP export (ms) */
 
     /* Span aggregation & gating */
     zend_long  max_span_depth;         /* depth gating: max child span depth (default 5) */

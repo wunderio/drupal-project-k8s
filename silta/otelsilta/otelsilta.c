@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <time.h>
+#include <unistd.h>
 
 /* php_random_bytes_throw():
  *   PHP 8.2+ moved the random API to ext/random/php_random.h
@@ -218,10 +219,20 @@ uint64_t otelsilta_time_ns(void) {
 }
 
 void otelsilta_generate_id(char *buf, int bytes) {
-    /* Use PHP's CSPRNG (php_random_bytes) */
     unsigned char raw[16];
     if (bytes > 16) bytes = 16;
-    php_random_bytes_throw(raw, bytes);
+    if (bytes < 0)  bytes = 0;
+    if (php_random_bytes_silent(raw, (size_t)bytes) == FAILURE) {
+        /* CSPRNG unavailable: fall back to an LCG so IDs are never
+         * uninitialized stack bytes and no exception is left pending. */
+        static uint64_t counter = 0;
+        uint64_t seed = otelsilta_time_ns()
+                        ^ ((uint64_t)getpid() << 32) ^ ++counter;
+        for (int i = 0; i < bytes; i++) {
+            seed = seed * 6364136223846793005ULL + 1442695040888963407ULL;
+            raw[i] = (unsigned char)(seed >> 33);
+        }
+    }
     for (int i = 0; i < bytes; i++) {
         sprintf(buf + (i * 2), "%02x", raw[i]);
     }

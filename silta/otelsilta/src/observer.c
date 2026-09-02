@@ -49,6 +49,7 @@ static void ob_curl_exec_begin(zend_execute_data *ex);
 static void ob_curl_exec_end(zend_execute_data *ex, zval *retval);
 static void ob_curl_setopt_begin(zend_execute_data *ex);
 static void ob_curl_setopt_end(zend_execute_data *ex, zval *retval);
+static void ob_curl_setopt_array_begin(zend_execute_data *ex);
 
 /* Cache (Redis, Memcached) */
 static void ob_cache_begin(zend_execute_data *ex);
@@ -286,6 +287,9 @@ zend_observer_fcall_handlers otelsilta_observer_fcall_init(
     if (fn_name && strcmp(fn_name, "curl_setopt") == 0) {
         return (zend_observer_fcall_handlers){ob_curl_setopt_begin,
                                                ob_curl_setopt_end};
+    }
+    if (fn_name && strcmp(fn_name, "curl_setopt_array") == 0) {
+        return (zend_observer_fcall_handlers){ob_curl_setopt_array_begin, NULL};
     }
 
     /* ---- Cache: Redis, Memcached ---- */
@@ -618,9 +622,57 @@ static void ob_mysqli_query_end(zend_execute_data *ex, zval *retval) {
 # define CURLINFO_HTTP_CODE     2097154
 #endif
 
-/* curl_setopt: capture URL and method metadata per curl handle */
+/* ================================================================
+ * Shared curl-handle metadata: lookup/create + option capture.
+ *
+ * Used by both ob_curl_setopt_begin (single option) and
+ * ob_curl_setopt_array_begin (bulk options via curl_setopt_array()).
+ * ================================================================ */
+
+static otelsilta_curl_info_t *curl_info_for(zend_ulong rid) {
+    otelsilta_curl_info_t *info = (otelsilta_curl_info_t *)
+        zend_hash_index_find_ptr(&OTELSILTA_G(curl_handles), rid);
+    if (!info) {
+        info = (otelsilta_curl_info_t *)emalloc(sizeof(*info));
+        memset(info, 0, sizeof(*info));
+        ZVAL_UNDEF(&info->headers);
+        strncpy(info->method, "GET", sizeof(info->method) - 1);
+        zend_hash_index_update_ptr(&OTELSILTA_G(curl_handles), rid, info);
+    }
+    return info;
+}
+
+static void curl_capture_option(zend_ulong rid, zend_long option, zval *zvalue) {
+    otelsilta_curl_info_t *info = curl_info_for(rid);
+    if (option == CURLOPT_URL && Z_TYPE_P(zvalue) == IS_STRING) {
+        char clean[OTELSILTA_MAX_STR_LEN];
+        otelsilta_sanitize_url(Z_STRVAL_P(zvalue), clean, sizeof(clean));
+        strncpy(info->url, clean, sizeof(info->url) - 1);
+    } else if (option == CURLOPT_CUSTOMREQUEST && Z_TYPE_P(zvalue) == IS_STRING) {
+        strncpy(info->method, Z_STRVAL_P(zvalue), sizeof(info->method) - 1);
+    } else if (option == CURLOPT_POST && zval_is_true(zvalue)) {
+        strncpy(info->method, "POST", sizeof(info->method) - 1);
+    } else if (option == CURLOPT_HTTPHEADER && Z_TYPE_P(zvalue) == IS_ARRAY) {
+        /* Snapshot: PHP's curl copies the list at setopt time (into a
+         * curl_slist), so we must snapshot too rather than hold a
+         * reference — a live reference would not mirror curl's semantics
+         * if the app later mutates the same array variable. */
+        zval_ptr_dtor(&info->headers);
+        ZVAL_ARR(&info->headers, zend_array_dup(Z_ARRVAL_P(zvalue)));
+    }
+}
+
+void otelsilta_observer_curl_info_free(void *ptr) {
+    otelsilta_curl_info_t *info = (otelsilta_curl_info_t *)ptr;
+    if (!info) return;
+    zval_ptr_dtor(&info->headers);   /* no-op when IS_UNDEF */
+    efree(info);
+}
+
+/* curl_setopt: capture URL/method/header metadata per curl handle */
 static void ob_curl_setopt_begin(zend_execute_data *ex) {
     if (!OTELSILTA_G(request_active) || !OTELSILTA_G(feature_http)) return;
+    if (OTELSILTA_G(curl_injecting)) return;
 
     if (ZEND_CALL_NUM_ARGS(ex) < 3) return;
 
@@ -645,36 +697,52 @@ static void ob_curl_setopt_begin(zend_execute_data *ex) {
         return;
     }
 
-    typedef struct {
-        char url[OTELSILTA_MAX_STR_LEN];
-        char method[16];
-    } curl_info_t;
-
-    curl_info_t *info = (curl_info_t *)
-        zend_hash_index_find_ptr(&OTELSILTA_G(curl_handles), rid);
-
-    if (!info) {
-        info = (curl_info_t *)emalloc(sizeof(*info));
-        memset(info, 0, sizeof(*info));
-        strncpy(info->method, "GET", sizeof(info->method) - 1);
-        zend_hash_index_update_ptr(&OTELSILTA_G(curl_handles), rid, info);
-    }
-
-    zend_long option = Z_LVAL_P(zopt);
-    if (option == CURLOPT_URL && Z_TYPE_P(zvalue) == IS_STRING) {
-        char clean[OTELSILTA_MAX_STR_LEN];
-        otelsilta_sanitize_url(Z_STRVAL_P(zvalue), clean, sizeof(clean));
-        strncpy(info->url, clean, sizeof(info->url) - 1);
-    } else if (option == CURLOPT_CUSTOMREQUEST &&
-               Z_TYPE_P(zvalue) == IS_STRING) {
-        strncpy(info->method, Z_STRVAL_P(zvalue), sizeof(info->method) - 1);
-    } else if (option == CURLOPT_POST && zval_is_true(zvalue)) {
-        strncpy(info->method, "POST", sizeof(info->method) - 1);
-    }
+    curl_capture_option(rid, Z_LVAL_P(zopt), zvalue);
 }
 
 static void ob_curl_setopt_end(zend_execute_data *ex, zval *retval) {
     (void)ex; (void)retval; /* metadata already captured in begin */
+}
+
+/* curl_setopt_array: same capture, but iterating an [option => value] map */
+static void ob_curl_setopt_array_begin(zend_execute_data *ex) {
+    if (!OTELSILTA_G(request_active) || !OTELSILTA_G(feature_http)) return;
+    if (OTELSILTA_G(curl_injecting)) return;
+    if (ZEND_CALL_NUM_ARGS(ex) < 2) return;
+    zval *zid  = ZEND_CALL_ARG(ex, 1);
+    zval *zarr = ZEND_CALL_ARG(ex, 2);
+    if (!zid || !zarr || Z_TYPE_P(zarr) != IS_ARRAY) return;
+    if (Z_TYPE_P(zid) != IS_OBJECT) return;
+    zend_ulong rid = (zend_ulong)Z_OBJ_P(zid)->handle;
+
+    zend_ulong opt;
+    zend_string *skey;
+    zval *val;
+    ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(zarr), opt, skey, val) {
+        if (!skey) curl_capture_option(rid, (zend_long)opt, val);
+    } ZEND_HASH_FOREACH_END();
+}
+
+/* otelsilta_curl_merge_headers: build a merged CURLOPT_HTTPHEADER array.
+ *
+ * Copies every string entry from `stored` (a previously snapshotted
+ * CURLOPT_HTTPHEADER array, or NULL) into `dst`, skipping any existing
+ * "traceparent:" header (case-insensitive) so we don't emit duplicates,
+ * then appends `traceparent_line`.  Non-string entries are skipped. */
+void otelsilta_curl_merge_headers(zval *dst, HashTable *stored,
+                                   const char *traceparent_line) {
+    array_init(dst);
+    if (stored) {
+        zval *entry;
+        ZEND_HASH_FOREACH_VAL(stored, entry) {
+            if (Z_TYPE_P(entry) != IS_STRING) continue;
+            if (strncasecmp(Z_STRVAL_P(entry), "traceparent:",
+                            sizeof("traceparent:") - 1) == 0) continue;
+            Z_TRY_ADDREF_P(entry);
+            add_next_index_zval(dst, entry);
+        } ZEND_HASH_FOREACH_END();
+    }
+    add_next_index_string(dst, traceparent_line);
 }
 
 /* curl_exec: create HTTP client span, inject traceparent, capture result */
@@ -691,6 +759,7 @@ static void ob_curl_exec_begin(zend_execute_data *ex) {
 
     const char *url    = "unknown";
     const char *method = "GET";
+    otelsilta_curl_info_t *info = NULL;
 
     if (zid) {
         zend_ulong rid = 0;
@@ -703,12 +772,7 @@ static void ob_curl_exec_begin(zend_execute_data *ex) {
         }
 #endif
 
-        typedef struct {
-            char url[OTELSILTA_MAX_STR_LEN];
-            char method[16];
-        } curl_info_t;
-
-        curl_info_t *info = (curl_info_t *)
+        info = (otelsilta_curl_info_t *)
             zend_hash_index_find_ptr(&OTELSILTA_G(curl_handles), rid);
         if (info) {
             url    = info->url;
@@ -726,19 +790,21 @@ static void ob_curl_exec_begin(zend_execute_data *ex) {
         otelsilta_span_set_str(span, "http.method", method);
         otelsilta_span_set_str(span, "http.url",    url);
 
-        /* Inject traceparent header */
+        /* Inject traceparent header, merged with whatever CURLOPT_HTTPHEADER
+         * the app already set on this handle (see otelsilta_curl_merge_headers). */
         if (zid && OTELSILTA_G(trace_id)[0] != '\0') {
             char traceparent[64];
             otelsilta_build_traceparent(
                 OTELSILTA_G(trace_id), span->span_id,
                 1, traceparent, sizeof(traceparent));
 
-            zval z_headers, z_header_str, z_curlopt;
-            array_init(&z_headers);
             char hdr[128];
             snprintf(hdr, sizeof(hdr), "traceparent: %s", traceparent);
-            ZVAL_STRING(&z_header_str, hdr);
-            add_next_index_zval(&z_headers, &z_header_str);
+            zval z_headers, z_curlopt;
+            otelsilta_curl_merge_headers(&z_headers,
+                (info && Z_TYPE(info->headers) == IS_ARRAY)
+                    ? Z_ARRVAL(info->headers) : NULL,
+                hdr);
             ZVAL_LONG(&z_curlopt, CURLOPT_HTTPHEADER);
 
             zend_function *setopt_fn = (zend_function *)
@@ -752,8 +818,14 @@ static void ob_curl_exec_begin(zend_execute_data *ex) {
                 ZVAL_COPY_VALUE(&params[0], zid);
                 ZVAL_COPY_VALUE(&params[1], &z_curlopt);
                 ZVAL_COPY_VALUE(&params[2], &z_headers);
+                /* Suppress curl_setopt's own observer hook while we make
+                 * this internal call — otherwise our injected, merged
+                 * header array would be re-captured as "app state" and
+                 * clobber the very snapshot we just merged from. */
+                OTELSILTA_G(curl_injecting) = 1;
                 zend_call_known_function(
                     setopt_fn, NULL, NULL, &retval_tmp, 3, params, NULL);
+                OTELSILTA_G(curl_injecting) = 0;
                 zval_ptr_dtor(&retval_tmp);
             }
             zval_ptr_dtor(&z_headers);

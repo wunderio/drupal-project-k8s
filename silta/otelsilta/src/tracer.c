@@ -88,6 +88,7 @@ void otelsilta_tracer_request_init(void) {
     OTELSILTA_G(is_sampled)        = 0;
     OTELSILTA_G(has_error)         = 0;
     OTELSILTA_G(request_excluded)  = 0;
+    OTELSILTA_G(curl_injecting)    = 0;
     OTELSILTA_G(root_span)         = NULL;
     OTELSILTA_G(span_stack_depth)  = 0;
     OTELSILTA_G(all_spans)         = NULL;

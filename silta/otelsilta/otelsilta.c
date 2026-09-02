@@ -336,6 +336,18 @@ PHP_FUNCTION(otelsilta_test_span_attribute_count) {
     RETURN_LONG((zend_long)span->attribute_count);
 }
 
+/* internal test seam — not a public API */
+PHP_FUNCTION(otelsilta_test_merge_headers) {
+    zval *headers = NULL;
+    char *line; size_t line_len;
+    ZEND_PARSE_PARAMETERS_START(2, 2)
+        Z_PARAM_ARRAY_OR_NULL(headers)
+        Z_PARAM_STRING(line, line_len)
+    ZEND_PARSE_PARAMETERS_END();
+    otelsilta_curl_merge_headers(return_value,
+        headers ? Z_ARRVAL_P(headers) : NULL, line);
+}
+
 /* ===== Function table ===== */
 
 /* Arginfo for userland functions (PHP 8.0+) */
@@ -366,6 +378,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_span_attribute_count, 0, 0, 1)
     ZEND_ARG_TYPE_INFO(0, handle, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_merge_headers, 0, 0, 2)
+    ZEND_ARG_TYPE_INFO(0, headers, IS_ARRAY, 1)
+    ZEND_ARG_TYPE_INFO(0, line, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_span_start,          arginfo_otelsilta_span_start)
     PHP_FE(otelsilta_span_finish,         arginfo_otelsilta_span_finish)
@@ -374,6 +391,7 @@ static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_force_sample_request, arginfo_otelsilta_force_sample_request)
     PHP_FE(otelsilta_test_span_count,     arginfo_otelsilta_test_span_count)
     PHP_FE(otelsilta_test_span_attribute_count, arginfo_otelsilta_test_span_attribute_count)
+    PHP_FE(otelsilta_test_merge_headers, arginfo_otelsilta_test_merge_headers)
     PHP_FE_END
 };
 
@@ -531,7 +549,7 @@ PHP_RSHUTDOWN_FUNCTION(otelsilta) {
         void *ptr;
         ZEND_HASH_FOREACH_NUM_KEY_PTR(&OTELSILTA_G(curl_handles), idx, ptr) {
             (void)idx;
-            if (ptr) efree(ptr);
+            otelsilta_observer_curl_info_free(ptr);
         } ZEND_HASH_FOREACH_END();
         zend_hash_destroy(&OTELSILTA_G(curl_handles));
     }

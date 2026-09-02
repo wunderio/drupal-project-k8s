@@ -132,6 +132,9 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     bool           has_error;
     bool           request_excluded;  /* URL matched excluded_urls */
     bool           cli_mode;          /* 1 when running under CLI SAPI */
+    bool           curl_injecting;    /* 1 while our own curl_setopt call for
+                                        * traceparent injection is in flight,
+                                        * so it isn't re-captured as app state */
     char                trace_id[33];
     otelsilta_span_t   *root_span;
     otelsilta_span_t   *span_stack[OTELSILTA_SPAN_STACK_SIZE];

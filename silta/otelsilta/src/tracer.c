@@ -106,6 +106,9 @@ void otelsilta_tracer_request_init(void) {
 
     /* NULL dtor: entries are emalloc'd structs freed at request end. */
     zend_hash_init(&OTELSILTA_G(curl_handles), 8, NULL, NULL, 0);
+
+    OTELSILTA_G(next_span_handle) = 0;
+    zend_hash_init(&OTELSILTA_G(span_handles), 8, NULL, NULL, 0);
 }
 
 /* ---- URL exclusion check ---- */

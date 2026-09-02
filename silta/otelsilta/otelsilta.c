@@ -239,6 +239,15 @@ void otelsilta_debug_log(const char *fmt, ...) {
     fprintf(stderr, "[otelsilta] %s\n", msg);
 }
 
+/* ===== Span handle registry ===== */
+
+static otelsilta_span_t *otelsilta_resolve_span_handle(zend_long h) {
+    /* request_active implies tracer_request_init ran, so the table exists. */
+    if (h <= 0 || !OTELSILTA_G(request_active)) return NULL;
+    return (otelsilta_span_t *)
+        zend_hash_index_find_ptr(&OTELSILTA_G(span_handles), (zend_ulong)h);
+}
+
 /* ===== PHP functions exposed to userland ===== */
 
 /* otelsilta_span_start(string $name): resource|false */
@@ -255,8 +264,9 @@ PHP_FUNCTION(otelsilta_span_start) {
     if (!span) {
         RETURN_FALSE;
     }
-    /* Return span pointer as a long (not a real resource, but usable) */
-    RETURN_LONG((zend_long)(uintptr_t)span);
+    zend_long h = ++OTELSILTA_G(next_span_handle);
+    zend_hash_index_add_new_ptr(&OTELSILTA_G(span_handles), (zend_ulong)h, span);
+    RETURN_LONG(h);
 }
 
 /* otelsilta_span_finish(int $handle): void */
@@ -266,7 +276,7 @@ PHP_FUNCTION(otelsilta_span_finish) {
         Z_PARAM_LONG(handle)
     ZEND_PARSE_PARAMETERS_END();
 
-    otelsilta_span_t *span = (otelsilta_span_t *)(uintptr_t)handle;
+    otelsilta_span_t *span = otelsilta_resolve_span_handle(handle);
     otelsilta_tracer_end_span(span);
 }
 
@@ -283,7 +293,7 @@ PHP_FUNCTION(otelsilta_span_set_attribute) {
         Z_PARAM_ZVAL(value)
     ZEND_PARSE_PARAMETERS_END();
 
-    otelsilta_span_t *span = (otelsilta_span_t *)(uintptr_t)handle;
+    otelsilta_span_t *span = otelsilta_resolve_span_handle(handle);
     if (!span) return;
 
     switch (Z_TYPE_P(value)) {
@@ -331,7 +341,7 @@ PHP_FUNCTION(otelsilta_test_span_attribute_count) {
     ZEND_PARSE_PARAMETERS_START(1, 1)
         Z_PARAM_LONG(handle)
     ZEND_PARSE_PARAMETERS_END();
-    otelsilta_span_t *span = (otelsilta_span_t *)(uintptr_t)handle;
+    otelsilta_span_t *span = otelsilta_resolve_span_handle(handle);
     if (!span) RETURN_LONG(-1);
     RETURN_LONG((zend_long)span->attribute_count);
 }
@@ -553,6 +563,8 @@ PHP_RSHUTDOWN_FUNCTION(otelsilta) {
         } ZEND_HASH_FOREACH_END();
         zend_hash_destroy(&OTELSILTA_G(curl_handles));
     }
+
+    zend_hash_destroy(&OTELSILTA_G(span_handles));
 
     return SUCCESS;
 }

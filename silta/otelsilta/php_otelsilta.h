@@ -155,6 +155,11 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     /* curl handle → URL mapping (key=resource_id as zend_long) */
     HashTable           curl_handles;
 
+    /* Userland span-handle registry: opaque incrementing IDs → span ptr.
+     * Never hand raw pointers to PHP. */
+    HashTable           span_handles;
+    zend_long           next_span_handle;
+
     /* --- Observer API per-request state --- */
     otelsilta_span_t   *ob_span_stack[OTELSILTA_OB_SPAN_STACK_SIZE];
     int                 ob_span_stack_depth;

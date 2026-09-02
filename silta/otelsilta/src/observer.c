@@ -226,6 +226,9 @@ static inline int is_in_list(const char *name, const char **list) {
  * settings (enabled, feature flags, request_active, span depth, …).
  * Only function-name / class-name matching is safe here.
  * All runtime gating goes in the begin handlers.
+ * Exception: PHP_INI_SYSTEM settings (e.g. otelsilta.features.functions)
+ * are fixed at process start and cannot change per-request, so they are
+ * safe to consult here too; PHP_INI_ALL / per-request state remain forbidden.
  * ================================================================ */
 
 zend_observer_fcall_handlers otelsilta_observer_fcall_init(

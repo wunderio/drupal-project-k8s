@@ -1155,7 +1155,18 @@ static void ob_func_end(zend_execute_data *ex, zval *retval) {
     }
 }
 
-/* Bailout safety: free frames whose end handler never ran. */
+/* Bailout safety: free frames whose end handler never ran, and neutralise
+ * every other observer stack so a stranded end handler has nothing left
+ * to pop.  zend_observer_fcall_end_all() runs during shutdown_executor
+ * AFTER module RSHUTDOWN, so on a bailout mid-observed-call (e.g. OOM
+ * inside a Twig render, or a fatal in a curl callback) the engine still
+ * invokes end handlers for calls that were in flight when RSHUTDOWN ran.
+ * By then otelsilta_tracer_request_shutdown() has already freed every
+ * span, so a late ob_tpl_end/ob_curl_exec_end popping ob_span_stack (or
+ * an end handler popping ob_meta_stack) would read/write a dangling
+ * pointer into freed Zend MM memory -- corrupting the next request on
+ * this worker.  Resetting all three stacks here, before span teardown,
+ * makes every such pop a no-op instead. */
 void otelsilta_observer_functions_rshutdown(void) {
     while (OTELSILTA_G(func_frame_depth) > 0) {
         int fd = --OTELSILTA_G(func_frame_depth);
@@ -1167,4 +1178,12 @@ void otelsilta_observer_functions_rshutdown(void) {
         OTELSILTA_G(func_frames)[fd].span = NULL;
         OTELSILTA_G(func_frames)[fd].ex   = NULL;
     }
+
+    /* Also neutralise the older observer stacks: on bailout,
+     * zend_observer_fcall_end_all() runs AFTER RSHUTDOWN has freed all
+     * spans — a stranded ob_tpl_end/ob_curl_exec_end must pop NULL, not a
+     * dangling span pointer. (Same pattern as the func_frames reset above.) */
+    OTELSILTA_G(ob_span_stack_depth) = 0;
+    memset(OTELSILTA_G(ob_span_stack), 0, sizeof(OTELSILTA_G(ob_span_stack)));
+    ob_meta_stack_depth = 0;
 }

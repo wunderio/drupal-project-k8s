@@ -171,8 +171,9 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     /* Span aggregation buffer (DB + cache operations) */
     HashTable          *agg_buckets;   /* key → otelsilta_agg_bucket_t* */
 
-    /* Deferred function-span frames (observer begin/end pairing).
-     * NOTE: NTS-only design, like ob_meta_stack in observer.c. */
+    /* Deferred function-span frames (observer begin/end pairing). Lives in
+     * module globals (per-thread under ZTS); note observer.c's
+     * ob_meta_stack is a file static and genuinely NTS-only. */
     struct {
         zend_execute_data *ex;
         otelsilta_span_t  *span;

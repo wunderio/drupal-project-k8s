@@ -33,8 +33,9 @@ static void otelsilta_throw_exception_hook(zend_object *exception) {
                 zend_class_entry *ce = exception->ce;
                 const char *cname = ce ? ZSTR_VAL(ce->name) : "Exception";
 
+                zval rv;
                 zval *msg_zv = zend_read_property(ce, exception,
-                    "message", sizeof("message") - 1, 1, NULL);
+                    "message", sizeof("message") - 1, 1, &rv);
                 const char *msg = (msg_zv && Z_TYPE_P(msg_zv) == IS_STRING)
                                   ? Z_STRVAL_P(msg_zv) : "";
 
@@ -58,6 +59,7 @@ static void otelsilta_throw_exception_hook(zend_object *exception) {
 
                 otelsilta_span_add_event(span, cname, msg, st);
 
+                if (msg_zv == &rv) zval_ptr_dtor(&rv);
                 if (Z_TYPE(trace_str) != IS_UNDEF) zval_ptr_dtor(&trace_str);
             }
         }

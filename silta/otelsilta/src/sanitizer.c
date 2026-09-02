@@ -17,32 +17,49 @@ void otelsilta_sanitize_sql(const char *sql, char *out, size_t out_size) {
     for (size_t i = 0; i < len && j + 2 < out_size; i++) {
         char c = sql[i];
 
-        /* Single-quoted string */
-        if (c == '\'') {
+        /* Quoted literal: handles SQL doubled-quote escapes ('') and backslash escapes */
+        if (c == '\'' || c == '"') {
+            char q = c;
             if (j + 3 < out_size) {
-                out[j++] = '\'';
+                out[j++] = q;
                 out[j++] = '?';
-                out[j++] = '\'';
+                out[j++] = q;
             }
             i++;
+            int escaped = 0;
             while (i < len) {
-                if (sql[i] == '\'' &&
-                    (i == 0 || sql[i - 1] != '\\')) { break; }
+                if (escaped) {
+                    escaped = 0;
+                    i++;
+                    continue;
+                }
+                if (sql[i] == '\\') {
+                    escaped = 1;
+                    i++;
+                    continue;
+                }
+                if (sql[i] == q) {
+                    if (i + 1 < len && sql[i + 1] == q) {
+                        i += 2;
+                    } else {
+                        break;
+                    }
+                }
                 i++;
             }
             continue;
         }
 
-        /* Double-quoted string */
-        if (c == '"') {
-            if (j + 3 < out_size) {
-                out[j++] = '"';
-                out[j++] = '?';
-                out[j++] = '"';
-            }
+        /* Hex literal (0x1F) */
+        if (c == '0' && i + 1 < len && (sql[i + 1] == 'x' || sql[i + 1] == 'X') &&
+            j > 0 &&
+            (isspace((unsigned char)out[j - 1]) ||
+             out[j - 1] == '='  || out[j - 1] == ',' ||
+             out[j - 1] == '('  || out[j - 1] == '>' ||
+             out[j - 1] == '<')) {
+            out[j++] = '?';
             i++;
-            while (i < len) {
-                if (sql[i] == '"' && (i == 0 || sql[i - 1] != '\\')) break;
+            while (i + 1 < len && isxdigit((unsigned char)sql[i + 1])) {
                 i++;
             }
             continue;
@@ -53,7 +70,8 @@ void otelsilta_sanitize_sql(const char *sql, char *out, size_t out_size) {
             (isspace((unsigned char)out[j - 1]) ||
              out[j - 1] == '='  || out[j - 1] == ',' ||
              out[j - 1] == '('  || out[j - 1] == '>' ||
-             out[j - 1] == '<')) {
+             out[j - 1] == '<'  || out[j - 1] == '-' ||
+             out[j - 1] == '+')) {
             out[j++] = '?';
             while (i + 1 < len &&
                    (isdigit((unsigned char)sql[i + 1]) ||

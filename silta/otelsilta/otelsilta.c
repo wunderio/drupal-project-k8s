@@ -417,6 +417,16 @@ PHP_FUNCTION(otelsilta_test_sanitize_url) {
     RETURN_STRING(clean_url);
 }
 
+PHP_FUNCTION(otelsilta_test_sanitize_sql) {
+    char *sql; size_t sql_len;
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+        Z_PARAM_STRING(sql, sql_len)
+    ZEND_PARSE_PARAMETERS_END();
+    char out[OTELSILTA_MAX_STR_LEN];
+    otelsilta_sanitize_sql(sql, out, sizeof(out));
+    RETURN_STRING(out);
+}
+
 /* ===== Function table ===== */
 
 /* Arginfo for userland functions (PHP 8.0+) */
@@ -463,6 +473,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_sanitize_url, 0, 0, 1)
     ZEND_ARG_TYPE_INFO(0, url, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_sanitize_sql, 0, 0, 1)
+    ZEND_ARG_TYPE_INFO(0, sql, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_span_start,          arginfo_otelsilta_span_start)
     PHP_FE(otelsilta_span_finish,         arginfo_otelsilta_span_finish)
@@ -475,6 +489,7 @@ static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_test_spans,          arginfo_otelsilta_test_spans)
     PHP_FE(otelsilta_test_parse_traceparent, arginfo_otelsilta_test_parse_traceparent)
     PHP_FE(otelsilta_test_sanitize_url,   arginfo_otelsilta_test_sanitize_url)
+    PHP_FE(otelsilta_test_sanitize_sql,   arginfo_otelsilta_test_sanitize_sql)
     PHP_FE_END
 };
 

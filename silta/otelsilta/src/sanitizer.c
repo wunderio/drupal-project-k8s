@@ -41,6 +41,7 @@ void otelsilta_sanitize_sql(const char *sql, char *out, size_t out_size) {
                 if (sql[i] == q) {
                     if (i + 1 < len && sql[i + 1] == q) {
                         i += 2;
+                        continue;
                     } else {
                         break;
                     }

@@ -222,11 +222,15 @@ void otelsilta_tracer_make_sampling_decision(void) {
             parent_trace_id, parent_span_id, &flags);
     }
 
-    /* Sampling decision */
-    double r = otelsilta_random01();
-    int sampled = (r < OTELSILTA_G(sample_rate));
-    /* If parent said sampled, honour it */
-    if (has_parent && (flags & 0x01)) sampled = 1;
+    /* A valid parent's decision wins BOTH ways: sampling only part of a
+     * distributed trace produces orphaned fragments. The local rate applies
+     * to parentless requests only. */
+    int sampled;
+    if (has_parent) {
+        sampled = (flags & 0x01) ? 1 : 0;
+    } else {
+        sampled = (otelsilta_random01() < OTELSILTA_G(sample_rate));
+    }
 
     OTELSILTA_G(is_sampled) = sampled;
 

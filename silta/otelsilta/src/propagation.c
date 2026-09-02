@@ -20,7 +20,12 @@ int otelsilta_parse_traceparent(
     size_t len = strlen(header);
     if (len < 55) return 0;
 
-    if (header[0] != '0' || header[1] != '0' || header[2] != '-') return 0;
+    /* version: 2 hex chars; 0xff is forbidden by the W3C spec. Future
+     * versions are parsed per the 00 layout (spec-sanctioned fallback). */
+    if (!isxdigit((unsigned char)header[0]) ||
+        !isxdigit((unsigned char)header[1]) || header[2] != '-') return 0;
+    if (tolower((unsigned char)header[0]) == 'f' &&
+        tolower((unsigned char)header[1]) == 'f') return 0;
 
     /* trace-id: chars 3..34 */
     for (int i = 3; i < 35; i++) {
@@ -51,6 +56,13 @@ int otelsilta_parse_traceparent(
     int all_zero = 1;
     for (int i = 0; i < 32; i++) {
         if (trace_id_out[i] != '0') { all_zero = 0; break; }
+    }
+    if (all_zero) return 0;
+
+    /* Reject all-zeros parent span-id */
+    all_zero = 1;
+    for (int i = 0; i < 16; i++) {
+        if (span_id_out[i] != '0') { all_zero = 0; break; }
     }
     if (all_zero) return 0;
 

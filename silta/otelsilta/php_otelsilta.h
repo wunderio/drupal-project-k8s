@@ -178,6 +178,7 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
         uint64_t           start_ns;
     }                   func_frames[OTELSILTA_SPAN_STACK_SIZE];
     int                 func_frame_depth;
+    bool                request_initialized;
 ZEND_END_MODULE_GLOBALS(otelsilta)
 
 #ifdef ZTS

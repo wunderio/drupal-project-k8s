@@ -62,7 +62,7 @@ static void php_otelsilta_init_globals(zend_otelsilta_globals *g) {
 
 PHP_INI_BEGIN()
     /* Core */
-    STD_PHP_INI_BOOLEAN("otelsilta.enabled",       "1",       PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.enabled",       "1",       PHP_INI_SYSTEM,
         OnUpdateBool,   enabled,       zend_otelsilta_globals, otelsilta_globals)
     STD_PHP_INI_ENTRY("otelsilta.otel_service_name",    "", PHP_INI_ALL,
         OnUpdateString, otel_service_name,  zend_otelsilta_globals, otelsilta_globals)
@@ -82,19 +82,19 @@ PHP_INI_BEGIN()
         zend_otelsilta_globals, otelsilta_globals)
 
     /* Feature toggles */
-    STD_PHP_INI_BOOLEAN("otelsilta.features.errors",     "1", PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.features.errors",     "1", PHP_INI_SYSTEM,
         OnUpdateBool, feature_errors,     zend_otelsilta_globals, otelsilta_globals)
-    STD_PHP_INI_BOOLEAN("otelsilta.features.db",         "1", PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.features.db",         "1", PHP_INI_SYSTEM,
         OnUpdateBool, feature_db,         zend_otelsilta_globals, otelsilta_globals)
-    STD_PHP_INI_BOOLEAN("otelsilta.features.http",       "1", PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.features.http",       "1", PHP_INI_SYSTEM,
         OnUpdateBool, feature_http,       zend_otelsilta_globals, otelsilta_globals)
-    STD_PHP_INI_BOOLEAN("otelsilta.features.cache",      "0", PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.features.cache",      "0", PHP_INI_SYSTEM,
         OnUpdateBool, feature_cache,      zend_otelsilta_globals, otelsilta_globals)
-    STD_PHP_INI_BOOLEAN("otelsilta.features.templates",  "0", PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.features.templates",  "0", PHP_INI_SYSTEM,
         OnUpdateBool, feature_templates,  zend_otelsilta_globals, otelsilta_globals)
     STD_PHP_INI_BOOLEAN("otelsilta.features.functions",  "0", PHP_INI_SYSTEM,
         OnUpdateBool, feature_functions,  zend_otelsilta_globals, otelsilta_globals)
-    STD_PHP_INI_BOOLEAN("otelsilta.features.profiling",  "0", PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.features.profiling",  "0", PHP_INI_SYSTEM,
         OnUpdateBool, feature_profiling,  zend_otelsilta_globals, otelsilta_globals)
 
     /* Limits */
@@ -532,7 +532,7 @@ PHP_RINIT_FUNCTION(otelsilta) {
 }
 
 PHP_RSHUTDOWN_FUNCTION(otelsilta) {
-    if (!OTELSILTA_G(enabled)) return SUCCESS;
+    if (!OTELSILTA_G(request_initialized)) return SUCCESS;
 
     if (OTELSILTA_G(feature_profiling) && OTELSILTA_G(request_active)) {
         otelsilta_span_t *root = OTELSILTA_G(root_span);
@@ -577,6 +577,7 @@ PHP_RSHUTDOWN_FUNCTION(otelsilta) {
 
     zend_hash_destroy(&OTELSILTA_G(span_handles));
 
+    OTELSILTA_G(request_initialized) = 0;
     return SUCCESS;
 }
 

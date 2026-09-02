@@ -110,6 +110,7 @@ void otelsilta_tracer_request_init(void) {
 
     OTELSILTA_G(next_span_handle) = 0;
     zend_hash_init(&OTELSILTA_G(span_handles), 8, NULL, NULL, 0);
+    OTELSILTA_G(request_initialized) = 1;
 }
 
 /* ---- URL exclusion check ---- */

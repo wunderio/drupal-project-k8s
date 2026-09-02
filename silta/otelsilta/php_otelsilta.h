@@ -89,6 +89,7 @@ typedef struct _otelsilta_span_t {
     otelsilta_attribute_t   attributes[OTELSILTA_MAX_ATTRIBUTES];
     int                     attribute_count;
     int                     is_finished;
+    int                     force_keep;    /* a kept child/observer span pins this ancestor */
     otelsilta_span_event_t *events;        /* NULL until first event */
     int                     event_count;
     int                     event_dropped; /* throws beyond the per-span cap */
@@ -169,10 +170,14 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     /* Span aggregation buffer (DB + cache operations) */
     HashTable          *agg_buckets;   /* key → otelsilta_agg_bucket_t* */
 
-    /* Saved original zend_execute_ex / zend_execute_internal pointers
-     * (set in MINIT, restored in MSHUTDOWN). */
-    void (*original_execute_ex)(zend_execute_data *execute_data);
-    void (*original_execute_internal)(zend_execute_data *execute_data, zval *return_value);
+    /* Deferred function-span frames (observer begin/end pairing).
+     * NOTE: NTS-only design, like ob_meta_stack in observer.c. */
+    struct {
+        zend_execute_data *ex;
+        otelsilta_span_t  *span;
+        uint64_t           start_ns;
+    }                   func_frames[OTELSILTA_SPAN_STACK_SIZE];
+    int                 func_frame_depth;
 ZEND_END_MODULE_GLOBALS(otelsilta)
 
 #ifdef ZTS

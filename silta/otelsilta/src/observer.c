@@ -1,14 +1,14 @@
 /*
- * otelsilta_observer.c — Observer API router + zend_execute_ex override.
+ * otelsilta_observer.c — Observer API router.
  *
- * The Observer API (zend_observer_fcall_register) is used for targeted
- * hooks on specific internal functions (PDO, curl, Redis, Memcached,
- * templates).  These work well because the engine caches the returned
- * {begin, end} handlers per function for the process lifetime.
- *
- * Generic userland function tracing uses zend_execute_ex override
- * instead, because it needs to fire on every invocation — the observer
- * API's per-function caching means it won't trace every call.
+ * The Observer API (zend_observer_fcall_register) is used for all
+ * tracing: targeted hooks on specific internal functions (PDO, curl,
+ * Redis, Memcached, templates) as well as generic userland function
+ * tracing.  The engine calls the router once per function on first
+ * invocation and caches the returned {begin, end} handlers for the
+ * process lifetime — but those cached handlers still fire on every
+ * subsequent call to that function, so this is sufficient to trace
+ * every invocation without a zend_execute_ex override.
  */
 
 #include "observer.h"
@@ -59,10 +59,9 @@ static void ob_cache_end(zend_execute_data *ex, zval *retval);
 static void ob_tpl_begin(zend_execute_data *ex);
 static void ob_tpl_end(zend_execute_data *ex, zval *retval);
 
-/* Generic function-level tracing is handled via zend_execute_ex override
- * (see otelsilta_execute_ex below), NOT via the observer API, because
- * the observer caches handler decisions per-function per-process and
- * does not invoke callbacks on every call. */
+/* Generic user-function tracing (feature_functions) */
+static void ob_func_begin(zend_execute_data *ex);
+static void ob_func_end(zend_execute_data *ex, zval *retval);
 
 /* ================================================================
  * Helper: match class name (case-insensitive)
@@ -315,8 +314,11 @@ zend_observer_fcall_handlers otelsilta_observer_fcall_init(
         }
     }
 
-    /* Generic function-level tracing is handled by zend_execute_ex override,
-     * not the observer API. */
+    /* Generic user-function tracing. feature_functions is PHP_INI_SYSTEM,
+     * so it is process-constant and safe to consult in this cached router. */
+    if (OTELSILTA_G(feature_functions) && func->type == ZEND_USER_FUNCTION) {
+        return (zend_observer_fcall_handlers){ob_func_begin, ob_func_end};
+    }
 
     return empty;
 }
@@ -1017,15 +1019,10 @@ static void ob_tpl_end(zend_execute_data *ex, zval *retval) {
     }
 }
 
-/* ================================================================
- * Generic function-level tracing via zend_execute_ex override.
- *
- * Unlike the Observer API (which caches {begin,end} per function per
- * process), this hook is invoked on EVERY userland function call,
- * ensuring complete tracing coverage.
- * ================================================================ */
-
-#define MAX_FUNC_DEPTH 32
+/* ---- Generic user-function tracing (feature_functions, PHP_INI_SYSTEM) ----
+ * Deferred-append: the span is created at begin (so children nest under it)
+ * but only appended to the export list at end if it was slow, errored,
+ * carries events, or was pinned by a kept descendant (force_keep). */
 
 /* Adaptive threshold for generic function spans.
  *
@@ -1082,95 +1079,87 @@ static zend_long otelsilta_effective_function_threshold_ms(void) {
     return dyn;
 }
 
-void otelsilta_execute_ex(zend_execute_data *execute_data) {
-    /* Fast path: call original if tracing is inactive or feature disabled */
-    if (!OTELSILTA_G(request_active) || !OTELSILTA_G(feature_functions)) {
-        if (OTELSILTA_G(original_execute_ex)) {
-            OTELSILTA_G(original_execute_ex)(execute_data);
-        } else {
-            execute_ex(execute_data);
-        }
-        return;
-    }
+static void ob_func_begin(zend_execute_data *ex) {
+    if (!OTELSILTA_G(request_active) || !OTELSILTA_G(feature_functions)) return;
+    zend_function *func = ex->func;
+    if (!func || func->type != ZEND_USER_FUNCTION || !func->common.function_name) return;
+    const char *fn_name = ZSTR_VAL(func->common.function_name);
+    if (strncmp(fn_name, "otelsilta", 9) == 0) return;
+    if (strstr(fn_name, "{closure}") != NULL) return;
+    if (OTELSILTA_G(func_frame_depth) >= OTELSILTA_SPAN_STACK_SIZE) return;
+    int depth = OTELSILTA_G(span_stack_depth);
+    if (depth >= OTELSILTA_SPAN_STACK_SIZE) return;
+    if (OTELSILTA_G(max_span_depth) > 0 && depth >= OTELSILTA_G(max_span_depth)) return;
 
-    zend_function *func = execute_data->func;
-    const char *fn_name = NULL;
-    const char *cls_name = NULL;
-
-    if (func && func->common.function_name) {
-        fn_name = ZSTR_VAL(func->common.function_name);
-    }
-    if (func && func->common.scope) {
-        cls_name = ZSTR_VAL(func->common.scope->name);
-    }
-
-    /* Skip: no name, internal functions, our own extension, or closures.
-     * Closures show up as "{closure}" and produce noisy, low-value spans
-     * (Composer autoloader, framework middleware internals, etc.). */
-    int should_trace = 0;
-    if (func && func->type == ZEND_USER_FUNCTION && fn_name) {
-        if (strncmp(fn_name, "otelsilta", 9) != 0 &&
-            strstr(fn_name, "{closure}") == NULL &&
-            OTELSILTA_G(span_stack_depth) < MAX_FUNC_DEPTH &&
-            (OTELSILTA_G(max_span_depth) == 0 ||
-             OTELSILTA_G(span_stack_depth) < OTELSILTA_G(max_span_depth))) {
-            should_trace = 1;
-        }
-    }
-
-    if (!should_trace) {
-        if (OTELSILTA_G(original_execute_ex)) {
-            OTELSILTA_G(original_execute_ex)(execute_data);
-        } else {
-            execute_ex(execute_data);
-        }
-        return;
-    }
-
-    /* Build span name */
+    const char *cls_name = func->common.scope ? ZSTR_VAL(func->common.scope->name) : NULL;
     char span_name[512];
     snprintf(span_name, sizeof(span_name), "%s%s%s",
-             cls_name ? cls_name : "", cls_name ? "::" : "",
-             fn_name ? fn_name : "{closure}");
+             cls_name ? cls_name : "", cls_name ? "::" : "", fn_name);
 
-    /* Capture start time before execution */
-    uint64_t start_ns = otelsilta_time_ns();
+    const char *parent_id = depth > 0 ? OTELSILTA_G(span_stack)[depth - 1]->span_id : "";
+    otelsilta_span_t *span = otelsilta_span_create(
+        span_name, SPAN_KIND_INTERNAL, OTELSILTA_G(trace_id), parent_id);
+    if (!span) return;
 
-    /* Call the original execute_ex (runs the actual function) */
-    if (OTELSILTA_G(original_execute_ex)) {
-        OTELSILTA_G(original_execute_ex)(execute_data);
-    } else {
-        execute_ex(execute_data);
+    OTELSILTA_G(span_stack)[depth]  = span;
+    OTELSILTA_G(span_stack_depth)   = depth + 1;
+
+    int fd = OTELSILTA_G(func_frame_depth)++;
+    OTELSILTA_G(func_frames)[fd].ex       = ex;
+    OTELSILTA_G(func_frames)[fd].span     = span;
+    OTELSILTA_G(func_frames)[fd].start_ns = span->start_time_ns;
+
+    if (func->op_array.filename) {
+        otelsilta_span_set_str(span, "code.filepath", ZSTR_VAL(func->op_array.filename));
+        otelsilta_span_set_int(span, "code.lineno", (zend_long)func->op_array.line_start);
     }
-
-    /* Duration gating: skip spans shorter than min_span_duration_ms.
-     * 0 = no threshold (keep everything). */
-    uint64_t end_ns      = otelsilta_time_ns();
-    uint64_t duration_ns = end_ns - start_ns;
-    double   duration_ms = (double)duration_ns / 1e6;
-
     OTELSILTA_G(function_calls_seen)++;
+}
 
+static void ob_func_end(zend_execute_data *ex, zval *retval) {
+    (void)retval;
+    int fd = OTELSILTA_G(func_frame_depth);
+    if (fd == 0 || OTELSILTA_G(func_frames)[fd - 1].ex != ex) return; /* begin skipped */
+    OTELSILTA_G(func_frame_depth) = fd - 1;
+    otelsilta_span_t *span     = OTELSILTA_G(func_frames)[fd - 1].span;
+    uint64_t          start_ns = OTELSILTA_G(func_frames)[fd - 1].start_ns;
+
+    otelsilta_span_finish(span);
+    otelsilta_tracer_pop_span(span);
+
+    double duration_ms = (double)(span->end_time_ns - start_ns) / 1e6;
     zend_long threshold = otelsilta_effective_function_threshold_ms();
-    if (threshold > 0 && duration_ms < (double)threshold) {
-        return;
+    int keep = span->force_keep ||
+               span->status == SPAN_STATUS_ERROR ||
+               span->event_count > 0 ||
+               threshold <= 0 ||
+               duration_ms >= (double)threshold;
+
+    if (keep && OTELSILTA_G(max_spans_per_trace) > 0 &&
+        OTELSILTA_G(span_count) >= OTELSILTA_G(max_spans_per_trace)) {
+        keep = 0; /* budget exhausted; accept a possible orphaned child */
     }
 
-    /* Slow enough — create the span and back-date its start time */
-    otelsilta_span_t *span =
-        otelsilta_tracer_start_span(span_name, SPAN_KIND_INTERNAL);
-
-    if (span) {
-        span->start_time_ns = start_ns;
-
-        if (func->op_array.filename) {
-            otelsilta_span_set_str(span, "code.filepath",
-                                    ZSTR_VAL(func->op_array.filename));
-            otelsilta_span_set_int(span, "code.lineno",
-                                    (zend_long)func->op_array.line_start);
-        }
-
+    if (keep) {
+        otelsilta_tracer_append_span(span);
         OTELSILTA_G(function_spans_emitted)++;
-        otelsilta_tracer_end_span(span);
+        int d = OTELSILTA_G(span_stack_depth);
+        if (d > 0) OTELSILTA_G(span_stack)[d - 1]->force_keep = 1;
+    } else {
+        otelsilta_span_free_all(span); /* span->next is NULL: frees only this one */
+    }
+}
+
+/* Bailout safety: free frames whose end handler never ran. */
+void otelsilta_observer_functions_rshutdown(void) {
+    while (OTELSILTA_G(func_frame_depth) > 0) {
+        int fd = --OTELSILTA_G(func_frame_depth);
+        otelsilta_span_t *span = OTELSILTA_G(func_frames)[fd].span;
+        if (span) {
+            otelsilta_tracer_pop_span(span);
+            otelsilta_span_free_all(span);
+        }
+        OTELSILTA_G(func_frames)[fd].span = NULL;
+        OTELSILTA_G(func_frames)[fd].ex   = NULL;
     }
 }

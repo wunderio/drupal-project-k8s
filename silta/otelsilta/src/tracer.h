@@ -18,6 +18,12 @@ otelsilta_span_t *otelsilta_tracer_start_span(const char *name,
 /* Finish the top-of-stack span and pop it. */
 void otelsilta_tracer_end_span(otelsilta_span_t *span);
 
+/* Append an already-created span to the export list (deferred spans). */
+void otelsilta_tracer_append_span(otelsilta_span_t *span);
+
+/* Remove a span from the parent stack without finishing/appending it. */
+void otelsilta_tracer_pop_span(otelsilta_span_t *span);
+
 /* Return the currently active span (top of stack), or NULL. */
 otelsilta_span_t *otelsilta_tracer_current_span(void);
 

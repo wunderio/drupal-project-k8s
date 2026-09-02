@@ -100,6 +100,7 @@ void otelsilta_tracer_request_init(void) {
         OTELSILTA_G(min_span_duration_ms);
     OTELSILTA_G(function_calls_seen)    = 0;
     OTELSILTA_G(function_spans_emitted) = 0;
+    OTELSILTA_G(func_frame_depth)       = 0;
 
     memset(OTELSILTA_G(trace_id), 0, sizeof(OTELSILTA_G(trace_id)));
     memset(OTELSILTA_G(span_stack), 0, sizeof(OTELSILTA_G(span_stack)));
@@ -392,6 +393,7 @@ otelsilta_span_t *otelsilta_tracer_start_span(const char *name,
     int depth = OTELSILTA_G(span_stack_depth);
     if (depth > 0) {
         parent_id = OTELSILTA_G(span_stack)[depth - 1]->span_id;
+        OTELSILTA_G(span_stack)[depth - 1]->force_keep = 1;
     }
 
     otelsilta_span_t *span = otelsilta_span_create(
@@ -416,6 +418,25 @@ void otelsilta_tracer_end_span(otelsilta_span_t *span) {
     for (int i = depth - 1; i >= 0; i--) {
         if (OTELSILTA_G(span_stack)[i] == span) {
             /* Shift remaining entries down */
+            for (int j = i; j < depth - 1; j++) {
+                OTELSILTA_G(span_stack)[j] = OTELSILTA_G(span_stack)[j + 1];
+            }
+            OTELSILTA_G(span_stack_depth)--;
+            break;
+        }
+    }
+}
+
+/* Append an already-created span to the export list (deferred spans). */
+void otelsilta_tracer_append_span(otelsilta_span_t *span) {
+    append_span(span);
+}
+
+/* Remove a span from the parent stack without finishing/appending it. */
+void otelsilta_tracer_pop_span(otelsilta_span_t *span) {
+    int depth = OTELSILTA_G(span_stack_depth);
+    for (int i = depth - 1; i >= 0; i--) {
+        if (OTELSILTA_G(span_stack)[i] == span) {
             for (int j = i; j < depth - 1; j++) {
                 OTELSILTA_G(span_stack)[j] = OTELSILTA_G(span_stack)[j + 1];
             }

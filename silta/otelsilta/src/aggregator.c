@@ -127,6 +127,14 @@ void otelsilta_aggregator_flush(void) {
 
         if (!span) continue;
 
+        /* Re-parent to the root span: the bucket's first-occurrence parent
+         * may be a function span that was since dropped (deferred-append
+         * gating), which would otherwise orphan this rollup span. */
+        if (OTELSILTA_G(root_span)) {
+            strncpy(span->parent_span_id, OTELSILTA_G(root_span)->span_id,
+                    sizeof(span->parent_span_id) - 1);
+        }
+
         /* Timing: use the cumulative DB/cache time as the span duration.
          * NOT the wall-clock window (last_end - first_start), which would
          * span the entire request and be hugely misleading in Grafana.

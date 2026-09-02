@@ -92,7 +92,7 @@ PHP_INI_BEGIN()
         OnUpdateBool, feature_cache,      zend_otelsilta_globals, otelsilta_globals)
     STD_PHP_INI_BOOLEAN("otelsilta.features.templates",  "0", PHP_INI_ALL,
         OnUpdateBool, feature_templates,  zend_otelsilta_globals, otelsilta_globals)
-    STD_PHP_INI_BOOLEAN("otelsilta.features.functions",  "0", PHP_INI_ALL,
+    STD_PHP_INI_BOOLEAN("otelsilta.features.functions",  "0", PHP_INI_SYSTEM,
         OnUpdateBool, feature_functions,  zend_otelsilta_globals, otelsilta_globals)
     STD_PHP_INI_BOOLEAN("otelsilta.features.profiling",  "0", PHP_INI_ALL,
         OnUpdateBool, feature_profiling,  zend_otelsilta_globals, otelsilta_globals)
@@ -358,6 +358,22 @@ PHP_FUNCTION(otelsilta_test_merge_headers) {
         headers ? Z_ARRVAL_P(headers) : NULL, line);
 }
 
+/* internal test seam — not a public API */
+PHP_FUNCTION(otelsilta_test_spans) {
+    ZEND_PARSE_PARAMETERS_NONE();
+    array_init(return_value);
+    if (!OTELSILTA_G(request_active)) return;
+    for (otelsilta_span_t *s = OTELSILTA_G(all_spans); s; s = s->next) {
+        zval row;
+        array_init(&row);
+        add_assoc_string(&row, "name", s->name);
+        add_assoc_string(&row, "span_id", s->span_id);
+        add_assoc_string(&row, "parent_span_id", s->parent_span_id);
+        add_assoc_long(&row, "event_count", (zend_long)s->event_count);
+        add_next_index_zval(return_value, &row);
+    }
+}
+
 /* ===== Function table ===== */
 
 /* Arginfo for userland functions (PHP 8.0+) */
@@ -393,6 +409,9 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_merge_headers, 0, 0, 2)
     ZEND_ARG_TYPE_INFO(0, line, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_spans, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_span_start,          arginfo_otelsilta_span_start)
     PHP_FE(otelsilta_span_finish,         arginfo_otelsilta_span_finish)
@@ -402,6 +421,7 @@ static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_test_span_count,     arginfo_otelsilta_test_span_count)
     PHP_FE(otelsilta_test_span_attribute_count, arginfo_otelsilta_test_span_attribute_count)
     PHP_FE(otelsilta_test_merge_headers, arginfo_otelsilta_test_merge_headers)
+    PHP_FE(otelsilta_test_spans,          arginfo_otelsilta_test_spans)
     PHP_FE_END
 };
 
@@ -420,13 +440,6 @@ PHP_MINIT_FUNCTION(otelsilta) {
          * with the observer API since they target specific functions. */
         otelsilta_observer_register();
 
-        /* Hook zend_execute_ex for generic userland function tracing.
-         * The observer API caches handler decisions per-function per-process
-         * and does not invoke callbacks on every call, so we use the
-         * traditional zend_execute_ex override to trace each invocation. */
-        OTELSILTA_G(original_execute_ex) = zend_execute_ex;
-        zend_execute_ex = otelsilta_execute_ex;
-
         /* Error/exception hooks still use global engine callbacks
          * (zend_throw_exception_hook / zend_error_cb) because they
          * are not function-call observers. */
@@ -440,12 +453,6 @@ PHP_MINIT_FUNCTION(otelsilta) {
 
 PHP_MSHUTDOWN_FUNCTION(otelsilta) {
     otelsilta_errors_mshutdown();
-
-    /* Restore original zend_execute_ex */
-    if (OTELSILTA_G(original_execute_ex)) {
-        zend_execute_ex = OTELSILTA_G(original_execute_ex);
-        OTELSILTA_G(original_execute_ex) = NULL;
-    }
 
     /* Observer API hooks are automatically cleaned up by the engine
      * when the module is unloaded — no explicit unregistration needed. */
@@ -536,6 +543,10 @@ PHP_RSHUTDOWN_FUNCTION(otelsilta) {
                                     (zend_long)zend_memory_peak_usage(0));
         }
     }
+
+    /* Bailout safety: free any deferred function-span frames whose end
+     * handler never ran (e.g. a fatal error mid-call). */
+    otelsilta_observer_functions_rshutdown();
 
     /* Per-feature cleanup before trace export */
     if (OTELSILTA_G(feature_db)) {

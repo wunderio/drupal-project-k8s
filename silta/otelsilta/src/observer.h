@@ -50,15 +50,11 @@ void otelsilta_curl_merge_headers(zval *dst, HashTable *stored_or_null,
 void otelsilta_observer_curl_info_free(void *ptr);
 
 /*
- * zend_execute_ex override for generic userland function tracing.
- *
- * Unlike the Observer API (which caches per-function per-process),
- * this is invoked on every userland function call.  Install in MINIT:
- *     OTELSILTA_G(original_execute_ex) = zend_execute_ex;
- *     zend_execute_ex = otelsilta_execute_ex;
- * Restore in MSHUTDOWN:
- *     zend_execute_ex = OTELSILTA_G(original_execute_ex);
+ * Bailout safety for generic user-function tracing: frees any deferred
+ * function-span frames whose end handler never ran (e.g. a fatal error
+ * mid-call).  Call from RSHUTDOWN, after the profiling block and before
+ * the PDO/aggregator/tracer shutdown calls.
  */
-void otelsilta_execute_ex(zend_execute_data *execute_data);
+void otelsilta_observer_functions_rshutdown(void);
 
 #endif /* OTELSILTA_OBSERVER_H */

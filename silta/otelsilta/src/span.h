@@ -18,7 +18,7 @@ void otelsilta_span_finish(otelsilta_span_t *span);
 void otelsilta_span_set_str(otelsilta_span_t *span, const char *key, const char *value);
 void otelsilta_span_set_int(otelsilta_span_t *span, const char *key, zend_long value);
 void otelsilta_span_set_dbl(otelsilta_span_t *span, const char *key, double value);
-void otelsilta_span_set_bool(otelsilta_span_t *span, const char *key, zend_bool value);
+void otelsilta_span_set_bool(otelsilta_span_t *span, const char *key, bool value);
 
 /* Mark span status. */
 void otelsilta_span_set_status(otelsilta_span_t *span,

@@ -426,7 +426,7 @@ static void db_meta_begin(zend_execute_data *ex,
 }
 
 /* Helper: end a DB operation — decide keep vs aggregate */
-static void db_meta_end(zend_bool is_error) {
+static void db_meta_end(bool is_error) {
     ob_meta_t *meta = ob_pop_meta();
     if (!meta || !meta->valid) return;
 
@@ -900,7 +900,7 @@ static void ob_cache_end(zend_execute_data *ex, zval *retval) {
     const char *fn = get_function_name(ex);
     if (fn && (strcasecmp(fn, "get") == 0 ||
                strcasecmp(fn, "hget") == 0)) {
-        zend_bool miss = (retval &&
+        bool miss = (retval &&
             (Z_TYPE_P(retval) == IS_FALSE || Z_TYPE_P(retval) == IS_NULL));
         otelsilta_span_set_bool(span, "cache.hit", miss ? 0 : 1);
     }

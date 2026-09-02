@@ -49,7 +49,7 @@ typedef struct {
         char       str_val[OTELSILTA_MAX_STR_LEN];
         zend_long  int_val;
         double     dbl_val;
-        zend_bool  bool_val;
+        bool  bool_val;
     } value;
 } otelsilta_attribute_t;
 
@@ -99,7 +99,7 @@ typedef struct _otelsilta_span_t {
 
 ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     /* --- static config (from php.ini) --- */
-    zend_bool  enabled;
+    bool  enabled;
     char      *otel_service_name;
     char      *otel_service_namespace;
     char      *otel_deployment_environment;
@@ -108,17 +108,18 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     double     sample_rate;
     zend_long  slow_request_threshold_ms;
 
-    zend_bool  feature_errors;
-    zend_bool  feature_db;
-    zend_bool  feature_http;
-    zend_bool  feature_cache;
-    zend_bool  feature_templates;
-    zend_bool  feature_functions;
-    zend_bool  feature_profiling;
+    bool  feature_errors;
+    bool  feature_db;
+    bool  feature_http;
+    bool  feature_cache;
+    bool  feature_templates;
+    bool  feature_functions;
+    bool  feature_profiling;
 
     zend_long  max_spans_per_trace;
     zend_long  max_attributes_per_span;
-    zend_bool  debug_mode;
+    bool  debug_mode;
+    bool       cli_enabled;    /* allow tracing under the CLI SAPI (tests) */
     char      *excluded_urls;          /* comma-separated URL prefixes */
 
     /* Span aggregation & gating */
@@ -126,11 +127,11 @@ ZEND_BEGIN_MODULE_GLOBALS(otelsilta)
     zend_long  min_span_duration_ms;   /* threshold gating: min duration to keep individual span (default 1) */
 
     /* --- per-request state (reset in RINIT) --- */
-    zend_bool           request_active;
-    zend_bool           is_sampled;
-    zend_bool           has_error;
-    zend_bool           request_excluded;  /* URL matched excluded_urls */
-    zend_bool           cli_mode;          /* 1 when running under CLI SAPI */
+    bool           request_active;
+    bool           is_sampled;
+    bool           has_error;
+    bool           request_excluded;  /* URL matched excluded_urls */
+    bool           cli_mode;          /* 1 when running under CLI SAPI */
     char                trace_id[33];
     otelsilta_span_t   *root_span;
     otelsilta_span_t   *span_stack[OTELSILTA_SPAN_STACK_SIZE];

@@ -74,7 +74,7 @@ void otelsilta_span_set_dbl(otelsilta_span_t *span, const char *key, double valu
     a->value.dbl_val = value;
 }
 
-void otelsilta_span_set_bool(otelsilta_span_t *span, const char *key, zend_bool value) {
+void otelsilta_span_set_bool(otelsilta_span_t *span, const char *key, bool value) {
     if (!span || !key || span->attribute_count >= attr_limit(span)) return;
     otelsilta_attribute_t *a = &span->attributes[span->attribute_count++];
     strncpy(a->key, key, sizeof(a->key) - 1);

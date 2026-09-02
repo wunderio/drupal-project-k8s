@@ -109,6 +109,10 @@ PHP_INI_BEGIN()
     STD_PHP_INI_BOOLEAN("otelsilta.debug", "0", PHP_INI_ALL,
         OnUpdateBool, debug_mode, zend_otelsilta_globals, otelsilta_globals)
 
+    /* Test/CLI support: treat the CLI SAPI as a normal request. */
+    STD_PHP_INI_BOOLEAN("otelsilta.cli_enabled", "0", PHP_INI_SYSTEM,
+        OnUpdateBool, cli_enabled, zend_otelsilta_globals, otelsilta_globals)
+
     /* URL exclusion */
     STD_PHP_INI_ENTRY("otelsilta.excluded_urls", "", PHP_INI_ALL,
         OnUpdateString, excluded_urls, zend_otelsilta_globals, otelsilta_globals)
@@ -315,6 +319,12 @@ PHP_FUNCTION(otelsilta_force_sample_request) {
     otelsilta_tracer_force_sample();
 }
 
+/* internal test seam — not a public API */
+PHP_FUNCTION(otelsilta_test_span_count) {
+    ZEND_PARSE_PARAMETERS_NONE();
+    RETURN_LONG((zend_long)OTELSILTA_G(span_count));
+}
+
 /* ===== Function table ===== */
 
 /* Arginfo for userland functions (PHP 8.0+) */
@@ -338,12 +348,16 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_force_sample_request, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_span_count, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_span_start,          arginfo_otelsilta_span_start)
     PHP_FE(otelsilta_span_finish,         arginfo_otelsilta_span_finish)
     PHP_FE(otelsilta_span_set_attribute,  arginfo_otelsilta_span_set_attribute)
     PHP_FE(otelsilta_current_trace_id,    arginfo_otelsilta_current_trace_id)
     PHP_FE(otelsilta_force_sample_request, arginfo_otelsilta_force_sample_request)
+    PHP_FE(otelsilta_test_span_count,     arginfo_otelsilta_test_span_count)
     PHP_FE_END
 };
 
@@ -405,7 +419,8 @@ PHP_RINIT_FUNCTION(otelsilta) {
     /* Detect CLI mode early so MINIT hooks (error handler, etc.) can
      * bail out quickly without touching any engine state. */
     OTELSILTA_G(cli_mode) = (sapi_module.name &&
-                              strcmp(sapi_module.name, "cli") == 0) ? 1 : 0;
+                              strcmp(sapi_module.name, "cli") == 0 &&
+                              !OTELSILTA_G(cli_enabled)) ? 1 : 0;
 
     /* Initialise per-request state (always, so RSHUTDOWN can safely
      * destroy curl_handles even when we bail out early). */

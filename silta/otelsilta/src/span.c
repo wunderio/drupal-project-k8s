@@ -7,8 +7,11 @@
 /* ---- helpers ---- */
 
 static int attr_limit(otelsilta_span_t *span) {
+    (void)span;
     zend_long lim = OTELSILTA_G(max_attributes_per_span);
-    if (lim <= 0) lim = OTELSILTA_MAX_ATTRIBUTES;
+    /* Clamp to the compile-time array size: values above
+     * OTELSILTA_MAX_ATTRIBUTES would write past span->attributes[]. */
+    if (lim <= 0 || lim > OTELSILTA_MAX_ATTRIBUTES) lim = OTELSILTA_MAX_ATTRIBUTES;
     return (int)lim;
 }
 

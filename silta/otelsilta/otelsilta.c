@@ -325,6 +325,17 @@ PHP_FUNCTION(otelsilta_test_span_count) {
     RETURN_LONG((zend_long)OTELSILTA_G(span_count));
 }
 
+/* internal test seam — not a public API */
+PHP_FUNCTION(otelsilta_test_span_attribute_count) {
+    zend_long handle = 0;
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+        Z_PARAM_LONG(handle)
+    ZEND_PARSE_PARAMETERS_END();
+    otelsilta_span_t *span = (otelsilta_span_t *)(uintptr_t)handle;
+    if (!span) RETURN_LONG(-1);
+    RETURN_LONG((zend_long)span->attribute_count);
+}
+
 /* ===== Function table ===== */
 
 /* Arginfo for userland functions (PHP 8.0+) */
@@ -351,6 +362,10 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_span_count, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_otelsilta_test_span_attribute_count, 0, 0, 1)
+    ZEND_ARG_TYPE_INFO(0, handle, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_span_start,          arginfo_otelsilta_span_start)
     PHP_FE(otelsilta_span_finish,         arginfo_otelsilta_span_finish)
@@ -358,6 +373,7 @@ static const zend_function_entry otelsilta_functions[] = {
     PHP_FE(otelsilta_current_trace_id,    arginfo_otelsilta_current_trace_id)
     PHP_FE(otelsilta_force_sample_request, arginfo_otelsilta_force_sample_request)
     PHP_FE(otelsilta_test_span_count,     arginfo_otelsilta_test_span_count)
+    PHP_FE(otelsilta_test_span_attribute_count, arginfo_otelsilta_test_span_attribute_count)
     PHP_FE_END
 };
 

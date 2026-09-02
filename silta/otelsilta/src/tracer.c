@@ -11,6 +11,15 @@
 #include <stdlib.h>
 #include <time.h>
 
+/* php_random_bytes_silent():
+ *   PHP 8.2+ moved the random API to ext/random/php_random.h
+ *   PHP 8.0–8.1 keeps it in ext/standard/php_random.h              */
+#if PHP_VERSION_ID >= 80200
+# include "ext/random/php_random.h"
+#else
+# include "ext/standard/php_random.h"
+#endif
+
 /* ---- $_SERVER access helper ----
  *
  * In PHP-FPM, $_SERVER is an auto-global whose backing zval
@@ -153,6 +162,16 @@ static int otelsilta_is_url_excluded(const char *uri) {
     return 0;
 }
 
+/* Uniform double in [0,1) from the CSPRNG. rand() is unusable here: FPM
+ * seeds once in the master, so every worker inherits the same sequence. */
+static double otelsilta_random01(void) {
+    uint64_t r = 0;
+    if (php_random_bytes_silent(&r, sizeof(r)) == FAILURE) {
+        return 0.0; /* fail open: sample */
+    }
+    return (double)(r >> 11) * (1.0 / 9007199254740992.0); /* 53-bit mantissa */
+}
+
 void otelsilta_tracer_make_sampling_decision(void) {
     if (!OTELSILTA_G(enabled)) return;
 
@@ -204,7 +223,7 @@ void otelsilta_tracer_make_sampling_decision(void) {
     }
 
     /* Sampling decision */
-    double r = (double)rand() / (double)RAND_MAX;
+    double r = otelsilta_random01();
     int sampled = (r < OTELSILTA_G(sample_rate));
     /* If parent said sampled, honour it */
     if (has_parent && (flags & 0x01)) sampled = 1;

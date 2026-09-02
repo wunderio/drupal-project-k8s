@@ -431,9 +431,6 @@ PHP_MINIT_FUNCTION(otelsilta) {
     ZEND_INIT_MODULE_GLOBALS(otelsilta, php_otelsilta_init_globals, NULL);
     REGISTER_INI_ENTRIES();
 
-    /* Seed PRNG for sampling decisions */
-    srand((unsigned)time(NULL) ^ (unsigned)getpid());
-
     if (OTELSILTA_G(enabled)) {
         /* Register the central Observer API callback for targeted hooks
          * (PDO, curl, Redis, Memcached, templates).  These work well

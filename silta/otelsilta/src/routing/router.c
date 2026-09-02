@@ -1,6 +1,4 @@
 #include "router.h"
-#include "php_otelsilta.h"
-
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -105,40 +103,4 @@ void otelsilta_normalize_route(const char *path, char *out, size_t out_size) {
 
     if (j == 0 && out_size > 0) { out[j++] = '/'; }
     out[j] = '\0';
-}
-
-/* ---- Framework-aware detection ---- */
-
-void otelsilta_detect_route(const char *uri, char *out, size_t out_size) {
-    if (!out || out_size == 0) return;
-
-    /* Force $_SERVER auto-global creation before access. */
-    {
-        zend_string *name = zend_string_init("_SERVER", sizeof("_SERVER") - 1, 0);
-        zend_is_auto_global(name);
-        zend_string_release(name);
-    }
-
-    /* Laravel: route name may be in $_SERVER['ROUTE_NAME']
-     * or a global PHP variable set by framework middleware */
-    zval *server = &PG(http_globals)[TRACK_VARS_SERVER];
-    if (Z_TYPE_P(server) == IS_ARRAY) {
-        /* Laravel often exposes ROUTE_URI */
-        static const char *keys[] = {
-            "ROUTE_URI", "HTTP_X_ROUTE", NULL
-        };
-        for (int k = 0; keys[k]; k++) {
-            zval *v = zend_hash_str_find(
-                Z_ARRVAL_P(server),
-                keys[k], strlen(keys[k]));
-            if (v && Z_TYPE_P(v) == IS_STRING && Z_STRLEN_P(v) > 0) {
-                strncpy(out, Z_STRVAL_P(v), out_size - 1);
-                out[out_size - 1] = '\0';
-                return;
-            }
-        }
-    }
-
-    /* Fallback: generic normalization */
-    otelsilta_normalize_route(uri, out, out_size);
 }

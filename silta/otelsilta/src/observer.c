@@ -393,8 +393,8 @@ static void db_meta_begin(zend_execute_data *ex,
 
     /* Determine db.system from PDO DSN map */
     const char *db_sys = "other";
-    if (ex->func && ex->func->common.scope) {
-        zend_object *obj = Z_OBJ_P(&ex->This);
+    if (ex->func && ex->func->common.scope && Z_TYPE(ex->This) == IS_OBJECT) {
+        zend_object *obj = Z_OBJ(ex->This);
         if (obj) db_sys = get_db_system_for_object(obj);
     }
     strncpy(meta.db_system, db_sys, sizeof(meta.db_system) - 1);
@@ -495,7 +495,8 @@ static void ob_pdo_construct_begin(zend_execute_data *ex) {
 
 static void ob_pdo_construct_end(zend_execute_data *ex, zval *retval) {
     (void)retval;
-    if (!OTELSILTA_G(request_active) || !OTELSILTA_G(pdo_dsn_map)) return;
+    if (!OTELSILTA_G(request_active) || !OTELSILTA_G(pdo_dsn_map) ||
+        Z_TYPE(ex->This) != IS_OBJECT) return;
 
     if (ZEND_CALL_NUM_ARGS(ex) >= 1) {
         zval *dsn_arg = ZEND_CALL_ARG(ex, 1);
@@ -564,7 +565,8 @@ static void ob_pdo_prepare_end(zend_execute_data *ex, zval *retval) {
 
 /* PDOStatement::execute */
 static void ob_stmt_execute_begin(zend_execute_data *ex) {
-    if (OTELSILTA_G(stmt_sql_map) && OTELSILTA_G(request_active)) {
+    if (OTELSILTA_G(stmt_sql_map) && OTELSILTA_G(request_active) &&
+        Z_TYPE(ex->This) == IS_OBJECT) {
         zend_ulong handle = (zend_ulong)Z_OBJ_P(&ex->This)->handle;
         zval *sql_zv = zend_hash_index_find(OTELSILTA_G(stmt_sql_map), handle);
         if (sql_zv && Z_TYPE_P(sql_zv) == IS_STRING) {

@@ -538,8 +538,10 @@ PHP_RINIT_FUNCTION(otelsilta) {
                               strcmp(sapi_module.name, "cli") == 0 &&
                               !OTELSILTA_G(cli_enabled)) ? 1 : 0;
 
-    /* Initialise per-request state (always, so RSHUTDOWN can safely
-     * destroy curl_handles even when we bail out early). */
+    /* Initialise per-request state. RSHUTDOWN keys its cleanup off
+     * request_initialized, so it runs iff this ran — the CLI
+     * early-return below still gets cleanup; a disabled request
+     * (enabled=0, returned above) skips both. */
     otelsilta_tracer_request_init();
 
     /* Skip full tracing for CLI SAPI — the extension is designed for
@@ -626,7 +628,8 @@ PHP_RSHUTDOWN_FUNCTION(otelsilta) {
     }
 
     /* Finalise root span, export, and free all spans.
-     * Must run after feature cleanups; destroys curl_handles HashTable. */
+     * Must run after feature cleanups. curl_handles/span_handles are
+     * destroyed below. */
     otelsilta_tracer_request_shutdown();
 
     /* Free emalloc'd curl_info entries, then destroy the HashTable itself. */
@@ -672,8 +675,18 @@ PHP_MINFO_FUNCTION(otelsilta) {
     php_info_print_table_row(2,    "Tracing ready",
         OTELSILTA_G(enabled) && config_ok ? "yes" : "no — required config missing");
 
-    php_info_print_table_row(2,    "Features",
-        OTELSILTA_G(feature_errors)    ? "errors "    : "");
+    char feat[128];
+    snprintf(feat, sizeof(feat), "%s%s%s%s%s%s%s",
+        OTELSILTA_G(feature_errors)    ? "errors "    : "",
+        OTELSILTA_G(feature_db)        ? "db "        : "",
+        OTELSILTA_G(feature_http)      ? "http "      : "",
+        OTELSILTA_G(feature_cache)     ? "cache "     : "",
+        OTELSILTA_G(feature_templates) ? "templates " : "",
+        OTELSILTA_G(feature_functions) ? "functions " : "",
+        OTELSILTA_G(feature_profiling) ? "profiling " : "");
+    size_t fl = strlen(feat);
+    if (fl > 0 && feat[fl - 1] == ' ') feat[fl - 1] = '\0';
+    php_info_print_table_row(2, "Features", feat[0] ? feat : "(none)");
     php_info_print_table_end();
     DISPLAY_INI_ENTRIES();
 }

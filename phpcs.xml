@@ -10,6 +10,10 @@
 
     <!-- exclude vendor code -->
     <exclude-pattern>vendor|drush|scripts</exclude-pattern>
+
+    <!-- exclude the otelsilta C extension (not Drupal PHP; contains only
+         minimal FastCGI test-trigger fixtures under test/) -->
+    <exclude-pattern>silta/otelsilta</exclude-pattern>
     <exclude-pattern>web/core|web/*/contrib</exclude-pattern>
     <exclude-pattern>web/_ping.php</exclude-pattern>
     <exclude-pattern>web/autoload.php</exclude-pattern>

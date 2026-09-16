@@ -1,3 +1,0 @@
-# Used when wunderio/silta-images validates a freshly released mailhog image.
-mailhog:
-  enabled: true

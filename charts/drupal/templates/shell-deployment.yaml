@@ -6,6 +6,10 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
     service: shell
+  annotations:
+    # Deploy after the Sync-phase pre-release hooks (wave 1), which in turn run
+    # after the PVCs and ConfigMap they mount (wave 0). Inert outside ArgoCD.
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   replicas: 1
   selector:
@@ -30,7 +34,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: shell
-        image: {{ .Values.shell.image | quote }}
+        image: {{ include "drupal.image" .Values.shell.image | quote }}
         env:
         {{- include "drupal.env" . | indent 8 }}
         {{- if .Values.shell.gitAuth.keyserver.enabled }}

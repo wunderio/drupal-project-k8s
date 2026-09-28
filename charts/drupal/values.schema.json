@@ -484,7 +484,8 @@
                 "enabled": { "type": "boolean" },
                 "url": { "type": "string" },
                 "username": { "type": "string" },
-                "password": { "type": "string" }
+                "password": { "type": "string" },
+                "existingSecret": { "type": "string" }
               }
             },
             "outsideCollaborators": { "type": "boolean" },

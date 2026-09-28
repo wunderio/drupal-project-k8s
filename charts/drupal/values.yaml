@@ -527,6 +527,10 @@ shell:
       url: ''
       username: ''
       password: ''
+      # Name of an existing Secret holding the keys keyserver.username and
+      # keyserver.password. When set, username/password above are ignored and
+      # the chart does not render its own shell Secret.
+      existingSecret: ''
   # Static ssh keys
   # Note: cluster administrator support required for duplicating keys in jumphost.
   authorizedKeys: []

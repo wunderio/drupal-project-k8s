@@ -125,9 +125,16 @@ spec:
   ingress:
   - ports:
     - port: 3306
+    - port: 4567
+    - port: 4568
+    - port: 4444
     - port: 5555
+    - port: 5566
     from:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: mariadb-operator
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: silta-cluster
 {{- end }}

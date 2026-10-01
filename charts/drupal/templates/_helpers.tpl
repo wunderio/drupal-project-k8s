@@ -226,7 +226,7 @@ imagePullSecrets:
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb-ha
-      key: password
+      key: root-password
 {{- end }}
 {{- end }}
 

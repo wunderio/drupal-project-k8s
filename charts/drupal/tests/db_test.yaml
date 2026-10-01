@@ -3,9 +3,11 @@ templates:
   - drupal-configmap.yaml
   - drupal-deployment.yaml
   - drupal-secret.yaml
+  - mariadb-ha.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1
+    - k8s.mariadb.com/v1alpha1
 tests:
   - it: sets mariadb user
     template: drupal-deployment.yaml
@@ -97,3 +99,61 @@ tests:
           content:
             name: DB_HOST
             value: RELEASE-NAME-proxysql
+  - it: sets correct db environments when mariadb-ha enabled and primary db
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: false
+      mariadb-ha.enabled: true
+      db.primary: mariadb-ha
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_USER
+            value: root
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_HOST
+            value: RELEASE-NAME-mariadb-ha-primary
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: RELEASE-NAME-mariadb-ha
+                key: root-password
+  - it: creates drupal user and database in mariadb-ha
+    template: mariadb-ha.yaml
+    documentIndex: 0
+    set:
+      mariadb-ha.enabled: true
+    asserts:
+      - isKind:
+          of: MariaDB
+      - equal:
+          path: spec.database
+          value: drupal
+      - equal:
+          path: spec.username
+          value: drupal
+      - equal:
+          path: spec.podDisruptionBudget.maxUnavailable
+          value: 1
+  - it: fails on even mariadb-ha replica count
+    template: mariadb-ha.yaml
+    set:
+      mariadb-ha.enabled: true
+      mariadb-ha.replicas: 4
+    asserts:
+      - failedTemplate:
+          errorMessage: mariadb-ha.replicas must be an odd number, at least 3
+  - it: fails on too few mariadb-ha replicas
+    template: mariadb-ha.yaml
+    set:
+      mariadb-ha.enabled: true
+      mariadb-ha.replicas: 1
+    asserts:
+      - failedTemplate:
+          errorMessage: mariadb-ha.replicas must be an odd number, at least 3

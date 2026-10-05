@@ -178,9 +178,9 @@ imagePullSecrets:
 {{- end }}
 {{- if index ( index .Values "mariadb-ha" ) "enabled" }}
 - name: MARIADB_HA_DB_USER
-  value: "drupal"
+  value: "{{ (index .Values "mariadb-ha").db.user }}"
 - name: MARIADB_HA_DB_NAME
-  value: "drupal"
+  value: "{{ (index .Values "mariadb-ha").db.name }}"
 - name: MARIADB_HA_DB_HOST
   value: {{ .Release.Name }}-mariadb-ha-primary
 - name: MARIADB_HA_DB_PASS
@@ -219,7 +219,7 @@ imagePullSecrets:
 - name: DB_USER
   value: "root"
 - name: DB_NAME
-  value: "drupal"
+  value: "{{ (index .Values "mariadb-ha").db.name }}"
 - name: DB_HOST
   value: {{ .Release.Name }}-mariadb-ha-primary
 - name: DB_PASS

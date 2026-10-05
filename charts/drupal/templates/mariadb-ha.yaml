@@ -18,8 +18,8 @@ metadata:
     helm.sh/chart: {{ include "drupal.chart" . }}
 spec:
   port: 3306
-  database: drupal
-  username: drupal
+  database: {{ $mariadbha.db.name | quote }}
+  username: {{ $mariadbha.db.user | quote }}
   image: {{ $mariadbha.image | quote }}
   imagePullPolicy: {{ $mariadbha.imagePullPolicy | quote }}
   inheritMetadata:
@@ -107,8 +107,8 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 type: Opaque
 data:
-  password: "{{ $mariadbha.password | b64enc }}"
-  root-password: "{{ $mariadbha.rootPassword | b64enc }}"
+  password: "{{ $mariadbha.db.password | b64enc }}"
+  root-password: "{{ $mariadbha.rootUser.password | b64enc }}"
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

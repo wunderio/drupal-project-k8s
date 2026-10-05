@@ -624,7 +624,22 @@
         "enabled": { "type": "boolean" },
         "image": { "type": "string" },
         "imagePullPolicy": { "type": "string" },
-        "password": { "type": "string" },
+        "rootUser": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "password": { "type": "string" }
+          }
+        },
+        "db": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "user": { "type": "string" },
+            "password": { "type": "string" }
+          }
+        },
         "replicas": { "type": "integer" },
         "persistence": {
           "type": "object",

@@ -157,3 +157,57 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: mariadb-ha.replicas must be an odd number, at least 3
+  - it: sets custom mariadb-ha database name and user in environment
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: false
+      mariadb-ha.enabled: true
+      mariadb-ha.db.name: custom
+      mariadb-ha.db.user: customuser
+      db.primary: mariadb-ha
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_NAME
+            value: custom
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MARIADB_HA_DB_NAME
+            value: custom
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MARIADB_HA_DB_USER
+            value: customuser
+  - it: sets custom mariadb-ha database name and user in MariaDB resource
+    template: mariadb-ha.yaml
+    documentIndex: 0
+    set:
+      mariadb-ha.enabled: true
+      mariadb-ha.db.name: custom
+      mariadb-ha.db.user: customuser
+    asserts:
+      - equal:
+          path: spec.database
+          value: custom
+      - equal:
+          path: spec.username
+          value: customuser
+  - it: sets mariadb-ha passwords in secret
+    template: mariadb-ha.yaml
+    documentIndex: 1
+    set:
+      mariadb-ha.enabled: true
+      mariadb-ha.db.password: userpass
+      mariadb-ha.rootUser.password: rootpass
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: data.password
+          value: dXNlcnBhc3M=
+      - equal:
+          path: data.root-password
+          value: cm9vdHBhc3M=

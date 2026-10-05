@@ -697,8 +697,12 @@ mariadb-ha:
   enabled: false
   image: "docker-registry1.mariadb.com/library/mariadb:11.4"
   imagePullPolicy: IfNotPresent
-  password: drupal
-  rootPassword: drupal
+  rootUser:
+    password: drupal
+  db:
+    name: drupal
+    user: drupal
+    password: drupal
   # Odd number of replicas required, at least 3
   replicas: 3
   persistence:

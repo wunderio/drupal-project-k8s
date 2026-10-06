@@ -62,12 +62,5 @@ php:
     # backup: true
     command: "echo 'Pre-upgrade command'"
 
-
-# mariadb:
-#   enabled: false
-
-mariadb-ha:
+mariadb:
   enabled: true
-
-db:
-  primary: mariadb-ha

@@ -1,0 +1,3 @@
+# Used when wunderio/silta-images validates a freshly released solr image.
+solr:
+  enabled: true

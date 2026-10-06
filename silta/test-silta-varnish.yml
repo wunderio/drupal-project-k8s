@@ -1,0 +1,3 @@
+# Used when wunderio/silta-images validates a freshly released varnish image.
+varnish:
+  enabled: true
